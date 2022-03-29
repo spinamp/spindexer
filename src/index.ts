@@ -30,6 +30,7 @@ const updateDBBatch = async () => {
   }
   const newProcessedDBBlock = parseInt(newNFTs[newNFTs.length - 1].createdAtBlockNumber);
   const newTracks = await processTracksFromNFTs(newNFTs, dbClient, ethClient);
+  await dbClient.update('nfts', newNFTs, newProcessedDBBlock);
   await dbClient.update('tracks', newTracks, newProcessedDBBlock);
 
   numberOfTracks = await dbClient.getNumberRecords('tracks');
