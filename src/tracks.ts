@@ -1,7 +1,3 @@
-import { MusicPlatform } from './platforms';
-
-export type Track = {
+export type SubgraphTrack = {
   id: string
-  createdAtBlockNumber: string
-  platform: MusicPlatform
 }

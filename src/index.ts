@@ -1,6 +1,6 @@
 import db from './local-db';
 import subgraph from './subgraph';
-import { processNFTs } from './nfts';
+import { processTracksFromNFTs } from './nfts';
 
 const SUBGRAPH_ENDPOINT = `http://localhost:8000/subgraphs/name/web3-music-minimal`;
 
@@ -17,8 +17,8 @@ const updateDBBatch = async () => {
     return true;
   }
 
-  let numberOfNFTs = await dbClient.getNumberNFTs();
-  console.log(`DB has ${numberOfNFTs} nfts and has processed up to ${lastProcessedDBBlock}`);
+  let numberOfTracks = await dbClient.getNumberTracks();
+  console.log(`DB has ${numberOfTracks} tracks and has processed up to ${lastProcessedDBBlock}`);
   console.log(`Processing next batch from block ${lastProcessedDBBlock}`);
 
   const newNFTs = await subgraphClient.getNFTsFrom(lastProcessedDBBlock + 1);
@@ -26,12 +26,12 @@ const updateDBBatch = async () => {
     return false;
   }
   const newProcessedDBBlock = parseInt(newNFTs[newNFTs.length - 1].createdAtBlockNumber);
-  const processedNFTs = processNFTs(newNFTs);
-  await dbClient.update('nfts', processedNFTs, newProcessedDBBlock);
+  const newTracks = await processTracksFromNFTs(newNFTs, dbClient);
+  await dbClient.update('tracks', newTracks, newProcessedDBBlock);
 
-  numberOfNFTs = await dbClient.getNumberNFTs();
+  numberOfTracks = await dbClient.getNumberTracks();
   lastProcessedDBBlock = await dbClient.getLastProcessedBlock();
-  console.log(`DB has ${numberOfNFTs} nfts and has processed up to ${lastProcessedDBBlock}`);
+  console.log(`DB has ${numberOfTracks} tracks and has processed up to ${lastProcessedDBBlock}`);
   return false;
 };
 
