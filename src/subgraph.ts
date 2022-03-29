@@ -9,21 +9,33 @@ const QUERIES = {
   getRecordsFrom: (recordType: RecordType, startBlock: Number) => gql`
   {
     ${recordType}s(where:{createdAtBlockNumber_gte:${startBlock}}, orderBy:createdAtBlockNumber, orderDirection: asc, first:${QUERY_LIMIT}) {
-        id
-        createdAtBlockNumber
+      id
+      ${recordType === RecordType.nft ? 'contractAddress' : ''}
+      ${recordType === RecordType.nft ? 'tokenId' : ''}
+      ${recordType === RecordType.nft ? 'platform' : ''}
+      ${recordType === RecordType.nft ? 'track{id}' : ''}
+      createdAtBlockNumber
     }
   }`,
   getRecordsAtBlock: (recordType: RecordType, block: Number) => gql`
   {
     ${recordType}s(where:{createdAtBlockNumber:${block}}, first:${QUERY_LIMIT}) {
-        id
-        createdAtBlockNumber
+      id
+      ${recordType === RecordType.nft ? 'contractAddress' : ''}
+      ${recordType === RecordType.nft ? 'tokenId' : ''}
+      ${recordType === RecordType.nft ? 'platform' : ''}
+      ${recordType === RecordType.nft ? 'track{id}' : ''}
+      createdAtBlockNumber
     }
   }`,
   getLatestRecord: (recordType: RecordType) => gql`
   {
     ${recordType}s(orderBy: createdAtBlockNumber, orderDirection: desc, first: 1) {
       id
+      ${recordType === RecordType.nft ? 'contractAddress' : ''}
+      ${recordType === RecordType.nft ? 'tokenId' : ''}
+      ${recordType === RecordType.nft ? 'platform' : ''}
+      ${recordType === RecordType.nft ? 'track{id}' : ''}
       createdAtBlockNumber
     }
   }`,

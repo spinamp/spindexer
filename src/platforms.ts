@@ -16,5 +16,6 @@ export const platformConfig = {
     metadataURLQuery: 'tokenURI',
   },
   other: {
+    metadataURLQuery: 'tokenURI',
   }
 }
