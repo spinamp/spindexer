@@ -4,11 +4,9 @@ import subgraph from './subgraph';
 import ethereum from './ethereum';
 import { processTracksFromNFTs } from './nfts';
 
-const SUBGRAPH_ENDPOINT = `http://localhost:8000/subgraphs/name/web3-music-minimal`;
-
 const updateDBBatch = async () => {
   const dbClient = await db.init();
-  const subgraphClient = subgraph.init(SUBGRAPH_ENDPOINT);
+  const subgraphClient = subgraph.init(process.env.SUBGRAPH_ENDPOINT!);
   const ethClient = await ethereum.init();
 
   let lastProcessedDBBlock = await dbClient.getLastProcessedBlock();

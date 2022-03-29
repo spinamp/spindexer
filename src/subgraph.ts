@@ -3,12 +3,10 @@ import { request, gql } from 'graphql-request'
 import { Record, RecordType, recordIsInBatch } from './helpers';
 import { NFT } from './nfts';
 
-const QUERY_LIMIT = 20;
-
 const QUERIES = {
   getRecordsFrom: (recordType: RecordType, startBlock: Number) => gql`
   {
-    ${recordType}s(where:{createdAtBlockNumber_gte:${startBlock}}, orderBy:createdAtBlockNumber, orderDirection: asc, first:${QUERY_LIMIT}) {
+    ${recordType}s(where:{createdAtBlockNumber_gte:${startBlock}}, orderBy:createdAtBlockNumber, orderDirection: asc, first:${process.env.SUBGRAPH_QUERY_LIMIT}) {
       id
       ${recordType === RecordType.nft ? 'contractAddress' : ''}
       ${recordType === RecordType.nft ? 'tokenId' : ''}
@@ -19,7 +17,7 @@ const QUERIES = {
   }`,
   getRecordsAtBlock: (recordType: RecordType, block: Number) => gql`
   {
-    ${recordType}s(where:{createdAtBlockNumber:${block}}, first:${QUERY_LIMIT}) {
+    ${recordType}s(where:{createdAtBlockNumber:${block}}, first:${process.env.SUBGRAPH_QUERY_LIMIT}) {
       id
       ${recordType === RecordType.nft ? 'contractAddress' : ''}
       ${recordType === RecordType.nft ? 'tokenId' : ''}
@@ -46,7 +44,7 @@ const init = (endpoint: string) => {
     const fromResponseData = await request(endpoint, QUERIES.getRecordsFrom(type, startBlock));
     const nextRecordBatch = fromResponseData[`${type}s`];
 
-    if (nextRecordBatch.length < QUERY_LIMIT) {
+    if (nextRecordBatch.length < process.env.SUBGRAPH_QUERY_LIMIT!) {
       return nextRecordBatch;
     }
 
