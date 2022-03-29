@@ -29,7 +29,7 @@ const filterExistingTrackNFTs = async (nfts: NFT[], dbClient: DBClient) => {
       console.log({ nft });
       throw new Error('Error processing NFT');
     }
-    const isExistingTrack = (await dbClient.trackExists(nft.track.id)) || newTrackIds[nft.track.id];
+    const isExistingTrack = (await dbClient.recordExists('tracks', nft.track.id)) || newTrackIds[nft.track.id];
     if (!isExistingTrack) {
       newTrackIds[nft.track.id] = true;
       newTrackNFTs.push(nft);
@@ -43,7 +43,6 @@ export const processTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, eth
   const metadataCalls = newTrackNFTs.map(nft => getNFTMetadataCall(nft));
   console.log(`Processing bulk call`);
   const metadataURIs = await ethClient.call(metadataCalls)
-  // todo: do bulk metadata call to get all metadata urls and add to track record
   // todo: do metadata url calls to get all metadata and add to track record
   // todo: postfilter/zora only music&catalog filter/extra noizd calls/extra centralized calls for optimized media
   const newTracks = newTrackNFTs.map((nft, index) => {

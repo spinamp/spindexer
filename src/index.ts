@@ -20,7 +20,7 @@ const updateDBBatch = async () => {
     return true;
   }
 
-  let numberOfTracks = await dbClient.getNumberTracks();
+  let numberOfTracks = await dbClient.getNumberRecords('tracks');
   console.log(`DB has ${numberOfTracks} tracks and has processed up to ${lastProcessedDBBlock}`);
   console.log(`Processing next batch from block ${lastProcessedDBBlock}`);
 
@@ -32,7 +32,7 @@ const updateDBBatch = async () => {
   const newTracks = await processTracksFromNFTs(newNFTs, dbClient, ethClient);
   await dbClient.update('tracks', newTracks, newProcessedDBBlock);
 
-  numberOfTracks = await dbClient.getNumberTracks();
+  numberOfTracks = await dbClient.getNumberRecords('tracks');
   lastProcessedDBBlock = await dbClient.getLastProcessedBlock();
   console.log(`DB has ${numberOfTracks} tracks and has processed up to ${lastProcessedDBBlock}`);
   return false;

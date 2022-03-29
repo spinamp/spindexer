@@ -55,11 +55,11 @@ const init = async (): Promise<DBClient> => {
       db.lastProcessedBlock = newProcessedDBBlock;
       await saveDB(db);
     },
-    getNumberTracks: () => {
-      return db.tracks.length;
+    getNumberRecords: (tableName: string) => {
+      return db[tableName].length;
     },
-    trackExists: (trackID: string) => {
-      return Promise.resolve(!!(db.indexes.tracks[trackID]));
+    recordExists: (tableName: string, recordID: string) => {
+      return Promise.resolve(!!(db.indexes[tableName][recordID]));
     }
   };
 }

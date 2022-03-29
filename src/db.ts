@@ -5,6 +5,6 @@ export type Record = {
 export type DBClient = {
   getLastProcessedBlock: () => Promise<number>;
   update: (tableName: string, rows: Record[], newProcessedDBBlock: Number) => Promise<void>;
-  getNumberTracks: () => any;
-  trackExists: (trackID: string) => Promise<boolean>;
+  getNumberRecords: (tableName: string) => any;
+  recordExists: (tableName: string, recordID: string) => Promise<boolean>;
 }
