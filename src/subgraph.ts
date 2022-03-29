@@ -28,28 +28,40 @@ const QUERIES = {
   }`,
 }
 const init = (endpoint: string) => {
+  const getRecordsFrom = async (type: RecordType, startBlock: Number) => {
+    const fromResponseData = await request(endpoint, QUERIES.getRecordsFrom(type, startBlock));
+    const nextRecordBatch = fromResponseData[`${type}s`];
+
+    if (nextRecordBatch.length < QUERY_LIMIT) {
+      return nextRecordBatch;
+    }
+
+    // We also need to get all records in the last block of a batch to ensure we do not miss
+    // when multiple records are created in a single block and the cursor on the first query
+    // does not include them all.
+    const lastBlockInBatch = nextRecordBatch[nextRecordBatch.length - 1].createdAtBlockNumber;
+    const blockResponseData = await request(endpoint, QUERIES.getRecordsAtBlock(type, lastBlockInBatch));
+    const lastBlockRecords = blockResponseData[`${type}s`];
+    const extraRecords = lastBlockRecords.filter((record: Record) => !recordIsInBatch(record, nextRecordBatch));
+    const allRecords = nextRecordBatch.concat(...extraRecords);
+
+    return allRecords;
+  };
+  const getLatestRecord = async (type: RecordType) => {
+    const data = await request(endpoint, QUERIES.getLatestRecord(type));
+    return data[`${type}s`][0];
+  };
+  const getTracksFrom = async (startBlock: Number) => {
+    return getRecordsFrom(RecordType.track, startBlock);
+  };
+  const getLatestTrack = async () => {
+    return getLatestRecord(RecordType.track);
+  };
   return {
-    getTracksFrom: async (startBlock: Number) => {
-      const { tracks: nextTrackBatch } = await request(endpoint, QUERIES.getRecordsFrom(RecordType.track, startBlock));
-
-      if (nextTrackBatch.length < QUERY_LIMIT) {
-        return nextTrackBatch;
-      }
-
-      // We also need to get all tracks in the last block of a batch to ensure we do not miss
-      // when multiple tracks are minted in a single block and the cursor on the first query
-      // does not include them all.
-      const lastBlockInBatch = nextTrackBatch[nextTrackBatch.length - 1].createdAtBlockNumber;
-      const { tracks: lastBlockTracks } = await request(endpoint, QUERIES.getRecordsAtBlock(RecordType.track, lastBlockInBatch));
-      const extraTracks = lastBlockTracks.filter((track: Record) => !recordIsInBatch(track, nextTrackBatch));
-      const allTracks = nextTrackBatch.concat(...extraTracks);
-
-      return allTracks;
-    },
-    getLatestTrack: async () => {
-      const data = await request(endpoint, QUERIES.getLatestRecord(RecordType.track));
-      return data.tracks[0];
-    },
+    getRecordsFrom,
+    getLatestRecord,
+    getTracksFrom,
+    getLatestTrack
   }
 }
 
