@@ -1,8 +1,9 @@
 import { request, gql } from 'graphql-request'
 
 import { Record, RecordType, recordIsInBatch } from './helpers';
+import { NFT } from './nfts';
 
-const QUERY_LIMIT = 300;
+const QUERY_LIMIT = 20;
 
 const QUERIES = {
   getRecordsFrom: (recordType: RecordType, startBlock: Number) => gql`
@@ -26,7 +27,8 @@ const QUERIES = {
       createdAtBlockNumber
     }
   }`,
-}
+};
+
 const init = (endpoint: string) => {
   const getRecordsFrom = async (type: RecordType, startBlock: Number) => {
     const fromResponseData = await request(endpoint, QUERIES.getRecordsFrom(type, startBlock));
@@ -51,17 +53,17 @@ const init = (endpoint: string) => {
     const data = await request(endpoint, QUERIES.getLatestRecord(type));
     return data[`${type}s`][0];
   };
-  const getTracksFrom = async (startBlock: Number) => {
-    return getRecordsFrom(RecordType.track, startBlock);
+  const getNFTsFrom = async (startBlock: Number): Promise<NFT[]> => {
+    return getRecordsFrom(RecordType.nft, startBlock);
   };
-  const getLatestTrack = async () => {
-    return getLatestRecord(RecordType.track);
+  const getLatestNFT = async () => {
+    return getLatestRecord(RecordType.nft);
   };
   return {
     getRecordsFrom,
     getLatestRecord,
-    getTracksFrom,
-    getLatestTrack
+    getNFTsFrom,
+    getLatestNFT
   }
 }
 

@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 const DB_FILE = process.cwd() + '/localdb/db.json';
 const GLOBAL_STARTING_BLOCK = 11565019;
 
-type Track = {}
+type Record = {}
 
 const loadDB = async () => {
   try {
@@ -20,7 +20,7 @@ const loadDB = async () => {
 }
 
 const createDB = async () => {
-  const initialDB = { lastProcessedBlock: GLOBAL_STARTING_BLOCK, tracks: [], artists: [] };
+  const initialDB = { lastProcessedBlock: GLOBAL_STARTING_BLOCK, nfts: [], artists: [], tracks: [] };
   await saveDB(initialDB);
   return initialDB;
 };
@@ -35,17 +35,17 @@ const init = async () => {
     getLastProcessedBlock: async () => {
       return parseInt(db.lastProcessedBlock);
     },
-    update: async (tableName: string, rows: Track[], newProcessedDBBlock: Number) => {
+    update: async (tableName: string, rows: Record[], newProcessedDBBlock: Number) => {
       const table = db[tableName];
-      rows.forEach((row: Track) => {
+      rows.forEach((row: Record) => {
         return row;
       });
       table.push(...rows);
       db.lastProcessedBlock = newProcessedDBBlock;
       await saveDB(db);
     },
-    getNumberTracks: () => {
-      return db.tracks.length;
+    getNumberNFTs: () => {
+      return db.nfts.length;
     }
   };
 }

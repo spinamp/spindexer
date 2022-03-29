@@ -1,5 +1,6 @@
 import db from './local-db';
 import subgraph from './subgraph';
+import { processNFTs } from './nfts';
 
 const SUBGRAPH_ENDPOINT = `http://localhost:8000/subgraphs/name/web3-music-minimal`;
 
@@ -8,28 +9,29 @@ const updateDBBatch = async () => {
   const subgraphClient = subgraph.init(SUBGRAPH_ENDPOINT);
 
   let lastProcessedDBBlock = await dbClient.getLastProcessedBlock();
-  const latestTrack = await subgraphClient.getLatestTrack();
-  const lastProcessedSubGraphBlock = parseInt(latestTrack.createdAtBlockNumber);
+  const latestNFT = await subgraphClient.getLatestNFT();
+  const lastProcessedSubGraphBlock = parseInt(latestNFT.createdAtBlockNumber);
 
   if (lastProcessedSubGraphBlock === lastProcessedDBBlock) {
     console.log(`DB up to date.`);
     return true;
   }
 
-  let numberOfTracks = await dbClient.getNumberTracks();
-  console.log(`DB has ${numberOfTracks} tracks and has processed up to ${lastProcessedDBBlock}`);
+  let numberOfNFTs = await dbClient.getNumberNFTs();
+  console.log(`DB has ${numberOfNFTs} nfts and has processed up to ${lastProcessedDBBlock}`);
   console.log(`Processing next batch from block ${lastProcessedDBBlock}`);
 
-  const newTracks = await subgraphClient.getTracksFrom(lastProcessedDBBlock + 1);
-  if (newTracks.length === 0) {
+  const newNFTs = await subgraphClient.getNFTsFrom(lastProcessedDBBlock + 1);
+  if (newNFTs.length === 0) {
     return false;
   }
-  const newProcessedDBBlock = parseInt(newTracks[newTracks.length - 1].createdAtBlockNumber);
-  await dbClient.update('tracks', newTracks, newProcessedDBBlock);
+  const newProcessedDBBlock = parseInt(newNFTs[newNFTs.length - 1].createdAtBlockNumber);
+  const processedNFTs = processNFTs(newNFTs);
+  await dbClient.update('nfts', processedNFTs, newProcessedDBBlock);
 
-  numberOfTracks = await dbClient.getNumberTracks();
+  numberOfNFTs = await dbClient.getNumberNFTs();
   lastProcessedDBBlock = await dbClient.getLastProcessedBlock();
-  console.log(`DB has ${numberOfTracks} tracks and has processed up to ${lastProcessedDBBlock}`);
+  console.log(`DB has ${numberOfNFTs} nfts and has processed up to ${lastProcessedDBBlock}`);
   return false;
 };
 
