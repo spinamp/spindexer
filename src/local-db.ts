@@ -3,9 +3,8 @@ import { promises as fs } from 'fs';
 import { Record, DBClient } from './db';
 
 const DB_FILE = process.cwd() + '/localdb/db.json';
-const GLOBAL_STARTING_BLOCK = 11565019;
 const INITIAL_DB = {
-  lastProcessedBlock: GLOBAL_STARTING_BLOCK,
+  lastProcessedBlock: process.env.GLOBAL_STARTING_BLOCK,
   nfts: [],
   artists: [],
   tracks: [],
