@@ -3,8 +3,9 @@ export type Record = {
 }
 
 export type DBClient = {
-  getLastProcessedBlock: () => Promise<number>;
-  update: (tableName: string, rows: Record[], newProcessedDBBlock: Number) => Promise<void>;
+  getLastProcessedBlock: (processor: string) => Promise<number>;
+  insert: (tableName: string, rows: Record[]) => Promise<void>;
+  updateProcessor: (processor: string, newProcessedDBBlock: Number) => Promise<void>;
   getNumberRecords: (tableName: string) => any;
   recordExists: (tableName: string, recordID: string) => Promise<boolean>;
 }

@@ -1,8 +1,7 @@
 import { DBClient } from '../db/db';
 import { SubgraphClient } from '../clients/subgraph';
 
-export const newNFTsCreated = async (dbClient: DBClient, subgraphClient: SubgraphClient) => {
-  let lastProcessedDBBlock = await dbClient.getLastProcessedBlock();
+export const newNFTsCreated = async (dbClient: DBClient, subgraphClient: SubgraphClient, lastProcessedDBBlock: number) => {
   const latestNFT = await subgraphClient.getLatestNFT();
   const lastProcessedSubGraphBlock = parseInt(latestNFT.createdAtBlockNumber);
 

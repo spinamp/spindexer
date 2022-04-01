@@ -5,6 +5,12 @@ This code is intended to become a multi-stage processing pipeline that processes
  - Transforms the database into a more comprehensive schema
  - Saves a new dump of the DB
 
+## Running it
+ - Copy .env.example to .env
+ - Setup ethereum provider and subgraph endpoints
+ - yarn build
+ - yarn start
+
 ## Design Goals
 There are a few design goals for the code:
  - Be fast, up to date and have low latency liveness

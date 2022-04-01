@@ -4,10 +4,14 @@ import { Record, DBClient } from './db';
 
 const DB_FILE = process.cwd() + '/localdb/db.json';
 const INITIAL_DB = {
-  lastProcessedBlock: process.env.GLOBAL_STARTING_BLOCK,
   nfts: [],
   artists: [],
   tracks: [],
+  processors: {
+    createTracksFromNFTs: {
+      lastProcessedBlock: process.env.GLOBAL_STARTING_BLOCK,
+    }
+  },
   indexes: {
     nfts: {},
     artists: {},
@@ -41,10 +45,10 @@ const saveDB = async (contents: any) => {
 const init = async (): Promise<DBClient> => {
   const db = await loadDB();
   return {
-    getLastProcessedBlock: async () => {
-      return parseInt(db.lastProcessedBlock);
+    getLastProcessedBlock: async (processor: string) => {
+      return parseInt(db.processors[processor].lastProcessedBlock);
     },
-    update: async (tableName: string, rows: Record[], newProcessedDBBlock: Number) => {
+    insert: async (tableName: string, rows: Record[]) => {
       const table = db[tableName];
       const index = db.indexes[tableName];
       rows.forEach((row: Record) => {
@@ -52,7 +56,10 @@ const init = async (): Promise<DBClient> => {
         return row;
       });
       table.push(...rows);
-      db.lastProcessedBlock = newProcessedDBBlock;
+      await saveDB(db);
+    },
+    updateProcessor: async (processor: string, newProcessedDBBlock: Number) => {
+      db.processors[processor].lastProcessedBlock = newProcessedDBBlock;
       await saveDB(db);
     },
     getNumberRecords: (tableName: string) => {

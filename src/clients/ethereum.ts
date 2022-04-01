@@ -1,6 +1,6 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract, Provider } from 'ethcall';
-import MetaABI from './abis/MetaABI.json';
+import MetaABI from '../abis/MetaABI.json';
 
 export type EthCall = {
   contractAddress: string,
