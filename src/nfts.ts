@@ -1,24 +1,6 @@
-import { MusicPlatform, platformConfig } from './platforms';
-import { SubgraphTrack } from './tracks';
-import { DBClient } from './db';
-import { EthClient } from './ethereum';
-
-export type NFT = {
-  id: string
-  createdAtBlockNumber: string
-  contractAddress: string
-  tokenId: BigInt
-  platform: MusicPlatform
-  track: SubgraphTrack
-}
-
-const getNFTMetadataCall = (nft: NFT) => {
-  return {
-    contractAddress: nft.contractAddress,
-    callFunction: platformConfig[nft.platform].metadataURLQuery,
-    callInput: nft.tokenId.toString(),
-  };
-};
+import { DBClient } from './db/db';
+import { EthClient } from './clients/ethereum';
+import { NFT, getNFTMetadataCall } from './types/nft';
 
 const filterExistingTrackNFTs = async (nfts: NFT[], dbClient: DBClient) => {
   let newTrackNFTs = [];

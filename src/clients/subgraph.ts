@@ -1,7 +1,14 @@
 import { request, gql } from 'graphql-request'
 
-import { Record, RecordType, recordIsInBatch } from './helpers';
-import { NFT } from './nfts';
+import { Record, RecordType, recordIsInBatch } from '../types/record';
+import { NFT } from '../types/nft';
+
+export type SubgraphClient = {
+  getRecordsFrom: (type: RecordType, startBlock: Number) => Promise<Record[]>;
+  getLatestRecord: (type: RecordType) => Promise<Record>;
+  getNFTsFrom: (startBlock: Number) => Promise<NFT[]>;
+  getLatestNFT: () => Promise<NFT>;
+}
 
 const QUERIES = {
   getRecordsFrom: (recordType: RecordType, startBlock: Number) => gql`
@@ -59,7 +66,7 @@ const init = (endpoint: string) => {
 
     return allRecords;
   };
-  const getLatestRecord = async (type: RecordType) => {
+  const getLatestRecord = async (type: RecordType): Promise<Record> => {
     const data = await request(endpoint, QUERIES.getLatestRecord(type));
     return data[`${type}s`][0];
   };
@@ -67,7 +74,7 @@ const init = (endpoint: string) => {
     return getRecordsFrom(RecordType.nft, startBlock);
   };
   const getLatestNFT = async () => {
-    return getLatestRecord(RecordType.nft);
+    return getLatestRecord(RecordType.nft) as Promise<NFT>;
   };
   return {
     getRecordsFrom,
