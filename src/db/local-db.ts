@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 
-import { Record, DBClient } from './db';
+import { Record, DBClient, Query } from './db';
 
 const DB_FILE = process.cwd() + '/localdb/db.json';
 const INITIAL_DB = {
@@ -9,7 +9,7 @@ const INITIAL_DB = {
   tracks: [],
   processors: {
     createTracksFromNFTs: {
-      lastProcessedBlock: process.env.GLOBAL_STARTING_BLOCK,
+      cursor: process.env.GLOBAL_STARTING_BLOCK,
     }
   },
   indexes: {
@@ -45,8 +45,15 @@ const saveDB = async (contents: any) => {
 const init = async (): Promise<DBClient> => {
   const db = await loadDB();
   return {
-    getLastProcessedBlock: async (processor: string) => {
-      return parseInt(db.processors[processor].lastProcessedBlock);
+    getCursor: async (processor: string): Promise<(number | undefined)> => {
+      return parseInt(db.processors[processor].cursor);
+    },
+    getRecords: async (tableName: string, query?: Query): (Promise<Record[]>) => {
+      const allRecords = db[tableName]
+      if (query) {
+        return allRecords.filter((record: Record) => record[query.where.key as keyof Record] === query.where.value);
+      }
+      return allRecords;
     },
     insert: async (tableName: string, rows: Record[]) => {
       const table = db[tableName];
@@ -59,7 +66,7 @@ const init = async (): Promise<DBClient> => {
       await saveDB(db);
     },
     updateProcessor: async (processor: string, newProcessedDBBlock: Number) => {
-      db.processors[processor].lastProcessedBlock = newProcessedDBBlock;
+      db.processors[processor].cursor = newProcessedDBBlock;
       await saveDB(db);
     },
     getNumberRecords: (tableName: string) => {

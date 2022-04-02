@@ -1,9 +1,16 @@
 import { EthClient } from "../clients/ethereum";
+import { SubgraphClient } from "../clients/subgraph";
 import { DBClient } from "../db/db";
-import { Trigger } from "./trigger";
+import { Cursor, Trigger } from "./trigger";
+
+export type Clients = {
+  eth: EthClient,
+  db: DBClient,
+  subgraph: SubgraphClient,
+}
 
 export type Processor = {
   name: string,
-  trigger: Trigger,
-  processorFunction: (newTriggerItems: any[], ethClient: EthClient, dbClient: DBClient) => Promise<void>;
+  trigger: Trigger<Clients, Cursor | undefined>,
+  processorFunction: (newTriggerItems: any[], clients: Clients) => Promise<void>;
 };

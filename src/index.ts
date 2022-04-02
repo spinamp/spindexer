@@ -7,10 +7,7 @@ const PROCESSORS = [
 ];
 
 const updateDBLoop = async () => {
-  let dbIsUpdated = false;
-  while (!dbIsUpdated) {
-    dbIsUpdated = await runProcessors(PROCESSORS);
-  }
-}
+  await runProcessors(PROCESSORS);
+};
 
 updateDBLoop();

@@ -1,3 +1,11 @@
-import { SubgraphClient } from '../clients/subgraph';
+import { Clients } from './processor';
 
-export type Trigger = (subgraphClient: SubgraphClient, lastProcessedDBBlock: number) => Promise<any[]>;
+// A cursor is any data that a trigger needs to keep track of to track
+// its progress, for example, a block number it has processed up to.
+export type Cursor = number;
+
+type GetIfCursor<T> = T extends Cursor
+  ? Cursor
+  : undefined
+
+export type Trigger<_, OptionalCursor> = (clients: Clients, cursor: GetIfCursor<OptionalCursor>) => Promise<any[]>;
