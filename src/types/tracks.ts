@@ -3,5 +3,8 @@ export type SubgraphTrack = {
 }
 
 export type Track = {
-  id: string
+  id: string,
+  tokenMetadataURI?: string
+  metadata: any
+  metadataError: string
 }

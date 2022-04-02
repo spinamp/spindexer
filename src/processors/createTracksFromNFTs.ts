@@ -6,7 +6,7 @@ import { Clients, Processor } from '../types/processor';
 
 const name = 'createTracksFromNFTs';
 
-export const processTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethClient: EthClient) => {
+export const createTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethClient: EthClient) => {
   const newTrackNFTs = await filterExistingTrackNFTs(nfts, dbClient);
   const metadataCalls = newTrackNFTs.map(nft => getNFTMetadataCall(nft));
   console.info(`Processing bulk call`);
@@ -25,7 +25,7 @@ export const processTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, eth
 
 const processorFunction = async (newNFTs: NFT[], clients: Clients) => {
   const newProcessedDBBlock = parseInt(newNFTs[newNFTs.length - 1].createdAtBlockNumber);
-  const newTracks = await processTracksFromNFTs(newNFTs, clients.db, clients.eth);
+  const newTracks = await createTracksFromNFTs(newNFTs, clients.db, clients.eth);
   await clients.db.insert('nfts', newNFTs);
   await clients.db.insert('tracks', newTracks);
   await clients.db.updateProcessor(name, newProcessedDBBlock);
