@@ -2,24 +2,20 @@ import 'dotenv/config';
 import db from './db/local-db';
 import subgraph from './clients/subgraph';
 import ethereum from './clients/ethereum';
-import { processTracksFromNFTs } from './nfts';
-import { newNFTsCreated } from './triggers/nft';
+import { createTracksFromNFTsProcessor } from './processors/createTracksFromNFTs';
 
 const updateDBBatch = async () => {
   const dbClient = await db.init();
   const subgraphClient = subgraph.init(process.env.SUBGRAPH_ENDPOINT!);
   const ethClient = await ethereum.init();
 
-  let lastProcessedDBBlock = await dbClient.getLastProcessedBlock('createTracksFromNFTs');
-  const newNFTs = await newNFTsCreated(dbClient, subgraphClient, lastProcessedDBBlock);
-  if (newNFTs.length === 0) {
+  const processor = createTracksFromNFTsProcessor;
+  let lastProcessedDBBlock = await dbClient.getLastProcessedBlock(processor.name);
+  const newTriggerItems = await processor.trigger(subgraphClient, lastProcessedDBBlock);
+  if (newTriggerItems.length === 0) {
     return false;
   }
-  const newProcessedDBBlock = parseInt(newNFTs[newNFTs.length - 1].createdAtBlockNumber);
-  const newTracks = await processTracksFromNFTs(newNFTs, dbClient, ethClient);
-  await dbClient.insert('nfts', newNFTs);
-  await dbClient.insert('tracks', newTracks);
-  await dbClient.updateProcessor('createTracksFromNFTs', newProcessedDBBlock);
+  await processor.processorFunction(newTriggerItems, ethClient, dbClient);
 
   const numberOfTracks = await dbClient.getNumberRecords('tracks');
   lastProcessedDBBlock = await dbClient.getLastProcessedBlock('createTracksFromNFTs');
