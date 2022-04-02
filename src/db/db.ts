@@ -16,4 +16,5 @@ export type DBClient = {
   updateProcessor: (processor: string, newProcessedDBBlock: Number) => Promise<void>;
   getNumberRecords: (tableName: string) => Promise<any>;
   recordExists: (tableName: string, recordID: string) => Promise<boolean>;
+  getFullDB: () => Promise<any>;
 }

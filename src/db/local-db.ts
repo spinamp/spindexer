@@ -101,11 +101,14 @@ const init = async (): Promise<DBClient> => {
       db.processors[processor].cursor = newProcessedDBBlock;
       await saveDB(db);
     },
-    getNumberRecords: (tableName: string) => {
+    getNumberRecords: async (tableName: string) => {
       return db[tableName].length;
     },
-    recordExists: (tableName: string, recordID: string) => {
+    recordExists: async (tableName: string, recordID: string) => {
       return Promise.resolve(!!(indexes[tableName][recordID]));
+    },
+    getFullDB: async () => {
+      return { db, indexes };
     }
   };
 }
