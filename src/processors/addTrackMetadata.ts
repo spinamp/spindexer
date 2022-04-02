@@ -84,6 +84,7 @@ const processorFunction = async (tracks: Track[], clients: Clients) => {
   console.info('Batch done');
   console.dir(batch, { depth: null });
   // todo: should have some way to skip/detect/error on buggy urls and ideally continue and ignore them.
+  // todo: ensure filtering for trigger working properly
   // maybe an error field inserted into the record so it can be skipped?
   // todo: should upsert
 };
