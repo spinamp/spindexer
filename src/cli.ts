@@ -31,9 +31,9 @@ const findECONNREFUSEDErrorTracks = (tracks: Track[]) => {
 const clearFixedMetadataErrors = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
-  const metadataFixedTracks = findMetadataDups(db.tracks);
+  const metadataFixedTracks = await findMetadataDups(db.tracks);
   const updates = metadataFixedTracks.map(t => ({ id: t.id, metadataError: undefined }));
-  dbClient.update('tracks', updates);
+  await dbClient.update('tracks', updates);
 }
 
 const printMissingIPFS = async () => {
@@ -51,64 +51,68 @@ const printMetadataErrors = async () => {
 const clearTimeoutErrors = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
-  const timeoutErrorTracks = findTimeoutErrorTracks(db.tracks);
+  const timeoutErrorTracks = await findTimeoutErrorTracks(db.tracks);
   const updates = timeoutErrorTracks.map(t => ({ id: t.id, metadataError: undefined }));
-  dbClient.update('tracks', updates);
+  await dbClient.update('tracks', updates);
 }
 
 const clearIPFSProtocolErrors = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
-  const timeoutErrorTracks = findIPFSProtocolErrorTracks(db.tracks);
+  const timeoutErrorTracks = await findIPFSProtocolErrorTracks(db.tracks);
   const updates = timeoutErrorTracks.map(t => ({ id: t.id, metadataError: undefined }));
-  dbClient.update('tracks', updates);
+  await dbClient.update('tracks', updates);
 }
 
 const clearECONNREFUSEDErrors = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
-  const timeoutErrorTracks = findECONNREFUSEDErrorTracks(db.tracks);
+  const timeoutErrorTracks = await findECONNREFUSEDErrorTracks(db.tracks);
   const updates = timeoutErrorTracks.map(t => ({ id: t.id, metadataError: undefined }));
-  dbClient.update('tracks', updates);
+  await dbClient.update('tracks', updates);
 }
 
-yargs(hideBin(process.argv))
-  .command('printMissingIPFS', 'print all ipfs hashes', (yargs) => {
-    return yargs
-  }, () => {
-    printMissingIPFS();
-  })
-  .command('printMetadataErrors', 'print all tracks with metadata errors', (yargs) => {
-    return yargs
-  }, () => {
-    printMetadataErrors();
-  })
-  .command('clearFixedMetadataErrors', 'clear out metadata errors from tracks that have has metadata successfully added', (yargs) => {
-    return yargs
-  }, () => {
-    clearFixedMetadataErrors();
-  })
-  .command('clearTimeoutErrors', 'clear out metadata errors from tracks with timeout errors', (yargs) => {
-    return yargs
-  }, () => {
-    clearTimeoutErrors();
-  })
-  .command('clearIPFSProtocolErrors', 'clear out metadata errors from tracks with ipfs protocol url errors', (yargs) => {
-    return yargs
-  }, () => {
-    clearIPFSProtocolErrors();
-  })
-  .command('clearECONNREFUSEDErrors', 'clear out metadata errors from tracks with ECONNREFUSED errors', (yargs) => {
-    return yargs
-  }, () => {
-    clearECONNREFUSEDErrors();
-  })
-  .command('clearStaleErrors', 'clear out metadata errors that are stale and should be retried from tracks', (yargs) => {
-    return yargs
-  }, () => {
-    clearFixedMetadataErrors();
-    clearTimeoutErrors();
-    clearIPFSProtocolErrors();
-    clearECONNREFUSEDErrors();
-  })
-  .parse()
+const start = async () => {
+  yargs(hideBin(process.argv))
+    .command('printMissingIPFS', 'print all ipfs hashes', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printMissingIPFS();
+    })
+    .command('printMetadataErrors', 'print all tracks with metadata errors', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printMetadataErrors();
+    })
+    .command('clearFixedMetadataErrors', 'clear out metadata errors from tracks that have has metadata successfully added', async (yargs) => {
+      return yargs
+    }, async () => {
+      await clearFixedMetadataErrors();
+    })
+    .command('clearTimeoutErrors', 'clear out metadata errors from tracks with timeout errors', async (yargs) => {
+      return yargs
+    }, async () => {
+      await clearTimeoutErrors();
+    })
+    .command('clearIPFSProtocolErrors', 'clear out metadata errors from tracks with ipfs protocol url errors', async (yargs) => {
+      return yargs
+    }, async () => {
+      await clearIPFSProtocolErrors();
+    })
+    .command('clearECONNREFUSEDErrors', 'clear out metadata errors from tracks with ECONNREFUSED errors', async (yargs) => {
+      return yargs
+    }, async () => {
+      await clearECONNREFUSEDErrors();
+    })
+    .command('clearStaleErrors', 'clear out metadata errors that are stale and should be retried from tracks', async (yargs) => {
+      return yargs
+    }, async () => {
+      await clearFixedMetadataErrors();
+      await clearTimeoutErrors();
+      await clearIPFSProtocolErrors();
+      await clearECONNREFUSEDErrors();
+    })
+    .parse()
+}
+
+start();

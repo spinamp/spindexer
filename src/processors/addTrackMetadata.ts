@@ -3,14 +3,13 @@ import { Clients, Processor } from '../types/processor';
 import { Track } from '../types/tracks';
 import { Axios, AxiosResponse, AxiosError } from 'axios';
 import { DBClient } from '../db/db';
-import { IPFSClient, isIPFSProtocol } from '../clients/ipfs';
+import { IPFSClient } from '../clients/ipfs';
 
 // todo: do metadata url calls to get all metadata and add to track record
 // todo: postfilter/zora only music&catalog filter/extra noizd calls/extra centralized calls for optimized media
 
 const name = 'addTrackMetadata';
 const MAX_CONCURRENT_REQUESTS = 40;
-const REQUEST_TIMEOUT = 5000;
 
 const getMetadataForTrack = (track: Track, timeout: number, axios: Axios, ipfs: IPFSClient): any => {
   if (!track.tokenMetadataURI) {
@@ -48,7 +47,7 @@ const processorFunction = async (batch: Track[], clients: Clients) => {
         while (activeRequests < MAX_CONCURRENT_REQUESTS && count < batch.length) {
           const track = batch[count];
           console.info(`Processing track ${count} with id ${track.id}`);
-          getMetadataForTrack(track, REQUEST_TIMEOUT, clients.axios, clients.ipfs).then((response: AxiosResponse) => {
+          getMetadataForTrack(track, parseInt(process.env.METADATA_REQUEST_TIMEOUT!), clients.axios, clients.ipfs).then((response: AxiosResponse) => {
             track.metadata = response.data;
             activeRequests--;
           }).catch((error: AxiosError) => {
