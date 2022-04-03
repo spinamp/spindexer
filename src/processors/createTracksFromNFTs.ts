@@ -35,4 +35,5 @@ export const createTracksFromNFTsProcessor: Processor = {
   name,
   trigger: newNFTsCreated,
   processorFunction,
+  initialCursor: parseInt(process.env.GLOBAL_STARTING_BLOCK!),
 };

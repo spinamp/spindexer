@@ -8,10 +8,6 @@ const INITIAL_DB = {
   artists: [],
   tracks: [],
   processors: {
-    createTracksFromNFTs: {
-      cursor: process.env.GLOBAL_STARTING_BLOCK,
-    },
-    addTrackMetadata: {},
   },
 };
 
@@ -68,7 +64,7 @@ const init = async (): Promise<DBClient> => {
   const { db, indexes } = await loadDB();
   return {
     getCursor: async (processor: string): Promise<(number | undefined)> => {
-      return parseInt(db.processors[processor].cursor);
+      return parseInt(db.processors[processor]?.cursor);
     },
     getRecords: async (tableName: string, query?: Query): (Promise<Record[]>) => {
       const allRecords = db[tableName]
@@ -98,6 +94,7 @@ const init = async (): Promise<DBClient> => {
       await saveDB(db);
     },
     updateProcessor: async (processor: string, newProcessedDBBlock: Number) => {
+      db.processors[processor] = db.processors[processor] || {};
       db.processors[processor].cursor = newProcessedDBBlock;
       await saveDB(db);
     },

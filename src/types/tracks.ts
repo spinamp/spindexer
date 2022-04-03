@@ -5,6 +5,7 @@ export type SubgraphTrack = {
 export type Track = {
   id: string,
   tokenMetadataURI?: string
+  metadataIPFSHash?: string
   metadata: any
   metadataError: string
 }
