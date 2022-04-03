@@ -61,7 +61,7 @@ const saveDB = async (db: any) => {
 };
 
 const init = async (): Promise<DBClient> => {
-  const { db, indexes } = await loadDB();
+  let { db, indexes } = await loadDB();
   return {
     getCursor: async (processor: string): Promise<(number | undefined)> => {
       return parseInt(db.processors[processor]?.cursor);
@@ -103,6 +103,13 @@ const init = async (): Promise<DBClient> => {
         Object.assign(record, { ...update });
       });
       await saveDB(db);
+    },
+    delete: async (tableName: string, ids: string[]) => {
+      const records = db[tableName];
+      const newRecords = records.filter((r: Record) => !ids.includes(r.id));
+      db[tableName] = newRecords;
+      await saveDB(db);
+      indexes = await createIndexes(db);
     },
     updateProcessor: async (processor: string, newProcessedDBBlock: Number) => {
       db.processors[processor] = db.processors[processor] || {};

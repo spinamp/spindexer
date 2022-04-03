@@ -4,7 +4,7 @@ import { hideBin } from 'yargs/helpers';
 import { DBClient } from './db/db';
 import dbLib from './db/local-db';
 import { Track } from './types/tracks';
-
+import prompt from 'prompt';
 
 const logMetadataDups = async (dbClient: DBClient) => {
   const { db, indexes } = await dbClient.getFullDB();
@@ -48,6 +48,22 @@ const printMetadataErrors = async () => {
   console.log(db.tracks.filter((t: Track) => t.metadataError));
 }
 
+const killMetadataErrors = async () => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  const errorTracks = db.tracks.filter((t: Track) => t.metadataError);
+  console.dir(errorTracks, { depth: null });
+  console.log(`Remove ${errorTracks.length} tracks?`)
+  prompt.start();
+  prompt.get(['confirm'], async (err, result) => {
+    if (result.confirm === 'y') {
+      const deletion = errorTracks.map((t: Track) => t.id);
+      await dbClient.delete('tracks', deletion);
+      console.log('Deleted');
+    }
+  });
+}
+
 const clearTimeoutErrors = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
@@ -74,7 +90,7 @@ const clearECONNREFUSEDErrors = async () => {
 
 const start = async () => {
   yargs(hideBin(process.argv))
-    .command('printMissingIPFS', 'print all ipfs hashes', async (yargs) => {
+    .command('printMissingIPFS', 'print all tracks with missing ipfs hashes', async (yargs) => {
       return yargs
     }, async () => {
       await printMissingIPFS();
@@ -111,6 +127,11 @@ const start = async () => {
       await clearTimeoutErrors();
       await clearIPFSProtocolErrors();
       await clearECONNREFUSEDErrors();
+    })
+    .command('killMetadataErrors', 'clear out tracks that have a metadataError', async (yargs) => {
+      return yargs
+    }, async () => {
+      await killMetadataErrors();
     })
     .parse()
 }
