@@ -69,7 +69,18 @@ const init = async (): Promise<DBClient> => {
     getRecords: async (tableName: string, query?: Query): (Promise<Record[]>) => {
       const allRecords = db[tableName]
       if (query) {
-        return allRecords.filter((record: Record) => record[query.where.key as keyof Record] === query.where.value);
+        let filteredRecords = allRecords;
+        if (Array.isArray(query.where)) {
+          for (const filter of query.where) {
+            filteredRecords = filteredRecords.filter((record: Record) =>
+              record[filter.key as keyof Record] === filter.value
+            );
+          }
+        } else {
+          const filter = query.where;
+          filteredRecords = allRecords.filter((record: Record) => record[filter.key as keyof Record] === filter.value);
+        }
+        return filteredRecords;
       }
       return allRecords;
     },

@@ -6,6 +6,9 @@ export type Query = {
   where: {
     key: string,
     value: any
+  }[] | {
+    key: string,
+    value: any
   }
 }
 export type DBClient = {

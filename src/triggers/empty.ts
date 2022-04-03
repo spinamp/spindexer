@@ -6,11 +6,14 @@ const BATCH_SIZE = 300;
 export const missingTrackMetadata: Trigger<Clients, undefined> = async (clients: Clients) => {
   const tracks = (await clients.db.getRecords('tracks',
     {
-      where:
-      {
-        key: 'metadata',
-        value: undefined
-      }
+      where: [
+        {
+          key: 'metadata',
+          value: undefined
+        }, {
+          key: 'metadataError',
+          value: undefined
+        }]
     })).slice(0, BATCH_SIZE);
   return tracks;
 };
