@@ -1,5 +1,3 @@
-const IPFS_PROVIDER_URL = `http://localhost:8080/ipfs/`;
-
 export type IPFSClient = {
   getHTTPURL: (ipfsURL: string) => string;
 }
@@ -33,7 +31,7 @@ export const extractHashFromURL = (urlString: string) => {
 const init = async () => {
   return {
     getHTTPURL: (ipfsHash: string) => {
-      return `${IPFS_PROVIDER_URL}${ipfsHash}`;
+      return `${process.env.IPFS_ENDPOINT}${ipfsHash}`;
     }
   }
 }
