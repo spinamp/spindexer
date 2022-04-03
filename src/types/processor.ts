@@ -1,3 +1,4 @@
+import { Axios } from "axios";
 import { EthClient } from "../clients/ethereum";
 import { SubgraphClient } from "../clients/subgraph";
 import { DBClient } from "../db/db";
@@ -7,6 +8,7 @@ export type Clients = {
   eth: EthClient,
   db: DBClient,
   subgraph: SubgraphClient,
+  axios: Axios,
 }
 
 export type Processor = {

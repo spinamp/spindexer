@@ -1,17 +1,20 @@
 import db from './db/local-db';
 import subgraph from './clients/subgraph';
 import ethereum from './clients/ethereum';
+import axios from './clients/axios';
 import { Clients, Processor } from './types/processor';
 
 export const runProcessors = async (processors: Processor[]) => {
   const dbClient = await db.init();
   const subgraphClient = subgraph.init(process.env.SUBGRAPH_ENDPOINT!);
   const ethClient = await ethereum.init();
+  const axiosClient = await axios.init();
 
   const clients: Clients = {
     eth: ethClient,
     db: dbClient,
     subgraph: subgraphClient,
+    axios: axiosClient,
   };
 
   // This runs each processor until completion serially. We could consider

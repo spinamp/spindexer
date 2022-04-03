@@ -12,6 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^17.0.23",
+    "@types/yargs": "^17.0.10",
     "nodemon": "^2.0.15",
     "ts-node": "^10.7.0",
     "typechain": "^8.0.0",
@@ -24,6 +25,7 @@
     "ethcall": "^4.4.0",
     "ethers": "^5.6.2",
     "graphql": "^16.3.0",
-    "graphql-request": "^4.2.0"
+    "graphql-request": "^4.2.0",
+    "yargs": "^17.4.0"
   }
 }

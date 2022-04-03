@@ -1,7 +1,7 @@
 import { missingTrackMetadata } from '../triggers/empty';
 import { Clients, Processor } from '../types/processor';
 import { Track } from '../types/tracks';
-import axios, { AxiosResponse } from 'axios';
+import { Axios, AxiosResponse, AxiosError } from 'axios';
 import { DBClient } from '../db/db';
 
 // todo: do metadata url calls to get all metadata and add to track record
@@ -11,7 +11,7 @@ const name = 'addTrackMetadata';
 const MAX_CONCURRENT_REQUESTS = 40;
 const REQUEST_TIMEOUT = 2000;
 
-const getMetadataForTrack = (track: Track, timeout: number): any => {
+const getMetadataForTrack = (track: Track, timeout: number, axios: Axios): any => {
   if (!track.tokenMetadataURI) {
     throw new Error('Track tokenMetadataURI missing');
     //todo: maybe track or error rather?
@@ -41,12 +41,13 @@ const processorFunction = async (batch: Track[], clients: Clients) => {
         resolve(true);
       } else {
         while (activeRequests < MAX_CONCURRENT_REQUESTS && count < batch.length) {
-          console.info(`Processing track ${count}`);
           const track = batch[count];
-          getMetadataForTrack(track, REQUEST_TIMEOUT).then((response: AxiosResponse) => {
+          console.info(`Processing track ${count} with id ${track.id}`);
+          getMetadataForTrack(track, REQUEST_TIMEOUT, clients.axios).then((response: AxiosResponse) => {
             track.metadata = response.data;
             activeRequests--;
-          }).catch((error: Error) => {
+          }).catch((error: AxiosError) => {
+            console.log({ error: error.message, headers: error.response?.headers })
             track.metadataError = error.message;
             activeRequests--;
           });
@@ -61,7 +62,6 @@ const processorFunction = async (batch: Track[], clients: Clients) => {
   await isDone;
   saveMetadata(batch, clients.db);
   console.info('Batch done');
-  console.dir(batch, { depth: null });
   // todo: should have some way to skip/detect/error on buggy urls and ideally continue and ignore them.
   // todo: ensure filtering for trigger working properly
   // maybe an error field inserted into the record so it can be skipped?
