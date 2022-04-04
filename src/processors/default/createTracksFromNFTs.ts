@@ -18,6 +18,7 @@ export const createTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethC
         id: nft.track.id,
         platform: nft.platform,
         tokenMetadataURI: metadataURIs[index],
+        createdAtBlockNumber: nft.createdAtBlockNumber,
       }
     }
   });
