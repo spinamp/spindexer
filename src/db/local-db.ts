@@ -67,6 +67,9 @@ const init = async (): Promise<DBClient> => {
     getCursor: async (processor: string): Promise<(number | undefined)> => {
       return parseInt(db.processors[processor]?.cursor);
     },
+    getRecord: async (tableName: string, id: string): (Promise<Record>) => {
+      return indexes[tableName] && indexes[tableName][id];
+    },
     getRecords: async (tableName: string, query?: Query): (Promise<Record[]>) => {
       const allRecords = db[tableName]
       if (query) {

@@ -1,6 +1,6 @@
 import { DBClient } from '../db/db';
 import { MusicPlatform, platformConfig } from './platforms';
-import { SubgraphTrack } from './tracks';
+import { SubgraphTrack, Track } from './tracks';
 
 export type NFT = {
   id: string
@@ -22,7 +22,7 @@ export const getNFTMetadataCall = (nft: NFT) => {
 // This code checks each record. A more efficient version could probably just
 // do a bulk query to check all at once. With that improvement, would also then
 // be better to make this function pure.
-export const filterExistingTrackNFTs = async (nfts: NFT[], dbClient: DBClient) => {
+export const filterNewTrackNFTs = async (nfts: NFT[], dbClient: DBClient) => {
   let newTrackNFTs = [];
   let newTrackIds: any = {};
   for (let i = 0; i < nfts.length; i++) {
@@ -33,6 +33,25 @@ export const filterExistingTrackNFTs = async (nfts: NFT[], dbClient: DBClient) =
     }
     const isExistingTrack = (await dbClient.recordExists('tracks', nft.track.id)) || newTrackIds[nft.track.id];
     if (!isExistingTrack) {
+      newTrackIds[nft.track.id] = true;
+      newTrackNFTs.push(nft);
+    }
+  }
+  return newTrackNFTs;
+}
+
+export const filterUntimestampedTracks = async (nfts: NFT[], dbClient: DBClient) => {
+  let newTrackNFTs = [];
+  let newTrackIds: any = {};
+  for (let i = 0; i < nfts.length; i++) {
+    const nft = nfts[i];
+    if (!nft || !nft.track) {
+      console.error({ nft });
+      throw new Error('Error processing NFT');
+    }
+    const track: Track = await dbClient.getRecord('tracks', nft.track.id) as Track;
+    const trackHasTimestamp = track.createdAtBlockNumber || newTrackIds[nft.track.id];
+    if (!trackHasTimestamp) {
       newTrackIds[nft.track.id] = true;
       newTrackNFTs.push(nft);
     }

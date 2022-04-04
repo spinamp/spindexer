@@ -2,6 +2,8 @@ export type Record = {
   id: string
 }
 
+export type PartialRecord<Type> = Partial<Type> & Record
+
 export type Query = {
   where: {
     key: string,
@@ -14,6 +16,7 @@ export type Query = {
 }
 export type DBClient = {
   getCursor: (processor: string) => Promise<number | undefined>;
+  getRecord: (tableName: string, id: string) => Promise<Record>;
   getRecords: (tableName: string, query?: Query) => Promise<Record[]>;
   insert: (tableName: string, rows: Record[]) => Promise<void>;
   update: (tableName: string, rows: Record[]) => Promise<void>;

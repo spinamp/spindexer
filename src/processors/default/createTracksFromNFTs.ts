@@ -1,13 +1,13 @@
 import { EthClient } from '../../clients/ethereum';
 import { DBClient } from '../../db/db';
 import { newNFTsCreated } from '../../triggers/newNFTsCreated';
-import { filterExistingTrackNFTs, getNFTMetadataCall, NFT } from '../../types/nft';
+import { filterNewTrackNFTs, getNFTMetadataCall, NFT } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 
 const name = 'createTracksFromNFTs';
 
 export const createTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethClient: EthClient) => {
-  const newTrackNFTs = await filterExistingTrackNFTs(nfts, dbClient);
+  const newTrackNFTs = await filterNewTrackNFTs(nfts, dbClient);
   const metadataCalls = newTrackNFTs.map(nft => getNFTMetadataCall(nft));
   console.info(`Processing bulk call`);
   const metadataURIs = await ethClient.call(metadataCalls);

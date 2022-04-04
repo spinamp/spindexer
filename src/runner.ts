@@ -32,8 +32,7 @@ export const runProcessors = async (processors: Processor[]) => {
   }
 
   const numberOfTracks = await dbClient.getNumberRecords('tracks');
-  const lastProcessedDBBlock = await dbClient.getCursor('createTracksFromNFTs');
-  console.info(`DB has ${numberOfTracks} tracks and has processed up to ${lastProcessedDBBlock}`);
+  console.info(`DB has ${numberOfTracks} tracks`);
   return false;
 };
 

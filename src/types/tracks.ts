@@ -9,6 +9,7 @@ export type Track = {
   platform: MusicPlatform,
   tokenMetadataURI?: string
   metadataIPFSHash?: string
+  createdAtBlockNumber?: string
   metadata: any
   metadataError: string
 }
