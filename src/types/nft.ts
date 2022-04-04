@@ -50,10 +50,12 @@ export const filterUntimestampedTracks = async (nfts: NFT[], dbClient: DBClient)
       throw new Error('Error processing NFT');
     }
     const track: Track = await dbClient.getRecord('tracks', nft.track.id) as Track;
-    const trackHasTimestamp = track.createdAtBlockNumber || newTrackIds[nft.track.id];
-    if (!trackHasTimestamp) {
-      newTrackIds[nft.track.id] = true;
-      newTrackNFTs.push(nft);
+    if (track) {
+      const trackHasTimestamp = track.createdAtBlockNumber || newTrackIds[nft.track.id];
+      if (!trackHasTimestamp) {
+        newTrackIds[nft.track.id] = true;
+        newTrackNFTs.push(nft);
+      }
     }
   }
   return newTrackNFTs;
