@@ -6,7 +6,7 @@ import dbLib from './db/local-db';
 import { Track } from './types/tracks';
 import prompt from 'prompt';
 import _ from 'lodash';
-import { MusicPlatform } from './types/platforms';
+import { MusicPlatform, verifyCatalogTrack } from './types/platforms';
 
 const logMetadataDups = async (dbClient: DBClient) => {
   const { db, indexes } = await dbClient.getFullDB();
@@ -78,6 +78,27 @@ const printZoraNotCatalogTracks = async () => {
       !t.metadata?.body?.version?.includes('catalog');
   });
   console.log(tracks);
+}
+
+const printFakeCatalogTracks = async () => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  const allCatalogTracks = db.tracks.filter((t: Track) => {
+    return t.platform === MusicPlatform.zora &&
+      t.metadata?.body?.version?.includes('catalog');
+  });
+  const fakeCatalogTracks = allCatalogTracks.filter(((t: Track) => !verifyCatalogTrack(t)));
+  console.log(fakeCatalogTracks);
+}
+
+const printTracks = async (key: string, value: string) => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  const tracks = db.tracks.filter((t: Track) => {
+    return (t as any)[key] === value
+  });
+  console.log(tracks);
+  console.log(`${tracks.length} Tracks`);
 }
 
 const killMetadataErrors = async () => {
@@ -180,10 +201,30 @@ const start = async () => {
     }, async () => {
       await printSoundTracks();
     })
-    .command('printZoraNotCatalogTracks', 'print all zora tracks that are not from catalog', async (yargs) => {
+    .command('printZoraNotCatalogTracks', 'print all zora tracks that are not from catalog preprocessing', async (yargs) => {
       return yargs
     }, async () => {
       await printZoraNotCatalogTracks();
+    })
+    .command('printFakeCatalogTracks', 'print all zora tracks that are not from catalog', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printFakeCatalogTracks();
+    })
+    .command('printZoraTracks', 'print all raw zora tracks that are not from catalog postprocessing', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printTracks('platform', 'zoraRaw');
+    })
+    .command('printCatalogTracks', 'print all catalog-only zora tracks', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printTracks('platform', 'catalog');
+    })
+    .command('printUnprocessedZoraTracks', 'print all unprocessed zora tracks', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printTracks('platform', 'zora');
     })
     .parse()
 }
