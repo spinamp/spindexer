@@ -64,6 +64,16 @@ const printSoundTracks = async () => {
   console.log(tracks);
 }
 
+const printZoraNotCatalogTracks = async () => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  const tracks = db.tracks.filter((t: Track) => {
+    return t.platform === MusicPlatform.zora &&
+      !t.metadata?.body?.version?.includes('catalog');
+  });
+  console.log(tracks);
+}
+
 const killMetadataErrors = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
@@ -158,6 +168,11 @@ const start = async () => {
       return yargs
     }, async () => {
       await printSoundTracks();
+    })
+    .command('printZoraNotCatalogTracks', 'print all zora tracks that are not from catalog', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printZoraNotCatalogTracks();
     })
     .parse()
 }
