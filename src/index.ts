@@ -5,15 +5,11 @@ import { createTracksFromNFTsProcessor } from './processors/default/createTracks
 import { stripNonAudio } from './processors/default/stripNonAudio';
 import { runProcessors } from './runner';
 
-// const PROCESSORS = [
-//   createTracksFromNFTsProcessor,
-//   addTrackMetadataIPFSHash,
-//   addTrackMetadata,
-//   stripNonAudio,
-// ];
-import { fillInPlatform } from './processors/other/fillInPlatform';
 const PROCESSORS = [
-  fillInPlatform,
+  createTracksFromNFTsProcessor,
+  addTrackMetadataIPFSHash,
+  addTrackMetadata,
+  stripNonAudio,
 ];
 
 const updateDBLoop = async () => {

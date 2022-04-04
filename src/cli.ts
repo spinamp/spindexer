@@ -6,6 +6,7 @@ import dbLib from './db/local-db';
 import { Track } from './types/tracks';
 import prompt from 'prompt';
 import _ from 'lodash';
+import { MusicPlatform } from './types/platforms';
 
 const logMetadataDups = async (dbClient: DBClient) => {
   const { db, indexes } = await dbClient.getFullDB();
@@ -54,6 +55,13 @@ const printMimeTypes = async () => {
   const { db, indexes } = await dbClient.getFullDB();
   const mimeTypes = db.tracks.map((t: Track) => t.metadata?.mimeType);
   console.log(_.uniq(mimeTypes));
+}
+
+const printSoundTracks = async () => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  const tracks = db.tracks.filter((t: Track) => t.platform === MusicPlatform.sound).map((t: Track) => t.tokenMetadataURI);
+  console.log(tracks);
 }
 
 const killMetadataErrors = async () => {
@@ -145,6 +153,11 @@ const start = async () => {
       return yargs
     }, async () => {
       await printMimeTypes();
+    })
+    .command('printSoundTracks', 'print all sound tracks', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printSoundTracks();
     })
     .parse()
 }

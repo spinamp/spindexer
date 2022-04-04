@@ -24,8 +24,7 @@ const processorFunction = async (tracks: Track[], clients: Clients) => {
     id: t.id,
     platform: getPlatform(t)
   }))
-  const zoraTrackUpdates = trackUpdates.filter(t => t.platform === MusicPlatform.noizd);
-  await clients.db.update('tracks', zoraTrackUpdates);
+  await clients.db.update('tracks', trackUpdates);
 };
 
 export const fillInPlatform: Processor = {
