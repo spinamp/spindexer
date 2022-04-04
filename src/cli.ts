@@ -44,6 +44,12 @@ const printMissingIPFS = async () => {
   console.log(db.tracks.filter((t: Track) => !t.metadataIPFSHash));
 }
 
+const printMissingMetadata = async () => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  console.log(db.tracks.filter((t: Track) => !t.metadata));
+}
+
 const printMetadataErrors = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
@@ -120,6 +126,11 @@ const start = async () => {
       return yargs
     }, async () => {
       await printMissingIPFS();
+    })
+    .command('printMissingMetadata', 'print all tracks with missing metadata', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printMissingMetadata();
     })
     .command('printMetadataErrors', 'print all tracks with metadata errors', async (yargs) => {
       return yargs

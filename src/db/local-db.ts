@@ -73,7 +73,12 @@ const init = async (): Promise<DBClient> => {
         let filteredRecords = allRecords;
         if (Array.isArray(query.where)) {
           filteredRecords = filteredRecords.filter((record: Record) => {
-            let matched = false;
+            let matched;
+            if (query.whereType === 'or') {
+              matched = false;
+            } else {
+              matched = true;
+            }
             for (const filter of (query.where as Array<any>)) {
               const match = _.get(record, filter.key) === filter.value;
               if (query.whereType === 'or') {
