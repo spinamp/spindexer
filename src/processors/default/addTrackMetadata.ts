@@ -23,13 +23,13 @@ const getMetadataForTrack = (track: Track, timeout: number, axios: Axios, ipfs: 
   return axios.get(queryURL, { timeout });
 }
 
-const saveMetadata = (tracks: Track[], dbClient: DBClient) => {
+const saveMetadata = async (tracks: Track[], dbClient: DBClient) => {
   const trackUpdates = tracks.map(track => ({
     id: track.id,
     metadata: track.metadata,
     metadataError: track.metadataError,
   }));
-  dbClient.update('tracks', trackUpdates);
+  await dbClient.update('tracks', trackUpdates);
 }
 
 // This function effectively gets a batch of tracks to process. It then sets up a buffer
@@ -64,7 +64,7 @@ const processorFunction = async (batch: Track[], clients: Clients) => {
     fillQueueUntilDone();
   });
   await isDone;
-  saveMetadata(batch, clients.db);
+  await saveMetadata(batch, clients.db);
   console.info('Batch done');
   // todo: should have some way to skip/detect/error on buggy urls and ideally continue and ignore them.
   // todo: ensure filtering for trigger working properly
