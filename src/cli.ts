@@ -5,6 +5,7 @@ import { DBClient } from './db/db';
 import dbLib from './db/local-db';
 import { Track } from './types/tracks';
 import prompt from 'prompt';
+import _ from 'lodash';
 
 const logMetadataDups = async (dbClient: DBClient) => {
   const { db, indexes } = await dbClient.getFullDB();
@@ -46,6 +47,13 @@ const printMetadataErrors = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
   console.log(db.tracks.filter((t: Track) => t.metadataError));
+}
+
+const printMimeTypes = async () => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  const mimeTypes = db.tracks.map((t: Track) => t.metadata?.mimeType);
+  console.log(_.uniq(mimeTypes));
 }
 
 const killMetadataErrors = async () => {
@@ -132,6 +140,11 @@ const start = async () => {
       return yargs
     }, async () => {
       await killMetadataErrors();
+    })
+    .command('printMimeTypes', 'print all mime types in metadata in db', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printMimeTypes();
     })
     .parse()
 }

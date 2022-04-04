@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs';
 
 import { Record, DBClient, Query } from './db';
+import _ from 'lodash';
 
 const DB_FILE = process.cwd() + '/localdb/db.json';
 const INITIAL_DB = {
@@ -71,11 +72,19 @@ const init = async (): Promise<DBClient> => {
       if (query) {
         let filteredRecords = allRecords;
         if (Array.isArray(query.where)) {
-          for (const filter of query.where) {
-            filteredRecords = filteredRecords.filter((record: Record) =>
-              record[filter.key as keyof Record] === filter.value
-            );
+          filteredRecords = filteredRecords.filter((record: Record) => {
+            let matched = false;
+            for (const filter of (query.where as Array<any>)) {
+              const match = _.get(record, filter.key) === filter.value;
+              if (query.whereType === 'or') {
+                matched = matched || match;
+              } else {
+                matched = matched && match;
+              }
+            }
+            return matched;
           }
+          );
         } else {
           const filter = query.where;
           filteredRecords = allRecords.filter((record: Record) => record[filter.key as keyof Record] === filter.value);

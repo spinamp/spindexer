@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/lodash": "^4.14.181",
     "@types/node": "^17.0.23",
     "@types/prompt": "^1.1.2",
     "@types/yargs": "^17.0.10",
@@ -27,6 +28,7 @@
     "ethers": "^5.6.2",
     "graphql": "^16.3.0",
     "graphql-request": "^4.2.0",
+    "lodash": "^4.17.21",
     "prompt": "^1.2.2",
     "yargs": "^17.4.0"
   }

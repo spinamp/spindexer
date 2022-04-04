@@ -9,7 +9,8 @@ export type Query = {
   }[] | {
     key: string,
     value: any
-  }
+  },
+  whereType?: string
 }
 export type DBClient = {
   getCursor: (processor: string) => Promise<number | undefined>;
