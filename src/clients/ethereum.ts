@@ -2,9 +2,14 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract, Provider } from 'ethcall';
 import MetaABI from '../abis/MetaABI.json';
 
+export enum ValidContractCallFunction {
+  tokenURI = "tokenURI",
+  tokenMetadataURI = "tokenMetadataURI"
+}
+
 export type EthCall = {
   contractAddress: string,
-  callFunction: string,
+  callFunction: ValidContractCallFunction,
   callInput: string,
 }
 

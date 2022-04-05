@@ -3,7 +3,7 @@ import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import { DBClient } from './db/db';
 import dbLib from './db/local-db';
-import { Track } from './types/track';
+import { getMetadataURL, Track } from './types/track';
 import prompt from 'prompt';
 import _ from 'lodash';
 import { MusicPlatform } from './types/platform';
@@ -67,7 +67,7 @@ const printMimeTypes = async () => {
 const printSoundTracks = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
-  const tracks = db.tracks.filter((t: Track) => t.platform === MusicPlatform.sound).map((t: Track) => t.tokenMetadataURI);
+  const tracks = db.tracks.filter((t: Track) => t.platform === MusicPlatform.sound).map((t: Track) => getMetadataURL(t));
   console.log(tracks);
 }
 

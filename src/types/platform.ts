@@ -1,3 +1,5 @@
+import { ValidContractCallFunction } from "../clients/ethereum";
+
 export enum MusicPlatform {
   sound = "sound",
   zora = "zora",
@@ -9,21 +11,27 @@ export enum MusicPlatform {
 
 export const platformConfig = {
   sound: {
-    metadataURLQuery: 'tokenURI',
+    contractCalls: [ValidContractCallFunction.tokenURI],
+    contractMetadataField: ValidContractCallFunction.tokenURI,
   },
   zora: {
-    metadataURLQuery: 'tokenMetadataURI',
+    contractCalls: [ValidContractCallFunction.tokenURI, ValidContractCallFunction.tokenMetadataURI],
+    contractMetadataField: ValidContractCallFunction.tokenMetadataURI,
   },
   catalog: {
-    metadataURLQuery: 'tokenMetadataURI',
+    contractCalls: [ValidContractCallFunction.tokenURI, ValidContractCallFunction.tokenMetadataURI],
+    contractMetadataField: ValidContractCallFunction.tokenMetadataURI,
   },
   zoraRaw: {
-    metadataURLQuery: 'tokenMetadataURI',
+    contractCalls: [ValidContractCallFunction.tokenURI, ValidContractCallFunction.tokenMetadataURI],
+    contractMetadataField: ValidContractCallFunction.tokenMetadataURI,
   },
   noizd: {
-    metadataURLQuery: 'tokenURI',
+    contractCalls: [ValidContractCallFunction.tokenURI],
+    contractMetadataField: ValidContractCallFunction.tokenURI,
   },
   other: {
-    metadataURLQuery: 'tokenURI',
+    contractCalls: [ValidContractCallFunction.tokenURI],
+    contractMetadataField: ValidContractCallFunction.tokenURI,
   }
 }

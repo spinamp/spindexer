@@ -11,12 +11,14 @@ export type NFT = {
   track: SubgraphTrack
 }
 
-export const getNFTMetadataCall = (nft: NFT) => {
-  return {
-    contractAddress: nft.contractAddress,
-    callFunction: platformConfig[nft.platform].metadataURLQuery,
-    callInput: nft.tokenId.toString(),
-  };
+export const getNFTMetadataCalls = (nft: NFT) => {
+  return platformConfig[nft.platform].contractCalls.map(call => {
+    return {
+      contractAddress: nft.contractAddress,
+      callFunction: call,
+      callInput: nft.tokenId.toString(),
+    };
+  });
 };
 
 // This code checks each record. A more efficient version could probably just

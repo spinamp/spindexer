@@ -1,21 +1,19 @@
 import { missingTrackMetadata } from '../../triggers/missing';
 import { Clients, Processor } from '../../types/processor';
-import { Track } from '../../types/track';
+import { getMetadataURL, Track } from '../../types/track';
 import { Axios, AxiosResponse, AxiosError } from 'axios';
 import { DBClient } from '../../db/db';
 import { IPFSClient } from '../../clients/ipfs';
-
-// todo: do metadata url calls to get all metadata and add to track record
-// todo: postfilter/zora only music&catalog filter/extra noizd calls/extra centralized calls for optimized media
 
 const name = 'addTrackMetadata';
 const MAX_CONCURRENT_REQUESTS = 40;
 
 const getMetadataForTrack = (track: Track, timeout: number, axios: Axios, ipfs: IPFSClient): any => {
-  if (!track.tokenMetadataURI) {
-    throw new Error('Track tokenMetadataURI missing');
+  const metadataURL = getMetadataURL(track);
+  if (!metadataURL) {
+    throw new Error('Track metadataURL missing');
   }
-  let queryURL = track.tokenMetadataURI;
+  let queryURL = metadataURL;
   if (track.metadataIPFSHash) {
     queryURL = ipfs.getHTTPURL(track.metadataIPFSHash);
   }

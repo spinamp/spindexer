@@ -1,11 +1,13 @@
+import { ValidContractCallFunction } from "../clients/ethereum";
+import { extractHashFromURL } from "../clients/ipfs";
 import { Artist } from "./artist";
-import { MusicPlatform } from "./platform"
+import { MusicPlatform, platformConfig } from "./platform"
 
 export type SubgraphTrack = {
   id: string
 }
 
-export type ProcessedTrack {
+export type ProcessedTrack = {
   id: string;
   originalId: string;
   title: string;
@@ -22,10 +24,26 @@ export type ProcessedTrack {
 export type Track = {
   id: string,
   platform: MusicPlatform,
-  tokenMetadataURI?: string
   metadataIPFSHash?: string
   createdAtBlockNumber?: string
-  metadata: any
+  [ValidContractCallFunction.tokenURI]?: string
+  [ValidContractCallFunction.tokenMetadataURI]?: string
+  metadata?: any
+  metadataError?: string
   platformMetadata?: any
-  metadataError: string
+}
+
+export const getMetadataURL = (track: Track): (string | null | undefined) => {
+  const metadataField = platformConfig[track.platform].contractMetadataField;
+  const metadataURL = track[metadataField];
+  return metadataURL;
+}
+
+export const getMetadataIPFSHash = (track: Track): (string | null | undefined) => {
+  const metadataURL = getMetadataURL(track);
+  if (!metadataURL) {
+    return undefined;
+  }
+  const hash = extractHashFromURL(metadataURL);
+  return hash || null;
 }

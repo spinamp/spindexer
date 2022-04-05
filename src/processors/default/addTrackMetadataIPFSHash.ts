@@ -1,17 +1,8 @@
-import { extractHashFromURL } from '../../clients/ipfs';
 import { missingMetadataIPFSHash } from '../../triggers/missing';
 import { Clients, Processor } from '../../types/processor';
-import { Track } from '../../types/track';
+import { Track, getMetadataIPFSHash } from '../../types/track';
 
 const name = 'addTrackMetadataIPFSHash';
-
-const getMetadataIPFSHash = (track: Track): (string | null | undefined) => {
-  if (!track.tokenMetadataURI) {
-    return undefined;
-  }
-  const hash = extractHashFromURL(track.tokenMetadataURI);
-  return hash || null;
-}
 
 const processorFunction = async (tracks: Track[], clients: Clients) => {
   console.log(`Processing updates from ${tracks[0].id}`)

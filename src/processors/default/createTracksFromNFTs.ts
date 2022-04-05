@@ -1,29 +1,50 @@
-import { EthClient } from '../../clients/ethereum';
+import _ from 'lodash';
+import { EthClient, ValidContractCallFunction } from '../../clients/ethereum';
 import { DBClient } from '../../db/db';
 import { newNFTsCreated } from '../../triggers/newNFTsCreated';
 import { formatAddress } from '../../types/address';
-import { filterNewTrackNFTs, getNFTMetadataCall, NFT } from '../../types/nft';
+import { filterNewTrackNFTs, getNFTMetadataCalls, NFT } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
+import { Track } from '../../types/track';
 
 const name = 'createTracksFromNFTs';
 
 export const createTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethClient: EthClient) => {
   const newTrackNFTs = await filterNewTrackNFTs(nfts, dbClient);
-  const metadataCalls = newTrackNFTs.map(nft => getNFTMetadataCall(nft));
+  const metadataCalls = newTrackNFTs.map(nft => getNFTMetadataCalls(nft));
+  const flatMetadataCalls: {
+    contractAddress: string;
+    callFunction: ValidContractCallFunction;
+    callInput: string;
+  }[] = [];
+  let flatMetadataCallsIndex = 0;
+  const nftIndexToCalls = metadataCalls.map((nftCalls) => {
+    const callIndexes: number[] = [];
+    nftCalls.forEach(call => {
+      flatMetadataCalls.push(call);
+      callIndexes.push(flatMetadataCallsIndex)
+      flatMetadataCallsIndex++;
+    });
+    return callIndexes;
+  });
   console.info(`Processing bulk call`);
-  const metadataURIs = await ethClient.call(metadataCalls);
+  const callResults = await ethClient.call(flatMetadataCalls);
   const newTracks = newTrackNFTs.map((nft, index) => {
     console.info(`Processing nft for track ${nft.track.id}`);
-    return {
-      record: {
-        id: formatAddress(nft.track.id),
-        platform: nft.platform,
-        tokenMetadataURI: metadataURIs[index],
-        createdAtBlockNumber: nft.createdAtBlockNumber,
-      }
-    }
+    const track: Track = {
+      id: formatAddress(nft.track.id),
+      platform: nft.platform,
+      createdAtBlockNumber: nft.createdAtBlockNumber,
+    };
+    const callIndexes = nftIndexToCalls[index];
+    callIndexes.forEach(callIndex => {
+      const key = flatMetadataCalls[callIndex].callFunction;
+      const value = callResults[callIndex];
+      track[key] = value as string;
+    });
+    return track;
   });
-  return newTracks.map(track => track.record);
+  return newTracks;
 };
 
 const processorFunction = async (newNFTs: NFT[], clients: Clients) => {
