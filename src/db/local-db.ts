@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 
-import { Record, DBClient, Query } from './db';
+import { Record, DBClient, Query, Where } from './db';
 import _ from 'lodash';
 
 const DB_FILE = process.cwd() + '/localdb/db.json';
@@ -82,8 +82,14 @@ const init = async (): Promise<DBClient> => {
             } else {
               matched = true;
             }
-            for (const filter of (query.where as Array<any>)) {
-              const match = _.get(record, filter.key) === filter.value;
+            for (const filter of (query.where as Array<Where>)) {
+              let match;
+              if ((filter as any).value) {
+                match = _.get(record, filter.key) === (filter as any).value;
+              }
+              if ((filter as any).valueExists) {
+                match = !!_.get(record, filter.key) == (filter as any).valueExists;
+              }
               if (query.whereType === 'or') {
                 matched = matched || match;
               } else {
@@ -95,7 +101,16 @@ const init = async (): Promise<DBClient> => {
           );
         } else {
           const filter = query.where;
-          filteredRecords = allRecords.filter((record: Record) => record[filter.key as keyof Record] === filter.value);
+          filteredRecords = allRecords.filter((record: Record) => {
+            let match;
+            if ((filter as any).value) {
+              match = _.get(record, filter.key) === (filter as any).value;
+            }
+            if ((filter as any).valueExists) {
+              match = !!_.get(record, filter.key) == (filter as any).valueExists;
+            }
+            return match;
+          });
         }
         return filteredRecords;
       }

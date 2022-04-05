@@ -4,14 +4,20 @@ export type Record = {
 
 export type PartialRecord<Type> = Partial<Type> & Record
 
+export type ValueIsWhere = {
+  key: string,
+  value: any,
+}
+
+export type ValueExistsWhere = {
+  key: string,
+  valueExists: boolean
+}
+
+export type Where = ValueIsWhere | ValueExistsWhere
+
 export type Query = {
-  where: {
-    key: string,
-    value: any
-  }[] | {
-    key: string,
-    value: any
-  },
+  where: Where[] | Where,
   whereType?: string
 }
 export type DBClient = {
