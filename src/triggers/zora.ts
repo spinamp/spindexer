@@ -1,6 +1,5 @@
 import { MusicPlatform } from '../types/platform';
 import { Clients } from '../types/processor';
-import { Track } from '../types/track';
 import { Trigger } from '../types/trigger';
 
 export const zoraRawWithMetadata: Trigger<Clients, undefined> = async (clients: Clients) => {

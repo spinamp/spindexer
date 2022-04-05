@@ -8,10 +8,10 @@ export const missingTrackMetadata: Trigger<Clients, undefined> = async (clients:
       where: [
         {
           key: 'metadata',
-          value: undefined
+          valueExists: false
         }, {
           key: 'metadataError',
-          value: undefined
+          valueExists: false
         }]
     })).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return tracks;
