@@ -1,4 +1,4 @@
-import { MusicPlatform } from '../types/platforms';
+import { MusicPlatform } from '../types/platform';
 import { Clients } from '../types/processor';
 import { Trigger } from '../types/trigger';
 

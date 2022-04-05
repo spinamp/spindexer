@@ -1,6 +1,6 @@
 import { nonAudioTracks } from '../../triggers/nonAudio';
 import { Clients, Processor } from '../../types/processor';
-import { Track } from '../../types/tracks';
+import { Track } from '../../types/track';
 
 const name = 'stripNonAudio';
 

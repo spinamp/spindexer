@@ -1,4 +1,5 @@
 import { Axios } from "axios";
+import { CatalogClient } from "../clients/catalog";
 import { EthClient } from "../clients/ethereum";
 import { IPFSClient } from "../clients/ipfs";
 import { SubgraphClient } from "../clients/subgraph";
@@ -11,6 +12,7 @@ export type Clients = {
   subgraph: SubgraphClient,
   axios: Axios,
   ipfs: IPFSClient,
+  catalog: CatalogClient,
 }
 
 export type Processor = {

@@ -1,6 +1,6 @@
 import { DBClient } from '../db/db';
-import { MusicPlatform, platformConfig } from './platforms';
-import { SubgraphTrack, Track } from './tracks';
+import { MusicPlatform, platformConfig } from './platform';
+import { SubgraphTrack, Track } from './track';
 
 export type NFT = {
   id: string

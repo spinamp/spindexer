@@ -1,7 +1,7 @@
 import { zoraRaw } from '../../triggers/zora';
-import { getZoraPlatform } from '../../types/platforms';
+import { getZoraPlatform } from '../../types/platforms/catalog';
 import { Clients, Processor } from '../../types/processor';
-import { Track } from '../../types/tracks';
+import { Track } from '../../types/track';
 
 export const categorizeZora: Processor = {
   name: 'categorizeZora',

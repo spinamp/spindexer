@@ -1,3 +1,4 @@
+import { MusicPlatform } from '../types/platform';
 import { Clients } from '../types/processor';
 import { Trigger } from '../types/trigger';
 
@@ -36,6 +37,22 @@ export const missingPlatform: Trigger<Clients, undefined> = async (clients: Clie
         key: 'platform',
         value: undefined
       }
+    })).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+  return tracks;
+};
+
+export const unprocessedCatalogTracks: Trigger<Clients, undefined> = async (clients: Clients) => {
+  const tracks = (await clients.db.getRecords('tracks',
+    {
+      where:
+        [{
+          key: 'processedTrack',
+          value: undefined,
+        },
+        {
+          key: 'platform',
+          value: MusicPlatform.catalog
+        }]
     })).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return tracks;
 };

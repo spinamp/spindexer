@@ -1,6 +1,7 @@
 import { EthClient } from '../../clients/ethereum';
 import { DBClient } from '../../db/db';
 import { newNFTsCreated } from '../../triggers/newNFTsCreated';
+import { formatAddress } from '../../types/address';
 import { filterNewTrackNFTs, getNFTMetadataCall, NFT } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 
@@ -15,7 +16,7 @@ export const createTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethC
     console.info(`Processing nft for track ${nft.track.id}`);
     return {
       record: {
-        id: nft.track.id,
+        id: formatAddress(nft.track.id),
         platform: nft.platform,
         tokenMetadataURI: metadataURIs[index],
         createdAtBlockNumber: nft.createdAtBlockNumber,
@@ -26,6 +27,7 @@ export const createTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethC
 };
 
 const processorFunction = async (newNFTs: NFT[], clients: Clients) => {
+  newNFTs.forEach(nft => { nft.id = formatAddress(nft.id) });
   const newProcessedDBBlock = parseInt(newNFTs[newNFTs.length - 1].createdAtBlockNumber);
   const newTracks = await createTracksFromNFTs(newNFTs, clients.db, clients.eth);
   await clients.db.insert('nfts', newNFTs);

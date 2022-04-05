@@ -1,7 +1,7 @@
 import { extractHashFromURL } from '../../clients/ipfs';
 import { missingMetadataIPFSHash } from '../../triggers/missing';
 import { Clients, Processor } from '../../types/processor';
-import { Track } from '../../types/tracks';
+import { Track } from '../../types/track';
 
 const name = 'addTrackMetadataIPFSHash';
 
