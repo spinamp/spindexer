@@ -23,7 +23,7 @@ export const missingMetadataIPFSHash: Trigger<Clients, undefined> = async (clien
       where:
       {
         key: 'metadataIPFSHash',
-        value: undefined
+        valueExists: false
       }
     })).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return tracks;
@@ -35,7 +35,7 @@ export const missingPlatform: Trigger<Clients, undefined> = async (clients: Clie
       where:
       {
         key: 'platform',
-        value: undefined
+        valueExists: false
       }
     })).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return tracks;
@@ -47,7 +47,7 @@ export const unprocessedCatalogTracks: Trigger<Clients, undefined> = async (clie
       where:
         [{
           key: 'processedTrack',
-          value: undefined,
+          valueExists: false
         },
         {
           key: 'platform',

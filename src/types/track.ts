@@ -42,7 +42,7 @@ export const getMetadataURL = (track: Track): (string | null | undefined) => {
 export const getMetadataIPFSHash = (track: Track): (string | null | undefined) => {
   const metadataURL = getMetadataURL(track);
   if (!metadataURL) {
-    return undefined;
+    return null;
   }
   const hash = extractHashFromURL(metadataURL);
   return hash || null;

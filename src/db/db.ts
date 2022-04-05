@@ -6,7 +6,7 @@ export type PartialRecord<Type> = Partial<Type> & Record
 
 export type ValueIsWhere = {
   key: string,
-  value: any,
+  value: {},
 }
 
 export type ValueExistsWhere = {

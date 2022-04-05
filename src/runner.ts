@@ -45,6 +45,7 @@ const runProcessor = async (processor: Processor, clients: Clients) => {
   if (newTriggerItems.length === 0) {
     return true;
   }
+  console.info(`Running ${processor.name} processor.`)
   await processor.processorFunction(newTriggerItems, clients);
   return false;
 }

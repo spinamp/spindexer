@@ -87,7 +87,8 @@ const init = async (): Promise<DBClient> => {
               if ((filter as any).value) {
                 match = _.get(record, filter.key) === (filter as any).value;
               } else {
-                match = !!_.get(record, filter.key) == (filter as any).valueExists;
+                const valueExists = !(_.get(record, filter.key) === undefined)
+                match = valueExists === (filter as any).valueExists;
               }
               if (query.whereType === 'or') {
                 matched = matched || match;
@@ -105,7 +106,8 @@ const init = async (): Promise<DBClient> => {
             if ((filter as any).value) {
               match = _.get(record, filter.key) === (filter as any).value;
             } else {
-              match = !!_.get(record, filter.key) == (filter as any).valueExists;
+              const valueExists = !(_.get(record, filter.key) === undefined)
+              match = valueExists === (filter as any).valueExists;
             }
             return match;
           });
