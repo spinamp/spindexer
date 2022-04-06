@@ -20,7 +20,7 @@ export type PlatformMapper = {
   }[]>;
   mapTrack: (trackItem: {
     track: Track;
-    platformTrackResponse?: any;
+    platformTrackResponse: unknown;
   }) => ProcessedTrack;
   mapArtistProfile: (artistItem: any, createdAtBlockNumber: string) => ArtistProfile;
 }
