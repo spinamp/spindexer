@@ -30,6 +30,7 @@
     "graphql-request": "^4.2.0",
     "lodash": "^4.17.21",
     "prompt": "^1.2.2",
+    "slugify": "^1.6.5",
     "yargs": "^17.4.0"
   }
 }

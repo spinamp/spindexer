@@ -1,7 +1,9 @@
-import { MusicPlatform } from "../platform";
-import { Track } from "../track";
-import { toUtf8Bytes, verifyMessage } from "ethers/lib/utils";
-import { formatAddress } from "../address";
+import slugify from 'slugify';
+import { MusicPlatform } from '../platform';
+import { ProcessedTrack, Track } from '../track';
+import { toUtf8Bytes, verifyMessage } from 'ethers/lib/utils';
+import { formatAddress } from '../address';
+import { Artist, ArtistProfile } from '../artist';
 
 export const recoverCatalogAddress = (body: any, signature: string) => {
   const bodyString = JSON.stringify(body);
@@ -34,68 +36,63 @@ export const getZoraPlatform = (track: Track) => {
   }
 }
 
-// artist: {
-//   name: track.artist.name,
-//   id: mapCatalogArtistID(track),
-//   originalId: track.artist.id,
-//   provider: MusicProvider.catalog,
-//   avatarUrl: track.artist.picture_uri,
-//   websiteUrl: track.artist.handle
-//     ? `https://beta.catalog.works/${track.artist.handle}`
-//     : 'https://beta.catalog.works',
-// },
-
 export const getTokenIdFromTrack = (track: Track) => {
   return track.id.split('/')[1];
 
 }
-export const mapCatalogTrackID = (contractAddress: string, nftID: string): string => {
-  return `ethereum/${formatAddress(contractAddress)}/${nftID}`;
+export const mapCatalogTrackID = (trackId: string): string => {
+  const [contractAddress, nftId] = trackId.split('/');
+  return `ethereum/${formatAddress(contractAddress)}/${nftId}`;
 };
 
-export const mapCatalogArtistID = (catalogArtistID: string): string => {
-  return `ethereum/${formatAddress(catalogArtistID)}`;
+export const mapCatalogArtistID = (artistId: string): string => {
+  return `ethereum/${formatAddress(artistId)}`;
 };
 
-export const transformCatalogTracks = (catalogTrackData: any) => {
+export const mapCatalogTrack = (trackItem: {
+  tokenId: string;
+  track: Track;
+  catalogTrackResponse?: any;
+}): ProcessedTrack => ({
+  id: mapCatalogTrackID(trackItem.track.id),
+  platformId: trackItem.catalogTrackResponse.id,
+  title: trackItem.catalogTrackResponse.title,
+  platform: MusicPlatform.catalog,
+  lossyAudioIPFSHash: trackItem.catalogTrackResponse.ipfs_hash_lossy_audio,
+  lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${trackItem.catalogTrackResponse.ipfs_hash_lossy_audio}`,
+  createdAtBlockNumber: trackItem.track.createdAtBlockNumber,
+  lossyArtworkIPFSHash: `https://catalogworks.b-cdn.net/ipfs/${trackItem.catalogTrackResponse.ipfs_hash_lossy_artwork}`,
+  lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${trackItem.catalogTrackResponse.ipfs_hash_lossy_artwork}`,
+  websiteUrl:
+    trackItem.catalogTrackResponse.artist.handle && trackItem.catalogTrackResponse.short_url
+      ? `https://beta.catalog.works/${trackItem.catalogTrackResponse.artist.handle}/${trackItem.catalogTrackResponse.short_url}`
+      : 'https://beta.catalog.works',
+  artistId: mapCatalogArtistID(trackItem.catalogTrackResponse.artist.id),
+  artist: { id: trackItem.catalogTrackResponse.artist.id, name: trackItem.catalogTrackResponse.artist.name }
+});
+
+export const mapCatalogArtistProfile = (artistItem: any, createdAtBlockNumber: string): ArtistProfile => {
   return {
-    processedTrack: {
-      id: mapCatalogTrackID(catalogTrackData.contract_address, catalogTrackData.nft_id),
-      platformMetadata: catalogTrackData
-    },
-    artistProfile: {
-      id: mapCatalogArtistID(catalogTrackData.artist.id),
-      //   name: track.artist.name,
-      //   originalId: track.artist.id,
-      //   provider: MusicProvider.catalog,
-      //   avatarUrl: track.artist.picture_uri,
-      //   websiteUrl: track.artist.handle
-      //     ? `https://beta.catalog.works/${track.artist.handle}`
-      //     : 'https://beta.catalog.works',
-    },
-    artist: {
-    }
+    name: artistItem.name,
+    artistId: mapCatalogArtistID(artistItem.id),
+    platformId: artistItem.id,
+    platform: MusicPlatform.catalog,
+    avatarUrl: artistItem.picture_uri,
+    websiteUrl: artistItem.handle
+      ? `https://beta.catalog.works/${artistItem.handle}`
+      : 'https://beta.catalog.works',
+    createdAtBlockNumber,
   }
 };
 
-// export const mapCatalogTrack = (track: any): IRawTrack => ({
-//   id: mapCatalogTrackID(track),
-//   title: track.title,
-//   artist: { // this is the artist profile
-//     name: track.artist.name,
-//     id: mapCatalogArtistID(track),
-//     originalId: track.artist.id,
-//     provider: MusicProvider.catalog,
-//     avatarUrl: track.artist.picture_uri,
-//     websiteUrl: track.artist.handle
-//       ? `https://beta.catalog.works/${track.artist.handle}`
-//       : 'https://beta.catalog.works',
-//   },
-//   url: `https://catalogworks.b-cdn.net/ipfs/${track.ipfs_hash_lossy_audio}`,
-//   createdAt: track.created_at,
-//   artwork: `https://catalogworks.b-cdn.net/ipfs/${track.ipfs_hash_lossy_artwork}`,
-//   websiteUrl:
-//     track.artist.handle && track.short_url
-//       ? `https://beta.catalog.works/${track.artist.handle}/${track.short_url}`
-//       : 'https://beta.catalog.works',
-// });
+export const mapCatalogArtist = (artistProfile: ArtistProfile): Artist => {
+  return {
+    name: artistProfile.name,
+    slug: slugify(`${artistProfile.name} ${artistProfile.createdAtBlockNumber}`).toLowerCase(),
+    id: artistProfile.artistId,
+    profiles: {
+      catalog: artistProfile
+    },
+    createdAtBlockNumber: artistProfile.createdAtBlockNumber,
+  }
+};

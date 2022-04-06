@@ -33,6 +33,7 @@ const saveMetadata = async (tracks: Track[], dbClient: DBClient) => {
 // This function effectively gets a batch of tracks to process. It then sets up a buffer
 // of concurrent requests and flushes track requests through until all tracks metadata has
 // been processed or timed out. It then updates all those tracks in the DB.
+// todo: should probably be abstracted out/generalized
 const processorFunction = async (batch: Track[], clients: Clients) => {
   let activeRequests = 0;
   let count = 0;
@@ -64,10 +65,6 @@ const processorFunction = async (batch: Track[], clients: Clients) => {
   await isDone;
   await saveMetadata(batch, clients.db);
   console.info('Batch done');
-  // todo: should have some way to skip/detect/error on buggy urls and ideally continue and ignore them.
-  // todo: ensure filtering for trigger working properly
-  // maybe an error field inserted into the record so it can be skipped?
-  // todo: should upsert
 };
 
 export const addTrackMetadata: Processor = {

@@ -125,7 +125,7 @@ const init = async (): Promise<DBClient> => {
       });
       await saveDB(db);
     },
-    update: async (tableName: string, recordUpdates: Record[]) => {
+    update: async (tableName: string, recordUpdates: Record[], type?: {}) => {
       const index = indexes[tableName];
       recordUpdates.forEach((update: Record) => {
         const record = index[update.id];

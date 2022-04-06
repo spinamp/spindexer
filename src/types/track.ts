@@ -9,28 +9,31 @@ export type SubgraphTrack = {
 
 export type ProcessedTrack = {
   id: string;
-  originalId: string;
+  platformId: string;
   title: string;
   platform: MusicPlatform;
-  url: string;
+  lossyAudioIPFSHash: string;
+  lossyAudioURL: string;
   description?: string;
   artwork?: string;
-  createdAt?: string;
+  createdAtBlockNumber: string;
+  lossyArtworkIPFSHash: string;
+  lossyArtworkURL: string;
   websiteUrl?: string;
   artistId: string;
-  artist: Artist;
+  artist: { id: string, name: string };
 }
 
 export type Track = {
   id: string,
   platform: MusicPlatform,
   metadataIPFSHash?: string
-  createdAtBlockNumber?: string
+  createdAtBlockNumber: string
   [ValidContractCallFunction.tokenURI]?: string
   [ValidContractCallFunction.tokenMetadataURI]?: string
   metadata?: any
   metadataError?: string
-  platformMetadata?: any
+  processed?: true
 }
 
 export const getMetadataURL = (track: Track): (string | null | undefined) => {

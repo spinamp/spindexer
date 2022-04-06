@@ -3,9 +3,11 @@ import { MusicPlatform } from "./platform";
 export type Artist = {
   id: string;
   name: string;
+  slug: string;
   profiles: {
     [platform in MusicPlatform]?: ArtistProfile;
   };
+  createdAtBlockNumber: string;
 }
 
 export type ArtistProfile = {
@@ -15,4 +17,5 @@ export type ArtistProfile = {
   platform: MusicPlatform;
   avatarUrl?: string;
   websiteUrl?: string;
+  createdAtBlockNumber: string;
 }
