@@ -4,6 +4,8 @@ import { ProcessedTrack, Track } from '../track';
 import { toUtf8Bytes, verifyMessage } from 'ethers/lib/utils';
 import { formatAddress } from '../address';
 import { Artist, ArtistProfile } from '../artist';
+import { CatalogClient } from '../../clients/catalog';
+import _ from 'lodash';
 
 export const recoverCatalogAddress = (body: any, signature: string) => {
   const bodyString = JSON.stringify(body);
@@ -36,45 +38,44 @@ export const getZoraPlatform = (track: Track) => {
   }
 }
 
-export const getTokenIdFromTrack = (track: Track) => {
+const getTokenIdFromTrack = (track: Track) => {
   return track.id.split('/')[1];
 
 }
-export const mapCatalogTrackID = (trackId: string): string => {
+const mapTrackID = (trackId: string): string => {
   const [contractAddress, nftId] = trackId.split('/');
   return `ethereum/${formatAddress(contractAddress)}/${nftId}`;
 };
 
-export const mapCatalogArtistID = (artistId: string): string => {
+const mapArtistID = (artistId: string): string => {
   return `ethereum/${formatAddress(artistId)}`;
 };
 
-export const mapCatalogTrack = (trackItem: {
-  tokenId: string;
+const mapTrack = (trackItem: {
   track: Track;
-  catalogTrackResponse?: any;
+  platformTrackResponse?: any;
 }): ProcessedTrack => ({
-  id: mapCatalogTrackID(trackItem.track.id),
-  platformId: trackItem.catalogTrackResponse.id,
-  title: trackItem.catalogTrackResponse.title,
+  id: mapTrackID(trackItem.track.id),
+  platformId: trackItem.platformTrackResponse.id,
+  title: trackItem.platformTrackResponse.title,
   platform: MusicPlatform.catalog,
-  lossyAudioIPFSHash: trackItem.catalogTrackResponse.ipfs_hash_lossy_audio,
-  lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${trackItem.catalogTrackResponse.ipfs_hash_lossy_audio}`,
+  lossyAudioIPFSHash: trackItem.platformTrackResponse.ipfs_hash_lossy_audio,
+  lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${trackItem.platformTrackResponse.ipfs_hash_lossy_audio}`,
   createdAtBlockNumber: trackItem.track.createdAtBlockNumber,
-  lossyArtworkIPFSHash: `https://catalogworks.b-cdn.net/ipfs/${trackItem.catalogTrackResponse.ipfs_hash_lossy_artwork}`,
-  lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${trackItem.catalogTrackResponse.ipfs_hash_lossy_artwork}`,
+  lossyArtworkIPFSHash: `https://catalogworks.b-cdn.net/ipfs/${trackItem.platformTrackResponse.ipfs_hash_lossy_artwork}`,
+  lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${trackItem.platformTrackResponse.ipfs_hash_lossy_artwork}`,
   websiteUrl:
-    trackItem.catalogTrackResponse.artist.handle && trackItem.catalogTrackResponse.short_url
-      ? `https://beta.catalog.works/${trackItem.catalogTrackResponse.artist.handle}/${trackItem.catalogTrackResponse.short_url}`
+    trackItem.platformTrackResponse.artist.handle && trackItem.platformTrackResponse.short_url
+      ? `https://beta.catalog.works/${trackItem.platformTrackResponse.artist.handle}/${trackItem.platformTrackResponse.short_url}`
       : 'https://beta.catalog.works',
-  artistId: mapCatalogArtistID(trackItem.catalogTrackResponse.artist.id),
-  artist: { id: trackItem.catalogTrackResponse.artist.id, name: trackItem.catalogTrackResponse.artist.name }
+  artistId: mapTrackID(trackItem.platformTrackResponse.artist.id),
+  artist: { id: trackItem.platformTrackResponse.artist.id, name: trackItem.platformTrackResponse.artist.name }
 });
 
-export const mapCatalogArtistProfile = (artistItem: any, createdAtBlockNumber: string): ArtistProfile => {
+const mapArtistProfile = (artistItem: any, createdAtBlockNumber: string): ArtistProfile => {
   return {
     name: artistItem.name,
-    artistId: mapCatalogArtistID(artistItem.id),
+    artistId: mapArtistID(artistItem.id),
     platformId: artistItem.id,
     platform: MusicPlatform.catalog,
     avatarUrl: artistItem.picture_uri,
@@ -85,7 +86,7 @@ export const mapCatalogArtistProfile = (artistItem: any, createdAtBlockNumber: s
   }
 };
 
-export const mapCatalogArtist = (artistProfile: ArtistProfile): Artist => {
+const mapArtist = (artistProfile: ArtistProfile): Artist => {
   return {
     name: artistProfile.name,
     slug: slugify(`${artistProfile.name} ${artistProfile.createdAtBlockNumber}`).toLowerCase(),
@@ -96,3 +97,27 @@ export const mapCatalogArtist = (artistProfile: ArtistProfile): Artist => {
     createdAtBlockNumber: artistProfile.createdAtBlockNumber,
   }
 };
+
+const addPlatformTrackData = async (tracks: Track[], client: CatalogClient) => {
+  const trackTokenIds = tracks.map(t => getTokenIdFromTrack(t));
+  const platformTracks = await client.fetchCatalogTracksByNFT(trackTokenIds);
+  const platformTrackData: { tokenId: string, track: Track, platformTrackResponse?: any }[]
+    = tracks.map(track => ({ tokenId: getTokenIdFromTrack(track), track }));
+  const platformTrackDataByTokenId = _.keyBy(platformTrackData, 'tokenId');
+  platformTracks.forEach((platformTrackResponse: any) => {
+    if (platformTrackDataByTokenId[platformTrackResponse.nft_id]) {
+      platformTrackDataByTokenId[platformTrackResponse.nft_id].platformTrackResponse = platformTrackResponse;
+    }
+  });
+  return platformTrackData;
+}
+
+export default {
+  addPlatformTrackData,
+  getTokenIdFromTrack,
+  mapTrackID,
+  mapTrack,
+  mapArtistID,
+  mapArtistProfile,
+  mapArtist
+}
