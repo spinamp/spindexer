@@ -1,20 +1,68 @@
-// export const mapSoundTrackID = (track: any): string => {
-//   return `ethereum/${formatAddressId(track.artist.contract.address)}/${
-//     track.mintInfo.editionId
-//   }`;
-// };
+import _ from "lodash";
+import { SoundClient } from "../../clients/sound";
+import { formatAddress } from "../address";
+import { ArtistProfile, Artist } from "../artist";
+import { MusicPlatform } from "../platform";
+import { Track, ProcessedTrack } from "../track";
 
-// export const mapSoundArtistID = (track: any): string => {
-//   return `ethereum/${formatAddressId(track.artist.user.publicAddress)}`;
-// };
+const mapTrackID = (trackId: string): string => {
+  const [contractAddress, editionId] = trackId.split('/');
+  return `ethereum/${formatAddress(contractAddress)}/${editionId}`;
+};
 
-// artist: {
-//   id: mapSoundArtistID(track),
-//   name: track.artist.name,
-//   provider: MusicProvider.soundXyz,
-//   originalId: track.artist.id,
-//   avatarUrl: track.artist.user?.avatar?.url,
-//   websiteUrl: track.artist.soundHandle
-//     ? `https://www.sound.xyz/${track.artist.soundHandle}`
-//     : 'https://www.sound.xyz',
-// },
+
+const mapArtistID = (artistId: string): string => {
+  return `ethereum/${formatAddress(artistId)}`;
+};
+
+const mapTrack = (trackItem: {
+  track: Track;
+  platformTrackResponse: any;
+}): ProcessedTrack => ({
+  id: mapTrackID(trackItem.track.id),
+  platformId: trackItem.platformTrackResponse.id,
+  title: trackItem.platformTrackResponse.title,
+  platform: MusicPlatform.sound,
+  lossyAudioURL: trackItem.platformTrackResponse.tracks[0]?.audio?.url,
+  createdAtBlockNumber: trackItem.track.createdAtBlockNumber,
+  lossyArtworkURL: trackItem.platformTrackResponse.coverImage?.url,
+  websiteUrl:
+    trackItem.platformTrackResponse.artist.soundHandle && trackItem.platformTrackResponse.titleSlug
+      ? `https://www.sound.xyz/${trackItem.platformTrackResponse.artist.soundHandle}/${trackItem.platformTrackResponse.titleSlug}`
+      : 'https://www.sound.xyz',
+  artistId: mapArtistID(trackItem.platformTrackResponse.artist.user.publicAddress),
+  artist: { id: mapArtistID(trackItem.platformTrackResponse.artist.user.publicAddress), name: trackItem.platformTrackResponse.artist.name }
+});
+
+const mapArtistProfile = (platformResponse: any, createdAtBlockNumber: string): ArtistProfile => {
+  const artist = platformResponse.artist
+  return {
+    name: artist.name,
+    artistId: mapArtistID(artist.id),
+    platformId: artist.id,
+    platform: MusicPlatform.sound,
+    avatarUrl: artist.user?.avatar?.url,
+    websiteUrl: artist.soundHandle ?
+      `https://www.sound.xyz/${artist.soundHandle}`
+      : 'https://www.sound.xyz',
+    createdAtBlockNumber,
+  }
+};
+
+const addPlatformTrackData = async (tracks: Track[], client: SoundClient) => {
+  const platformTracks = await client.getAllMintedReleases();
+  const platformTracksWithTrackID = platformTracks.map(platformTrack => ({
+    ...platformTrack,
+    id: `${formatAddress(platformTrack?.artist?.contract?.address)}/${platformTrack?.mintInfo?.editionId}`,
+  }));
+  const platformTrackDataByTrackId = _.keyBy(platformTracksWithTrackID, 'id');
+  const platformTrackData: { track: Track, platformTrackResponse: any }[]
+    = tracks.map(track => ({ track, platformTrackResponse: platformTrackDataByTrackId[track.id] }));
+  return platformTrackData;
+}
+
+export default {
+  addPlatformTrackData,
+  mapTrack,
+  mapArtistProfile,
+}

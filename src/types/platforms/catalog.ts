@@ -1,9 +1,8 @@
-import slugify from 'slugify';
 import { MusicPlatform } from '../platform';
 import { ProcessedTrack, Track } from '../track';
 import { toUtf8Bytes, verifyMessage } from 'ethers/lib/utils';
 import { formatAddress } from '../address';
-import { Artist, ArtistProfile } from '../artist';
+import { ArtistProfile } from '../artist';
 import { CatalogClient } from '../../clients/catalog';
 import _ from 'lodash';
 
@@ -68,41 +67,30 @@ const mapTrack = (trackItem: {
     trackItem.platformTrackResponse.artist.handle && trackItem.platformTrackResponse.short_url
       ? `https://beta.catalog.works/${trackItem.platformTrackResponse.artist.handle}/${trackItem.platformTrackResponse.short_url}`
       : 'https://beta.catalog.works',
-  artistId: mapTrackID(trackItem.platformTrackResponse.artist.id),
-  artist: { id: trackItem.platformTrackResponse.artist.id, name: trackItem.platformTrackResponse.artist.name }
+  artistId: mapArtistID(trackItem.platformTrackResponse.artist.id),
+  artist: { id: mapArtistID(trackItem.platformTrackResponse.artist.id), name: trackItem.platformTrackResponse.artist.name }
 });
 
-const mapArtistProfile = (artistItem: any, createdAtBlockNumber: string): ArtistProfile => {
+const mapArtistProfile = (platformResponse: any, createdAtBlockNumber: string): ArtistProfile => {
+  const artist = platformResponse.artist;
   return {
-    name: artistItem.name,
-    artistId: mapArtistID(artistItem.id),
-    platformId: artistItem.id,
+    name: artist.name,
+    artistId: mapArtistID(artist.id),
+    platformId: artist.id,
     platform: MusicPlatform.catalog,
-    avatarUrl: artistItem.picture_uri,
-    websiteUrl: artistItem.handle
-      ? `https://beta.catalog.works/${artistItem.handle}`
+    avatarUrl: artist.picture_uri,
+    websiteUrl: artist.handle
+      ? `https://beta.catalog.works/${artist.handle}`
       : 'https://beta.catalog.works',
     createdAtBlockNumber,
-  }
-};
-
-const mapArtist = (artistProfile: ArtistProfile): Artist => {
-  return {
-    name: artistProfile.name,
-    slug: slugify(`${artistProfile.name} ${artistProfile.createdAtBlockNumber}`).toLowerCase(),
-    id: artistProfile.artistId,
-    profiles: {
-      catalog: artistProfile
-    },
-    createdAtBlockNumber: artistProfile.createdAtBlockNumber,
   }
 };
 
 const addPlatformTrackData = async (tracks: Track[], client: CatalogClient) => {
   const trackTokenIds = tracks.map(t => getTokenIdFromTrack(t));
   const platformTracks = await client.fetchCatalogTracksByNFT(trackTokenIds);
-  const platformTrackData: { tokenId: string, track: Track, platformTrackResponse?: any }[]
-    = tracks.map(track => ({ tokenId: getTokenIdFromTrack(track), track }));
+  const platformTrackData: { tokenId: string, track: Track, platformTrackResponse: any }[]
+    = tracks.map(track => ({ tokenId: getTokenIdFromTrack(track), track, platformTrackResponse: undefined }));
   const platformTrackDataByTokenId = _.keyBy(platformTrackData, 'tokenId');
   platformTracks.forEach((platformTrackResponse: any) => {
     if (platformTrackDataByTokenId[platformTrackResponse.nft_id]) {
@@ -114,10 +102,6 @@ const addPlatformTrackData = async (tracks: Track[], client: CatalogClient) => {
 
 export default {
   addPlatformTrackData,
-  getTokenIdFromTrack,
-  mapTrackID,
   mapTrack,
-  mapArtistID,
   mapArtistProfile,
-  mapArtist
 }

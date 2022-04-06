@@ -1,18 +1,20 @@
 import _ from 'lodash';
 import { PartialRecord } from '../../db/db';
 import { unprocessedPlatformTracks } from '../../triggers/missing';
-import { Artist, ArtistProfile } from '../../types/artist';
+import { Artist, ArtistProfile, mapArtist } from '../../types/artist';
 import { MusicPlatform, platformConfig, PlatformMapper } from '../../types/platform';
 import { Clients } from '../../types/processor';
 import { Track, ProcessedTrack } from '../../types/track';
+
+type ImplementedMusicPlatform = MusicPlatform.catalog | MusicPlatform.sound;
 
 const name = 'processTracks';
 
 const processPlatformTrackData = (platformTrackData: {
   track: Track;
-  platformTrackResponse?: any;
-}[], platformMapper: PlatformMapper) => {
-  const { mapArtist, mapArtistProfile, mapTrack } = platformMapper;
+  platformTrackResponse: unknown;
+}[], platformMapper: PlatformMapper, platform: ImplementedMusicPlatform) => {
+  const { mapArtistProfile, mapTrack } = platformMapper;
 
   const { processedTracks, trackUpdates } = platformTrackData.reduce<
     { processedTracks: Omit<ProcessedTrack, 'artistId' | 'artist'>[], trackUpdates: PartialRecord<Track>[] }>
@@ -31,27 +33,25 @@ const processPlatformTrackData = (platformTrackData: {
     );
   const artistProfiles = _.uniqBy(platformTrackData.reduce<ArtistProfile[]>((profiles, trackData) => {
     if (trackData.platformTrackResponse) {
-      profiles.push(mapArtistProfile(trackData.platformTrackResponse?.artist, trackData.track.createdAtBlockNumber));
+      profiles.push(mapArtistProfile(trackData.platformTrackResponse, trackData.track.createdAtBlockNumber));
     }
     return profiles
   }, []), 'artistId');
-  const artists = artistProfiles.map(p => mapArtist(p));
+  const artists = artistProfiles.map(profile => mapArtist(profile, platform));
   return {
     processedTracks, trackUpdates, artists,
   };
 }
 
-type ImplementedMusicPlatform = MusicPlatform.catalog;
-
 const processorFunction = (platform: Partial<ImplementedMusicPlatform>) => async (tracks: Track[], clients: Clients) => {
   console.log(`Getting ${platform} API tracks for ids: ${tracks.map(t => t.id)}`);
   const platformMapper = platformConfig[platform].mappers;
   if (!platformMapper) {
-    throw new Error('Platform mapper not found');
+    throw new Error(`Platform mapper for ${platform} not found`);
   }
   const platformTrackData = await platformMapper.addPlatformTrackData(tracks, clients[platform]);
 
-  const { processedTracks, trackUpdates, artists } = processPlatformTrackData(platformTrackData, platformMapper);
+  const { processedTracks, trackUpdates, artists } = processPlatformTrackData(platformTrackData, platformMapper, platform);
   const existingArtistsQuery = { where: artists.map(a => ({ key: 'id', value: a.id })), whereType: 'or' };
   const existingArtists = await clients.db.getRecords<Artist>('artists', existingArtistsQuery);
   const existingArtistsById = _.keyBy(existingArtists, 'id');

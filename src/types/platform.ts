@@ -1,7 +1,7 @@
-import { CatalogClient } from "../clients/catalog";
 import { ValidContractCallFunction } from "../clients/ethereum";
 import { ArtistProfile, Artist } from "./artist";
 import catalogMappers from './platforms/catalog';
+import soundMappers from './platforms/sound';
 import { Track, ProcessedTrack } from "./track";
 
 export enum MusicPlatform {
@@ -14,19 +14,15 @@ export enum MusicPlatform {
 }
 
 export type PlatformMapper = {
-  addPlatformTrackData: (tracks: Track[], client: CatalogClient) => Promise<{
+  addPlatformTrackData: (tracks: Track[], client: any) => Promise<{
     track: Track;
-    platformTrackResponse?: any;
+    platformTrackResponse: unknown;
   }[]>;
-  getTokenIdFromTrack: (track: Track) => string;
-  mapTrackID: (trackId: string) => string;
   mapTrack: (trackItem: {
     track: Track;
     platformTrackResponse?: any;
   }) => ProcessedTrack;
-  mapArtistID: (artistId: string) => string;
   mapArtistProfile: (artistItem: any, createdAtBlockNumber: string) => ArtistProfile;
-  mapArtist: (artistProfile: ArtistProfile) => Artist;
 }
 
 export type PlatformConfigItem = {
@@ -43,6 +39,7 @@ export const platformConfig: PlatformConfig = {
   sound: {
     contractCalls: [ValidContractCallFunction.tokenURI],
     contractMetadataField: ValidContractCallFunction.tokenURI,
+    mappers: soundMappers,
   },
   zora: {
     contractCalls: [ValidContractCallFunction.tokenURI, ValidContractCallFunction.tokenMetadataURI],

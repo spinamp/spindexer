@@ -12,12 +12,12 @@ export type ProcessedTrack = {
   platformId: string;
   title: string;
   platform: MusicPlatform;
-  lossyAudioIPFSHash: string;
+  lossyAudioIPFSHash?: string;
   lossyAudioURL: string;
   description?: string;
   artwork?: string;
   createdAtBlockNumber: string;
-  lossyArtworkIPFSHash: string;
+  lossyArtworkIPFSHash?: string;
   lossyArtworkURL: string;
   websiteUrl?: string;
   artistId: string;
