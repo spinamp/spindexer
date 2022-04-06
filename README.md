@@ -26,17 +26,30 @@ There are a few design goals for the code:
  - The intention is that the code can eventually just be run in a labmda function automatically and trigger on every ethereum block doing small updates each block as needed.
 
 # Code/Data Architecture
-In order to facilitate some of the above goals, the pipeline needs to be able to track it's progress processing data in a 2-dimensional way. Processing progresses along mainly 2 dimensions, ie:
- - Time/blocks: As time or blocks pass, the processing needs to progress with new blocks.
+
+In order to facilitate some of the above goals, the pipeline has seperate processers that are each able to track their progress processing data across different dimensions, for example:
+ - Time/blocks: As time or blocks pass, a processor may need to progress with new blocks and track how far it has gone.
  - Stages: Each record in the DB may be processed in multiple stages and so this progress needs to be tracked. For example, a new track may enter the DB with just an ID and a smart contract address first. Then Ethereum may be queried to get it's tokenURI. Then IFPS may be queried to get it's metadata. Then some other centralized platforms may be queried to augment that data.
 
-The first dimension of progress, ie, time/blocks generally applies to a data source being ingested. For example, new tracks being added into the web3-music-subgraph is one example. Ethereum events could be another example. An nft transfer/change of ownership is another example. Each data source should track its progress independently so that when future data sources are added (eg: new smart contracts), that source can catch up and process independently of any others.
+Processors check their progress using a trigger.
 
-*Note: This isn't perfect. There may be cases where there is a dependency across sources, For example, imagine Sound.xyz adds some feature where if you hold 2 golden eggs at the same time, you get a special platinum egg. In this case, there would be a dependency between nft ownership and platinum eggs. This means that if the nft ownership source is up to date but the golden egg processor is not, we would have to re-run the nft ownership processer again to make sure we didn't miss any instances where a user was temporarily holding 2 golden eggs and minted a platinum egg. Perhaps a more powerful design could also allow specifying explicit dependencies across sources for re-calculation.*
+## Processors
+A processor is a combination of a trigger, optional cursor and processing function that decides what to do with new data.
 
-The second dimension of progress generally applies to a specific record, as in the IPFS data ingestion example above. Each record should track it's progress independently of others. As an alternative, a stage could track all records that it has processed, however given that stages tend to progress serially, it makes more sense to partition based on recrods rather than stages.
+## Triggers
+A trigger is a function that a processor runs to check if there is anything new for it to process. This may or may not involve a cursor, for example:
+ - The NFT processor that tracks new NFT mints runs over all blocks one by one and will keep track of the most recent block it has processed in a cursor
+ - The track metadata processor just queries for any tracks that have not yet had their metadata processed. It does not need to track a cursor, but rather just keeps going until the query is empty and there is nothing left for it to process.
 
-In addition to fulfilling the above design goals, this kind of 2-dimensional progress architecture will make it super easy to parallelize the pipeline in future if ever needed.
+Each processor should track its progress independently so that when future data sources and processors are added (eg: new smart contracts), that source can catch up and process independently of any others.
+
+Another way to think about triggers based on these examples:
+ - Cursor based: In the first example, the dimension of progress, ie, time/blocks generally applies to a data source being ingested and the information about progress is stored directly by the processor. Other examples in this category could be: New tracks being added into the web3-music-subgraph, New Ethereum events, An nft transfer/change of ownership.
+ - Cursorless: In the second example, ie, IPFS data ingestion, progress generally applies to a specific record. Each record effectively tracks it's progress itself, independently of others. Cursorless triggers should aim to be idempotent, and so should always modify their record such that the record is no longer triggered on future runs. *(As an alternative, a processor could perhaps track all records that it has processed, however for many processors it makes more sense to effectively track progress on records rather than stages.)*
+
+*Note: This isn't perfect. There may be cases where there is a dependency across processors, For example, imagine Sound.xyz adds some feature where if you hold 2 golden eggs at the same time, you get a special platinum egg. In this case, there would be a dependency between nft ownership and platinum eggs. This means that if the nft ownership processor is completed but the golden egg processor is not, we would have to re-run the nft ownership processer again to make sure we didn't miss any instances where a user was temporarily holding 2 golden eggs and minted a platinum egg. Perhaps a more powerful design could also allow specifying explicit dependencies across sources for re-calculation.*
+
+In addition to fulfilling the above design goals, this kind of process architecture will make it super easy to parallelize the pipeline in future if ever needed.
 
 # Runner
-Each processor can run in parallel, but a simple runner can just loop across all processors over and over until all are up to date.
+Each processor could in theory run in parallel, but at the moment there is a simple runner that just loops across all processors over and over until all are up to date.
