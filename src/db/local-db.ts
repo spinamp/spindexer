@@ -8,6 +8,7 @@ const INITIAL_DB = {
   nfts: [],
   artists: [],
   tracks: [],
+  processedTracks: [],
   processors: {
   },
 };
@@ -16,6 +17,7 @@ const INITIAL_INDEXES = {
   nfts: {},
   artists: {},
   tracks: {},
+  processedTracks: {},
 };
 
 const createIndexes = async (db: any) => {
@@ -70,12 +72,12 @@ const init = async (): Promise<DBClient> => {
     getRecord: async (tableName: string, id: string): (Promise<Record>) => {
       return indexes[tableName] && indexes[tableName][id];
     },
-    getRecords: async (tableName: string, query?: Query): (Promise<Record[]>) => {
+    getRecords: async <RecordType extends Record>(tableName: string, query?: Query): (Promise<RecordType[]>) => {
       const allRecords = db[tableName]
       if (query) {
         let filteredRecords = allRecords;
         if (Array.isArray(query.where)) {
-          filteredRecords = filteredRecords.filter((record: Record) => {
+          filteredRecords = filteredRecords.filter((record: RecordType) => {
             let matched;
             if (query.whereType === 'or') {
               matched = false;
@@ -101,7 +103,7 @@ const init = async (): Promise<DBClient> => {
           );
         } else {
           const filter = query.where;
-          filteredRecords = allRecords.filter((record: Record) => {
+          filteredRecords = allRecords.filter((record: RecordType) => {
             let match;
             if ((filter as any).value) {
               match = _.get(record, filter.key) === (filter as any).value;
@@ -125,7 +127,7 @@ const init = async (): Promise<DBClient> => {
       });
       await saveDB(db);
     },
-    update: async (tableName: string, recordUpdates: Record[], type?: {}) => {
+    update: async (tableName: string, recordUpdates: Record[]) => {
       const index = indexes[tableName];
       recordUpdates.forEach((update: Record) => {
         const record = index[update.id];
@@ -133,6 +135,20 @@ const init = async (): Promise<DBClient> => {
           throw new Error('Unknown record provided');
         }
         Object.assign(record, { ...update });
+      });
+      await saveDB(db);
+    },
+    upsert: async (tableName: string, recordUpserts: Record[]) => {
+      const index = indexes[tableName];
+      const table = db[tableName];
+      recordUpserts.forEach((upsert: Record) => {
+        const existingRecord = index[upsert.id];
+        if (existingRecord) {
+          Object.assign(existingRecord, { ...upsert });
+        } else {
+          table.push(upsert);
+          index[upsert.id] = upsert;
+        }
       });
       await saveDB(db);
     },

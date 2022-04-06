@@ -64,7 +64,7 @@ const processorFunction = async (tracks: Track[], clients: Clients) => {
   });
   await clients.db.update('tracks', trackUpdates);
   await clients.db.insert('processedTracks', processedTracks);
-  await clients.db.update('mergedArtists', mergedArtists);
+  await clients.db.upsert('artists', mergedArtists);
 };
 
 export const processCatalogTracks: Processor = {

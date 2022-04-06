@@ -46,7 +46,7 @@ export const unprocessedCatalogTracks: Trigger<Clients, undefined> = async (clie
     {
       where:
         [{
-          key: 'processedTrack',
+          key: 'processed',
           valueExists: false
         },
         {
