@@ -16,6 +16,7 @@ const fetchNOIZDTracksForNFTs = async (
     params: {
       $order: '[["created", "DESC"]]',
       $where: `{ "metadata.id": { "$in": ${JSON.stringify(nftIds)} } }`,
+      $limit: 100,
     },
   });
   return data.items;

@@ -31,10 +31,6 @@ const findECONNREFUSEDErrorTracks = (tracks: Track[]) => {
   return tracks.filter(t => t.metadataError && t.metadataError.includes('connect ECONNREFUSED'));
 }
 
-const findProcessErrorTracks = (tracks: Track[]) => {
-  return tracks.filter(t => t.processed && t.processError);
-}
-
 const findTracks = (tracks: Track[], filter: any) => {
   return tracks.filter(track => {
     const filters = Object.keys(filter)
@@ -169,7 +165,15 @@ const resetProcessTracks = async () => {
 const resetProcessErrorTracks = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
-  const processErrorTracks = await findProcessErrorTracks(db.tracks);
+  const processErrorTracks = await findTracks(db.tracks, { processed: true, processError: true });
+  const updates = processErrorTracks.map(t => ({ id: t.id, processed: undefined, processError: undefined }));
+  await dbClient.update('tracks', updates);
+}
+
+const resetNOIZDProcessErrorTracks = async () => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  const processErrorTracks = await findTracks(db.tracks, { processed: true, processError: true, platform: MusicPlatform.noizd });
   const updates = processErrorTracks.map(t => ({ id: t.id, processed: undefined, processError: undefined }));
   await dbClient.update('tracks', updates);
 }
@@ -316,6 +320,11 @@ const start = async () => {
       return yargs
     }, async () => {
       await printTracks('processError', true);
+    })
+    .command('resetNOIZDProcessErrorTracks', 'clear out processing and processError from NOIZD tracks with error so they can be retried', async (yargs) => {
+      return yargs
+    }, async () => {
+      await resetNOIZDProcessErrorTracks();
     })
     .parse()
 }
