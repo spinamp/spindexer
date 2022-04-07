@@ -19,13 +19,19 @@ const processPlatformTrackData = (platformTrackData: {
   const { processedTracks, trackUpdates } = platformTrackData.reduce<
     { processedTracks: Omit<ProcessedTrack, 'artistId' | 'artist'>[], trackUpdates: PartialRecord<Track>[] }>
     ((accum, item) => {
-      accum.trackUpdates.push({
-        id: item.track.id,
-        processed: true,
-      });
       if (item.platformTrackResponse) {
         const processedTrack = mapTrack(item)
         accum.processedTracks.push(processedTrack);
+        accum.trackUpdates.push({
+          id: item.track.id,
+          processed: true,
+        });
+      } else {
+        accum.trackUpdates.push({
+          id: item.track.id,
+          processed: true,
+          processError: true,
+        });
       }
       return accum;
     },

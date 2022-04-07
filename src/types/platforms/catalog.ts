@@ -89,14 +89,12 @@ const mapArtistProfile = (platformResponse: any, createdAtBlockNumber: string): 
 const addPlatformTrackData = async (tracks: Track[], client: CatalogClient) => {
   const trackTokenIds = tracks.map(t => getTokenIdFromTrack(t));
   const platformTracks = await client.fetchCatalogTracksByNFT(trackTokenIds);
-  const platformTrackData: { tokenId: string, track: Track, platformTrackResponse: any }[]
-    = tracks.map(track => ({ tokenId: getTokenIdFromTrack(track), track, platformTrackResponse: undefined }));
-  const platformTrackDataByTokenId = _.keyBy(platformTrackData, 'tokenId');
-  platformTracks.forEach((platformTrackResponse: any) => {
-    if (platformTrackDataByTokenId[platformTrackResponse.nft_id]) {
-      platformTrackDataByTokenId[platformTrackResponse.nft_id].platformTrackResponse = platformTrackResponse;
-    }
-  });
+  const platformTrackDataByTokenId = _.keyBy(platformTracks, 'nft_id');
+  const platformTrackData: { track: Track, platformTrackResponse: any }[]
+    = tracks.map(track => ({
+      track,
+      platformTrackResponse: platformTrackDataByTokenId[getTokenIdFromTrack(track)]
+    }));
   return platformTrackData;
 }
 

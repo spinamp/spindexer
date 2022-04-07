@@ -5,20 +5,19 @@ const catalogApi = new GraphQLClient(
 );
 
 export type CatalogClient = {
-  fetchCatalogTracksByNFT: (nftIds: string[], limit?: Number) => Promise<any[]>;
+  fetchCatalogTracksByNFT: (nftIds: string[]) => Promise<any[]>;
 }
 
 const init = async () => {
   return {
     fetchCatalogTracksByNFT: async (
       nftIds: string[],
-      limit: Number = 100,
     ): Promise<any[]> => {
       const nftIdsForQuery = JSON.stringify(nftIds);
       const { tracks } = await catalogApi.request(
         gql`
           {
-            tracks(limit:${limit}, where: {nft_id: {_in: ${nftIdsForQuery}}}) {
+            tracks(where: {nft_id: {_in: ${nftIdsForQuery}}}) {
               title
               contract_address
               nft_id

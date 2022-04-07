@@ -42,6 +42,7 @@ export type Track = {
   metadata?: any
   metadataError?: string
   processed?: true
+  processError?: true
 }
 
 export const getMetadataURL = (track: Track): (string | null | undefined) => {
