@@ -3,7 +3,7 @@ import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import { DBClient } from '../db/db';
 import dbLib from '../db/local-db';
-import { getMetadataURL, Track } from '../types/track';
+import { getMetadataURL, ProcessedTrack, Track } from '../types/track';
 import prompt from 'prompt';
 import _ from 'lodash';
 import { MusicPlatform } from '../types/platform';
@@ -29,6 +29,18 @@ const findIPFSProtocolErrorTracks = (tracks: Track[]) => {
 
 const findECONNREFUSEDErrorTracks = (tracks: Track[]) => {
   return tracks.filter(t => t.metadataError && t.metadataError.includes('connect ECONNREFUSED'));
+}
+
+const findTracks = (tracks: Track[], filter: any) => {
+  return tracks.filter(track => {
+    const filters = Object.keys(filter)
+    for (const key of filters) {
+      if ((track as any)[key] !== filter[key]) {
+        return false;
+      }
+    }
+    return true;
+  });
 }
 
 const clearFixedMetadataErrors = async () => {
@@ -142,6 +154,53 @@ const clearECONNREFUSEDErrors = async () => {
   await dbClient.update('tracks', updates);
 }
 
+const resetProcessTracks = async () => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  const tracks = db.tracks;
+  const updates = tracks.map((track: Track) => ({ id: track.id, processed: undefined, processError: undefined }));
+  await dbClient.update('tracks', updates);
+}
+
+const resetProcessErrorTracks = async () => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  const processErrorTracks = await findTracks(db.tracks, { processed: true, processError: true });
+  const updates = processErrorTracks.map(t => ({ id: t.id, processed: undefined, processError: undefined }));
+  await dbClient.update('tracks', updates);
+}
+
+const resetNOIZDProcessErrorTracks = async () => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  const processErrorTracks = await findTracks(db.tracks, { processed: true, processError: true, platform: MusicPlatform.noizd });
+  const updates = processErrorTracks.map(t => ({ id: t.id, processed: undefined, processError: undefined }));
+  await dbClient.update('tracks', updates);
+}
+
+const printTrackCount = async (filter: any) => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  const processedCatalogTracks = await findTracks(db.tracks, filter);
+  console.log({ processedCatalogTracks: processedCatalogTracks.length });
+}
+
+const killResetProcessedTracks = async () => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  const processedTracks = db.processedTracks;
+  console.log(`Remove ${processedTracks.length} tracks?`)
+  prompt.start();
+  prompt.get(['confirm'], async (err, result) => {
+    if (result.confirm === 'y') {
+      const deletion = processedTracks.map((t: ProcessedTrack) => t.id);
+      await dbClient.delete('processedTracks', deletion);
+      await resetProcessTracks();
+      console.log('Deleted');
+    }
+  });
+}
+
 const start = async () => {
   yargs(hideBin(process.argv))
     .command('printMissingIPFS', 'print all tracks with missing ipfs hashes', async (yargs) => {
@@ -192,6 +251,11 @@ const start = async () => {
     }, async () => {
       await killMetadataErrors();
     })
+    .command('killResetProcessedTracks', 'clear out and reset all processed tracks', async (yargs) => {
+      return yargs
+    }, async () => {
+      await killResetProcessedTracks();
+    })
     .command('printMimeTypes', 'print all mime types in metadata in db', async (yargs) => {
       return yargs
     }, async () => {
@@ -231,6 +295,36 @@ const start = async () => {
       return yargs
     }, async () => {
       await printTracks('artist', undefined);
+    })
+    .command('resetProcessErrorTracks', 'clear out processing and processError from tracks with error so they can be retried', async (yargs) => {
+      return yargs
+    }, async () => {
+      await resetProcessErrorTracks();
+    })
+    .command('printProcessedCatalogTrackCount', 'print processed catalog track count', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printTrackCount({ platform: MusicPlatform.catalog, processed: true });
+    })
+    .command('printProcessErrorCatalogTrackCount', 'print failed processing catalog track count', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printTrackCount({ platform: MusicPlatform.catalog, processError: true });
+    })
+    .command('printProcessErrorTrackCount', 'print failed processing track count', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printTrackCount({ processError: true });
+    })
+    .command('printProcessErrorTracks', 'print failed processing tracks count', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printTracks('processError', true);
+    })
+    .command('resetNOIZDProcessErrorTracks', 'clear out processing and processError from NOIZD tracks with error so they can be retried', async (yargs) => {
+      return yargs
+    }, async () => {
+      await resetNOIZDProcessErrorTracks();
     })
     .parse()
 }

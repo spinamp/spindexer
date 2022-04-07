@@ -41,7 +41,7 @@ export const missingPlatform: Trigger<Clients, undefined> = async (clients: Clie
   return tracks;
 };
 
-export const unprocessedCatalogTracks: Trigger<Clients, undefined> = async (clients: Clients) => {
+export const unprocessedPlatformTracks = (platform: MusicPlatform) => async (clients: Clients) => {
   const tracks = (await clients.db.getRecords('tracks',
     {
       where:
@@ -51,7 +51,7 @@ export const unprocessedCatalogTracks: Trigger<Clients, undefined> = async (clie
         },
         {
           key: 'platform',
-          value: MusicPlatform.catalog
+          value: platform
         }]
     })).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return tracks;

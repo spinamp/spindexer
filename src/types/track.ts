@@ -1,28 +1,36 @@
 import { ValidContractCallFunction } from "../clients/ethereum";
 import { extractHashFromURL } from "../clients/ipfs";
-import { Artist } from "./artist";
 import { MusicPlatform, platformConfig } from "./platform"
 
 export type SubgraphTrack = {
   id: string
 }
 
+export type EthereumTimestamp = {
+  createdAtBlockNumber: string;
+}
+
+export type APITimestamp = {
+  createdAtTime: string;
+}
+
+export type Timestamp = EthereumTimestamp | APITimestamp;
+
 export type ProcessedTrack = {
   id: string;
   platformId: string;
   title: string;
   platform: MusicPlatform;
-  lossyAudioIPFSHash: string;
+  lossyAudioIPFSHash?: string;
   lossyAudioURL: string;
   description?: string;
   artwork?: string;
-  createdAtBlockNumber: string;
-  lossyArtworkIPFSHash: string;
+  lossyArtworkIPFSHash?: string;
   lossyArtworkURL: string;
   websiteUrl?: string;
   artistId: string;
   artist: { id: string, name: string };
-}
+} & Timestamp
 
 export type Track = {
   id: string,
@@ -34,6 +42,7 @@ export type Track = {
   metadata?: any
   metadataError?: string
   processed?: true
+  processError?: true
 }
 
 export const getMetadataURL = (track: Track): (string | null | undefined) => {

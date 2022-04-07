@@ -4,7 +4,9 @@ import ethereum from './clients/ethereum';
 import axios from './clients/axios';
 import ipfs from './clients/ipfs';
 import catalog from './clients/catalog';
+import noizd from './clients/noizd';
 import { Clients, Processor } from './types/processor';
+import sound from './clients/sound';
 
 export const runProcessors = async (processors: Processor[]) => {
   const dbClient = await db.init();
@@ -13,6 +15,8 @@ export const runProcessors = async (processors: Processor[]) => {
   const axiosClient = await axios.init();
   const ipfsClient = await ipfs.init();
   const catalogClient = await catalog.init();
+  const soundClient = await sound.init();
+  const noizdClient = await noizd.init();
 
   const clients: Clients = {
     eth: ethClient,
@@ -20,7 +24,9 @@ export const runProcessors = async (processors: Processor[]) => {
     subgraph: subgraphClient,
     axios: axiosClient,
     ipfs: ipfsClient,
-    catalog: catalogClient
+    catalog: catalogClient,
+    sound: soundClient,
+    noizd: noizdClient
   };
 
   // This runs each processor until completion serially. We could consider

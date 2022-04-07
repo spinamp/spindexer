@@ -3,9 +3,10 @@ import { addTrackMetadata } from './processors/default/addTrackMetadata';
 import { addTrackMetadataIPFSHash } from './processors/default/addTrackMetadataIPFSHash';
 import { categorizeZora } from './processors/default/categorizeZora';
 import { createTracksFromNFTsProcessor } from './processors/default/createTracksFromNFTs';
-import { processCatalogTracks } from './processors/default/processCatalogTracks';
+import { processPlatformTracks } from './processors/default/processPlatformTracks';
 import { stripNonAudio } from './processors/default/stripNonAudio';
 import { runProcessors } from './runner';
+import { MusicPlatform } from './types/platform';
 
 const PROCESSORS = [
   createTracksFromNFTsProcessor,
@@ -13,7 +14,9 @@ const PROCESSORS = [
   addTrackMetadata,
   stripNonAudio,
   categorizeZora,
-  processCatalogTracks,
+  processPlatformTracks(MusicPlatform.catalog),
+  processPlatformTracks(MusicPlatform.sound),
+  processPlatformTracks(MusicPlatform.noizd),
 ];
 
 const updateDBLoop = async () => {
