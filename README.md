@@ -16,9 +16,9 @@ There are a few design goals for the code:
  - Be fast, up to date and have low latency liveness
  - Be reliable with minimal/zero maintenance need.
  - Handle crashes, downtime, resume without needing to rebuild the DB
- - Support offchain and centralized data sources
- - Allow extensions with additional new contracts without requiring a DB rebuild nor processing from start
- - Allow extensions with additional stages being added without requiring a DB rebuild nor processing from the start
+ - Support both onchain, multichain, offchain and centralized data sources
+ - Allow extensions with additional new contracts and platforms without requiring a DB rebuild nor re-processing from start
+ - Allow extensions with additional metadata or data transformations being added without requiring a DB rebuild nor re-processing from the start
 
 # Infrastructure Architecture
  - The input comes from ethereum events that have been ingested via the Graph
