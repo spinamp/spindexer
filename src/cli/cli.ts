@@ -307,6 +307,16 @@ const start = async () => {
     }, async () => {
       await printTrackCount({ platform: MusicPlatform.catalog, processError: true });
     })
+    .command('printProcessErrorTrackCount', 'print failed processing track count', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printTrackCount({ processError: true });
+    })
+    .command('printProcessErrorTracks', 'print failed processing tracks count', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printTracks('processError', true);
+    })
     .parse()
 }
 
