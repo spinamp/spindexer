@@ -2,6 +2,7 @@ import { ValidContractCallFunction } from "../clients/ethereum";
 import { ArtistProfile, Artist } from "./artist";
 import catalogMappers from './platforms/catalog';
 import soundMappers from './platforms/sound';
+import noizdMappers from './platforms/noizd';
 import { Track, ProcessedTrack } from "./track";
 
 export enum MusicPlatform {
@@ -57,6 +58,7 @@ export const platformConfig: PlatformConfig = {
   noizd: {
     contractCalls: [ValidContractCallFunction.tokenURI],
     contractMetadataField: ValidContractCallFunction.tokenURI,
+    mappers: noizdMappers,
   },
   other: {
     contractCalls: [ValidContractCallFunction.tokenURI],

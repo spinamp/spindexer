@@ -39,8 +39,8 @@ export const getZoraPlatform = (track: Track) => {
 
 const getTokenIdFromTrack = (track: Track) => {
   return track.id.split('/')[1];
-
 }
+
 const mapTrackID = (trackId: string): string => {
   const [contractAddress, nftId] = trackId.split('/');
   return `ethereum/${formatAddress(contractAddress)}/${nftId}`;

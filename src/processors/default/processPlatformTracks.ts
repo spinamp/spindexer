@@ -6,7 +6,7 @@ import { MusicPlatform, platformConfig, PlatformMapper } from '../../types/platf
 import { Clients } from '../../types/processor';
 import { Track, ProcessedTrack } from '../../types/track';
 
-type ImplementedMusicPlatform = MusicPlatform.catalog | MusicPlatform.sound;
+type ImplementedMusicPlatform = MusicPlatform.catalog | MusicPlatform.sound | MusicPlatform.noizd;
 
 const name = 'processTracks';
 

@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { SoundClient } from "../../clients/sound";
 import { formatAddress } from "../address";
-import { ArtistProfile, Artist } from "../artist";
+import { ArtistProfile } from "../artist";
 import { MusicPlatform } from "../platform";
 import { Track, ProcessedTrack } from "../track";
 
@@ -9,7 +9,6 @@ const mapTrackID = (trackId: string): string => {
   const [contractAddress, editionId] = trackId.split('/');
   return `ethereum/${formatAddress(contractAddress)}/${editionId}`;
 };
-
 
 const mapArtistID = (artistId: string): string => {
   return `ethereum/${formatAddress(artistId)}`;

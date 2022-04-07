@@ -16,6 +16,7 @@ const PROCESSORS = [
   categorizeZora,
   processPlatformTracks(MusicPlatform.catalog),
   processPlatformTracks(MusicPlatform.sound),
+  processPlatformTracks(MusicPlatform.noizd),
 ];
 
 const updateDBLoop = async () => {
