@@ -1,9 +1,9 @@
 # subgraph-pipeline
 
-This code is intended to become a multi-stage processing pipeline that processes the web3-music-subgraph and:
- - Augments the database with additional info needed (eg: from off-chain sources/ipfs)
- - Transforms the database into a more comprehensive schema
- - Saves a new dump of the DB
+This code is intended to become a multi-stage processing pipeline that generates a comprehensive web3 music database and:
+ - Augments on-chain data with additional info needed (eg: from off-chain sources/ipfs)
+ - Transforms data into a more comprehensive, robust schema
+ - Saves and keeps alive an updated real time DB
 
 ## Running it
  - Copy .env.example to .env
