@@ -1,4 +1,4 @@
-# subgraph-pipeline
+# web3-music-pipeline
 
 This code is intended to become a multi-stage processing pipeline that generates a comprehensive web3 music database and:
  - Augments on-chain data with additional info needed (eg: from off-chain sources/ipfs)
