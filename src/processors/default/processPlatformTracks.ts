@@ -61,10 +61,14 @@ const processorFunction = (platform: Partial<ImplementedMusicPlatform>) => async
   const platformTrackData = await platformMapper.addPlatformTrackData(tracks, clients[platform]);
 
   const { processedTracks, trackUpdates, artists } = processPlatformTrackData(platformTrackData, platformMapper, platform);
-  const mergedProcessedTracks = await mergeProcessedTracks(processedTracks, clients.db, true);
+  const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(processedTracks, clients.db, true);
 
   const mergedArtists = await mergeInExistingArtist(artists, clients.db);
+
   await clients.db.update('tracks', trackUpdates);
+  if (oldIds) {
+    await clients.db.delete('processedTracks', oldIds);
+  }
   await clients.db.upsert('processedTracks', mergedProcessedTracks);
   await clients.db.upsert('artists', mergedArtists);
 };

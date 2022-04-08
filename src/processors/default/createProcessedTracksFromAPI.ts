@@ -30,7 +30,7 @@ const processorFunction = (platform: APIMusicPlatform, name: string) => async (a
   // don't need to worry about changing the artistId and artist{} fields in the processed
   // tracks and can just do a simple merge.
   const processedTracks = apiTracks.map(apiTrack => mapAPITrack!(apiTrack));
-  const mergedProcessedTracks = await mergeProcessedTracks(processedTracks, clients.db, false);
+  const { mergedProcessedTracks } = await mergeProcessedTracks(processedTracks, clients.db, false);
 
   await clients.db.upsert('processedTracks', mergedProcessedTracks);
   await clients.db.upsert('artists', mergedArtists);

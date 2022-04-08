@@ -75,5 +75,14 @@ export const mergeProcessedTracks = async (newProcessedTracks: ProcessedTrack[],
       }
     }
   });
-  return mergedProcessedTracks;
+  if (prioritizeNew) {
+    return {
+      oldIds: existingProcessedTracks.map(t => t.id),
+      mergedProcessedTracks
+    }
+  } else {
+    return {
+      mergedProcessedTracks
+    }
+  }
 }
