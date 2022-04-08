@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import { DBClient } from '../../db/db';
 import { newPlatformTracks } from '../../triggers/newPlatformTracks';
 import { mapArtist, mergeInExistingArtist } from '../../types/artist';
 import { MusicPlatform, platformConfig } from '../../types/platform';
