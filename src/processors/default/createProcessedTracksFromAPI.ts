@@ -10,6 +10,7 @@ const NAME = 'createProcessedTracksFromAPI';
 export type APIMusicPlatform = MusicPlatform.noizd;
 
 const processorFunction = (platform: APIMusicPlatform, name: string) => async (apiTracks: unknown[], clients: Clients) => {
+  console.info(`Processing ${apiTracks.length} api tracks from ${platform}`);
   const lastCursor = clients[platform].getAPITrackCursor(apiTracks[apiTracks.length - 1]);
 
   const { mapAPITrack, mapArtistProfile, } = platformConfig[platform].mappers!;
@@ -35,6 +36,7 @@ const processorFunction = (platform: APIMusicPlatform, name: string) => async (a
   await clients.db.upsert('processedTracks', mergedProcessedTracks);
   await clients.db.upsert('artists', mergedArtists);
   await clients.db.updateProcessor(name, lastCursor);
+  console.info(`Processing completed, updated cursor to ${lastCursor}`);
 };
 
 export const createProcessedTracksFromAPI: (platform: APIMusicPlatform) => Processor =

@@ -12,7 +12,6 @@ export type NOIZDClient = {
   fetchNFTs: (nftIds: string[]) => Promise<NOIZDAPINFT[]>;
   fetchLatestTrackCursor: () => Promise<string>;
   getTracksFrom: (cursor: string) => Promise<NOIZDAPITrack[]>;
-  initialTrackCursor: string,
   getAPITrackCursor: (track: any) => string
 }
 
@@ -52,25 +51,21 @@ export const getTracksFrom = async (cursor: string): Promise<NOIZDAPITrack[]> =>
         created: { "$gt": cursor }
       },
       hidden: false,
-      $limit: 100,
+      $limit: 20,
     },
   });
   return data.items;
 }
 
-const initialTrackCursor = '2020-04-07T21:11:16.494Z'
-
 const getAPITrackCursor = (track: any) => {
   return track.created;
 }
-
 
 const init = async () => {
   return {
     fetchNFTs,
     fetchLatestTrackCursor,
     getTracksFrom,
-    initialTrackCursor,
     getAPITrackCursor
   }
 }

@@ -62,6 +62,7 @@ export const platformConfig: PlatformConfig = {
     contractCalls: [ValidContractCallFunction.tokenURI],
     contractMetadataField: ValidContractCallFunction.tokenURI,
     mappers: noizdMappers,
+    initialTrackCursor: '2020-04-07T21:11:16.494Z'
   },
   other: {
     contractCalls: [ValidContractCallFunction.tokenURI],
