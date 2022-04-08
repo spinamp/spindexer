@@ -4,7 +4,7 @@ import { unprocessedPlatformTracks } from '../../triggers/missing';
 import { Artist, ArtistProfile, mapArtist, mergeInExistingArtist } from '../../types/artist';
 import { MusicPlatform, platformConfig, PlatformMapper } from '../../types/platform';
 import { Clients } from '../../types/processor';
-import { Track, ProcessedTrack } from '../../types/track';
+import { Track, ProcessedTrack, mergeProcessedTracks } from '../../types/track';
 
 type ImplementedMusicPlatform = MusicPlatform.catalog | MusicPlatform.sound | MusicPlatform.noizd;
 
@@ -17,7 +17,7 @@ const processPlatformTrackData = (platformTrackData: {
   const { mapArtistProfile, mapTrack } = platformMapper;
 
   const { processedTracks, trackUpdates } = platformTrackData.reduce<
-    { processedTracks: Omit<ProcessedTrack, 'artistId' | 'artist'>[], trackUpdates: PartialRecord<Track>[] }>
+    { processedTracks: ProcessedTrack[], trackUpdates: PartialRecord<Track>[] }>
     ((accum, item) => {
       if (item.platformTrackResponse) {
         const processedTrack = mapTrack(item)
@@ -61,9 +61,11 @@ const processorFunction = (platform: Partial<ImplementedMusicPlatform>) => async
   const platformTrackData = await platformMapper.addPlatformTrackData(tracks, clients[platform]);
 
   const { processedTracks, trackUpdates, artists } = processPlatformTrackData(platformTrackData, platformMapper, platform);
+  const mergedProcessedTracks = await mergeProcessedTracks(processedTracks, clients.db, true);
+
   const mergedArtists = await mergeInExistingArtist(artists, clients.db);
   await clients.db.update('tracks', trackUpdates);
-  await clients.db.insert('processedTracks', processedTracks);
+  await clients.db.upsert('processedTracks', mergedProcessedTracks);
   await clients.db.upsert('artists', mergedArtists);
 };
 
