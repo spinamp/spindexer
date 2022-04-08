@@ -1,23 +1,15 @@
+import _ from "lodash";
 import { ValidContractCallFunction } from "../clients/ethereum";
 import { extractHashFromURL } from "../clients/ipfs";
+import { DBClient } from "../db/db";
 import { MusicPlatform, platformConfig } from "./platform"
+import { Record } from "./record"
 
 export type SubgraphTrack = {
   id: string
 }
 
-export type EthereumTimestamp = {
-  createdAtBlockNumber: string;
-}
-
-export type APITimestamp = {
-  createdAtTime: string;
-}
-
-export type Timestamp = EthereumTimestamp | APITimestamp;
-
-export type ProcessedTrack = {
-  id: string;
+export type ProcessedTrack = Record & {
   platformId: string;
   title: string;
   platform: MusicPlatform;
@@ -30,7 +22,7 @@ export type ProcessedTrack = {
   websiteUrl?: string;
   artistId: string;
   artist: { id: string, name: string };
-} & Timestamp
+}
 
 export type Track = {
   id: string,
@@ -58,4 +50,30 @@ export const getMetadataIPFSHash = (track: Track): (string | null | undefined) =
   }
   const hash = extractHashFromURL(metadataURL);
   return hash || null;
+}
+
+export const mergeProcessedTracks = async (newProcessedTracks: ProcessedTrack[], dbClient: DBClient, prioritizeNew: boolean) => {
+  const platformIds = newProcessedTracks.map(t => t.platformId);
+  const existingProcessedTracks = await dbClient.getRecords<ProcessedTrack>('processedTracks', {
+    where:
+    {
+      key: 'platformId',
+      valueIn: platformIds
+    }
+  });
+  const existingProcessedTracksByPlatformId = _.keyBy(existingProcessedTracks, 'platformId');
+  const mergedProcessedTracks = newProcessedTracks.map(t => {
+    if (prioritizeNew) {
+      return {
+        ...existingProcessedTracksByPlatformId[t.platformId],
+        ...t,
+      }
+    } else {
+      return {
+        ...t,
+        ...existingProcessedTracksByPlatformId[t.platformId],
+      }
+    }
+  });
+  return mergedProcessedTracks;
 }

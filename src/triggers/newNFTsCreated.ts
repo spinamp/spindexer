@@ -1,7 +1,7 @@
 import { Clients } from '../types/processor';
 import { Cursor, Trigger } from '../types/trigger';
 
-export const newNFTsCreated: Trigger<Clients, Cursor> = async (clients: Clients, lastProcessedDBBlock: Cursor) => {
+export const newNFTsCreated: Trigger<Clients, number> = async (clients: Clients, lastProcessedDBBlock: number) => {
   const latestNFT = await clients.subgraph.getLatestNFT();
   const lastProcessedSubGraphBlock = parseInt(latestNFT.createdAtBlockNumber);
 

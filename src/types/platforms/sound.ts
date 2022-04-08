@@ -33,7 +33,7 @@ const mapTrack = (trackItem: {
   artist: { id: mapArtistID(trackItem.platformTrackResponse.artist.user.publicAddress), name: trackItem.platformTrackResponse.artist.name }
 });
 
-const mapArtistProfile = (platformResponse: any, createdAtBlockNumber: string): ArtistProfile => {
+const mapArtistProfile = (platformResponse: any, createdAtBlockNumber?: string): ArtistProfile => {
   const artist = platformResponse.artist
   return {
     name: artist.name,
@@ -44,7 +44,7 @@ const mapArtistProfile = (platformResponse: any, createdAtBlockNumber: string): 
     websiteUrl: artist.soundHandle ?
       `https://www.sound.xyz/${artist.soundHandle}`
       : 'https://www.sound.xyz',
-    createdAtBlockNumber,
+    createdAtBlockNumber: createdAtBlockNumber!
   }
 };
 

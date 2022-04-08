@@ -41,7 +41,7 @@ export const missingPlatform: Trigger<Clients, undefined> = async (clients: Clie
   return tracks;
 };
 
-export const unprocessedPlatformTracks = (platform: MusicPlatform) => async (clients: Clients) => {
+export const unprocessedPlatformTracks: (platform: MusicPlatform) => Trigger<Clients, undefined> = (platform: MusicPlatform) => async (clients: Clients) => {
   const tracks = (await clients.db.getRecords('tracks',
     {
       where:

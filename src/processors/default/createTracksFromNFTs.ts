@@ -49,11 +49,11 @@ export const createTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethC
 
 const processorFunction = async (newNFTs: NFT[], clients: Clients) => {
   newNFTs.forEach(nft => { nft.id = formatAddress(nft.id) });
-  const newProcessedDBBlock = parseInt(newNFTs[newNFTs.length - 1].createdAtBlockNumber);
+  const lastCursor = parseInt(newNFTs[newNFTs.length - 1].createdAtBlockNumber);
   const newTracks = await createTracksFromNFTs(newNFTs, clients.db, clients.eth);
   await clients.db.insert('nfts', newNFTs);
   await clients.db.insert('tracks', newTracks);
-  await clients.db.updateProcessor(name, newProcessedDBBlock);
+  await clients.db.updateProcessor(name, lastCursor);
 };
 
 export const createTracksFromNFTsProcessor: Processor = {

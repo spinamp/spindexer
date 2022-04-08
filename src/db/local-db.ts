@@ -1,7 +1,8 @@
 import { promises as fs } from 'fs';
 
-import { Record, DBClient, Query, Where } from './db';
+import { Record, DBClient, Query, Where, ValueIsWhere, ValueInWhere } from './db';
 import _ from 'lodash';
+import { Cursor } from '../types/trigger';
 
 const DB_FILE = process.cwd() + '/localdb/db.json';
 const INITIAL_DB = {
@@ -67,7 +68,7 @@ const init = async (): Promise<DBClient> => {
   let { db, indexes } = await loadDB();
   return {
     getCursor: async (processor: string): Promise<(number | undefined)> => {
-      return parseInt(db.processors[processor]?.cursor);
+      return db.processors[processor]?.cursor;
     },
     getRecord: async (tableName: string, id: string): (Promise<Record>) => {
       return indexes[tableName] && indexes[tableName][id];
@@ -86,9 +87,14 @@ const init = async (): Promise<DBClient> => {
             }
             for (const filter of (query.where as Array<Where>)) {
               let match;
-              if ((filter as any).value) {
+              if ((filter as ValueIsWhere).value) {
                 match = _.get(record, filter.key) === (filter as any).value;
-              } else {
+              } else if ((filter as ValueInWhere).valueIn) {
+                const matchValues = (filter as ValueInWhere).valueIn;
+                const recordValue = _.get(record, filter.key);
+                match = matchValues.includes(recordValue);
+              }
+              else {
                 const valueExists = !(_.get(record, filter.key) === undefined)
                 match = valueExists === (filter as any).valueExists;
               }
@@ -105,8 +111,12 @@ const init = async (): Promise<DBClient> => {
           const filter = query.where;
           filteredRecords = allRecords.filter((record: RecordType) => {
             let match;
-            if ((filter as any).value) {
+            if ((filter as ValueIsWhere).value) {
               match = _.get(record, filter.key) === (filter as any).value;
+            } else if ((filter as ValueInWhere).valueIn) {
+              const matchValues = (filter as ValueInWhere).valueIn;
+              const recordValue = _.get(record, filter.key);
+              match = matchValues.includes(recordValue);
             } else {
               const valueExists = !(_.get(record, filter.key) === undefined)
               match = valueExists === (filter as any).valueExists;
@@ -159,9 +169,9 @@ const init = async (): Promise<DBClient> => {
       await saveDB(db);
       indexes = await createIndexes(db);
     },
-    updateProcessor: async (processor: string, newProcessedDBBlock: Number) => {
+    updateProcessor: async (processor: string, lastCursor: Cursor) => {
       db.processors[processor] = db.processors[processor] || {};
-      db.processors[processor].cursor = newProcessedDBBlock;
+      db.processors[processor].cursor = lastCursor;
       await saveDB(db);
     },
     getNumberRecords: async (tableName: string) => {

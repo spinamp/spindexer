@@ -8,8 +8,6 @@ import { SubgraphClient } from "../clients/subgraph";
 import { DBClient } from "../db/db";
 import { Cursor, Trigger } from "./trigger";
 
-export type PlatformClient = {};
-
 export type Clients = {
   eth: EthClient,
   db: DBClient,

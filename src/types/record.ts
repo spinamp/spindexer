@@ -1,6 +1,16 @@
+export type EthereumTimestamp = {
+  createdAtBlockNumber: string;
+}
+
+export type APITimestamp = {
+  createdAtTime: string;
+}
+
+export type Timestamp = EthereumTimestamp | APITimestamp;
+
 export type Record = {
   id: string
-}
+} & Timestamp
 
 export enum RecordType {
   nft = "nft",

@@ -71,7 +71,7 @@ const mapTrack = (trackItem: {
   artist: { id: mapArtistID(trackItem.platformTrackResponse.artist.id), name: trackItem.platformTrackResponse.artist.name }
 });
 
-const mapArtistProfile = (platformResponse: any, createdAtBlockNumber: string): ArtistProfile => {
+const mapArtistProfile = (platformResponse: any, createdAtBlockNumber?: string): ArtistProfile => {
   const artist = platformResponse.artist;
   return {
     name: artist.name,
@@ -82,7 +82,7 @@ const mapArtistProfile = (platformResponse: any, createdAtBlockNumber: string): 
     websiteUrl: artist.handle
       ? `https://beta.catalog.works/${artist.handle}`
       : 'https://beta.catalog.works',
-    createdAtBlockNumber,
+    createdAtBlockNumber: createdAtBlockNumber!
   }
 };
 

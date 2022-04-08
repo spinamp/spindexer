@@ -114,6 +114,23 @@ const printTracks = async (key: string, value: any) => {
   console.log(`${tracks.length} Tracks`);
 }
 
+const printProcessedTracks = async (key: string, value: any) => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  const processedTracks = db.processedTracks.filter((t: ProcessedTrack) => {
+    return (t as any)[key] === value
+  });
+  console.log(processedTracks);
+  console.log(`${processedTracks.length} Tracks`);
+}
+
+const printNOIZDDuplicates = async (key: string, value: any) => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  const processedTracks = _.filter(_.groupBy(db.processedTracks, 'platformId'), array => array.length > 1);
+  console.dir(processedTracks);
+}
+
 const killMetadataErrors = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
@@ -178,7 +195,7 @@ const resetNOIZDProcessErrorTracks = async () => {
   await dbClient.update('tracks', updates);
 }
 
-const printTrackCount = async (filter: any) => {
+const printProcessedTrackCount = async (filter: any) => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
   const processedCatalogTracks = await findTracks(db.tracks, filter);
@@ -296,6 +313,16 @@ const start = async () => {
     }, async () => {
       await printTracks('artist', undefined);
     })
+    .command('printNoizdTracks', 'print noizd tracks', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printProcessedTracks('platform', MusicPlatform.noizd);
+    })
+    .command('printNOIZDDuplicates', 'print noizd duplicates', async (yargs) => {
+      return yargs
+    }, async () => {
+      await printNOIZDDuplicates('platform', MusicPlatform.noizd);
+    })
     .command('resetProcessErrorTracks', 'clear out processing and processError from tracks with error so they can be retried', async (yargs) => {
       return yargs
     }, async () => {
@@ -304,17 +331,17 @@ const start = async () => {
     .command('printProcessedCatalogTrackCount', 'print processed catalog track count', async (yargs) => {
       return yargs
     }, async () => {
-      await printTrackCount({ platform: MusicPlatform.catalog, processed: true });
+      await printProcessedTrackCount({ platform: MusicPlatform.catalog, processed: true });
     })
     .command('printProcessErrorCatalogTrackCount', 'print failed processing catalog track count', async (yargs) => {
       return yargs
     }, async () => {
-      await printTrackCount({ platform: MusicPlatform.catalog, processError: true });
+      await printProcessedTrackCount({ platform: MusicPlatform.catalog, processError: true });
     })
     .command('printProcessErrorTrackCount', 'print failed processing track count', async (yargs) => {
       return yargs
     }, async () => {
-      await printTrackCount({ processError: true });
+      await printProcessedTrackCount({ processError: true });
     })
     .command('printProcessErrorTracks', 'print failed processing tracks count', async (yargs) => {
       return yargs
