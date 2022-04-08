@@ -33,6 +33,8 @@ const processorFunction = (platform: APIMusicPlatform, name: string) => async (a
   const processedTracks = apiTracks.map(apiTrack => mapAPITrack!(apiTrack));
   const mergedProcessedTracks = await mergeProcessedTracks(processedTracks, clients.db, false);
 
+  console.dir(mergedProcessedTracks);
+  process.exit(0);
   await clients.db.upsert('processedTracks', mergedProcessedTracks);
   await clients.db.upsert('artists', mergedArtists);
   await clients.db.updateProcessor(name, lastCursor);

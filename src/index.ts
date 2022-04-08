@@ -18,7 +18,7 @@ const PROCESSORS = [
   processPlatformTracks(MusicPlatform.catalog),
   processPlatformTracks(MusicPlatform.sound),
   processPlatformTracks(MusicPlatform.noizd),
-  createProcessedTracksFromAPI(MusicPlatform.noizd),
+  // createProcessedTracksFromAPI(MusicPlatform.noizd),
 ];
 
 const updateDBLoop = async () => {

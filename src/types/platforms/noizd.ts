@@ -58,7 +58,7 @@ const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any)
     platformId: apiTrack.id,
     title: apiTrack.title,
     platform: MusicPlatform.noizd,
-    lossyAudioURL: apiTrack.full.url,
+    lossyAudioURL: apiTrack.metadata ? apiTrack.metadata.audio_url : apiTrack.full.url,
     createdAtTime: apiTrack.created,
     lossyArtworkURL: artwork,
     websiteUrl: `https://noizd.com/assets/${apiTrack.id}`,
