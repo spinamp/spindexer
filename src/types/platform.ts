@@ -1,9 +1,10 @@
 import { ValidContractCallFunction } from "../clients/ethereum";
-import { ArtistProfile, Artist } from "./artist";
+import { ArtistProfile } from "./artist";
 import catalogMappers from './platforms/catalog';
 import soundMappers from './platforms/sound';
 import noizdMappers from './platforms/noizd';
 import { Track, ProcessedTrack } from "./track";
+import { Cursor } from '../types/trigger';
 
 export enum MusicPlatform {
   sound = "sound",
@@ -23,13 +24,15 @@ export type PlatformMapper = {
     track: Track;
     platformTrackResponse: unknown;
   }) => ProcessedTrack;
-  mapArtistProfile: (artistItem: any, createdAtBlockNumber: string) => ArtistProfile;
+  mapAPITrack?: (trackItem: unknown) => ProcessedTrack;
+  mapArtistProfile: (artistItem: any, createdAtBlockNumber?: string) => ArtistProfile;
 }
 
 export type PlatformConfigItem = {
   contractCalls: ValidContractCallFunction[],
   contractMetadataField: ValidContractCallFunction,
   mappers?: PlatformMapper
+  initialTrackCursor?: string
 };
 
 export type PlatformConfig = {
