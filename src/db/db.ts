@@ -28,7 +28,7 @@ export type Query = {
   whereType?: string
 }
 export type DBClient = {
-  getCursor: (processor: string) => Promise<number | undefined>;
+  getCursor: (processor: string) => Promise<string | undefined>;
   getRecord: (tableName: string, id: string) => Promise<Record>;
   getRecords: <Type extends Record>(tableName: string, query?: Query) => Promise<Type[]>;
   insert: (tableName: string, rows: Record[]) => Promise<void>;

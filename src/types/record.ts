@@ -1,9 +1,9 @@
 export type EthereumTimestamp = {
-  createdAtEthereumBlockNumber?: bigint;
+  createdAtEthereumBlockNumber?: string;
 }
 
 export type UnixTimestampSeconds = {
-  createdAtTimestamp: bigint;
+  createdAtTimestamp: string;
 }
 
 export type Timestamp = EthereumTimestamp & UnixTimestampSeconds;

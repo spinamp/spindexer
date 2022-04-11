@@ -52,11 +52,11 @@ const processorFunction = async (newNFTs: NFT[], clients: Clients) => {
   newNFTs.forEach(nft => {
     nft.id = formatAddress(nft.id);
     if(nft.createdAtEthereumBlockNumber) {
-      nft.createdAtEthereumBlockNumber = BigInt(nft.createdAtEthereumBlockNumber);
+      nft.createdAtEthereumBlockNumber = nft.createdAtEthereumBlockNumber;
     }
-    nft.createdAtTimestamp = BigInt(nft.createdAtTimestamp);
+    nft.createdAtTimestamp = nft.createdAtTimestamp;
   });
-  const lastCursor = BigInt(newNFTs[newNFTs.length - 1].createdAtTimestamp);
+  const lastCursor = newNFTs[newNFTs.length - 1].createdAtTimestamp;
   const newTracks = await createTracksFromNFTs(newNFTs, clients.db, clients.eth);
   await clients.db.insert('nfts', newNFTs);
   await clients.db.insert('tracks', newTracks);
@@ -67,5 +67,5 @@ export const createTracksFromNFTsProcessor: Processor = {
   name,
   trigger: newNFTsCreated,
   processorFunction,
-  initialCursor: BigInt(process.env.GLOBAL_STARTING_TIMESTAMP!),
+  initialCursor: process.env.GLOBAL_STARTING_TIMESTAMP,
 };

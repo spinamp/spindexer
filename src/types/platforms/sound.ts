@@ -34,7 +34,7 @@ const mapTrack = (trackItem: {
   artist: { id: mapArtistID(trackItem.platformTrackResponse.artist.user.publicAddress), name: trackItem.platformTrackResponse.artist.name }
 });
 
-export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: bigint, createdAtEthereumBlockNumber?: bigint): ArtistProfile => {
+export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: string, createdAtEthereumBlockNumber?: string): ArtistProfile => {
   const artist = platformResponse.artist
   return {
     name: artist.name,

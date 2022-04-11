@@ -27,7 +27,7 @@ const getNoizdResizedUrl = (src: string, size?: number | string): string => {
 
 const mapArtistID = (id: string) => `noizd/${id}`;
 
-export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: bigint, createdAtEthereumBlockNumber?: bigint): ArtistProfile => {
+export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: string, createdAtEthereumBlockNumber?: string): ArtistProfile => {
   const artist = platformResponse.artist;
   return {
     name: artist.username,
@@ -45,7 +45,7 @@ const mapAPITrackID = (apiTrackId: string): string => {
   return `noizd/${apiTrackId}`;
 };
 
-const mapAPITrackTimestamp = (apiTrack:any) => BigInt(new Date(apiTrack.created).getTime())
+const mapAPITrackTimestamp = (apiTrack:any) => '' + new Date(apiTrack.created).getTime()
 
 const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any) => {
   const { cover } = apiTrack;

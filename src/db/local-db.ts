@@ -67,8 +67,8 @@ const saveDB = async (db: any) => {
 const init = async (): Promise<DBClient> => {
   let { db, indexes } = await loadDB();
   return {
-    getCursor: async (processor: string): Promise<(number | undefined)> => {
-      return db.processors[processor]?.cursor;
+    getCursor: async (processor: string): Promise<(string | undefined)> => {
+      return db.processors[processor]?.cursor || process.env.GLOBAL_STARTING_TIMESTAMP;
     },
     getRecord: async (tableName: string, id: string): (Promise<Record>) => {
       return indexes[tableName] && indexes[tableName][id];

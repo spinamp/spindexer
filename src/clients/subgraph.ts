@@ -4,14 +4,14 @@ import { Record, RecordType, recordIsInBatch } from '../types/record';
 import { NFT } from '../types/nft';
 
 export type SubgraphClient = {
-  getRecordsFrom: (type: RecordType, timestamp: BigInt) => Promise<Record[]>;
+  getRecordsFrom: (type: RecordType, timestamp: string) => Promise<Record[]>;
   getLatestRecord: (type: RecordType) => Promise<Record>;
-  getNFTsFrom: (timestamp: BigInt) => Promise<NFT[]>;
+  getNFTsFrom: (timestamp: string) => Promise<NFT[]>;
   getLatestNFT: () => Promise<NFT>;
 }
 
 const QUERIES = {
-  getRecordsFrom: (recordType: RecordType, timestamp: BigInt) => gql`
+  getRecordsFrom: (recordType: RecordType, timestamp: string) => gql`
   {
     ${recordType}s(where:{createdAtTimestamp_gte:${timestamp}}, orderBy:createdAtTimestamp, orderDirection: asc, first:${process.env.SUBGRAPH_QUERY_LIMIT}) {
       id
@@ -23,7 +23,7 @@ const QUERIES = {
       createdAtBlockNumber
     }
   }`,
-  getRecordsAtBlock: (recordType: RecordType, block: BigInt) => gql`
+  getRecordsAtBlock: (recordType: RecordType, block: string) => gql`
   {
     ${recordType}s(where:{createdAtBlockNumber:${block}}, orderBy: createdAtTimestamp, first:${process.env.SUBGRAPH_QUERY_LIMIT}) {
       id
@@ -50,7 +50,7 @@ const QUERIES = {
 };
 
 const init = (endpoint: string) => {
-  const getRecordsFrom = async (type: RecordType, timestamp: BigInt) => {
+  const getRecordsFrom = async (type: RecordType, timestamp: string) => {
     const fromResponseData = await request(endpoint, QUERIES.getRecordsFrom(type, timestamp));
     const nextRecordBatch = fromResponseData[`${type}s`];
 
@@ -73,7 +73,7 @@ const init = (endpoint: string) => {
     const data = await request(endpoint, QUERIES.getLatestRecord(type));
     return data[`${type}s`][0];
   };
-  const getNFTsFrom = async (timestamp: BigInt): Promise<NFT[]> => {
+  const getNFTsFrom = async (timestamp: string): Promise<NFT[]> => {
     return getRecordsFrom(RecordType.nft, timestamp);
   };
   const getLatestNFT = async () => {

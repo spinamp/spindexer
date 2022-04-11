@@ -24,12 +24,12 @@ export type ArtistProfile = Timestamp & {
 export const mapArtist = (artistProfile: ArtistProfile, platform: MusicPlatform): Artist => {
   return {
     name: artistProfile.name,
-    slug: slugify(`${artistProfile.name} ${artistProfile.createdAtTime}`).toLowerCase(),
+    slug: slugify(`${artistProfile.name} ${artistProfile.createdAtTimestamp}`).toLowerCase(),
     id: artistProfile.artistId,
     profiles: {
       [platform]: artistProfile
     },
-    createdAtTime: artistProfile.createdAtTime,
+    createdAtTimestamp: artistProfile.createdAtTimestamp,
     createdAtEthereumBlockNumber: artistProfile.createdAtEthereumBlockNumber
   }
 };
