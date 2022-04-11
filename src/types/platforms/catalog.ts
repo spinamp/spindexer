@@ -60,7 +60,8 @@ const mapTrack = (trackItem: {
   platform: MusicPlatform.catalog,
   lossyAudioIPFSHash: trackItem.platformTrackResponse.ipfs_hash_lossy_audio,
   lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${trackItem.platformTrackResponse.ipfs_hash_lossy_audio}`,
-  createdAtBlockNumber: trackItem.track.createdAtBlockNumber,
+  createdAtTimestamp: trackItem.track.createdAtTimestamp,
+  createdAtEthereumBlockNumber: trackItem.track.createdAtEthereumBlockNumber,
   lossyArtworkIPFSHash: `https://catalogworks.b-cdn.net/ipfs/${trackItem.platformTrackResponse.ipfs_hash_lossy_artwork}`,
   lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${trackItem.platformTrackResponse.ipfs_hash_lossy_artwork}`,
   websiteUrl:
@@ -71,7 +72,7 @@ const mapTrack = (trackItem: {
   artist: { id: mapArtistID(trackItem.platformTrackResponse.artist.id), name: trackItem.platformTrackResponse.artist.name }
 });
 
-const mapArtistProfile = (platformResponse: any, createdAtBlockNumber?: string): ArtistProfile => {
+export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: bigint, createdAtEthereumBlockNumber?: bigint): ArtistProfile => {
   const artist = platformResponse.artist;
   return {
     name: artist.name,
@@ -82,7 +83,8 @@ const mapArtistProfile = (platformResponse: any, createdAtBlockNumber?: string):
     websiteUrl: artist.handle
       ? `https://beta.catalog.works/${artist.handle}`
       : 'https://beta.catalog.works',
-    createdAtBlockNumber: createdAtBlockNumber!
+    createdAtTimestamp,
+    createdAtEthereumBlockNumber
   }
 };
 

@@ -24,11 +24,9 @@ export type ProcessedTrack = Record & {
   artist: { id: string, name: string };
 }
 
-export type Track = {
-  id: string,
+export type Track = Record & {
   platform: MusicPlatform,
   metadataIPFSHash?: string
-  createdAtBlockNumber: string
   [ValidContractCallFunction.tokenURI]?: string
   [ValidContractCallFunction.tokenMetadataURI]?: string
   metadata?: any

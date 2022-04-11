@@ -25,7 +25,8 @@ export type PlatformMapper = {
     platformTrackResponse: unknown;
   }) => ProcessedTrack;
   mapAPITrack?: (trackItem: unknown) => ProcessedTrack;
-  mapArtistProfile: (artistItem: any, createdAtBlockNumber?: string) => ArtistProfile;
+  mapAPITrackTimestamp?: (trackItem: unknown) => bigint;
+  mapArtistProfile: (artistItem: any, createdAtTimestamp: bigint, createdAtEthereumBlockNumber?: bigint) => ArtistProfile;
 }
 
 export type PlatformConfigItem = {

@@ -12,10 +12,10 @@ const processorFunction = (platform: APIMusicPlatform, name: string) => async (a
   console.info(`Processing ${apiTracks.length} api tracks from ${platform}`);
   const lastCursor = clients[platform].getAPITrackCursor(apiTracks[apiTracks.length - 1]);
 
-  const { mapAPITrack, mapArtistProfile, } = platformConfig[platform].mappers!;
+  const { mapAPITrack, mapArtistProfile, mapAPITrackTimestamp} = platformConfig[platform].mappers!;
 
   const artistProfiles = _.uniqBy(apiTracks.map(apiTrack => {
-    return mapArtistProfile(apiTrack);
+    return mapArtistProfile(apiTrack, mapAPITrackTimestamp!(apiTrack));
   }), 'artistId');
   const artists = artistProfiles.map(profile => mapArtist(profile, platform));
 

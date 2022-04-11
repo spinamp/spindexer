@@ -1,12 +1,12 @@
 export type EthereumTimestamp = {
-  createdAtBlockNumber: string;
+  createdAtEthereumBlockNumber?: bigint;
 }
 
-export type APITimestamp = {
-  createdAtTime: string;
+export type UnixTimestampSeconds = {
+  createdAtTimestamp: bigint;
 }
 
-export type Timestamp = EthereumTimestamp | APITimestamp;
+export type Timestamp = EthereumTimestamp & UnixTimestampSeconds;
 
 export type Record = {
   id: string
