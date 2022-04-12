@@ -21,6 +21,7 @@ const mapTrack = (trackItem: {
   id: mapTrackID(trackItem.track.id),
   platformId: trackItem.platformTrackResponse.id,
   title: trackItem.platformTrackResponse.title,
+  description: trackItem.platformTrackResponse.description,
   platform: MusicPlatform.sound,
   lossyAudioURL: trackItem.platformTrackResponse.tracks[0]?.audio?.url,
   createdAtTimestamp: trackItem.track.createdAtTimestamp,

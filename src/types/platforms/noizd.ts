@@ -59,6 +59,7 @@ const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any)
     id: mapAPITrackID(apiTrack.id),
     platformId: apiTrack.id,
     title: apiTrack.title,
+    description: apiTrack.description,
     platform: MusicPlatform.noizd,
     lossyAudioURL: apiTrack.metadata ? apiTrack.metadata.audio_url : apiTrack.full.url,
     createdAtTimestamp: mapAPITrackTimestamp(apiTrack),

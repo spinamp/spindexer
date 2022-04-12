@@ -57,12 +57,13 @@ const mapTrack = (trackItem: {
   id: mapTrackID(trackItem.track.id),
   platformId: trackItem.platformTrackResponse.id,
   title: trackItem.platformTrackResponse.title,
+  description: trackItem.platformTrackResponse.description,
   platform: MusicPlatform.catalog,
   lossyAudioIPFSHash: trackItem.platformTrackResponse.ipfs_hash_lossy_audio,
   lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${trackItem.platformTrackResponse.ipfs_hash_lossy_audio}`,
   createdAtTimestamp: trackItem.track.createdAtTimestamp,
   createdAtEthereumBlockNumber: trackItem.track.createdAtEthereumBlockNumber,
-  lossyArtworkIPFSHash: `https://catalogworks.b-cdn.net/ipfs/${trackItem.platformTrackResponse.ipfs_hash_lossy_artwork}`,
+  lossyArtworkIPFSHash: trackItem.platformTrackResponse.ipfs_hash_lossy_artwork,
   lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${trackItem.platformTrackResponse.ipfs_hash_lossy_artwork}`,
   websiteUrl:
     trackItem.platformTrackResponse.artist.handle && trackItem.platformTrackResponse.short_url
