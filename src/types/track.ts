@@ -12,6 +12,7 @@ export type SubgraphTrack = {
 export type ProcessedTrack = Record & {
   platformId: string;
   title: string;
+  slug: string;
   platform: MusicPlatform;
   lossyAudioIPFSHash?: string;
   lossyAudioURL: string;

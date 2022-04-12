@@ -1,4 +1,5 @@
 import _ from "lodash";
+import slugify from "slugify";
 import { SoundClient } from "../../clients/sound";
 import { formatAddress } from "../address";
 import { ArtistProfile } from "../artist";
@@ -21,6 +22,7 @@ const mapTrack = (trackItem: {
   id: mapTrackID(trackItem.track.id),
   platformId: trackItem.platformTrackResponse.id,
   title: trackItem.platformTrackResponse.title,
+  slug: slugify(`${trackItem.platformTrackResponse.title} ${trackItem.track.createdAtTimestamp}`).toLowerCase(),
   description: trackItem.platformTrackResponse.description,
   platform: MusicPlatform.sound,
   lossyAudioURL: trackItem.platformTrackResponse.tracks[0]?.audio?.url,
