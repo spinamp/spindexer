@@ -27,9 +27,8 @@ const getNoizdResizedUrl = (src: string, size?: number | string): string => {
 
 const mapArtistID = (id: string) => `noizd/${id}`;
 
-export const mapArtistProfile = (platformResponse: any, createdAtBlockNumber?: string): ArtistProfile => {
+export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: string, createdAtEthereumBlockNumber?: string): ArtistProfile => {
   const artist = platformResponse.artist;
-  const created = createdAtBlockNumber ? { createdAtBlockNumber } : { createdAtTime: artist.created }
   return {
     name: artist.username,
     artistId: mapArtistID(artist.id),
@@ -37,13 +36,16 @@ export const mapArtistProfile = (platformResponse: any, createdAtBlockNumber?: s
     platform: MusicPlatform.noizd,
     avatarUrl: artist.profile?.image_profile?.url,
     websiteUrl: `https://noizd.com/u/${artist.uri}`,
-    ...created
+    createdAtTimestamp,
+    createdAtEthereumBlockNumber
   };
 };
 
 const mapAPITrackID = (apiTrackId: string): string => {
   return `noizd/${apiTrackId}`;
 };
+
+const mapAPITrackTimestamp = (apiTrack:any) => '' + new Date(apiTrack.created).getTime()
 
 const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any) => {
   const { cover } = apiTrack;
@@ -57,9 +59,10 @@ const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any)
     id: mapAPITrackID(apiTrack.id),
     platformId: apiTrack.id,
     title: apiTrack.title,
+    description: apiTrack.description,
     platform: MusicPlatform.noizd,
     lossyAudioURL: apiTrack.metadata ? apiTrack.metadata.audio_url : apiTrack.full.url,
-    createdAtTime: apiTrack.created,
+    createdAtTimestamp: mapAPITrackTimestamp(apiTrack),
     lossyArtworkURL: artwork,
     websiteUrl: `https://noizd.com/assets/${apiTrack.id}`,
     artistId: mapArtistID(apiTrack.artist.id),
@@ -79,7 +82,8 @@ const mapTrack = (trackItem: {
     ...processedTrack,
     id: mapTrackID(trackItem.track.id),
     lossyAudioURL: trackItem.platformTrackResponse.metadata.audio_url,
-    createdAtBlockNumber: trackItem.track.createdAtBlockNumber,
+    createdAtTimestamp: processedTrack.createdAtTimestamp || trackItem.track.createdAtTimestamp,
+    createdAtEthereumBlockNumber: trackItem.track.createdAtEthereumBlockNumber,
   };
 };
 
@@ -102,6 +106,7 @@ const addPlatformTrackData = async (tracks: Track[], client: NOIZDClient) => {
 
 export default {
   addPlatformTrackData,
+  mapAPITrackTimestamp,
   mapAPITrack,
   mapTrack,
   mapArtistProfile,

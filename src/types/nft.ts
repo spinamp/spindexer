@@ -1,10 +1,9 @@
 import { DBClient } from '../db/db';
 import { MusicPlatform, platformConfig } from './platform';
 import { SubgraphTrack, Track } from './track';
+import { Record } from './record';
 
-export type NFT = {
-  id: string
-  createdAtBlockNumber: string
+export type NFT = Record & {
   contractAddress: string
   tokenId: BigInt
   platform: MusicPlatform
@@ -37,27 +36,6 @@ export const filterNewTrackNFTs = async (nfts: NFT[], dbClient: DBClient) => {
     if (!isExistingTrack) {
       newTrackIds[nft.track.id] = true;
       newTrackNFTs.push(nft);
-    }
-  }
-  return newTrackNFTs;
-}
-
-export const filterUntimestampedTracks = async (nfts: NFT[], dbClient: DBClient) => {
-  let newTrackNFTs = [];
-  let newTrackIds: any = {};
-  for (let i = 0; i < nfts.length; i++) {
-    const nft = nfts[i];
-    if (!nft || !nft.track) {
-      console.error({ nft });
-      throw new Error('Error processing NFT');
-    }
-    const track: Track = await dbClient.getRecord('tracks', nft.track.id) as Track;
-    if (track) {
-      const trackHasTimestamp = track.createdAtBlockNumber || newTrackIds[nft.track.id];
-      if (!trackHasTimestamp) {
-        newTrackIds[nft.track.id] = true;
-        newTrackNFTs.push(nft);
-      }
     }
   }
   return newTrackNFTs;

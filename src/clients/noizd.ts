@@ -43,12 +43,13 @@ export const fetchLatestTrackCursor = async (): Promise<string> => {
 }
 
 export const getTracksFrom = async (cursor: string): Promise<NOIZDAPITrack[]> => {
+  const createdUTC = new Date(parseInt(cursor)).toISOString()
   const { data } = await noizdAPI.get('/music', {
     params: {
       $order: '[["created", "ASC"]]',
       $where: {
         '$artist.approved_artist$': { "$eq": true },
-        created: { "$gt": cursor }
+        created: { "$gt": createdUTC }
       },
       hidden: false,
       $limit: 20,
@@ -58,7 +59,7 @@ export const getTracksFrom = async (cursor: string): Promise<NOIZDAPITrack[]> =>
 }
 
 const getAPITrackCursor = (track: any) => {
-  return track.created;
+  return '' + new Date(track.created).getTime();
 }
 
 const init = async () => {

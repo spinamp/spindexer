@@ -41,7 +41,9 @@ export const runProcessors = async (processors: Processor[]) => {
   }
 
   const numberOfTracks = await dbClient.getNumberRecords('tracks');
+  const numberOfProcessedTracks = await dbClient.getNumberRecords('processedTracks');
   console.info(`DB has ${numberOfTracks} tracks`);
+  console.info(`DB has ${numberOfProcessedTracks} processed tracks`);
   return false;
 };
 

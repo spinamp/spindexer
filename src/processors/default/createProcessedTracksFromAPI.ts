@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import { DBClient } from '../../db/db';
 import { newPlatformTracks } from '../../triggers/newPlatformTracks';
 import { mapArtist, mergeInExistingArtist } from '../../types/artist';
 import { MusicPlatform, platformConfig } from '../../types/platform';
@@ -11,12 +10,11 @@ export type APIMusicPlatform = MusicPlatform.noizd;
 
 const processorFunction = (platform: APIMusicPlatform, name: string) => async (apiTracks: unknown[], clients: Clients) => {
   console.info(`Processing ${apiTracks.length} api tracks from ${platform}`);
+  const { mapAPITrack, mapArtistProfile, mapAPITrackTimestamp } = platformConfig[platform].mappers!;
   const lastCursor = clients[platform].getAPITrackCursor(apiTracks[apiTracks.length - 1]);
 
-  const { mapAPITrack, mapArtistProfile, } = platformConfig[platform].mappers!;
-
   const artistProfiles = _.uniqBy(apiTracks.map(apiTrack => {
-    return mapArtistProfile(apiTrack);
+    return mapArtistProfile(apiTrack, mapAPITrackTimestamp!(apiTrack));
   }), 'artistId');
   const artists = artistProfiles.map(profile => mapArtist(profile, platform));
 
@@ -31,7 +29,7 @@ const processorFunction = (platform: APIMusicPlatform, name: string) => async (a
   // don't need to worry about changing the artistId and artist{} fields in the processed
   // tracks and can just do a simple merge.
   const processedTracks = apiTracks.map(apiTrack => mapAPITrack!(apiTrack));
-  const mergedProcessedTracks = await mergeProcessedTracks(processedTracks, clients.db, false);
+  const { mergedProcessedTracks } = await mergeProcessedTracks(processedTracks, clients.db, false);
 
   await clients.db.upsert('processedTracks', mergedProcessedTracks);
   await clients.db.upsert('artists', mergedArtists);

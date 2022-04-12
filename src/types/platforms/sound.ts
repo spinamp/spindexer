@@ -21,9 +21,11 @@ const mapTrack = (trackItem: {
   id: mapTrackID(trackItem.track.id),
   platformId: trackItem.platformTrackResponse.id,
   title: trackItem.platformTrackResponse.title,
+  description: trackItem.platformTrackResponse.description,
   platform: MusicPlatform.sound,
   lossyAudioURL: trackItem.platformTrackResponse.tracks[0]?.audio?.url,
-  createdAtBlockNumber: trackItem.track.createdAtBlockNumber,
+  createdAtTimestamp: trackItem.track.createdAtTimestamp,
+  createdAtEthereumBlockNumber: trackItem.track.createdAtEthereumBlockNumber,
   lossyArtworkURL: trackItem.platformTrackResponse.coverImage?.url,
   websiteUrl:
     trackItem.platformTrackResponse.artist.soundHandle && trackItem.platformTrackResponse.titleSlug
@@ -33,18 +35,19 @@ const mapTrack = (trackItem: {
   artist: { id: mapArtistID(trackItem.platformTrackResponse.artist.user.publicAddress), name: trackItem.platformTrackResponse.artist.name }
 });
 
-const mapArtistProfile = (platformResponse: any, createdAtBlockNumber?: string): ArtistProfile => {
+export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: string, createdAtEthereumBlockNumber?: string): ArtistProfile => {
   const artist = platformResponse.artist
   return {
     name: artist.name,
-    artistId: mapArtistID(artist.id),
+    artistId: mapArtistID(artist.user.publicAddress),
     platformId: artist.id,
     platform: MusicPlatform.sound,
     avatarUrl: artist.user?.avatar?.url,
     websiteUrl: artist.soundHandle ?
       `https://www.sound.xyz/${artist.soundHandle}`
       : 'https://www.sound.xyz',
-    createdAtBlockNumber: createdAtBlockNumber!
+    createdAtTimestamp,
+    createdAtEthereumBlockNumber
   }
 };
 

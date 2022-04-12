@@ -5,7 +5,6 @@ import { MusicPlatform } from "./platform";
 import { Record, Timestamp } from "./record"
 
 export type Artist = Record & {
-  id: string;
   name: string;
   slug: string;
   profiles: {
@@ -23,20 +22,15 @@ export type ArtistProfile = Timestamp & {
 }
 
 export const mapArtist = (artistProfile: ArtistProfile, platform: MusicPlatform): Artist => {
-  let created;
-  if ((artistProfile as any).createdAtBlockNumber) {
-    created = { createdAtBlockNumber: (artistProfile as any).createdAtBlockNumber }
-  } else {
-    created = { createdAtTime: (artistProfile as any).createdAtTime }
-  }
   return {
     name: artistProfile.name,
-    slug: slugify(`${artistProfile.name} ${created}`).toLowerCase(),
+    slug: slugify(`${artistProfile.name} ${artistProfile.createdAtTimestamp}`).toLowerCase(),
     id: artistProfile.artistId,
     profiles: {
       [platform]: artistProfile
     },
-    ...created
+    createdAtTimestamp: artistProfile.createdAtTimestamp,
+    createdAtEthereumBlockNumber: artistProfile.createdAtEthereumBlockNumber
   }
 };
 
