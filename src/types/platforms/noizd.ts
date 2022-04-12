@@ -105,6 +105,7 @@ const addPlatformTrackData = async (tracks: Track[], client: NOIZDClient) => {
 
 export default {
   addPlatformTrackData,
+  mapAPITrackTimestamp,
   mapAPITrack,
   mapTrack,
   mapArtistProfile,

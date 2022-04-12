@@ -10,9 +10,8 @@ export type APIMusicPlatform = MusicPlatform.noizd;
 
 const processorFunction = (platform: APIMusicPlatform, name: string) => async (apiTracks: unknown[], clients: Clients) => {
   console.info(`Processing ${apiTracks.length} api tracks from ${platform}`);
+  const { mapAPITrack, mapArtistProfile, mapAPITrackTimestamp } = platformConfig[platform].mappers!;
   const lastCursor = clients[platform].getAPITrackCursor(apiTracks[apiTracks.length - 1]);
-
-  const { mapAPITrack, mapArtistProfile, mapAPITrackTimestamp} = platformConfig[platform].mappers!;
 
   const artistProfiles = _.uniqBy(apiTracks.map(apiTrack => {
     return mapArtistProfile(apiTrack, mapAPITrackTimestamp!(apiTrack));
