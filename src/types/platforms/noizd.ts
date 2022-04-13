@@ -5,6 +5,7 @@ import { MusicPlatform } from "../platform";
 import { ProcessedTrack, Track } from "../track";
 import { isGif, isMP4 } from '../media';
 import { ArtistProfile } from "../artist";
+import slugify from "slugify";
 
 const mapTrackID = (trackId: string): string => {
   const [contractAddress, nftId] = trackId.split('/');
@@ -59,6 +60,7 @@ const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any)
     id: mapAPITrackID(apiTrack.id),
     platformId: apiTrack.id,
     title: apiTrack.title,
+    slug: slugify(`${apiTrack.title} ${mapAPITrackTimestamp(apiTrack)}`).toLowerCase(),
     description: apiTrack.description,
     platform: MusicPlatform.noizd,
     lossyAudioURL: apiTrack.metadata ? apiTrack.metadata.audio_url : apiTrack.full.url,

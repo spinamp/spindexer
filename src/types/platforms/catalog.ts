@@ -5,6 +5,7 @@ import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { CatalogClient } from '../../clients/catalog';
 import _ from 'lodash';
+import slugify from 'slugify';
 
 export const recoverCatalogAddress = (body: any, signature: string) => {
   const bodyString = JSON.stringify(body);
@@ -57,6 +58,7 @@ const mapTrack = (trackItem: {
   id: mapTrackID(trackItem.track.id),
   platformId: trackItem.platformTrackResponse.id,
   title: trackItem.platformTrackResponse.title,
+  slug: slugify(`${trackItem.platformTrackResponse.title} ${trackItem.track.createdAtTimestamp}`).toLowerCase(),
   description: trackItem.platformTrackResponse.description,
   platform: MusicPlatform.catalog,
   lossyAudioIPFSHash: trackItem.platformTrackResponse.ipfs_hash_lossy_audio,

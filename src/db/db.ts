@@ -27,6 +27,7 @@ export type Query = {
   where: Where[] | Where,
   whereType?: string
 }
+
 export type DBClient = {
   getCursor: (processor: string) => Promise<string | undefined>;
   getRecord: (tableName: string, id: string) => Promise<Record>;

@@ -1,4 +1,5 @@
 import _ from "lodash";
+import slugify from "slugify";
 import { SoundClient } from "../../clients/sound";
 import { formatAddress } from "../address";
 import { ArtistProfile } from "../artist";
@@ -21,6 +22,7 @@ const mapTrack = (trackItem: {
   id: mapTrackID(trackItem.track.id),
   platformId: trackItem.platformTrackResponse.id,
   title: trackItem.platformTrackResponse.title,
+  slug: slugify(`${trackItem.platformTrackResponse.title} ${trackItem.track.createdAtTimestamp}`).toLowerCase(),
   description: trackItem.platformTrackResponse.description,
   platform: MusicPlatform.sound,
   lossyAudioURL: trackItem.platformTrackResponse.tracks[0]?.audio?.url,
@@ -55,9 +57,9 @@ const addPlatformTrackData = async (tracks: Track[], client: SoundClient) => {
   const platformTracks = await client.getAllMintedReleases();
   const platformTracksWithTrackID = platformTracks.map(platformTrack => ({
     ...platformTrack,
-    id: `${formatAddress(platformTrack?.artist?.contract?.address)}/${platformTrack?.mintInfo?.editionId}`,
+    trackId: `${formatAddress(platformTrack?.artist?.contract?.address)}/${platformTrack?.mintInfo?.editionId}`,
   }));
-  const platformTrackDataByTrackId = _.keyBy(platformTracksWithTrackID, 'id');
+  const platformTrackDataByTrackId = _.keyBy(platformTracksWithTrackID, 'trackId');
   const platformTrackData: { track: Track, platformTrackResponse: any }[]
     = tracks.map(track => ({ track, platformTrackResponse: platformTrackDataByTrackId[track.id] }));
   return platformTrackData;

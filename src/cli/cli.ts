@@ -6,7 +6,7 @@ import dbLib from '../db/local-db';
 import { getMetadataURL, ProcessedTrack, Track } from '../types/track';
 import prompt from 'prompt';
 import _ from 'lodash';
-import { MusicPlatform } from '../types/platform';
+import { MusicPlatform, platformConfig } from '../types/platform';
 import { verifyCatalogTrack } from '../types/platforms/catalog';
 
 const logMetadataDups = async (dbClient: DBClient) => {
@@ -218,6 +218,21 @@ const killResetProcessedTracks = async () => {
   });
 }
 
+const killNOIZDCursor = async () => {
+  const dbClient = await dbLib.init();
+  const { db, indexes } = await dbClient.getFullDB();
+  console.log(`Remove noizd cursor?`)
+  prompt.start();
+  prompt.get(['confirm'], async (err, result) => {
+    if (result.confirm === 'y') {
+      const cursorName = `createProcessedTracksFromAPI_noizd`
+      const initialCursor = platformConfig.noizd.initialTrackCursor!;
+      await dbClient.updateProcessor(cursorName, initialCursor);
+      console.log('Deleted');
+    }
+  });
+}
+
 const start = async () => {
   yargs(hideBin(process.argv))
     .command('printMissingIPFS', 'print all tracks with missing ipfs hashes', async (yargs) => {
@@ -272,6 +287,11 @@ const start = async () => {
       return yargs
     }, async () => {
       await killResetProcessedTracks();
+    })
+    .command('killNOIZDCursor', 'clear out noizd api track cursos', async (yargs) => {
+      return yargs
+    }, async () => {
+      await killNOIZDCursor();
     })
     .command('printMimeTypes', 'print all mime types in metadata in db', async (yargs) => {
       return yargs
