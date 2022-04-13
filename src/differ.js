@@ -1,5 +1,9 @@
-const orig = require('../app/src/db/preloadedData/preloadedData.json');
-const neww = require('./localdb/db.json');
+// This script was used to diff an old version of the DB with a new one and ensure nothing has been lost.
+// It should no longer be in use, though is being kept until
+// the migration is 100% completed.
+
+const orig = require('../../app/src/db/preloadedData/preloadedData.json');
+const neww = require('../localdb/db.json');
 const _ = require('lodash');
 
 const origTracks = orig.tracks.items; // map
@@ -160,6 +164,8 @@ const diffTrack = (oldTrack, newTrack) => {
     return undefined;
   }
   if (!newTrack) {
+    // console.log({ oldTrack, newTrack })
+    // throw Error("qq");
     return { old: oldTrack, new: undefined };
   }
   const oldKeys = Object.keys(oldTrack);
