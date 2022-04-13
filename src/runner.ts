@@ -1,4 +1,4 @@
-import db from './db/local-db';
+import db from './db/sql-db';
 import subgraph from './clients/subgraph';
 import ethereum from './clients/ethereum';
 import axios from './clients/axios';

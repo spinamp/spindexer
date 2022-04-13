@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import './types/env';
 import { addTrackMetadata } from './processors/default/addTrackMetadata';
 import { addTrackMetadataIPFSHash } from './processors/default/addTrackMetadataIPFSHash';
 import { categorizeZora } from './processors/default/categorizeZora';
@@ -11,14 +12,14 @@ import { MusicPlatform } from './types/platform';
 
 const PROCESSORS = [
   createTracksFromNFTsProcessor,
-  addTrackMetadataIPFSHash,
-  addTrackMetadata,
-  stripNonAudio,
-  categorizeZora,
-  processPlatformTracks(MusicPlatform.catalog),
-  processPlatformTracks(MusicPlatform.sound),
-  processPlatformTracks(MusicPlatform.noizd),
-  createProcessedTracksFromAPI(MusicPlatform.noizd),
+  // addTrackMetadataIPFSHash,
+  // addTrackMetadata,
+  // stripNonAudio,
+  // categorizeZora,
+  // processPlatformTracks(MusicPlatform.catalog),
+  // processPlatformTracks(MusicPlatform.sound),
+  // processPlatformTracks(MusicPlatform.noizd),
+  // createProcessedTracksFromAPI(MusicPlatform.noizd),
 ];
 
 const updateDBLoop = async () => {

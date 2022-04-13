@@ -1,13 +1,25 @@
 import { request, gql } from 'graphql-request'
+import { MusicPlatform } from '../types/platform';
 
 import { Record, RecordType, recordIsInBatch } from '../types/record';
-import { NFT } from '../types/nft';
 
 export type SubgraphClient = {
   getRecordsFrom: (type: RecordType, timestamp: string) => Promise<Record[]>;
   getLatestRecord: (type: RecordType) => Promise<Record>;
-  getNFTsFrom: (timestamp: string) => Promise<NFT[]>;
-  getLatestNFT: () => Promise<NFT>;
+  getNFTsFrom: (timestamp: string) => Promise<SubgraphNFT[]>;
+  getLatestNFT: () => Promise<SubgraphNFT>;
+}
+
+export type SubgraphNFT = {
+  id: string
+  contractAddress: string
+  tokenId: BigInt
+  createdAtBlockNumber: string
+  createdAtTimestamp: string
+  platform: MusicPlatform
+  track: {
+    id: string
+  }
 }
 
 const QUERIES = {
@@ -69,15 +81,15 @@ const init = (endpoint: string) => {
 
     return allRecords;
   };
-  const getLatestRecord = async (type: RecordType): Promise<Record> => {
+  const getLatestRecord = async (type: RecordType): Promise<SubgraphNFT> => {
     const data = await request(endpoint, QUERIES.getLatestRecord(type));
     return data[`${type}s`][0];
   };
-  const getNFTsFrom = async (timestamp: string): Promise<NFT[]> => {
+  const getNFTsFrom = async (timestamp: string): Promise<SubgraphNFT[]> => {
     return getRecordsFrom(RecordType.nft, timestamp);
   };
   const getLatestNFT = async () => {
-    return getLatestRecord(RecordType.nft) as Promise<NFT>;
+    return getLatestRecord(RecordType.nft) as Promise<SubgraphNFT>;
   };
   return {
     getRecordsFrom,
