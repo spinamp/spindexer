@@ -40,4 +40,5 @@ export type DBClient = {
   getNumberRecords: (tableName: string) => Promise<any>;
   recordExists: (tableName: string, recordID: string) => Promise<boolean>;
   getFullDB: () => Promise<any>;
+  close: () => Promise<void>;
 }

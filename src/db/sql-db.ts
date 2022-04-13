@@ -13,6 +13,7 @@ const loadDB = async () => {
 }
 
 const recordExistsFunc = (db: Knex) => async (tableName: string, recordID: string) => {
+  console.log(`Querying for record ${recordID} on ${tableName}`);
   const record = await db(tableName).where('id', recordID)
   return !!record[0];
 }
@@ -21,14 +22,20 @@ const init = async (): Promise<DBClient> => {
   const db = await loadDB();
   return ({
     getCursor: async (processor: string): Promise<(string | undefined)> => {
+      console.log(`Querying for processor cursor`);
       const cursorResult = await db('processors').where('id', processor).select('cursor');
       return cursorResult[0]?.cursor;
     },
     recordExists: recordExistsFunc(db),
     insert: async (tableName: string, records: Record[]) => {
+      console.log(`Inserting into ${tableName} ${records.length} records`);
+      if (records.length === 0) {
+        return;
+      }
       await db(tableName).insert(records);
     },
     updateProcessor: async (processor: string, lastCursor: Cursor) => {
+      console.log(`Updating ${processor} with cursor: ${lastCursor}`);
       const processorExists = await recordExistsFunc(db)('processors', processor);
       if (processorExists) {
         await db('processors').where('id', processor).update(
@@ -40,6 +47,14 @@ const init = async (): Promise<DBClient> => {
         );
       }
     },
+    getNumberRecords: async (tableName: string) => {
+      console.log(`Querying for count on ${tableName}`);
+      const count = await db(tableName).count({ count: '*' })
+      return count[0].count;
+    },
+    close: async () => {
+      return await db.destroy();
+    }
   } as any);
 }
 
@@ -150,9 +165,6 @@ const init = async (): Promise<DBClient> => {
       db[tableName] = newRecords;
       await saveDB(db);
       indexes = await createIndexes(db);
-    },
-    getNumberRecords: async (tableName: string) => {
-      return db[tableName].length;
     },
     recordExists: async (tableName: string, recordID: string) => {
       return Promise.resolve(!!(indexes[tableName][recordID]));

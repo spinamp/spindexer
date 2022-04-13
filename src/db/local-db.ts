@@ -182,7 +182,8 @@ const init = async (): Promise<DBClient> => {
     },
     getFullDB: async () => {
       return { db, indexes };
-    }
+    },
+    close: async () => { }
   };
 }
 
