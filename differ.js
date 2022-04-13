@@ -188,6 +188,9 @@ const diffTrack = (oldTrack, newTrack) => {
       keyNew = 'createdAtTimestamp'
       return;
     }
+    if (keyOld === 'provider' && oldTrack[keyOld] === 'soundXyz' && newTrack[keyNew] === 'sound') {
+      return
+    }
     if (keyOld === 'url' && oldTrack.provider === 'noizd' && newTrack.id.split('/')[2] <= 28) {
       return;
     }
@@ -229,6 +232,12 @@ const diffTrack = (oldTrack, newTrack) => {
     if (keyNew === 'lossyAudioURL' && newTrack.platform === 'noizd' && newTrack.id.split('/')[2] <= 28) {
       return;
     }
+    if (keyNew === 'platform' && oldTrack[keyOld] === 'soundXyz' && newTrack[keyNew] === 'sound') {
+      return
+    }
+    if (keyNew === 'slug') {
+      return
+    }
     if (keyNew === 'artist') {
       const diffedArtist = diffArtist(oldTrack.artist, newTrack.artist, false)
       if (diffedArtist) {
@@ -254,6 +263,9 @@ const diffTracks = (oldTracks, newTracks) => {
     let keyNew = keyOld;
     let newTrack = newTracks[keyNew];
     const trackPlatformId = oldTracks[keyOld].originalId;
+    if (keyOld === 'ethereum/0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/null') {
+      return {};
+    }
     if (oldTracks[keyOld].provider === 'noizd' && processedTracksByPlatformId[trackPlatformId]) {
       newTrack = processedTracksByPlatformId[trackPlatformId];
     }

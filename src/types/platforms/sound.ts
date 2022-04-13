@@ -57,9 +57,9 @@ const addPlatformTrackData = async (tracks: Track[], client: SoundClient) => {
   const platformTracks = await client.getAllMintedReleases();
   const platformTracksWithTrackID = platformTracks.map(platformTrack => ({
     ...platformTrack,
-    id: `${formatAddress(platformTrack?.artist?.contract?.address)}/${platformTrack?.mintInfo?.editionId}`,
+    trackId: `${formatAddress(platformTrack?.artist?.contract?.address)}/${platformTrack?.mintInfo?.editionId}`,
   }));
-  const platformTrackDataByTrackId = _.keyBy(platformTracksWithTrackID, 'id');
+  const platformTrackDataByTrackId = _.keyBy(platformTracksWithTrackID, 'trackId');
   const platformTrackData: { track: Track, platformTrackResponse: any }[]
     = tracks.map(track => ({ track, platformTrackResponse: platformTrackDataByTrackId[track.id] }));
   return platformTrackData;
