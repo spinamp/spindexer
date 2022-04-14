@@ -25,7 +25,7 @@ const getMetadataForTrack = (track: Track, timeout: number, axios: Axios, ipfs: 
 const saveMetadata = async (tracks: Track[], dbClient: DBClient) => {
   const trackUpdates = tracks.map((track): ({ id: string } & Partial<Track>) => ({
     id: track.id,
-    metadata: track.metadata,
+    metadata: JSON.stringify(track.metadata),
     mimeType: track.metadata?.mimeType,
     metadataError: track.metadataError,
   }));

@@ -69,13 +69,19 @@ const init = async (): Promise<DBClient> => {
     },
     update: async (tableName: string, recordUpdates: Record[]) => {
       console.log(`Updating records`);
-      if (recordUpdates) {
+      if (recordUpdates?.length > 0) {
         for (const update of recordUpdates) {
           const id = update.id;
           const changes: any = { ...update }
           delete changes.id
           await db(tableName).where('id', id).update(changes)
         }
+      }
+    },
+    delete: async (tableName: string, ids: string[]) => {
+      console.log(`Deleting records`);
+      if (ids?.length > 0) {
+        await db(tableName).whereIn('id', ids).delete()
       }
     },
     close: async () => {
@@ -93,18 +99,6 @@ export default {
 const init = async (): Promise<DBClient> => {
   let { db, indexes } = await loadDB();
   return {
-    getRecord: async (tableName: string, id: string): (Promise<Record>) => {
-      return indexes[tableName] && indexes[tableName][id];
-    },
-    insert: async (tableName: string, records: Record[]) => {
-      const table = db[tableName];
-      const index = indexes[tableName];
-      records.forEach((record: Record) => {
-        table.push(record);
-        index[record.id] = record;
-      });
-      await saveDB(db);
-    },
     upsert: async (tableName: string, recordUpserts: Record[]) => {
       const index = indexes[tableName];
       const table = db[tableName];
@@ -118,16 +112,6 @@ const init = async (): Promise<DBClient> => {
         }
       });
       await saveDB(db);
-    },
-    delete: async (tableName: string, ids: string[]) => {
-      const records = db[tableName];
-      const newRecords = records.filter((r: Record) => !ids.includes(r.id));
-      db[tableName] = newRecords;
-      await saveDB(db);
-      indexes = await createIndexes(db);
-    },
-    recordExists: async (tableName: string, recordID: string) => {
-      return Promise.resolve(!!(indexes[tableName][recordID]));
     },
     getFullDB: async () => {
       return { db, indexes };

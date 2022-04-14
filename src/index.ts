@@ -11,8 +11,8 @@ import { runProcessors } from './runner';
 import { MusicPlatform } from './types/platform';
 
 const PROCESSORS = [
-  createTracksFromNFTsProcessor,
-  addTrackMetadataIPFSHash,
+  // createTracksFromNFTsProcessor,
+  // addTrackMetadataIPFSHash,
   addTrackMetadata,
   // stripNonAudio,
   // categorizeZora,
