@@ -1,6 +1,5 @@
 import knex, { Knex } from 'knex';
-import { promises as fs } from 'fs';
-import { Record, DBClient, Query, Where, ValueIsWhere, ValueInWhere } from './db';
+import { Record, DBClient, Wheres, WhereFunc } from './db';
 import _ from 'lodash';
 import { Cursor } from '../types/trigger';
 import config from './knexfile';
@@ -52,6 +51,33 @@ const init = async (): Promise<DBClient> => {
       const count = await db(tableName).count({ count: '*' })
       return count[0].count;
     },
+    getRecords: async <RecordType extends Record>(tableName: string, wheres?: Wheres): (Promise<RecordType[]>) => {
+      console.log(`Querying for records where ${wheres}`);
+      let query = db(tableName);
+      if (wheres) {
+        wheres.forEach(where => {
+          const queryField = where[0];
+          if (queryField === 'and') {
+            query = query[queryField];
+          } else {
+            query = (query[queryField] as any)(...where[1])
+          }
+        })
+      }
+      const records = await query;
+      return records;
+    },
+    update: async (tableName: string, recordUpdates: Record[]) => {
+      console.log(`Updating records`);
+      if (recordUpdates) {
+        for (const update of recordUpdates) {
+          const id = update.id;
+          const changes: any = { ...update }
+          delete changes.id
+          await db(tableName).where('id', id).update(changes)
+        }
+      }
+    },
     close: async () => {
       return await db.destroy();
     }
@@ -70,78 +96,12 @@ const init = async (): Promise<DBClient> => {
     getRecord: async (tableName: string, id: string): (Promise<Record>) => {
       return indexes[tableName] && indexes[tableName][id];
     },
-    getRecords: async <RecordType extends Record>(tableName: string, query?: Query): (Promise<RecordType[]>) => {
-      const allRecords = db[tableName]
-      if (query) {
-        let filteredRecords = allRecords;
-        if (Array.isArray(query.where)) {
-          filteredRecords = filteredRecords.filter((record: RecordType) => {
-            let matched;
-            if (query.whereType === 'or') {
-              matched = false;
-            } else {
-              matched = true;
-            }
-            for (const filter of (query.where as Array<Where>)) {
-              let match;
-              if ((filter as ValueIsWhere).value) {
-                match = _.get(record, filter.key) === (filter as any).value;
-              } else if ((filter as ValueInWhere).valueIn) {
-                const matchValues = (filter as ValueInWhere).valueIn;
-                const recordValue = _.get(record, filter.key);
-                match = matchValues.includes(recordValue);
-              }
-              else {
-                const valueExists = !(_.get(record, filter.key) === undefined)
-                match = valueExists === (filter as any).valueExists;
-              }
-              if (query.whereType === 'or') {
-                matched = matched || match;
-              } else {
-                matched = matched && match;
-              }
-            }
-            return matched;
-          }
-          );
-        } else {
-          const filter = query.where;
-          filteredRecords = allRecords.filter((record: RecordType) => {
-            let match;
-            if ((filter as ValueIsWhere).value) {
-              match = _.get(record, filter.key) === (filter as any).value;
-            } else if ((filter as ValueInWhere).valueIn) {
-              const matchValues = (filter as ValueInWhere).valueIn;
-              const recordValue = _.get(record, filter.key);
-              match = matchValues.includes(recordValue);
-            } else {
-              const valueExists = !(_.get(record, filter.key) === undefined)
-              match = valueExists === (filter as any).valueExists;
-            }
-            return match;
-          });
-        }
-        return filteredRecords;
-      }
-      return allRecords;
-    },
     insert: async (tableName: string, records: Record[]) => {
       const table = db[tableName];
       const index = indexes[tableName];
       records.forEach((record: Record) => {
         table.push(record);
         index[record.id] = record;
-      });
-      await saveDB(db);
-    },
-    update: async (tableName: string, recordUpdates: Record[]) => {
-      const index = indexes[tableName];
-      recordUpdates.forEach((update: Record) => {
-        const record = index[update.id];
-        if (!record) {
-          throw new Error('Unknown record provided');
-        }
-        Object.assign(record, { ...update });
       });
       await saveDB(db);
     },

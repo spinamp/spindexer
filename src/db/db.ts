@@ -6,32 +6,26 @@ export type Record = {
 
 export type PartialRecord<Type> = Partial<Type> & Record
 
-export type ValueIsWhere = {
-  key: string,
-  value: {},
-}
+export type WhereFunc = 'where'
+  | 'whereNull'
+  | 'andWhere'
+  | 'whereJsonPath'
+  | 'whereExists'
+  | 'whereIn';
 
-export type ValueInWhere = {
-  key: string,
-  valueIn: string[],
-}
+export type WhereField = 'and';
 
-export type ValueExistsWhere = {
-  key: string,
-  valueExists: boolean
-}
+export type WhereFuncParam = any;
 
-export type Where = ValueIsWhere | ValueExistsWhere | ValueInWhere
+export type FieldWhere = [WhereField]
+export type FuncWhere = [WhereFunc, WhereFuncParam[]]
+export type Where = FieldWhere | FuncWhere;
 
-export type Query = {
-  where: Where[] | Where,
-  whereType?: string
-}
+export type Wheres = Where[];
 
 export type DBClient = {
   getCursor: (processor: string) => Promise<string | undefined>;
-  getRecord: (tableName: string, id: string) => Promise<Record>;
-  getRecords: <Type extends Record>(tableName: string, query?: Query) => Promise<Type[]>;
+  getRecords: <Type extends Record>(tableName: string, wheres?: Wheres) => Promise<Type[]>;
   insert: (tableName: string, rows: Record[]) => Promise<void>;
   update: (tableName: string, rows: Record[]) => Promise<void>;
   upsert: (tableName: string, rows: Record[]) => Promise<void>;

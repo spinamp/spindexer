@@ -22,9 +22,9 @@ export const extractHashFromURL = (urlString: string) => {
     if (url.host.includes('.ipfs.')) {
       return url.host.split('.ipfs.')[0];
     }
-    return null;
+    return '';
   } catch {
-    return null;
+    return '';
   }
 }
 
