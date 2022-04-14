@@ -1,6 +1,7 @@
 import { missingTrackMetadata } from '../../triggers/missing';
 import { Clients, Processor } from '../../types/processor';
 import { getMetadataURL, Track } from '../../types/track';
+import { Record } from '../../types/record';
 import { Axios, AxiosResponse, AxiosError } from 'axios';
 import { DBClient } from '../../db/db';
 import { IPFSClient } from '../../clients/ipfs';
@@ -22,9 +23,10 @@ const getMetadataForTrack = (track: Track, timeout: number, axios: Axios, ipfs: 
 }
 
 const saveMetadata = async (tracks: Track[], dbClient: DBClient) => {
-  const trackUpdates = tracks.map(track => ({
+  const trackUpdates = tracks.map((track): ({ id: string } & Partial<Track>) => ({
     id: track.id,
-    metadata: track.metadata,
+    metadata: JSON.stringify(track.metadata),
+    mimeType: track.metadata?.mimeType,
     metadataError: track.metadataError,
   }));
   await dbClient.update('tracks', trackUpdates);

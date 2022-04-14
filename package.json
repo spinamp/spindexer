@@ -22,15 +22,18 @@
   },
   "dependencies": {
     "@ethersproject/providers": "^5.6.2",
+    "@vscode/sqlite3": "^5.0.8",
     "axios": "^0.26.1",
     "dotenv": "^16.0.0",
     "ethcall": "^4.4.0",
     "ethers": "^5.6.2",
     "graphql": "^16.3.0",
     "graphql-request": "^4.2.0",
+    "knex": "^1.0.7",
     "lodash": "^4.17.21",
     "prompt": "^1.2.2",
     "slugify": "^1.6.5",
+    "sqlite3": "^5.0.3",
     "yargs": "^17.4.0"
   }
 }

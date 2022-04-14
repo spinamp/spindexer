@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import { PartialRecord } from '../../db/db';
 import { unprocessedPlatformTracks } from '../../triggers/missing';
-import { Artist, ArtistProfile, mapArtist, mergeInExistingArtist } from '../../types/artist';
+import { ArtistProfile, mapArtist } from '../../types/artist';
+import { Record } from '../../types/record';
 import { MusicPlatform, platformConfig, PlatformMapper } from '../../types/platform';
 import { Clients } from '../../types/processor';
 import { Track, ProcessedTrack, mergeProcessedTracks } from '../../types/track';
@@ -46,9 +47,9 @@ const processPlatformTrackData = (platformTrackData: {
     }
     return profiles
   }, []), 'artistId');
-  const artists = artistProfiles.map(profile => mapArtist(profile, platform));
+  const artists = artistProfiles.map(profile => mapArtist(profile));
   return {
-    processedTracks, trackUpdates, artists,
+    processedTracks, trackUpdates, artists, artistProfiles,
   };
 }
 
@@ -60,17 +61,16 @@ const processorFunction = (platform: Partial<ImplementedMusicPlatform>) => async
   }
   const platformTrackData = await platformMapper.addPlatformTrackData(tracks, clients[platform]);
 
-  const { processedTracks, trackUpdates, artists } = processPlatformTrackData(platformTrackData, platformMapper, platform);
+  const { processedTracks, trackUpdates, artists, artistProfiles } = processPlatformTrackData(platformTrackData, platformMapper, platform);
   const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(processedTracks, clients.db, true);
-
-  const mergedArtists = await mergeInExistingArtist(artists, clients.db);
 
   await clients.db.update('tracks', trackUpdates);
   if (oldIds) {
     await clients.db.delete('processedTracks', oldIds);
   }
   await clients.db.upsert('processedTracks', mergedProcessedTracks);
-  await clients.db.upsert('artists', mergedArtists);
+  await clients.db.upsert('artists', artists);
+  await clients.db.upsert('artistProfiles', (artistProfiles as unknown as Record[]), ['artistId', 'platform']);
 };
 
 export const processPlatformTracks = (platform: ImplementedMusicPlatform) => ({

@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import './types/env';
 import { addTrackMetadata } from './processors/default/addTrackMetadata';
 import { addTrackMetadataIPFSHash } from './processors/default/addTrackMetadataIPFSHash';
 import { categorizeZora } from './processors/default/categorizeZora';

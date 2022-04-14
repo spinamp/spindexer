@@ -34,7 +34,6 @@ const mapTrack = (trackItem: {
       ? `https://www.sound.xyz/${trackItem.platformTrackResponse.artist.soundHandle}/${trackItem.platformTrackResponse.titleSlug}`
       : 'https://www.sound.xyz',
   artistId: mapArtistID(trackItem.platformTrackResponse.artist.user.publicAddress),
-  artist: { id: mapArtistID(trackItem.platformTrackResponse.artist.user.publicAddress), name: trackItem.platformTrackResponse.artist.name }
 });
 
 export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: string, createdAtEthereumBlockNumber?: string): ArtistProfile => {

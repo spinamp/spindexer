@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import { newPlatformTracks } from '../../triggers/newPlatformTracks';
-import { mapArtist, mergeInExistingArtist } from '../../types/artist';
+import { mapArtist } from '../../types/artist';
 import { MusicPlatform, platformConfig } from '../../types/platform';
+import { Record } from '../../types/record';
 import { Clients, Processor } from '../../types/processor';
 import { mergeProcessedTracks } from '../../types/track';
 
@@ -16,23 +17,18 @@ const processorFunction = (platform: APIMusicPlatform, name: string) => async (a
   const artistProfiles = _.uniqBy(apiTracks.map(apiTrack => {
     return mapArtistProfile(apiTrack, mapAPITrackTimestamp!(apiTrack));
   }), 'artistId');
-  const artists = artistProfiles.map(profile => mapArtist(profile, platform));
 
-  // Note: This merge works because the mapped API artist ID
-  // is always the same as the mapped on chain ID. We ensure this
-  // by using the same function and parameters when creating the artist ID
-  // in both cases. We assume an artistID for an artist is the same across all
-  // their profiles.
-  const mergedArtists = await mergeInExistingArtist(artists, clients.db);
+  const artists = artistProfiles.map(profile => mapArtist(profile));
 
-  // Again, because we assume an artist has the same ID across all profiles, we
+  // Because we assume an artist has the same ID across all profiles, we
   // don't need to worry about changing the artistId and artist{} fields in the processed
   // tracks and can just do a simple merge.
   const processedTracks = apiTracks.map(apiTrack => mapAPITrack!(apiTrack));
   const { mergedProcessedTracks } = await mergeProcessedTracks(processedTracks, clients.db, false);
 
   await clients.db.upsert('processedTracks', mergedProcessedTracks);
-  await clients.db.upsert('artists', mergedArtists);
+  await clients.db.upsert('artists', artists);
+  await clients.db.upsert('artistProfiles', (artistProfiles as unknown as Record[]), ['artistId', 'platform']);
   await clients.db.updateProcessor(name, lastCursor);
   console.info(`Processing completed, updated cursor to ${lastCursor}`);
 };

@@ -1,4 +1,4 @@
-import db from './db/local-db';
+import db from './db/sql-db';
 import subgraph from './clients/subgraph';
 import ethereum from './clients/ethereum';
 import axios from './clients/axios';
@@ -44,6 +44,7 @@ export const runProcessors = async (processors: Processor[]) => {
   const numberOfProcessedTracks = await dbClient.getNumberRecords('processedTracks');
   console.info(`DB has ${numberOfTracks} tracks`);
   console.info(`DB has ${numberOfProcessedTracks} processed tracks`);
+  await dbClient.close();
   return false;
 };
 

@@ -46,7 +46,7 @@ const mapAPITrackID = (apiTrackId: string): string => {
   return `noizd/${apiTrackId}`;
 };
 
-const mapAPITrackTimestamp = (apiTrack:any) => '' + new Date(apiTrack.created).getTime()
+const mapAPITrackTimestamp = (apiTrack: any) => '' + new Date(apiTrack.created).getTime()
 
 const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any) => {
   const { cover } = apiTrack;
@@ -68,7 +68,6 @@ const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any)
     lossyArtworkURL: artwork,
     websiteUrl: `https://noizd.com/assets/${apiTrack.id}`,
     artistId: mapArtistID(apiTrack.artist.id),
-    artist: { id: mapArtistID(apiTrack.artist.id), name: apiTrack.artist.username }
   }
 }
 

@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { EthClient, ValidContractCallFunction } from '../../clients/ethereum';
+import { SubgraphNFT } from '../../clients/subgraph';
 import { DBClient } from '../../db/db';
 import { newNFTsCreated } from '../../triggers/newNFTsCreated';
 import { formatAddress } from '../../types/address';
@@ -30,9 +31,9 @@ export const createTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethC
   console.info(`Processing bulk call`);
   const callResults = await ethClient.call(flatMetadataCalls);
   const newTracks = newTrackNFTs.map((nft, index) => {
-    console.info(`Processing nft for track ${nft.track.id}`);
+    console.info(`Processing nft for track ${nft.trackId}`);
     const track: Track = {
-      id: formatAddress(nft.track.id),
+      id: formatAddress(nft.trackId),
       platform: nft.platform,
       createdAtTimestamp: nft.createdAtTimestamp,
       createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
@@ -48,14 +49,16 @@ export const createTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethC
   return newTracks;
 };
 
-const processorFunction = async (newNFTs: NFT[], clients: Clients) => {
-  newNFTs.forEach(nft => {
-    nft.id = formatAddress(nft.id);
-    if(nft.createdAtEthereumBlockNumber) {
-      nft.createdAtEthereumBlockNumber = nft.createdAtEthereumBlockNumber;
-    }
-    nft.createdAtTimestamp = nft.createdAtTimestamp;
-  });
+const processorFunction = async (newSubgraphNFTs: SubgraphNFT[], clients: Clients) => {
+  const newNFTs: NFT[] = newSubgraphNFTs.map(subgraphNFT => ({
+    id: formatAddress(subgraphNFT.id),
+    createdAtEthereumBlockNumber: subgraphNFT.createdAtBlockNumber,
+    createdAtTimestamp: subgraphNFT.createdAtTimestamp,
+    contractAddress: subgraphNFT.contractAddress,
+    tokenId: subgraphNFT.tokenId,
+    platform: subgraphNFT.platform,
+    trackId: subgraphNFT.track.id
+  }));
   const lastCursor = newNFTs[newNFTs.length - 1].createdAtTimestamp;
   const newTracks = await createTracksFromNFTs(newNFTs, clients.db, clients.eth);
   await clients.db.insert('nfts', newNFTs);

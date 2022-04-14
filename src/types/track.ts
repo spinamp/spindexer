@@ -22,7 +22,6 @@ export type ProcessedTrack = Record & {
   lossyArtworkURL: string;
   websiteUrl?: string;
   artistId: string;
-  artist: { id: string, name: string };
 }
 
 export type Track = Record & {
@@ -32,6 +31,7 @@ export type Track = Record & {
   [ValidContractCallFunction.tokenMetadataURI]?: string
   metadata?: any
   metadataError?: string
+  mimeType?: string
   processed?: true
   processError?: true
 }
@@ -45,21 +45,19 @@ export const getMetadataURL = (track: Track): (string | null | undefined) => {
 export const getMetadataIPFSHash = (track: Track): (string | null | undefined) => {
   const metadataURL = getMetadataURL(track);
   if (!metadataURL) {
-    return null;
+    return '';
   }
   const hash = extractHashFromURL(metadataURL);
-  return hash || null;
+  return hash || '';
 }
 
 export const mergeProcessedTracks = async (newProcessedTracks: ProcessedTrack[], dbClient: DBClient, prioritizeNew: boolean) => {
   const platformIds = newProcessedTracks.map(t => t.platformId);
-  const existingProcessedTracks = await dbClient.getRecords<ProcessedTrack>('processedTracks', {
-    where:
-    {
-      key: 'platformId',
-      valueIn: platformIds
-    }
-  });
+  const existingProcessedTracks = await dbClient.getRecords<ProcessedTrack>('processedTracks',
+    [
+      ['whereIn', ['platformId', platformIds]]
+    ]
+  );
   const existingProcessedTracksByPlatformId = _.keyBy(existingProcessedTracks, 'platformId');
   const mergedProcessedTracks = newProcessedTracks.map(t => {
     if (prioritizeNew) {

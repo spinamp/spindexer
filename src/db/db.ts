@@ -6,38 +6,33 @@ export type Record = {
 
 export type PartialRecord<Type> = Partial<Type> & Record
 
-export type ValueIsWhere = {
-  key: string,
-  value: {},
-}
+export type WhereFunc = 'where'
+  | 'whereNull'
+  | 'andWhere'
+  | 'whereJsonPath'
+  | 'whereNotNull'
+  | 'whereIn';
 
-export type ValueInWhere = {
-  key: string,
-  valueIn: string[],
-}
+export type WhereField = 'and';
 
-export type ValueExistsWhere = {
-  key: string,
-  valueExists: boolean
-}
+export type WhereFuncParam = any;
 
-export type Where = ValueIsWhere | ValueExistsWhere | ValueInWhere
+export type FieldWhere = [WhereField]
+export type FuncWhere = [WhereFunc, WhereFuncParam[]]
+export type Where = FieldWhere | FuncWhere;
 
-export type Query = {
-  where: Where[] | Where,
-  whereType?: string
-}
+export type Wheres = Where[];
 
 export type DBClient = {
   getCursor: (processor: string) => Promise<string | undefined>;
-  getRecord: (tableName: string, id: string) => Promise<Record>;
-  getRecords: <Type extends Record>(tableName: string, query?: Query) => Promise<Type[]>;
+  getRecords: <Type extends Record>(tableName: string, wheres?: Wheres) => Promise<Type[]>;
   insert: (tableName: string, rows: Record[]) => Promise<void>;
   update: (tableName: string, rows: Record[]) => Promise<void>;
-  upsert: (tableName: string, rows: Record[]) => Promise<void>;
+  upsert: (tableName: string, rows: Record[], idField?: string | string[]) => Promise<void>;
   delete: (tableName: string, ids: string[]) => Promise<void>;
   updateProcessor: (processor: string, lastCursor: Cursor) => Promise<void>;
   getNumberRecords: (tableName: string) => Promise<any>;
   recordExists: (tableName: string, recordID: string) => Promise<boolean>;
-  getFullDB: () => Promise<any>;
+  getFullDB?: () => Promise<any>;
+  close: () => Promise<void>;
 }

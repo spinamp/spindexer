@@ -1,13 +1,12 @@
 import { DBClient } from '../db/db';
 import { MusicPlatform, platformConfig } from './platform';
-import { SubgraphTrack, Track } from './track';
 import { Record } from './record';
 
 export type NFT = Record & {
   contractAddress: string
   tokenId: BigInt
   platform: MusicPlatform
-  track: SubgraphTrack
+  trackId: string
 }
 
 export const getNFTMetadataCalls = (nft: NFT) => {
@@ -28,13 +27,13 @@ export const filterNewTrackNFTs = async (nfts: NFT[], dbClient: DBClient) => {
   let newTrackIds: any = {};
   for (let i = 0; i < nfts.length; i++) {
     const nft = nfts[i];
-    if (!nft || !nft.track) {
+    if (!nft || !nft.trackId) {
       console.error({ nft });
       throw new Error('Error processing NFT');
     }
-    const isExistingTrack = (await dbClient.recordExists('tracks', nft.track.id)) || newTrackIds[nft.track.id];
+    const isExistingTrack = (await dbClient.recordExists('tracks', nft.trackId)) || newTrackIds[nft.trackId];
     if (!isExistingTrack) {
-      newTrackIds[nft.track.id] = true;
+      newTrackIds[nft.trackId] = true;
       newTrackNFTs.push(nft);
     }
   }

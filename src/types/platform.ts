@@ -15,6 +15,15 @@ export enum MusicPlatform {
   other = "other"
 }
 
+export const INITIAL_PLATFORM_ENUMS = [
+  "sound",
+  "zora",
+  "noizd",
+  "catalog",
+  "zoraRaw",
+  "other"
+]
+
 export type PlatformMapper = {
   addPlatformTrackData: (tracks: Track[], client: any) => Promise<{
     track: Track;

@@ -5,7 +5,7 @@ import { Track } from '../../types/track';
 const name = 'stripNonAudio';
 
 const processorFunction = async (tracks: Track[], clients: Clients) => {
-  console.log(`Processing updates for tracks with: ${tracks.map(t => t.metadata?.mimeType)}`);
+  console.log(`Processing updates for tracks with: ${tracks.map(t => t.mimeType)}`);
   const deletion = tracks.map((t: Track) => t.id);
   await clients.db.delete('tracks', deletion);
   console.log('Deleted');
