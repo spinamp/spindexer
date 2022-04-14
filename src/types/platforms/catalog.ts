@@ -17,7 +17,7 @@ export const recoverCatalogAddress = (body: any, signature: string) => {
 export const verifyCatalogTrack = (track: Track) => {
   const CATALOG_ETHEREUM_ADDRESS = '0xc236541380fc0C2C05c2F2c6c52a21ED57c37952'.toLowerCase();
   if (!track.metadata) {
-    throw new Error('Track metadata missing')
+    throw new Error(`Track metadata missing for track ${track.id}`)
   }
   if (!track.metadata.origin) {
     return false;
