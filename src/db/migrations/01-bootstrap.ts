@@ -53,6 +53,7 @@ const INITIAL_TABLES = [
       table.string('tokenMetadataURI');
       table.json('metadata');
       table.string('metadataError');
+      table.string('mimeType');
       table.boolean('processed');
       table.boolean('processError');
     },

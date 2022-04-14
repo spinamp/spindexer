@@ -32,6 +32,7 @@ export type Track = Record & {
   [ValidContractCallFunction.tokenMetadataURI]?: string
   metadata?: any
   metadataError?: string
+  mimeType?: string
   processed?: true
   processError?: true
 }

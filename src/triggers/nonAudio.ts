@@ -5,7 +5,7 @@ export const nonAudioTracks: Trigger<Clients, undefined> = async (clients: Clien
   const tracks = (await clients.db.getRecords('tracks',
     [
       [
-        'whereJsonPath', ['metadata', '$.mimeType', 'in',
+        'whereIn', ['mimeType',
           [
             'text/plain',
             'image/png',
