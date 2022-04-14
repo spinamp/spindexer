@@ -16,9 +16,9 @@ const PROCESSORS = [
   // addTrackMetadata,
   // stripNonAudio,
   // categorizeZora,
-  processPlatformTracks(MusicPlatform.catalog),
-  // processPlatformTracks(MusicPlatform.sound),
-  // processPlatformTracks(MusicPlatform.noizd),
+  // processPlatformTracks(MusicPlatform.catalog),
+  processPlatformTracks(MusicPlatform.sound),
+  processPlatformTracks(MusicPlatform.noizd),
   // createProcessedTracksFromAPI(MusicPlatform.noizd),
 ];
 
