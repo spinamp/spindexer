@@ -21,6 +21,26 @@ const recordExistsFunc = (db: Knex) => async (tableName: string, recordID: strin
   return !!record[0];
 }
 
+const getRecordsFunc = (db: Knex) => async <RecordType extends Record>(tableName: string, wheres?: Wheres): (Promise<RecordType[]>) => {
+  console.log(`Querying for records where ${JSON.stringify(wheres)}`);
+  let query = db(tableName);
+  if (wheres) {
+    wheres.forEach(where => {
+      const queryField = where[0];
+      if (queryField === 'and') {
+        query = query[queryField];
+      } else {
+        query = (query[queryField] as any)(...where[1])
+      }
+    })
+  }
+  const records = await query;
+  if (recordMapper[tableName]) {
+    return recordMapper[tableName](records);
+  }
+  return records;
+}
+
 const init = async (): Promise<DBClient> => {
   const db = await loadDB();
   return ({
@@ -55,25 +75,7 @@ const init = async (): Promise<DBClient> => {
       const count = await db(tableName).count({ count: '*' })
       return count[0].count;
     },
-    getRecords: async <RecordType extends Record>(tableName: string, wheres?: Wheres): (Promise<RecordType[]>) => {
-      console.log(`Querying for records where ${JSON.stringify(wheres)}`);
-      let query = db(tableName);
-      if (wheres) {
-        wheres.forEach(where => {
-          const queryField = where[0];
-          if (queryField === 'and') {
-            query = query[queryField];
-          } else {
-            query = (query[queryField] as any)(...where[1])
-          }
-        })
-      }
-      const records = await query;
-      if (recordMapper[tableName]) {
-        return recordMapper[tableName](records);
-      }
-      return records;
-    },
+    getRecords: getRecordsFunc(db),
     update: async (tableName: string, recordUpdates: Record[]) => {
       console.log(`Updating records`);
       if (recordUpdates?.length > 0) {
@@ -91,6 +93,16 @@ const init = async (): Promise<DBClient> => {
         await db(tableName).whereIn('id', ids).delete()
       }
     },
+    upsert: async (tableName: string, recordUpserts: Record[]) => {
+      const recordIds = recordUpserts.map(up => up.id);
+      // const existingRecords = getRecordsFunc(db)(tableName, [['whereIn', [{ id: recordIds }]]]);
+      console.log(`Upserting records`);
+      if (recordUpserts?.length > 0) {
+        for (const upsert of recordUpserts) {
+          await db(tableName).upsert(upsert)
+        }
+      }
+    },
     close: async () => {
       return await db.destroy();
     }
@@ -106,20 +118,6 @@ export default {
 const init = async (): Promise<DBClient> => {
   let { db, indexes } = await loadDB();
   return {
-    upsert: async (tableName: string, recordUpserts: Record[]) => {
-      const index = indexes[tableName];
-      const table = db[tableName];
-      recordUpserts.forEach((upsert: Record) => {
-        const existingRecord = index[upsert.id];
-        if (existingRecord) {
-          Object.assign(existingRecord, { ...upsert });
-        } else {
-          table.push(upsert);
-          index[upsert.id] = upsert;
-        }
-      });
-      await saveDB(db);
-    },
     getFullDB: async () => {
       return { db, indexes };
     }

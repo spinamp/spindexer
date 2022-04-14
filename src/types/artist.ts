@@ -38,7 +38,7 @@ export const mapArtist = (artistProfile: ArtistProfile, platform: MusicPlatform)
 export const mergeInExistingArtist = async (artists: Artist[], dbClient: DBClient): Promise<Artist[]> => {
   const existingArtistIds = artists.map(a => a.id);
   const existingArtists = await dbClient.getRecords<Artist>('artists', [
-    ['whereIn', [{ id: existingArtistIds }]]
+    ['whereIn', ['id', existingArtistIds]]
   ]);
   const existingArtistsById = _.keyBy(existingArtists, 'id');
   const mergedArtists = artists.map(artist => {

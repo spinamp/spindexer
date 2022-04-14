@@ -56,7 +56,7 @@ export const mergeProcessedTracks = async (newProcessedTracks: ProcessedTrack[],
   const platformIds = newProcessedTracks.map(t => t.platformId);
   const existingProcessedTracks = await dbClient.getRecords<ProcessedTrack>('processedTracks',
     [
-      ['whereIn', [{ platformId: platformIds }]]
+      ['whereIn', ['platformId', platformIds]]
     ]
   );
   const existingProcessedTracksByPlatformId = _.keyBy(existingProcessedTracks, 'platformId');
