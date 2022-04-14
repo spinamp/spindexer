@@ -23,6 +23,7 @@ const INITIAL_TABLES = [
     name: 'artists', create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
       table.timestamp('createdAtTimestamp', { precision: 3 });
+      table.bigint('createdAtEthereumBlockNumber');
       table.string('name');
       table.string('slug');
     }
@@ -62,6 +63,7 @@ const INITIAL_TABLES = [
     name: 'processedTracks', create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
       table.timestamp('createdAtTimestamp', { precision: 3 });
+      table.bigint('createdAtEthereumBlockNumber');
       table.string('platformId');
       table.string('title');
       table.string('slug');

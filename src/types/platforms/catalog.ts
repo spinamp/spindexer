@@ -72,7 +72,6 @@ const mapTrack = (trackItem: {
       ? `https://beta.catalog.works/${trackItem.platformTrackResponse.artist.handle}/${trackItem.platformTrackResponse.short_url}`
       : 'https://beta.catalog.works',
   artistId: mapArtistID(trackItem.platformTrackResponse.artist.id),
-  artist: { id: mapArtistID(trackItem.platformTrackResponse.artist.id), name: trackItem.platformTrackResponse.artist.name }
 });
 
 export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: string, createdAtEthereumBlockNumber?: string): ArtistProfile => {

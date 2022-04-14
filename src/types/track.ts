@@ -22,7 +22,6 @@ export type ProcessedTrack = Record & {
   lossyArtworkURL: string;
   websiteUrl?: string;
   artistId: string;
-  artist: { id: string, name: string };
 }
 
 export type Track = Record & {

@@ -99,7 +99,10 @@ const init = async (): Promise<DBClient> => {
       console.log(`Upserting records`);
       if (recordUpserts?.length > 0) {
         for (const upsert of recordUpserts) {
-          await db(tableName).upsert(upsert)
+          await db(tableName)
+            .insert(upsert)
+            .onConflict('id')
+            .merge()
         }
       }
     },
