@@ -9,6 +9,7 @@ export const nonAudioTracks: Trigger<Clients, undefined> = async (clients: Clien
           [
             'text/plain',
             'image/png',
+            'image/jpeg',
             'image/gif',
             'text/html',
             'text/markdown',
