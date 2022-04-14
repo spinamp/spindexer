@@ -11,14 +11,14 @@ import { runProcessors } from './runner';
 import { MusicPlatform } from './types/platform';
 
 const PROCESSORS = [
-  // createTracksFromNFTsProcessor,
-  // addTrackMetadataIPFSHash,
-  // addTrackMetadata,
-  // stripNonAudio,
-  // categorizeZora,
-  // processPlatformTracks(MusicPlatform.catalog),
-  // processPlatformTracks(MusicPlatform.sound),
-  // processPlatformTracks(MusicPlatform.noizd),
+  createTracksFromNFTsProcessor,
+  addTrackMetadataIPFSHash,
+  addTrackMetadata,
+  stripNonAudio,
+  categorizeZora,
+  processPlatformTracks(MusicPlatform.catalog),
+  processPlatformTracks(MusicPlatform.sound),
+  processPlatformTracks(MusicPlatform.noizd),
   createProcessedTracksFromAPI(MusicPlatform.noizd),
 ];
 
