@@ -31,6 +31,7 @@ const INITIAL_TABLES = [
   {
     name: 'artistProfiles', create: (table: Knex.CreateTableBuilder) => {
       table.timestamp('createdAtTimestamp', { precision: 3 });
+      table.bigint('createdAtEthereumBlockNumber');
       table.string('platformId');
       table.string('artistId');
       table.string('name');

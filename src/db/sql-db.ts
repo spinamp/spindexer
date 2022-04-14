@@ -15,9 +15,9 @@ const loadDB = async () => {
   return db;
 }
 
-const recordExistsFunc = (db: Knex) => async (tableName: string, recordID: string) => {
+const recordExistsFunc = (db: Knex) => async (tableName: string, recordID: string, idField: string = 'id') => {
   console.log(`Querying for record ${recordID} on ${tableName}`);
-  const record = await db(tableName).where('id', recordID)
+  const record = await db(tableName).where(idField, recordID)
   return !!record[0];
 }
 
@@ -76,32 +76,30 @@ const init = async (): Promise<DBClient> => {
       return count[0].count;
     },
     getRecords: getRecordsFunc(db),
-    update: async (tableName: string, recordUpdates: Record[]) => {
+    update: async (tableName: string, recordUpdates: Record[], idField: string = 'id') => {
       console.log(`Updating records`);
       if (recordUpdates?.length > 0) {
         for (const update of recordUpdates) {
           const id = update.id;
           const changes: any = { ...update }
           delete changes.id
-          await db(tableName).where('id', id).update(changes)
+          await db(tableName).where(idField, id).update(changes)
         }
       }
     },
-    delete: async (tableName: string, ids: string[]) => {
+    delete: async (tableName: string, ids: string[], idField: string = 'id') => {
       console.log(`Deleting records`);
       if (ids?.length > 0) {
-        await db(tableName).whereIn('id', ids).delete()
+        await db(tableName).whereIn(idField, ids).delete()
       }
     },
-    upsert: async (tableName: string, recordUpserts: Record[]) => {
-      const recordIds = recordUpserts.map(up => up.id);
-      // const existingRecords = getRecordsFunc(db)(tableName, [['whereIn', [{ id: recordIds }]]]);
+    upsert: async (tableName: string, recordUpserts: Record[], idField: string | string[] = 'id') => {
       console.log(`Upserting records`);
       if (recordUpserts?.length > 0) {
         for (const upsert of recordUpserts) {
           await db(tableName)
             .insert(upsert)
-            .onConflict('id')
+            .onConflict(idField as any)
             .merge()
         }
       }
@@ -109,7 +107,7 @@ const init = async (): Promise<DBClient> => {
     close: async () => {
       return await db.destroy();
     }
-  } as any);
+  });
 }
 
 export default {

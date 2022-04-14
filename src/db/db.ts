@@ -28,11 +28,11 @@ export type DBClient = {
   getRecords: <Type extends Record>(tableName: string, wheres?: Wheres) => Promise<Type[]>;
   insert: (tableName: string, rows: Record[]) => Promise<void>;
   update: (tableName: string, rows: Record[]) => Promise<void>;
-  upsert: (tableName: string, rows: Record[]) => Promise<void>;
+  upsert: (tableName: string, rows: Record[], idField?: string | string[]) => Promise<void>;
   delete: (tableName: string, ids: string[]) => Promise<void>;
   updateProcessor: (processor: string, lastCursor: Cursor) => Promise<void>;
   getNumberRecords: (tableName: string) => Promise<any>;
   recordExists: (tableName: string, recordID: string) => Promise<boolean>;
-  getFullDB: () => Promise<any>;
+  getFullDB?: () => Promise<any>;
   close: () => Promise<void>;
 }
