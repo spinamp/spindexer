@@ -7,7 +7,7 @@ export const zoraRawWithMetadata: Trigger<Clients, undefined> = async (clients: 
     [
       ['where', [{ platform: MusicPlatform.zora }]],
       ['and'],
-      ['whereExists', ['metadata']],
+      ['whereNotNull', ['metadata']],
     ]
   )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return tracks;

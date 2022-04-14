@@ -4,6 +4,10 @@ import _ from 'lodash';
 import { Cursor } from '../types/trigger';
 import config from './knexfile';
 
+const recordMapper: any = {
+  tracks: (tracks: any) => tracks.map((t: any) => ({ ...t, metadata: JSON.parse(t.metadata) }))
+}
+
 const loadDB = async () => {
   const currentConfig = config[process.env.NODE_ENV]
   const db = knex(currentConfig);
@@ -52,7 +56,7 @@ const init = async (): Promise<DBClient> => {
       return count[0].count;
     },
     getRecords: async <RecordType extends Record>(tableName: string, wheres?: Wheres): (Promise<RecordType[]>) => {
-      console.log(`Querying for records where ${wheres}`);
+      console.log(`Querying for records where ${JSON.stringify(wheres)}`);
       let query = db(tableName);
       if (wheres) {
         wheres.forEach(where => {
@@ -65,6 +69,9 @@ const init = async (): Promise<DBClient> => {
         })
       }
       const records = await query;
+      if (recordMapper[tableName]) {
+        return recordMapper[tableName](records);
+      }
       return records;
     },
     update: async (tableName: string, recordUpdates: Record[]) => {

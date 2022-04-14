@@ -10,7 +10,7 @@ export type WhereFunc = 'where'
   | 'whereNull'
   | 'andWhere'
   | 'whereJsonPath'
-  | 'whereExists'
+  | 'whereNotNull'
   | 'whereIn';
 
 export type WhereField = 'and';
