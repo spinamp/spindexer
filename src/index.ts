@@ -13,8 +13,8 @@ import { MusicPlatform } from './types/platform';
 const PROCESSORS = [
   // createTracksFromNFTsProcessor,
   // addTrackMetadataIPFSHash,
-  addTrackMetadata,
-  // stripNonAudio,
+  // addTrackMetadata,
+  stripNonAudio,
   // categorizeZora,
   // processPlatformTracks(MusicPlatform.catalog),
   // processPlatformTracks(MusicPlatform.sound),
