@@ -61,8 +61,8 @@ const processorFunction = async (newSubgraphNFTs: SubgraphNFT[], clients: Client
   }));
   const lastCursor = newSubgraphNFTs[newSubgraphNFTs.length - 1].createdAtTimestamp;
   const newTracks = await createTracksFromNFTs(newNFTs, clients.db, clients.eth);
-  await clients.db.insert('nfts', newNFTs);
   await clients.db.insert('tracks', newTracks);
+  await clients.db.insert('nfts', newNFTs);
   await clients.db.updateProcessor(name, lastCursor);
 };
 

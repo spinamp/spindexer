@@ -51,8 +51,8 @@ const INITIAL_TABLES = [
       table.string('platformId');
       table.foreign('platformId').references('id').inTable('platforms');
       table.string('metadataIPFSHash');
-      table.string('tokenURI');
-      table.string('tokenMetadataURI');
+      table.string('tokenURI', 20000);
+      table.string('tokenMetadataURI', 20000);
       table.json('metadata');
       table.string('metadataError');
       table.string('mimeType');
@@ -70,7 +70,7 @@ const INITIAL_TABLES = [
       table.string('platformInternalId');
       table.string('lossyAudioIPFSHash');
       table.string('lossyAudioURL');
-      table.string('description');
+      table.string('description', 10000);
       table.string('artwork');
       table.string('lossyArtworkIPFSHash');
       table.string('lossyArtworkURL');
