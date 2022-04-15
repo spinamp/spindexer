@@ -13,7 +13,6 @@ export const toDBRecords = (records: (Record | RecordUpdate<unknown>)[]) => {
   return records.map(record => toDBRecord(record))
 }
 
-
 const recordMapper: any = {
   tracks: (tracks: Record[]): Track[] => tracks.map((t: any) => ({ ...t, metadata: JSON.parse(t.metadata) }))
 }
@@ -21,7 +20,6 @@ const recordMapper: any = {
 export const fromDBRecord = (record: any): Record => {
   return { ...record, createdAtTime: new Date(record.createdAtTime) }
 }
-
 
 export const fromDBRecords = (tableName: string, dbRecords: any[]) => {
   const records: Record[] = dbRecords.map(fromDBRecord);

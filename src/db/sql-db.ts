@@ -122,20 +122,3 @@ const init = async (): Promise<DBClient> => {
 export default {
   init
 };
-
-/*
-
-const init = async (): Promise<DBClient> => {
-  let { db, indexes } = await loadDB();
-  return {
-    getFullDB: async () => {
-      return { db, indexes };
-    }
-  };
-}
-
-export default {
-  init
-};
-
-*/
