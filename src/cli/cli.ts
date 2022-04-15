@@ -2,7 +2,6 @@ import 'dotenv/config';
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import { DBClient } from '../db/db';
-import dbLib from '../db/local-db';
 import { getMetadataURL, ProcessedTrack, Track } from '../types/track';
 import prompt from 'prompt';
 import _ from 'lodash';
