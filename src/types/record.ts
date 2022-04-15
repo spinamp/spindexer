@@ -8,6 +8,10 @@ export type DateTimeField = {
 
 export type TimeField = EthereumBlockNumberField & DateTimeField;
 
-export type Record = {
+export type IdField = {
   id: string
-} & TimeField
+}
+
+export type Record = IdField & TimeField
+
+export type RecordUpdate<Type> = Partial<Type> & IdField

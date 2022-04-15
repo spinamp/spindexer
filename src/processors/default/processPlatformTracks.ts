@@ -1,8 +1,7 @@
 import _ from 'lodash';
-import { PartialRecord } from '../../db/db';
 import { unprocessedPlatformTracks } from '../../triggers/missing';
 import { ArtistProfile, mapArtist } from '../../types/artist';
-import { Record } from '../../types/record';
+import { Record, RecordUpdate } from '../../types/record';
 import { MusicPlatform, platformConfig, PlatformMapper } from '../../types/platform';
 import { Clients } from '../../types/processor';
 import { Track, ProcessedTrack, mergeProcessedTracks } from '../../types/track';
@@ -18,7 +17,7 @@ const processPlatformTrackData = (platformTrackData: {
   const { mapArtistProfile, mapTrack } = platformMapper;
 
   const { processedTracks, trackUpdates } = platformTrackData.reduce<
-    { processedTracks: ProcessedTrack[], trackUpdates: PartialRecord<Track>[] }>
+    { processedTracks: ProcessedTrack[], trackUpdates: RecordUpdate<Track>[] }>
     ((accum, item) => {
       if (item.platformTrackResponse) {
         const processedTrack = mapTrack(item)
