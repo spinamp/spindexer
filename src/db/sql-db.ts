@@ -10,6 +10,15 @@ const recordMapper: any = {
 
 const loadDB = async () => {
   const currentConfig = config[process.env.NODE_ENV]
+  if (process.env.NODE_ENV === 'production') {
+    const initialConfig = { ...currentConfig, connection: { ...currentConfig.connection, database: 'postgres' } };
+    const initialDB = knex(initialConfig);
+    const { rowCount } = await initialDB.raw(`SELECT 1 FROM pg_database WHERE datname='${process.env.POSTGRES_DATABASE}'`);
+    if (rowCount === 0) {
+      await initialDB.raw(`CREATE DATABASE ${process.env.POSTGRES_DATABASE};`);
+    }
+    await initialDB.destroy();
+  }
   const db = knex(currentConfig);
   await db.migrate.latest();
   return db;
