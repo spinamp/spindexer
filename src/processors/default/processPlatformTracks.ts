@@ -1,8 +1,7 @@
 import _ from 'lodash';
-import { PartialRecord } from '../../db/db';
 import { unprocessedPlatformTracks } from '../../triggers/missing';
 import { ArtistProfile, mapArtist } from '../../types/artist';
-import { Record } from '../../types/record';
+import { Record, RecordUpdate } from '../../types/record';
 import { MusicPlatform, platformConfig, PlatformMapper } from '../../types/platform';
 import { Clients } from '../../types/processor';
 import { Track, ProcessedTrack, mergeProcessedTracks } from '../../types/track';
@@ -14,11 +13,11 @@ const name = 'processTracks';
 const processPlatformTrackData = (platformTrackData: {
   track: Track;
   platformTrackResponse: unknown;
-}[], platformMapper: PlatformMapper, platform: ImplementedMusicPlatform) => {
+}[], platformMapper: PlatformMapper) => {
   const { mapArtistProfile, mapTrack } = platformMapper;
 
   const { processedTracks, trackUpdates } = platformTrackData.reduce<
-    { processedTracks: ProcessedTrack[], trackUpdates: PartialRecord<Track>[] }>
+    { processedTracks: ProcessedTrack[], trackUpdates: RecordUpdate<Track>[] }>
     ((accum, item) => {
       if (item.platformTrackResponse) {
         const processedTrack = mapTrack(item)
@@ -41,7 +40,7 @@ const processPlatformTrackData = (platformTrackData: {
   const artistProfiles = _.uniqBy(platformTrackData.reduce<ArtistProfile[]>((profiles, trackData) => {
     if (trackData.platformTrackResponse) {
       const artistProfile = {
-        ...mapArtistProfile(trackData.platformTrackResponse, trackData.track.createdAtTimestamp, trackData.track.createdAtEthereumBlockNumber),
+        ...mapArtistProfile(trackData.platformTrackResponse, trackData.track.createdAtTime, trackData.track.createdAtEthereumBlockNumber),
       } as ArtistProfile;
       profiles.push(artistProfile);
     }
@@ -53,29 +52,29 @@ const processPlatformTrackData = (platformTrackData: {
   };
 }
 
-const processorFunction = (platform: Partial<ImplementedMusicPlatform>) => async (tracks: Track[], clients: Clients) => {
-  console.log(`Getting ${platform} API tracks for ids: ${tracks.map(t => t.id)}`);
-  const platformMapper = platformConfig[platform].mappers;
+const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => async (tracks: Track[], clients: Clients) => {
+  console.log(`Getting ${platformId} API tracks for ids: ${tracks.map(t => t.id)}`);
+  const platformMapper = platformConfig[platformId].mappers;
   if (!platformMapper) {
-    throw new Error(`Platform mapper for ${platform} not found`);
+    throw new Error(`Platform mapper for ${platformId} not found`);
   }
-  const platformTrackData = await platformMapper.addPlatformTrackData(tracks, clients[platform]);
+  const platformTrackData = await platformMapper.addPlatformTrackData(tracks, clients[platformId]);
 
-  const { processedTracks, trackUpdates, artists, artistProfiles } = processPlatformTrackData(platformTrackData, platformMapper, platform);
+  const { processedTracks, trackUpdates, artists, artistProfiles } = processPlatformTrackData(platformTrackData, platformMapper);
   const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(processedTracks, clients.db, true);
 
   await clients.db.update('tracks', trackUpdates);
   if (oldIds) {
     await clients.db.delete('processedTracks', oldIds);
   }
-  await clients.db.upsert('processedTracks', mergedProcessedTracks);
   await clients.db.upsert('artists', artists);
-  await clients.db.upsert('artistProfiles', (artistProfiles as unknown as Record[]), ['artistId', 'platform']);
+  await clients.db.upsert('artistProfiles', (artistProfiles as unknown as Record[]), ['artistId', 'platformId']);
+  await clients.db.upsert('processedTracks', mergedProcessedTracks);
 };
 
-export const processPlatformTracks = (platform: ImplementedMusicPlatform) => ({
+export const processPlatformTracks = (platformId: ImplementedMusicPlatform) => ({
   name,
-  trigger: unprocessedPlatformTracks(platform),
-  processorFunction: processorFunction(platform),
+  trigger: unprocessedPlatformTracks(platformId),
+  processorFunction: processorFunction(platformId),
   initialCursor: undefined,
 });

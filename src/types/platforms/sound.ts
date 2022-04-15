@@ -20,13 +20,13 @@ const mapTrack = (trackItem: {
   platformTrackResponse: any;
 }): ProcessedTrack => ({
   id: mapTrackID(trackItem.track.id),
-  platformId: trackItem.platformTrackResponse.id,
+  platformInternalId: trackItem.platformTrackResponse.id,
   title: trackItem.platformTrackResponse.title,
-  slug: slugify(`${trackItem.platformTrackResponse.title} ${trackItem.track.createdAtTimestamp}`).toLowerCase(),
+  slug: slugify(`${trackItem.platformTrackResponse.title} ${trackItem.track.createdAtTime.getTime()}`).toLowerCase(),
   description: trackItem.platformTrackResponse.description,
-  platform: MusicPlatform.sound,
+  platformId: MusicPlatform.sound,
   lossyAudioURL: trackItem.platformTrackResponse.tracks[0]?.audio?.url,
-  createdAtTimestamp: trackItem.track.createdAtTimestamp,
+  createdAtTime: trackItem.track.createdAtTime,
   createdAtEthereumBlockNumber: trackItem.track.createdAtEthereumBlockNumber,
   lossyArtworkURL: trackItem.platformTrackResponse.coverImage?.url,
   websiteUrl:
@@ -36,18 +36,18 @@ const mapTrack = (trackItem: {
   artistId: mapArtistID(trackItem.platformTrackResponse.artist.user.publicAddress),
 });
 
-export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: string, createdAtEthereumBlockNumber?: string): ArtistProfile => {
+export const mapArtistProfile = (platformResponse: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
   const artist = platformResponse.artist
   return {
     name: artist.name,
     artistId: mapArtistID(artist.user.publicAddress),
-    platformId: artist.id,
-    platform: MusicPlatform.sound,
+    platformInternalId: artist.id,
+    platformId: MusicPlatform.sound,
     avatarUrl: artist.user?.avatar?.url,
     websiteUrl: artist.soundHandle ?
       `https://www.sound.xyz/${artist.soundHandle}`
       : 'https://www.sound.xyz',
-    createdAtTimestamp,
+    createdAtTime,
     createdAtEthereumBlockNumber
   }
 };

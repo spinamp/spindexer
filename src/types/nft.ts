@@ -5,12 +5,12 @@ import { Record } from './record';
 export type NFT = Record & {
   contractAddress: string
   tokenId: BigInt
-  platform: MusicPlatform
+  platformId: MusicPlatform
   trackId: string
 }
 
 export const getNFTMetadataCalls = (nft: NFT) => {
-  return platformConfig[nft.platform].contractCalls.map(call => {
+  return platformConfig[nft.platformId].contractCalls.map(call => {
     return {
       contractAddress: nft.contractAddress,
       callFunction: call,

@@ -6,8 +6,9 @@ const name = 'stripNonAudio';
 
 const processorFunction = async (tracks: Track[], clients: Clients) => {
   console.log(`Processing updates for tracks with: ${tracks.map(t => t.mimeType)}`);
-  const deletion = tracks.map((t: Track) => t.id);
-  await clients.db.delete('tracks', deletion);
+  const trackIdsForDelete = tracks.map((t: Track) => t.id);
+  await clients.db.delete('nfts', trackIdsForDelete, 'trackId');
+  await clients.db.delete('tracks', trackIdsForDelete);
   console.log('Deleted');
 };
 

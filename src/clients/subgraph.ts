@@ -1,11 +1,9 @@
 import { request, gql } from 'graphql-request'
 import { MusicPlatform } from '../types/platform';
 
-import { Record, RecordType, recordIsInBatch } from '../types/record';
-
 export type SubgraphClient = {
-  getRecordsFrom: (type: RecordType, timestamp: string) => Promise<Record[]>;
-  getLatestRecord: (type: RecordType) => Promise<Record>;
+  getRecordsFrom: (timestamp: string) => Promise<SubgraphNFT[]>;
+  getLatestRecord: () => Promise<SubgraphNFT>;
   getNFTsFrom: (timestamp: string) => Promise<SubgraphNFT[]>;
   getLatestNFT: () => Promise<SubgraphNFT>;
 }
@@ -23,48 +21,55 @@ export type SubgraphNFT = {
 }
 
 const QUERIES = {
-  getRecordsFrom: (recordType: RecordType, timestamp: string) => gql`
+  getRecordsFrom: (timestamp: string) => gql`
   {
-    ${recordType}s(where:{createdAtTimestamp_gte:${timestamp}}, orderBy:createdAtTimestamp, orderDirection: asc, first:${process.env.SUBGRAPH_QUERY_LIMIT}) {
+    nfts(where:{createdAtTimestamp_gte:${timestamp}}, orderBy:createdAtTimestamp, orderDirection: asc, first:${process.env.SUBGRAPH_QUERY_LIMIT}) {
       id
-      ${recordType === RecordType.nft ? 'contractAddress' : ''}
-      ${recordType === RecordType.nft ? 'tokenId' : ''}
-      ${recordType === RecordType.nft ? 'platform' : ''}
-      ${recordType === RecordType.nft ? 'track{id}' : ''}
+      contractAddress
+      tokenId
+      platform
+      track{id}
       createdAtTimestamp
       createdAtBlockNumber
     }
   }`,
-  getRecordsAtBlock: (recordType: RecordType, block: string) => gql`
+  getRecordsAtBlock: (block: string) => gql`
   {
-    ${recordType}s(where:{createdAtBlockNumber:${block}}, orderBy: createdAtTimestamp, first:${process.env.SUBGRAPH_QUERY_LIMIT}) {
+    nfts(where:{createdAtBlockNumber:${block}}, orderBy: createdAtTimestamp, first:${process.env.SUBGRAPH_QUERY_LIMIT}) {
       id
-      ${recordType === RecordType.nft ? 'contractAddress' : ''}
-      ${recordType === RecordType.nft ? 'tokenId' : ''}
-      ${recordType === RecordType.nft ? 'platform' : ''}
-      ${recordType === RecordType.nft ? 'track{id}' : ''}
+      contractAddress
+      tokenId
+      platform
+      track{id}
       createdAtTimestamp
       createdAtBlockNumber
     }
   }`,
-  getLatestRecord: (recordType: RecordType) => gql`
+  getLatestRecord: () => gql`
   {
-    ${recordType}s(orderBy: createdAtTimestamp, orderDirection: desc, first: 1) {
+    nfts(orderBy: createdAtTimestamp, orderDirection: desc, first: 1) {
       id
-      ${recordType === RecordType.nft ? 'contractAddress' : ''}
-      ${recordType === RecordType.nft ? 'tokenId' : ''}
-      ${recordType === RecordType.nft ? 'platform' : ''}
-      ${recordType === RecordType.nft ? 'track{id}' : ''}
+      contractAddress
+      tokenId
+      platform
+      track{id}
       createdAtTimestamp
       createdAtBlockNumber
     }
   }`,
 };
 
+export const recordsEqual = (recordA: SubgraphNFT, recordB: SubgraphNFT) => recordA.id == recordB.id;
+
+const recordIsInBatch = (record: SubgraphNFT, batch: SubgraphNFT[]) => {
+  const match = batch.find((batchRecord: SubgraphNFT) => recordsEqual(batchRecord, record));
+  return !!match;
+};
+
 const init = (endpoint: string) => {
-  const getRecordsFrom = async (type: RecordType, timestamp: string) => {
-    const fromResponseData = await request(endpoint, QUERIES.getRecordsFrom(type, timestamp));
-    const nextRecordBatch = fromResponseData[`${type}s`];
+  const getRecordsFrom = async (timestamp: string) => {
+    const fromResponseData = await request(endpoint, QUERIES.getRecordsFrom(timestamp));
+    const nextRecordBatch = fromResponseData[`nfts`];
 
     if (nextRecordBatch.length < process.env.SUBGRAPH_QUERY_LIMIT!) {
       return nextRecordBatch;
@@ -74,22 +79,22 @@ const init = (endpoint: string) => {
     // when multiple records are created in a single block and the cursor on the first query
     // does not include them all.
     const lastBlockInBatch = nextRecordBatch[nextRecordBatch.length - 1].createdAtBlockNumber;
-    const blockResponseData = await request(endpoint, QUERIES.getRecordsAtBlock(type, lastBlockInBatch));
-    const lastBlockRecords = blockResponseData[`${type}s`];
-    const extraRecords = lastBlockRecords.filter((record: Record) => !recordIsInBatch(record, nextRecordBatch));
+    const blockResponseData = await request(endpoint, QUERIES.getRecordsAtBlock(lastBlockInBatch));
+    const lastBlockRecords = blockResponseData[`nfts`];
+    const extraRecords = lastBlockRecords.filter((record: SubgraphNFT) => !recordIsInBatch(record, nextRecordBatch));
     const allRecords = nextRecordBatch.concat(...extraRecords);
 
     return allRecords;
   };
-  const getLatestRecord = async (type: RecordType): Promise<SubgraphNFT> => {
-    const data = await request(endpoint, QUERIES.getLatestRecord(type));
-    return data[`${type}s`][0];
+  const getLatestRecord = async (): Promise<SubgraphNFT> => {
+    const data = await request(endpoint, QUERIES.getLatestRecord());
+    return data[`nfts`][0];
   };
   const getNFTsFrom = async (timestamp: string): Promise<SubgraphNFT[]> => {
-    return getRecordsFrom(RecordType.nft, timestamp);
+    return getRecordsFrom(timestamp);
   };
   const getLatestNFT = async () => {
-    return getLatestRecord(RecordType.nft) as Promise<SubgraphNFT>;
+    return getLatestRecord() as Promise<SubgraphNFT>;
   };
   return {
     getRecordsFrom,

@@ -1,15 +1,23 @@
 import knex, { Knex } from 'knex';
-import { Record, DBClient, Wheres, WhereFunc } from './db';
+import { DBClient, Wheres } from './db';
+import { Record } from '../types/record';
 import _ from 'lodash';
 import { Cursor } from '../types/trigger';
 import config from './knexfile';
-
-const recordMapper: any = {
-  tracks: (tracks: any) => tracks.map((t: any) => ({ ...t, metadata: JSON.parse(t.metadata) }))
-}
+import { fromDBRecords, toDBRecord, toDBRecords } from './orm';
+import { RecordUpdate } from '../types/record';
 
 const loadDB = async () => {
   const currentConfig = config[process.env.NODE_ENV]
+  if (process.env.NODE_ENV === 'production') {
+    const initialConfig = { ...currentConfig, connection: { ...currentConfig.connection, database: 'postgres' } };
+    const initialDB = knex(initialConfig);
+    const { rowCount } = await initialDB.raw(`SELECT 1 FROM pg_database WHERE datname='${process.env.POSTGRES_DATABASE}'`);
+    if (rowCount === 0) {
+      await initialDB.raw(`CREATE DATABASE ${process.env.POSTGRES_DATABASE};`);
+    }
+    await initialDB.destroy();
+  }
   const db = knex(currentConfig);
   await db.migrate.latest();
   return db;
@@ -34,11 +42,8 @@ const getRecordsFunc = (db: Knex) => async <RecordType extends Record>(tableName
       }
     })
   }
-  const records = await query;
-  if (recordMapper[tableName]) {
-    return recordMapper[tableName](records);
-  }
-  return records;
+  const dbRecords = await query;
+  return fromDBRecords(tableName, dbRecords);
 }
 
 const init = async (): Promise<DBClient> => {
@@ -51,11 +56,12 @@ const init = async (): Promise<DBClient> => {
     },
     recordExists: recordExistsFunc(db),
     insert: async (tableName: string, records: Record[]) => {
-      console.log(`Inserting into ${tableName} ${records.length} records`);
       if (records.length === 0) {
         return;
       }
-      await db(tableName).insert(records);
+      console.log(`Inserting into ${tableName} ${records.length} records`);
+      const dbRecords = toDBRecords(records);
+      await db(tableName).insert(dbRecords);
     },
     updateProcessor: async (processor: string, lastCursor: Cursor) => {
       console.log(`Updating ${processor} with cursor: ${lastCursor}`);
@@ -76,13 +82,15 @@ const init = async (): Promise<DBClient> => {
       return count[0].count;
     },
     getRecords: getRecordsFunc(db),
-    update: async (tableName: string, recordUpdates: Record[], idField: string = 'id') => {
+    update: async (tableName: string, recordUpdates: RecordUpdate<unknown>[], idField: string = 'id') => {
       console.log(`Updating records`);
       if (recordUpdates?.length > 0) {
         for (const update of recordUpdates) {
-          const id = update.id;
-          const changes: any = { ...update }
+          const dbUpdate = toDBRecord(update);
+          const id = dbUpdate.id;
+          const changes: any = { ...dbUpdate }
           delete changes.id
+
           await db(tableName).where(idField, id).update(changes)
         }
       }
@@ -93,12 +101,13 @@ const init = async (): Promise<DBClient> => {
         await db(tableName).whereIn(idField, ids).delete()
       }
     },
-    upsert: async (tableName: string, recordUpserts: Record[], idField: string | string[] = 'id') => {
+    upsert: async (tableName: string, recordUpserts: (Record | RecordUpdate<unknown>)[], idField: string | string[] = 'id') => {
       console.log(`Upserting records`);
       if (recordUpserts?.length > 0) {
         for (const upsert of recordUpserts) {
+          const dbUpsert = toDBRecord(upsert);
           await db(tableName)
-            .insert(upsert)
+            .insert(dbUpsert)
             .onConflict(idField as any)
             .merge()
         }
@@ -113,20 +122,3 @@ const init = async (): Promise<DBClient> => {
 export default {
   init
 };
-
-/*
-
-const init = async (): Promise<DBClient> => {
-  let { db, indexes } = await loadDB();
-  return {
-    getFullDB: async () => {
-      return { db, indexes };
-    }
-  };
-}
-
-export default {
-  init
-};
-
-*/

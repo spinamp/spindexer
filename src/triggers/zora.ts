@@ -5,7 +5,7 @@ import { Trigger } from '../types/trigger';
 export const zoraRawWithMetadata: Trigger<Clients, undefined> = async (clients: Clients) => {
   const tracks = (await clients.db.getRecords('tracks',
     [
-      ['where', [{ platform: MusicPlatform.zora }]],
+      ['where', [{ platformId: MusicPlatform.zora }]],
       ['and'],
       ['whereNotNull', ['metadata']],
     ]

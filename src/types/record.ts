@@ -1,25 +1,17 @@
-export type EthereumTimestamp = {
+export type EthereumBlockNumberField = {
   createdAtEthereumBlockNumber?: string;
 }
 
-export type UnixTimestampSeconds = {
-  createdAtTimestamp: string;
+export type DateTimeField = {
+  createdAtTime: Date;
 }
 
-export type Timestamp = EthereumTimestamp & UnixTimestampSeconds;
+export type TimeField = EthereumBlockNumberField & DateTimeField;
 
-export type Record = {
+export type IdField = {
   id: string
-} & Timestamp
-
-export enum RecordType {
-  nft = "nft",
-  track = "track"
 }
 
-export const recordsEqual = (recordA: Record, recordB: Record) => recordA.id == recordB.id;
+export type Record = IdField & TimeField
 
-export const recordIsInBatch = (record: Record, batch: Record[]) => {
-  const match = batch.find((batchRecord: Record) => recordsEqual(batchRecord, record));
-  return !!match;
-};
+export type RecordUpdate<Type> = Partial<Type> & IdField

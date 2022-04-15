@@ -28,7 +28,7 @@ export const verifyCatalogTrack = (track: Track) => {
 }
 
 export const getZoraPlatform = (track: Track) => {
-  if (track.platform !== MusicPlatform.zora) {
+  if (track.platformId !== MusicPlatform.zora) {
     throw new Error('Bad track platform being processed')
   }
   if (verifyCatalogTrack(track)) {
@@ -56,14 +56,14 @@ const mapTrack = (trackItem: {
   platformTrackResponse?: any;
 }): ProcessedTrack => ({
   id: mapTrackID(trackItem.track.id),
-  platformId: trackItem.platformTrackResponse.id,
+  platformInternalId: trackItem.platformTrackResponse.id,
   title: trackItem.platformTrackResponse.title,
-  slug: slugify(`${trackItem.platformTrackResponse.title} ${trackItem.track.createdAtTimestamp}`).toLowerCase(),
+  slug: slugify(`${trackItem.platformTrackResponse.title} ${trackItem.track.createdAtTime.getDate()}`).toLowerCase(),
   description: trackItem.platformTrackResponse.description,
-  platform: MusicPlatform.catalog,
+  platformId: MusicPlatform.catalog,
   lossyAudioIPFSHash: trackItem.platformTrackResponse.ipfs_hash_lossy_audio,
   lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${trackItem.platformTrackResponse.ipfs_hash_lossy_audio}`,
-  createdAtTimestamp: trackItem.track.createdAtTimestamp,
+  createdAtTime: trackItem.track.createdAtTime,
   createdAtEthereumBlockNumber: trackItem.track.createdAtEthereumBlockNumber,
   lossyArtworkIPFSHash: trackItem.platformTrackResponse.ipfs_hash_lossy_artwork,
   lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${trackItem.platformTrackResponse.ipfs_hash_lossy_artwork}`,
@@ -74,18 +74,18 @@ const mapTrack = (trackItem: {
   artistId: mapArtistID(trackItem.platformTrackResponse.artist.id),
 });
 
-export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: string, createdAtEthereumBlockNumber?: string): ArtistProfile => {
+export const mapArtistProfile = (platformResponse: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
   const artist = platformResponse.artist;
   return {
     name: artist.name,
     artistId: mapArtistID(artist.id),
-    platformId: artist.id,
-    platform: MusicPlatform.catalog,
+    platformInternalId: artist.id,
+    platformId: MusicPlatform.catalog,
     avatarUrl: artist.picture_uri,
     websiteUrl: artist.handle
       ? `https://beta.catalog.works/${artist.handle}`
       : 'https://beta.catalog.works',
-    createdAtTimestamp,
+    createdAtTime,
     createdAtEthereumBlockNumber
   }
 };
