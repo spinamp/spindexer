@@ -13,8 +13,8 @@ const INITIAL_TABLES = [
       table.bigint('createdAtEthereumBlockNumber');
       table.string('tokenId');
       table.string('contractAddress');
-      table.string('platform');
-      table.foreign('platform').references('id').inTable('platforms');
+      table.string('platformId');
+      table.foreign('platformId').references('id').inTable('platforms');
       table.string('trackId');
       table.foreign('trackId').references('id').inTable('tracks');
     }
@@ -35,8 +35,8 @@ const INITIAL_TABLES = [
       table.string('platformId');
       table.string('artistId');
       table.string('name');
-      table.string('platform');
-      table.foreign('platform').references('id').inTable('platforms');
+      table.string('platformId');
+      table.foreign('platformId').references('id').inTable('platforms');
       table.string('avatarUrl');
       table.string('websiteUrl');
       table.primary(['artistId', 'platform']);
@@ -48,8 +48,8 @@ const INITIAL_TABLES = [
       table.string('id').primary();
       table.timestamp('createdAtTimestamp', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
-      table.string('platform');
-      table.foreign('platform').references('id').inTable('platforms');
+      table.string('platformId');
+      table.foreign('platformId').references('id').inTable('platforms');
       table.string('metadataIPFSHash');
       table.string('tokenURI');
       table.string('tokenMetadataURI');
@@ -68,8 +68,8 @@ const INITIAL_TABLES = [
       table.string('platformId');
       table.string('title');
       table.string('slug');
-      table.string('platform');
-      table.foreign('platform').references('id').inTable('platforms');
+      table.string('platformId');
+      table.foreign('platformId').references('id').inTable('platforms');
       table.string('lossyAudioIPFSHash');
       table.string('lossyAudioURL');
       table.string('description');
