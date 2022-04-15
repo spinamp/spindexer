@@ -6,7 +6,8 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "cli": "ts-node src/cli/cli.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "serve": "source .env && npx postgraphile  --append-plugins postgraphile-plugin-connection-filter -c postgresql://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DATABASE --watch --enhance-graphiql --dynamic-json --disable-default-mutations"
   },
   "author": "",
   "license": "ISC",
@@ -32,6 +33,8 @@
     "knex": "^1.0.7",
     "lodash": "^4.17.21",
     "pg": "^8.7.3",
+    "postgraphile": "^4.12.9",
+    "postgraphile-plugin-connection-filter": "^2.3.0",
     "prompt": "^1.2.2",
     "slugify": "^1.6.5",
     "sqlite3": "^5.0.3",
