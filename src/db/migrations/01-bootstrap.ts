@@ -32,15 +32,15 @@ const INITIAL_TABLES = [
     name: 'artistProfiles', create: (table: Knex.CreateTableBuilder) => {
       table.timestamp('createdAtTimestamp', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
-      table.string('platformId');
-      table.string('artistId');
+      table.string('platformInternalId');
       table.string('name');
-      table.string('platformId');
-      table.foreign('platformId').references('id').inTable('platforms');
       table.string('avatarUrl');
       table.string('websiteUrl');
-      table.primary(['artistId', 'platform']);
+      table.string('artistId');
       table.foreign('artistId').references('id').inTable('artists');
+      table.string('platformId');
+      table.foreign('platformId').references('id').inTable('platforms');
+      table.primary(['artistId', 'platformId']);
     }
   },
   {
@@ -65,11 +65,9 @@ const INITIAL_TABLES = [
       table.string('id').primary();
       table.timestamp('createdAtTimestamp', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
-      table.string('platformId');
       table.string('title');
       table.string('slug');
-      table.string('platformId');
-      table.foreign('platformId').references('id').inTable('platforms');
+      table.string('platformInternalId');
       table.string('lossyAudioIPFSHash');
       table.string('lossyAudioURL');
       table.string('description');
@@ -77,6 +75,8 @@ const INITIAL_TABLES = [
       table.string('lossyArtworkIPFSHash');
       table.string('lossyArtworkURL');
       table.string('websiteUrl');
+      table.string('platformId');
+      table.foreign('platformId').references('id').inTable('platforms');
       table.string('artistId');
       table.foreign('artistId').references('id').inTable('artists');
     }

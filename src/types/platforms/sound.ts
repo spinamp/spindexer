@@ -20,11 +20,11 @@ const mapTrack = (trackItem: {
   platformTrackResponse: any;
 }): ProcessedTrack => ({
   id: mapTrackID(trackItem.track.id),
-  platformId: trackItem.platformTrackResponse.id,
+  platformInternalId: trackItem.platformTrackResponse.id,
   title: trackItem.platformTrackResponse.title,
   slug: slugify(`${trackItem.platformTrackResponse.title} ${trackItem.track.createdAtTimestamp}`).toLowerCase(),
   description: trackItem.platformTrackResponse.description,
-  platform: MusicPlatform.sound,
+  platformId: MusicPlatform.sound,
   lossyAudioURL: trackItem.platformTrackResponse.tracks[0]?.audio?.url,
   createdAtTimestamp: trackItem.track.createdAtTimestamp,
   createdAtEthereumBlockNumber: trackItem.track.createdAtEthereumBlockNumber,
@@ -41,8 +41,8 @@ export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: stri
   return {
     name: artist.name,
     artistId: mapArtistID(artist.user.publicAddress),
-    platformId: artist.id,
-    platform: MusicPlatform.sound,
+    platformInternalId: artist.id,
+    platformId: MusicPlatform.sound,
     avatarUrl: artist.user?.avatar?.url,
     websiteUrl: artist.soundHandle ?
       `https://www.sound.xyz/${artist.soundHandle}`

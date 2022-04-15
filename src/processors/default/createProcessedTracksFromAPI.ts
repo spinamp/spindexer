@@ -9,10 +9,10 @@ import { mergeProcessedTracks } from '../../types/track';
 const NAME = 'createProcessedTracksFromAPI';
 export type APIMusicPlatform = MusicPlatform.noizd;
 
-const processorFunction = (platform: APIMusicPlatform, name: string) => async (apiTracks: unknown[], clients: Clients) => {
-  console.info(`Processing ${apiTracks.length} api tracks from ${platform}`);
-  const { mapAPITrack, mapArtistProfile, mapAPITrackTimestamp } = platformConfig[platform].mappers!;
-  const lastCursor = clients[platform].getAPITrackCursor(apiTracks[apiTracks.length - 1]);
+const processorFunction = (platformId: APIMusicPlatform, name: string) => async (apiTracks: unknown[], clients: Clients) => {
+  console.info(`Processing ${apiTracks.length} api tracks from ${platformId}`);
+  const { mapAPITrack, mapArtistProfile, mapAPITrackTimestamp } = platformConfig[platformId].mappers!;
+  const lastCursor = clients[platformId].getAPITrackCursor(apiTracks[apiTracks.length - 1]);
 
   const artistProfiles = _.uniqBy(apiTracks.map(apiTrack => {
     return mapArtistProfile(apiTrack, mapAPITrackTimestamp!(apiTrack));
@@ -28,15 +28,15 @@ const processorFunction = (platform: APIMusicPlatform, name: string) => async (a
 
   await clients.db.upsert('processedTracks', mergedProcessedTracks);
   await clients.db.upsert('artists', artists);
-  await clients.db.upsert('artistProfiles', (artistProfiles as unknown as Record[]), ['artistId', 'platform']);
+  await clients.db.upsert('artistProfiles', (artistProfiles as unknown as Record[]), ['artistId', 'platformId']);
   await clients.db.updateProcessor(name, lastCursor);
   console.info(`Processing completed, updated cursor to ${lastCursor}`);
 };
 
-export const createProcessedTracksFromAPI: (platform: APIMusicPlatform) => Processor =
-  (platform: APIMusicPlatform) => ({
-    name: `${NAME}_${platform}`,
-    trigger: newPlatformTracks(platform),
-    processorFunction: processorFunction(platform, `${NAME}_${platform}`),
-    initialCursor: platformConfig[platform].initialTrackCursor,
+export const createProcessedTracksFromAPI: (platformId: APIMusicPlatform) => Processor =
+  (platformId: APIMusicPlatform) => ({
+    name: `${NAME}_${platformId}`,
+    trigger: newPlatformTracks(platformId),
+    processorFunction: processorFunction(platformId, `${NAME}_${platformId}`),
+    initialCursor: platformConfig[platformId].initialTrackCursor,
   });

@@ -10,10 +10,10 @@ export type Artist = Record & {
 }
 
 export type ArtistProfile = Timestamp & {
-  platformId: string;
+  platformInternalId: string;
   artistId: string;
   name: string;
-  platform: MusicPlatform;
+  platformId: MusicPlatform;
   avatarUrl?: string;
   websiteUrl?: string;
 }

@@ -10,10 +10,10 @@ export type SubgraphTrack = {
 }
 
 export type ProcessedTrack = Record & {
-  platformId: string;
+  platformInternalId: string;
   title: string;
   slug: string;
-  platform: MusicPlatform;
+  platformId: MusicPlatform;
   lossyAudioIPFSHash?: string;
   lossyAudioURL: string;
   description?: string;
@@ -25,7 +25,7 @@ export type ProcessedTrack = Record & {
 }
 
 export type Track = Record & {
-  platform: MusicPlatform,
+  platformId: MusicPlatform,
   metadataIPFSHash?: string
   [ValidContractCallFunction.tokenURI]?: string
   [ValidContractCallFunction.tokenMetadataURI]?: string
@@ -37,7 +37,7 @@ export type Track = Record & {
 }
 
 export const getMetadataURL = (track: Track): (string | null | undefined) => {
-  const metadataField = platformConfig[track.platform].contractMetadataField;
+  const metadataField = platformConfig[track.platformId].contractMetadataField;
   const metadataURL = track[metadataField];
   return metadataURL;
 }
@@ -52,23 +52,23 @@ export const getMetadataIPFSHash = (track: Track): (string | null | undefined) =
 }
 
 export const mergeProcessedTracks = async (newProcessedTracks: ProcessedTrack[], dbClient: DBClient, prioritizeNew: boolean) => {
-  const platformIds = newProcessedTracks.map(t => t.platformId);
+  const platformInternalIds = newProcessedTracks.map(t => t.platformInternalId);
   const existingProcessedTracks = await dbClient.getRecords<ProcessedTrack>('processedTracks',
     [
-      ['whereIn', ['platformId', platformIds]]
+      ['whereIn', ['platformInternalId', platformInternalIds]]
     ]
   );
   const existingProcessedTracksByPlatformId = _.keyBy(existingProcessedTracks, 'platformId');
   const mergedProcessedTracks = newProcessedTracks.map(t => {
     if (prioritizeNew) {
       return {
-        ...existingProcessedTracksByPlatformId[t.platformId],
+        ...existingProcessedTracksByPlatformId[t.platformInternalId],
         ...t,
       }
     } else {
       return {
         ...t,
-        ...existingProcessedTracksByPlatformId[t.platformId],
+        ...existingProcessedTracksByPlatformId[t.platformInternalId],
       }
     }
   });

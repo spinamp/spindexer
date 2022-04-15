@@ -33,8 +33,8 @@ export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: stri
   return {
     name: artist.username,
     artistId: mapArtistID(artist.id),
-    platformId: artist.id,
-    platform: MusicPlatform.noizd,
+    platformInternalId: artist.id,
+    platformId: MusicPlatform.noizd,
     avatarUrl: artist.profile?.image_profile?.url,
     websiteUrl: `https://noizd.com/u/${artist.uri}`,
     createdAtTimestamp,
@@ -58,11 +58,11 @@ const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any)
 
   return {
     id: mapAPITrackID(apiTrack.id),
-    platformId: apiTrack.id,
+    platformInternalId: apiTrack.id,
     title: apiTrack.title,
     slug: slugify(`${apiTrack.title} ${mapAPITrackTimestamp(apiTrack)}`).toLowerCase(),
     description: apiTrack.description,
-    platform: MusicPlatform.noizd,
+    platformId: MusicPlatform.noizd,
     lossyAudioURL: apiTrack.metadata ? apiTrack.metadata.audio_url : apiTrack.full.url,
     createdAtTimestamp: mapAPITrackTimestamp(apiTrack),
     lossyArtworkURL: artwork,

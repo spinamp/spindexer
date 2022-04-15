@@ -34,7 +34,7 @@ export const createTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethC
     console.info(`Processing nft for track ${nft.trackId}`);
     const track: Track = {
       id: formatAddress(nft.trackId),
-      platform: nft.platform,
+      platformId: nft.platformId,
       createdAtTimestamp: nft.createdAtTimestamp,
       createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
     };
@@ -56,7 +56,7 @@ const processorFunction = async (newSubgraphNFTs: SubgraphNFT[], clients: Client
     createdAtTimestamp: subgraphNFT.createdAtTimestamp,
     contractAddress: subgraphNFT.contractAddress,
     tokenId: subgraphNFT.tokenId,
-    platform: subgraphNFT.platform,
+    platformId: subgraphNFT.platform,
     trackId: subgraphNFT.track.id
   }));
   const lastCursor = newNFTs[newNFTs.length - 1].createdAtTimestamp;

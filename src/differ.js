@@ -12,8 +12,7 @@ const processedTracks = neww.processedTracks; // array
 const newArtists = neww.artists; // array
 const processedTracksById = _.keyBy(processedTracks, 'id');
 const newArtistsById = _.keyBy(newArtists, 'id');
-const processedTracksByPlatformId = _.keyBy(processedTracks, 'platformId');
-const newArtistsByPlatformId = _.keyBy(newArtists, 'profiles.noizd.platformId');
+const processedTracksByPlatformInternalId = _.keyBy(processedTracks, 'platformInternalId');
 
 const diffProfile = (oldProfile, newProfile) => {
   const diff = {};
@@ -22,10 +21,10 @@ const diffProfile = (oldProfile, newProfile) => {
   oldProfileKeys.forEach(keyOld => {
     let keyNew = keyOld;
     if (keyOld === 'provider') {
-      keyNew = 'platform'
+      keyNew = 'platformId'
     }
     if (keyOld === 'originalId') {
-      keyNew = 'platformId'
+      keyNew = 'platformInternalId'
     }
     if (keyOld === 'id') {
       keyNew = 'artistId'
@@ -43,16 +42,16 @@ const diffProfile = (oldProfile, newProfile) => {
   });
   newProfileKeys.forEach(keyNew => {
     let keyOld = keyNew;
-    if (keyNew === 'platform') {
+    if (keyNew === 'platformId') {
       keyOld = 'provider'
     }
-    if (keyNew === 'platformId') {
+    if (keyNew === 'platformInternalId') {
       keyOld = 'originalId'
     }
     if (keyOld === 'artistId') {
       keyNew = 'id'
     }
-    if (keyNew === 'platformId' && oldProfile[keyOld] === 'soundXyz' && newProfile[keyNew] === 'sound') {
+    if (keyNew === 'platformInternalId' && oldProfile[keyOld] === 'soundXyz' && newProfile[keyNew] === 'sound') {
       return
     }
     if (keyNew === 'createdAtTimestamp') {
@@ -179,10 +178,10 @@ const diffTrack = (oldTrack, newTrack) => {
   oldKeys.forEach(keyOld => {
     let keyNew = keyOld;
     if (keyOld === 'provider') {
-      keyNew = 'platform'
+      keyNew = 'platformId'
     }
     if (keyOld === 'originalId') {
-      keyNew = 'platformId'
+      keyNew = 'platformInternalId'
     }
     if (keyOld === 'artwork') {
       keyNew = 'lossyArtworkURL'
@@ -213,10 +212,10 @@ const diffTrack = (oldTrack, newTrack) => {
   });
   newKeys.forEach(keyNew => {
     let keyOld = keyNew;
-    if (keyNew === 'platform') {
+    if (keyNew === 'platformId') {
       keyOld = 'provider'
     }
-    if (keyNew === 'platformId') {
+    if (keyNew === 'platformInternalId') {
       keyOld = 'originalId'
     }
     if (keyNew === 'lossyArtworkURL') {
@@ -235,10 +234,10 @@ const diffTrack = (oldTrack, newTrack) => {
     if (keyNew === 'lossyArtworkIPFSHash') {
       return;
     }
-    if (keyNew === 'lossyAudioURL' && newTrack.platform === 'noizd' && newTrack.id.split('/')[2] <= 28) {
+    if (keyNew === 'lossyAudioURL' && newTrack.platformId === 'noizd' && newTrack.id.split('/')[2] <= 28) {
       return;
     }
-    if (keyNew === 'platform' && oldTrack[keyOld] === 'soundXyz' && newTrack[keyNew] === 'sound') {
+    if (keyNew === 'platformId' && oldTrack[keyOld] === 'soundXyz' && newTrack[keyNew] === 'sound') {
       return
     }
     if (keyNew === 'slug') {
@@ -268,12 +267,12 @@ const diffTracks = (oldTracks, newTracks) => {
   oldTracksKeys.forEach(keyOld => {
     let keyNew = keyOld;
     let newTrack = newTracks[keyNew];
-    const trackPlatformId = oldTracks[keyOld].originalId;
+    const trackPlatformInternalId = oldTracks[keyOld].originalId;
     if (keyOld === 'ethereum/0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/null') {
       return {};
     }
-    if (oldTracks[keyOld].provider === 'noizd' && processedTracksByPlatformId[trackPlatformId]) {
-      newTrack = processedTracksByPlatformId[trackPlatformId];
+    if (oldTracks[keyOld].provider === 'noizd' && processedTracksByPlatformInternalId[trackPlatformInternalId]) {
+      newTrack = processedTracksByPlatformInternalId[trackPlatformInternalId];
     }
     const diffedTrack = diffTrack(oldTracks[keyOld], newTrack)
     if (diffedTrack) {
@@ -285,8 +284,8 @@ const diffTracks = (oldTracks, newTracks) => {
   });
   newTracksKeys.forEach(keyNew => {
     let keyOld = keyNew;
-    if (newTracks[keyNew].platform === 'noizd' && oldTracks[`noizd/${newTracks[keyNew].platformId}`]) {
-      keyOld = `noizd/${newTracks[keyNew].platformId}`;
+    if (newTracks[keyNew].platformId === 'noizd' && oldTracks[`noizd/${newTracks[keyNew].platformInternalId}`]) {
+      keyOld = `noizd/${newTracks[keyNew].platformInternalId}`;
     }
     const diffedTrack = diffTrack(oldTracks[keyOld], newTracks[keyNew])
     if (diffedTrack) {

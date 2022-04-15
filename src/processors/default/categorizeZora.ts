@@ -7,10 +7,10 @@ export const categorizeZora: Processor = {
   name: 'categorizeZora',
   trigger: zoraRawWithMetadata,
   processorFunction: async (tracks: Track[], clients: Clients) => {
-    console.log(`Processing updates for tracks with: ${tracks.map(t => t.platform)}`);
+    console.log(`Processing updates for tracks with: ${tracks.map(t => t.platformId)}`);
     const trackUpdates = tracks.map((t: Track) => ({
       id: t.id,
-      platform: getZoraPlatform(t),
+      platformId: getZoraPlatform(t),
     }));
     await clients.db.update('tracks', trackUpdates);
     console.log('Updated');

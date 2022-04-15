@@ -79,7 +79,7 @@ const printMimeTypes = async () => {
 const printSoundTracks = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
-  const tracks = db.tracks.filter((t: Track) => t.platform === MusicPlatform.sound).map((t: Track) => getMetadataURL(t));
+  const tracks = db.tracks.filter((t: Track) => t.platformId === MusicPlatform.sound).map((t: Track) => getMetadataURL(t));
   console.log(tracks);
 }
 
@@ -87,7 +87,7 @@ const printZoraNotCatalogTracks = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
   const tracks = db.tracks.filter((t: Track) => {
-    return t.platform === MusicPlatform.zora &&
+    return t.platformId === MusicPlatform.zora &&
       !t.metadata?.body?.version?.includes('catalog');
   });
   console.log(tracks);
@@ -97,7 +97,7 @@ const printFakeCatalogTracks = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
   const allCatalogTracks = db.tracks.filter((t: Track) => {
-    return t.platform === MusicPlatform.zora &&
+    return t.platformId === MusicPlatform.zora &&
       t.metadata?.body?.version?.includes('catalog');
   });
   const fakeCatalogTracks = allCatalogTracks.filter(((t: Track) => !verifyCatalogTrack(t)));
@@ -127,7 +127,7 @@ const printProcessedTracks = async (key: string, value: any) => {
 const printNOIZDDuplicates = async (key: string, value: any) => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
-  const processedTracks = _.filter(_.groupBy(db.processedTracks, 'platformId'), array => array.length > 1);
+  const processedTracks = _.filter(_.groupBy(db.processedTracks, 'platformInternalId'), array => array.length > 1);
   console.dir(processedTracks);
 }
 
@@ -190,7 +190,7 @@ const resetProcessErrorTracks = async () => {
 const resetNOIZDProcessErrorTracks = async () => {
   const dbClient = await dbLib.init();
   const { db, indexes } = await dbClient.getFullDB();
-  const processErrorTracks = await findTracks(db.tracks, { processed: true, processError: true, platform: MusicPlatform.noizd });
+  const processErrorTracks = await findTracks(db.tracks, { processed: true, processError: true, platformId: MusicPlatform.noizd });
   const updates = processErrorTracks.map(t => ({ id: t.id, processed: undefined, processError: undefined }));
   await dbClient.update('tracks', updates);
 }
@@ -316,17 +316,17 @@ const start = async () => {
     .command('printZoraTracks', 'print all raw zora tracks that are not from catalog postprocessing', async (yargs) => {
       return yargs
     }, async () => {
-      await printTracks('platform', 'zoraRaw');
+      await printTracks('platformId', 'zoraRaw');
     })
     .command('printCatalogTracks', 'print all catalog-only zora tracks', async (yargs) => {
       return yargs
     }, async () => {
-      await printTracks('platform', 'catalog');
+      await printTracks('platformId', 'catalog');
     })
     .command('printUnprocessedZoraTracks', 'print all unprocessed zora tracks', async (yargs) => {
       return yargs
     }, async () => {
-      await printTracks('platform', 'zora');
+      await printTracks('platformId', 'zora');
     })
     .command('printNoArtist', 'print tracks with no artist', async (yargs) => {
       return yargs
@@ -336,12 +336,12 @@ const start = async () => {
     .command('printNoizdTracks', 'print noizd tracks', async (yargs) => {
       return yargs
     }, async () => {
-      await printProcessedTracks('platform', MusicPlatform.noizd);
+      await printProcessedTracks('platformId', MusicPlatform.noizd);
     })
     .command('printNOIZDDuplicates', 'print noizd duplicates', async (yargs) => {
       return yargs
     }, async () => {
-      await printNOIZDDuplicates('platform', MusicPlatform.noizd);
+      await printNOIZDDuplicates('platformId', MusicPlatform.noizd);
     })
     .command('resetProcessErrorTracks', 'clear out processing and processError from tracks with error so they can be retried', async (yargs) => {
       return yargs
@@ -351,12 +351,12 @@ const start = async () => {
     .command('printProcessedCatalogTrackCount', 'print processed catalog track count', async (yargs) => {
       return yargs
     }, async () => {
-      await printProcessedTrackCount({ platform: MusicPlatform.catalog, processed: true });
+      await printProcessedTrackCount({ platformId: MusicPlatform.catalog, processed: true });
     })
     .command('printProcessErrorCatalogTrackCount', 'print failed processing catalog track count', async (yargs) => {
       return yargs
     }, async () => {
-      await printProcessedTrackCount({ platform: MusicPlatform.catalog, processError: true });
+      await printProcessedTrackCount({ platformId: MusicPlatform.catalog, processError: true });
     })
     .command('printProcessErrorTrackCount', 'print failed processing track count', async (yargs) => {
       return yargs

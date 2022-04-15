@@ -24,16 +24,16 @@ export const missingMetadataIPFSHash: Trigger<Clients, undefined> = async (clien
 export const missingPlatform: Trigger<Clients, undefined> = async (clients: Clients) => {
   const tracks = (await clients.db.getRecords('tracks',
     [
-      ['whereNull', ['platform']]
+      ['whereNull', ['platformId']]
     ])).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return tracks;
 };
 
-export const unprocessedPlatformTracks: (platform: MusicPlatform) => Trigger<Clients, undefined> = (platform: MusicPlatform) => async (clients: Clients) => {
+export const unprocessedPlatformTracks: (platformId: MusicPlatform) => Trigger<Clients, undefined> = (platformId: MusicPlatform) => async (clients: Clients) => {
   const tracks = (await clients.db.getRecords('tracks',
     [
       ['whereNull', ['processed']],
-      ['andWhere', [{ platform }]],
+      ['andWhere', [{ platformId }]],
     ]
   )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return tracks;
