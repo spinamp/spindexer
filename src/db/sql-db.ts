@@ -4,12 +4,8 @@ import { Record } from '../types/record';
 import _ from 'lodash';
 import { Cursor } from '../types/trigger';
 import config from './knexfile';
-import { toDBRecord, toDBRecords } from './orm';
+import { fromDBRecords, toDBRecord, toDBRecords } from './orm';
 import { RecordUpdate } from '../types/record';
-
-const recordMapper: any = {
-  tracks: (tracks: any) => tracks.map((t: any) => ({ ...t, metadata: JSON.parse(t.metadata) }))
-}
 
 const loadDB = async () => {
   const currentConfig = config[process.env.NODE_ENV]
@@ -46,11 +42,8 @@ const getRecordsFunc = (db: Knex) => async <RecordType extends Record>(tableName
       }
     })
   }
-  const records = await query;
-  if (recordMapper[tableName]) {
-    return recordMapper[tableName](records);
-  }
-  return records;
+  const dbRecords = await query;
+  return fromDBRecords(tableName, dbRecords);
 }
 
 const init = async (): Promise<DBClient> => {
