@@ -35,7 +35,7 @@ export const createTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethC
     const track: Track = {
       id: formatAddress(nft.trackId),
       platformId: nft.platformId,
-      createdAtTimestamp: nft.createdAtTimestamp,
+      createdAtTime: nft.createdAtTime,
       createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
     };
     const callIndexes = nftIndexToCalls[index];
@@ -53,13 +53,13 @@ const processorFunction = async (newSubgraphNFTs: SubgraphNFT[], clients: Client
   const newNFTs: NFT[] = newSubgraphNFTs.map(subgraphNFT => ({
     id: formatAddress(subgraphNFT.id),
     createdAtEthereumBlockNumber: subgraphNFT.createdAtBlockNumber,
-    createdAtTimestamp: subgraphNFT.createdAtTimestamp,
+    createdAtTime: new Date(parseInt(subgraphNFT.createdAtTimestamp)),
     contractAddress: subgraphNFT.contractAddress,
     tokenId: subgraphNFT.tokenId,
     platformId: subgraphNFT.platform,
     trackId: subgraphNFT.track.id
   }));
-  const lastCursor = newNFTs[newNFTs.length - 1].createdAtTimestamp;
+  const lastCursor = newSubgraphNFTs[newSubgraphNFTs.length - 1].createdAtTimestamp;
   const newTracks = await createTracksFromNFTs(newNFTs, clients.db, clients.eth);
   await clients.db.insert('nfts', newNFTs);
   await clients.db.insert('tracks', newTracks);

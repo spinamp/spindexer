@@ -9,7 +9,7 @@ const INITIAL_TABLES = [
   {
     name: 'nfts', create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
-      table.timestamp('createdAtTimestamp', { precision: 3 });
+      table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
       table.string('tokenId');
       table.string('contractAddress');
@@ -22,7 +22,7 @@ const INITIAL_TABLES = [
   {
     name: 'artists', create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
-      table.timestamp('createdAtTimestamp', { precision: 3 });
+      table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
       table.string('name');
       table.string('slug');
@@ -30,7 +30,7 @@ const INITIAL_TABLES = [
   },
   {
     name: 'artistProfiles', create: (table: Knex.CreateTableBuilder) => {
-      table.timestamp('createdAtTimestamp', { precision: 3 });
+      table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
       table.string('platformInternalId');
       table.string('name');
@@ -46,7 +46,7 @@ const INITIAL_TABLES = [
   {
     name: 'tracks', create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
-      table.timestamp('createdAtTimestamp', { precision: 3 });
+      table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
       table.string('platformId');
       table.foreign('platformId').references('id').inTable('platforms');
@@ -63,7 +63,7 @@ const INITIAL_TABLES = [
   {
     name: 'processedTracks', create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
-      table.timestamp('createdAtTimestamp', { precision: 3 });
+      table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
       table.string('title');
       table.string('slug');

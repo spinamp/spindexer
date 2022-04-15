@@ -33,7 +33,7 @@ const diffProfile = (oldProfile, newProfile) => {
       return
     }
     if (keyOld === 'createdAt') {
-      keyNew = 'createdAtTimestamp'
+      keyNew = 'createdAtTime'
       return;
     }
     if (!(oldProfile[keyOld] === newProfile[keyNew])) {
@@ -54,7 +54,7 @@ const diffProfile = (oldProfile, newProfile) => {
     if (keyNew === 'platformInternalId' && oldProfile[keyOld] === 'soundXyz' && newProfile[keyNew] === 'sound') {
       return
     }
-    if (keyNew === 'createdAtTimestamp') {
+    if (keyNew === 'createdAtTime') {
       keyOld = 'createdAt'
       return;
     }
@@ -120,7 +120,7 @@ const diffArtist = (oldArtist, newArtist, full) => {
       return;
     }
     if (keyOld === 'createdAt') {
-      keyNew = 'createdAtTimestamp'
+      keyNew = 'createdAtTime'
       return;
     }
     if (!(oldArtist[keyOld] === newArtist[keyNew])) {
@@ -140,7 +140,7 @@ const diffArtist = (oldArtist, newArtist, full) => {
     if (keyNew === 'profiles' && !full) {
       return;
     }
-    if (keyNew === 'createdAtTimestamp') {
+    if (keyNew === 'createdAtTime') {
       keyOld = 'createdAt'
       return;
     }
@@ -190,7 +190,7 @@ const diffTrack = (oldTrack, newTrack) => {
       keyNew = 'lossyAudioURL'
     }
     if (keyOld === 'createdAt') {
-      keyNew = 'createdAtTimestamp'
+      keyNew = 'createdAtTime'
       return;
     }
     if (keyOld === 'provider' && oldTrack[keyOld] === 'soundXyz' && newTrack[keyNew] === 'sound') {
@@ -224,7 +224,7 @@ const diffTrack = (oldTrack, newTrack) => {
     if (keyNew === 'lossyAudioURL') {
       keyOld = 'url'
     }
-    if (keyNew === 'createdAtTimestamp') {
+    if (keyNew === 'createdAtTime') {
       keyOld = 'createdAt'
       return;
     }

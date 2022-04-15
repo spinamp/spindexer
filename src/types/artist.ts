@@ -2,14 +2,14 @@ import _ from "lodash";
 import slugify from "slugify";
 import { DBClient } from "../db/db";
 import { MusicPlatform } from "./platform";
-import { Record, Timestamp } from "./record"
+import { Record, TimeField } from "./record"
 
 export type Artist = Record & {
   name: string;
   slug: string;
 }
 
-export type ArtistProfile = Timestamp & {
+export type ArtistProfile = TimeField & {
   platformInternalId: string;
   artistId: string;
   name: string;
@@ -21,9 +21,9 @@ export type ArtistProfile = Timestamp & {
 export const mapArtist = (artistProfile: ArtistProfile): Artist => {
   return {
     name: artistProfile.name,
-    slug: slugify(`${artistProfile.name} ${artistProfile.createdAtTimestamp}`).toLowerCase(),
+    slug: slugify(`${artistProfile.name} ${artistProfile.createdAtTime.getTime()}`).toLowerCase(),
     id: artistProfile.artistId,
-    createdAtTimestamp: artistProfile.createdAtTimestamp,
+    createdAtTime: artistProfile.createdAtTime,
     createdAtEthereumBlockNumber: artistProfile.createdAtEthereumBlockNumber
   }
 };

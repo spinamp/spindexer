@@ -28,7 +28,7 @@ const getNoizdResizedUrl = (src: string, size?: number | string): string => {
 
 const mapArtistID = (id: string) => `noizd/${id}`;
 
-export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: string, createdAtEthereumBlockNumber?: string): ArtistProfile => {
+export const mapArtistProfile = (platformResponse: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
   const artist = platformResponse.artist;
   return {
     name: artist.username,
@@ -37,7 +37,7 @@ export const mapArtistProfile = (platformResponse: any, createdAtTimestamp: stri
     platformId: MusicPlatform.noizd,
     avatarUrl: artist.profile?.image_profile?.url,
     websiteUrl: `https://noizd.com/u/${artist.uri}`,
-    createdAtTimestamp,
+    createdAtTime,
     createdAtEthereumBlockNumber
   };
 };
@@ -46,7 +46,7 @@ const mapAPITrackID = (apiTrackId: string): string => {
   return `noizd/${apiTrackId}`;
 };
 
-const mapAPITrackTimestamp = (apiTrack: any) => '' + new Date(apiTrack.created).getTime()
+const mapAPITrackTime = (apiTrack: any) => new Date(apiTrack.created)
 
 const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any) => {
   const { cover } = apiTrack;
@@ -60,11 +60,11 @@ const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any)
     id: mapAPITrackID(apiTrack.id),
     platformInternalId: apiTrack.id,
     title: apiTrack.title,
-    slug: slugify(`${apiTrack.title} ${mapAPITrackTimestamp(apiTrack)}`).toLowerCase(),
+    slug: slugify(`${apiTrack.title} ${mapAPITrackTime(apiTrack).getTime()}`).toLowerCase(),
     description: apiTrack.description,
     platformId: MusicPlatform.noizd,
     lossyAudioURL: apiTrack.metadata ? apiTrack.metadata.audio_url : apiTrack.full.url,
-    createdAtTimestamp: mapAPITrackTimestamp(apiTrack),
+    createdAtTime: mapAPITrackTime(apiTrack),
     lossyArtworkURL: artwork,
     websiteUrl: `https://noizd.com/assets/${apiTrack.id}`,
     artistId: mapArtistID(apiTrack.artist.id),
@@ -83,7 +83,7 @@ const mapTrack = (trackItem: {
     ...processedTrack,
     id: mapTrackID(trackItem.track.id),
     lossyAudioURL: trackItem.platformTrackResponse.metadata.audio_url,
-    createdAtTimestamp: processedTrack.createdAtTimestamp || trackItem.track.createdAtTimestamp,
+    createdAtTime: processedTrack.createdAtTime || trackItem.track.createdAtTime,
     createdAtEthereumBlockNumber: trackItem.track.createdAtEthereumBlockNumber,
   };
 };
@@ -107,7 +107,7 @@ const addPlatformTrackData = async (tracks: Track[], client: NOIZDClient) => {
 
 export default {
   addPlatformTrackData,
-  mapAPITrackTimestamp,
+  mapAPITrackTime,
   mapAPITrack,
   mapTrack,
   mapArtistProfile,

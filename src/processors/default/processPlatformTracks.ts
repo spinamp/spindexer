@@ -41,7 +41,7 @@ const processPlatformTrackData = (platformTrackData: {
   const artistProfiles = _.uniqBy(platformTrackData.reduce<ArtistProfile[]>((profiles, trackData) => {
     if (trackData.platformTrackResponse) {
       const artistProfile = {
-        ...mapArtistProfile(trackData.platformTrackResponse, trackData.track.createdAtTimestamp, trackData.track.createdAtEthereumBlockNumber),
+        ...mapArtistProfile(trackData.platformTrackResponse, trackData.track.createdAtTime, trackData.track.createdAtEthereumBlockNumber),
       } as ArtistProfile;
       profiles.push(artistProfile);
     }
