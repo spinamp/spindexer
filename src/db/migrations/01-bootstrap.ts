@@ -34,8 +34,8 @@ const INITIAL_TABLES = [
       table.bigint('createdAtEthereumBlockNumber');
       table.string('platformInternalId');
       table.string('name');
-      table.string('avatarUrl');
-      table.string('websiteUrl');
+      table.string('avatarUrl', 3000);
+      table.string('websiteUrl', 3000);
       table.string('artistId');
       table.foreign('artistId').references('id').inTable('artists');
       table.string('platformId');
@@ -54,7 +54,7 @@ const INITIAL_TABLES = [
       table.string('tokenURI', 20000);
       table.string('tokenMetadataURI', 20000);
       table.json('metadata');
-      table.string('metadataError');
+      table.string('metadataError', 3000);
       table.string('mimeType');
       table.boolean('processed');
       table.boolean('processError');
@@ -69,12 +69,11 @@ const INITIAL_TABLES = [
       table.string('slug');
       table.string('platformInternalId');
       table.string('lossyAudioIPFSHash');
-      table.string('lossyAudioURL');
+      table.string('lossyAudioURL', 3000);
       table.string('description', 10000);
-      table.string('artwork');
       table.string('lossyArtworkIPFSHash');
-      table.string('lossyArtworkURL');
-      table.string('websiteUrl');
+      table.string('lossyArtworkURL', 3000);
+      table.string('websiteUrl', 3000);
       table.string('platformId');
       table.foreign('platformId').references('id').inTable('platforms');
       table.string('artistId');

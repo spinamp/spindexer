@@ -17,7 +17,6 @@ export type ProcessedTrack = Record & {
   lossyAudioIPFSHash?: string;
   lossyAudioURL: string;
   description?: string;
-  artwork?: string;
   lossyArtworkIPFSHash?: string;
   lossyArtworkURL: string;
   websiteUrl?: string;

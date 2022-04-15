@@ -67,9 +67,9 @@ const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => asy
   if (oldIds) {
     await clients.db.delete('processedTracks', oldIds);
   }
-  await clients.db.upsert('processedTracks', mergedProcessedTracks);
   await clients.db.upsert('artists', artists);
   await clients.db.upsert('artistProfiles', (artistProfiles as unknown as Record[]), ['artistId', 'platformId']);
+  await clients.db.upsert('processedTracks', mergedProcessedTracks);
 };
 
 export const processPlatformTracks = (platformId: ImplementedMusicPlatform) => ({
