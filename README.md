@@ -6,8 +6,10 @@ This code is intended to become a multi-stage processing pipeline that generates
  - Saves and keeps alive an updated real time DB
 
 ## Running it
- - Copy .env.example to .env
+ - Set up a postgres server and user/password for a user that can create databases.
+ - Copy .env.example to .env and fill it in.
  - Setup ethereum provider and subgraph endpoints
+ - Install postgresql-client
  - yarn build
  - yarn start
 

@@ -7,7 +7,8 @@
     "start": "ts-node src/index.ts",
     "cli": "ts-node src/cli/cli.ts",
     "build": "tsc",
-    "serve": "source .env && npx postgraphile  --append-plugins postgraphile-plugin-connection-filter -c postgresql://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DATABASE --watch --enhance-graphiql --dynamic-json --disable-default-mutations"
+    "serve": "source .env && npx postgraphile  --append-plugins postgraphile-plugin-connection-filter -c postgresql://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DATABASE --watch --enhance-graphiql --dynamic-json --disable-default-mutations",
+    "save-db": "source .env && pg_dump -f ./localdb/db_dump -b -C -d $POSTGRES_DATABASE -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME"
   },
   "author": "",
   "license": "ISC",
@@ -31,6 +32,7 @@
     "graphql": "^16.3.0",
     "graphql-request": "^4.2.0",
     "knex": "^1.0.7",
+    "knex-dump": "^1.0.11",
     "lodash": "^4.17.21",
     "pg": "^8.7.3",
     "postgraphile": "^4.12.9",
