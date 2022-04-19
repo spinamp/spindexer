@@ -5,12 +5,15 @@ import config from '../src/db/knexfile';
 
 const bootstrapDB = async () => {
   const currentConfig = config[process.env.NODE_ENV]
-    const initialConfig = { ...currentConfig, connection: {
-      ...currentConfig.connection,
-      database: 'postgres',
-      user: process.env.DB_SUPERUSER,
-      password: process.env.DB_SUPERUSER_PASSWORD,
-    } };
+    const initialConfig = { ...currentConfig,
+      connection: {
+        ...currentConfig.connection,
+        database: 'postgres',
+        user: process.env.DB_SUPERUSER,
+        password: process.env.DB_SUPERUSER_PASSWORD,
+        ssl: process.env.NODE_ENV === 'production'
+      }
+    };
     const initialDB = knex(initialConfig);
     await initialDB.raw(`CREATE ROLE ${process.env.POSTGRES_USERNAME} LOGIN PASSWORD '${process.env.POSTGRES_PASSWORD}';`);
     await initialDB.raw(`GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${process.env.POSTGRES_USERNAME};`);

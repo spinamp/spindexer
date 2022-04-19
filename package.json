@@ -7,7 +7,7 @@
     "start": "ts-node src/index.ts",
     "cli": "ts-node src/cli/cli.ts",
     "build": "tsc",
-    "bootstrap-db": "ts-node db/bootstrap.ts",
+    "bootstrap-db": "NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem ts-node db/bootstrap.ts",
     "serve": "source .env && DEBUG=graphile-build-pg NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem ts-node ./src/serve.ts",
     "connect-db-root": "source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -d postgres -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME",
     "connect-db": "source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -d $POSTGRES_DATABASE -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME",
