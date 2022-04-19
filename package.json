@@ -8,8 +8,9 @@
     "cli": "ts-node src/cli/cli.ts",
     "build": "tsc",
     "serve": "source .env && npx postgraphile  --append-plugins postgraphile-plugin-connection-filter -c postgresql://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DATABASE --watch --enhance-graphiql --dynamic-json --disable-default-mutations",
+    "connect-db": "source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -d $POSTGRES_DATABASE -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME",
     "save-db": "source .env && pg_dump -f ./localdb/db_dump -b -C -d $POSTGRES_DATABASE -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME",
-    "restore-db": "source .env && psql postgresql://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@localhost:5432/postgres < ./localdb/db_dump"
+    "restore-db": "source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME -d postgres < ./localdb/db_dump"
   },
   "author": "",
   "license": "ISC",

@@ -5,11 +5,16 @@ This code is intended to become a multi-stage processing pipeline that generates
  - Transforms data into a more comprehensive, robust schema
  - Saves and keeps alive an updated real time DB
 
+## Requirements to run
+ - NodeJS/yarn setup
+ - Postgres setup
+ - The Graph node setup with IPFS, postgres and https://github.com/spinamp/web3-music-subgraph running
+ - postgresql-client installed
+
 ## Running it
  - Set up a postgres server and user/password for a user that can create databases.
  - Copy .env.example to .env and fill it in.
  - Setup ethereum provider and subgraph endpoints
- - Install postgresql-client
  - yarn build
  - **Optional:** Bootstrap the DB with a recent backup by running ```yarn restore-db```
  - yarn start
