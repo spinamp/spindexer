@@ -103,6 +103,11 @@ export const up = async (knex: Knex) => {
     return knex.schema.createTable(table.name, table.create);
   });
   await Promise.all(promises);
+  await knex.raw(`GRANT SELECT ON "platforms" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "nfts" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "artists" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "artistProfiles" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "processedTracks" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex('platforms').insert(INITIAL_PLATFORM_ENUMS);
 };
 

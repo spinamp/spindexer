@@ -12,11 +12,11 @@ This code is intended to become a multi-stage processing pipeline that generates
  - postgresql-client installed
 
 ## Running it
- - Set up a postgres server and user/password
- - Ensure the postgres user has permission to create databases
+ - Copy .env.example to .env and fill it in. Make sure to change the example passwords.
+ - Set up a postgres server with admin username/password
+ - Bootstrap the DB for the pipeline. This will create users for the pipeline, with: ```DB_SUPERUSER=postgres DB_SUPERUSER_PASSWORD=password yarn bootstrap-db```
  - Ensure the postgres server forces SSL only.
  - Ensure the SSL certificate for the postgres server is stored at db-ssl-certificate.pem if needed. If you're using AWS RDS, you can copy rds-ssl-certificate.pem
- - Copy .env.example to .env and fill it in.
  - Setup ethereum provider and subgraph endpoints
  - yarn build
  - **Optional:** Bootstrap the DB with a recent backup by running ```yarn restore-db```
