@@ -108,6 +108,10 @@ export const up = async (knex: Knex) => {
   await knex.raw(`GRANT SELECT ON "artists" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`GRANT SELECT ON "artistProfiles" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`GRANT SELECT ON "processedTracks" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`comment on table tracks is '@omit';`);
+  await knex.raw(`comment on table processors is '@omit';`);
+  await knex.raw(`comment on table knex_migrations is '@omit';`);
+  await knex.raw(`comment on table knex_migrations_lock is '@omit';`);
   await knex('platforms').insert(INITIAL_PLATFORM_ENUMS);
 };
 
