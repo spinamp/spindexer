@@ -29,12 +29,12 @@ export const missingPlatform: Trigger<Clients, undefined> = async (clients: Clie
   return tracks;
 };
 
-export const unprocessedPlatformTracks: (platformId: MusicPlatform) => Trigger<Clients, undefined> = (platformId: MusicPlatform) => async (clients: Clients) => {
+export const unprocessedPlatformTracks: (platformId: MusicPlatform, limit?: number) => Trigger<Clients, undefined> = (platformId: MusicPlatform, limit?: number) => async (clients: Clients) => {
   const tracks = (await clients.db.getRecords('tracks',
     [
       ['whereNull', ['processed']],
       ['andWhere', [{ platformId }]],
     ]
-  )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+  )).slice(0, limit || parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return tracks;
 };

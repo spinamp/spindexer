@@ -72,9 +72,9 @@ const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => asy
   await clients.db.upsert('processedTracks', mergedProcessedTracks);
 };
 
-export const processPlatformTracks = (platformId: ImplementedMusicPlatform) => ({
+export const processPlatformTracks = (platformId: ImplementedMusicPlatform, limit?: number) => ({
   name,
-  trigger: unprocessedPlatformTracks(platformId),
+  trigger: unprocessedPlatformTracks(platformId, limit),
   processorFunction: processorFunction(platformId),
   initialCursor: undefined,
 });

@@ -6,10 +6,28 @@ const soundAPI = new GraphQLClient(
 
 export type SoundClient = {
   getAllMintedReleases: () => Promise<any[]>;
+  audioFromTrack: (trackId: string) => Promise<any>;
 }
 
 const init = async () => {
   return {
+    audioFromTrack: async (trackId: string): Promise<any> => {
+      const respose = await soundAPI.request(
+        gql`
+        {
+          audioFromTrack(trackId:"${trackId}") {
+            audio {
+                id
+                url
+                key
+            }
+            duration
+            }
+          }
+        `
+      );
+      return respose.audioFromTrack.audio;
+    },
     getAllMintedReleases: async (
     ): Promise<any[]> => {
       const { getAllMintedReleases } = await soundAPI.request(
@@ -46,11 +64,6 @@ const init = async () => {
                 id
                 title
                 trackNumber
-                audio {
-                    id
-                    url
-                    key
-                }
                 duration
                 }
             }
