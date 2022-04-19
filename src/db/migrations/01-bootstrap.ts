@@ -98,6 +98,7 @@ const INITIAL_PLATFORM_ENUMS = [
 ]
 
 export const up = async (knex: Knex) => {
+  console.log('Running initial DB bootstrap');
   const promises = INITIAL_TABLES.map(table => {
     return knex.schema.createTable(table.name, table.create);
   });

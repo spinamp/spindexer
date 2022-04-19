@@ -12,6 +12,8 @@ This code is intended to become a multi-stage processing pipeline that generates
  - Install postgresql-client
  - yarn build
  - yarn start
+ - This should start up the server. It will seed your database from a recent backup if the database is not yet created, and then catch up the database with the latest data until it is up to date
+ - Repeat yarn start to catch up
 
 ## Design Goals
 There are a few design goals for the code:
