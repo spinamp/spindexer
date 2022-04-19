@@ -11,6 +11,7 @@ This code is intended to become a multi-stage processing pipeline that generates
  - Setup ethereum provider and subgraph endpoints
  - Install postgresql-client
  - yarn build
+ - **Optional:** Bootstrap the DB with a recent backup by running ```yarn restore-db```
  - yarn start
  - This should start up the server. It will seed your database from a recent backup if the database is not yet created, and then catch up the database with the latest data until it is up to date
  - Repeat yarn start to catch up
