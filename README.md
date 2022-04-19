@@ -7,12 +7,15 @@ This code is intended to become a multi-stage processing pipeline that generates
 
 ## Requirements to run
  - NodeJS/yarn setup
- - Postgres setup
+ - Postgres installed
  - The Graph node setup with IPFS, postgres and https://github.com/spinamp/web3-music-subgraph running
  - postgresql-client installed
 
 ## Running it
- - Set up a postgres server and user/password for a user that can create databases.
+ - Set up a postgres server and user/password
+ - Ensure the postgres user has permission to create databases
+ - Ensure the postgres server forces SSL only.
+ - Ensure the SSL certificate for the postgres server is stored at db-ssl-certificate.pem if needed. If you're using AWS RDS, you can copy rds-ssl-certificate.pem
  - Copy .env.example to .env and fill it in.
  - Setup ethereum provider and subgraph endpoints
  - yarn build

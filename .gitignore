@@ -4,3 +4,5 @@ todos
 
 .env
 .env.backup
+
+db-ssl-certificate.pem
