@@ -4,5 +4,6 @@ todos
 
 .env
 .env.backup
+.env.local
 
 db-ssl-certificate.pem
