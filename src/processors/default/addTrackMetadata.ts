@@ -1,7 +1,6 @@
 import { missingTrackMetadata } from '../../triggers/missing';
 import { Clients, Processor } from '../../types/processor';
 import { getMetadataURL, Track } from '../../types/track';
-import { Record } from '../../types/record';
 import { Axios, AxiosResponse, AxiosError } from 'axios';
 import { DBClient } from '../../db/db';
 import { IPFSClient } from '../../clients/ipfs';

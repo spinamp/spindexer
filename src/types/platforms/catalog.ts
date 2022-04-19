@@ -58,7 +58,7 @@ const mapTrack = (trackItem: {
   id: mapTrackID(trackItem.track.id),
   platformInternalId: trackItem.platformTrackResponse.id,
   title: trackItem.platformTrackResponse.title,
-  slug: slugify(`${trackItem.platformTrackResponse.title} ${trackItem.track.createdAtTime.getDate()}`).toLowerCase(),
+  slug: slugify(`${trackItem.platformTrackResponse.title} ${trackItem.track.createdAtTime.getTime()}`).toLowerCase(),
   description: trackItem.platformTrackResponse.description,
   platformId: MusicPlatform.catalog,
   lossyAudioIPFSHash: trackItem.platformTrackResponse.ipfs_hash_lossy_audio,
