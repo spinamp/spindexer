@@ -21,6 +21,7 @@ http
         dynamicJson: true,
         disableDefaultMutations: true,
         pgDefaultRole: 'open_access',
+        enableCors: true,
       }
     )
   )
