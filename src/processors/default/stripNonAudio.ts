@@ -1,20 +1,20 @@
-import { nonAudioTracks } from '../../triggers/nonAudio';
+import { nonAudioMetadata } from '../../triggers/nonAudio';
+import { Metadata } from '../../types/metadata';
 import { Clients, Processor } from '../../types/processor';
-import { Track } from '../../types/track';
 
 const name = 'stripNonAudio';
 
-const processorFunction = async (tracks: Track[], clients: Clients) => {
-  console.log(`Processing updates for tracks with: ${tracks.map(t => t.mimeType)}`);
-  const trackIdsForDelete = tracks.map((t: Track) => t.id);
-  await clients.db.delete('nfts', trackIdsForDelete, 'trackId');
-  await clients.db.delete('tracks', trackIdsForDelete);
+const processorFunction = async (metadatas: Metadata[], clients: Clients) => {
+  console.log(`Processing updates for metadatas with types: ${metadatas.map(m => m.mimeType)}`);
+  const metadataIdsForDelete = metadatas.map((m: Metadata) => m.id);
+  await clients.db.delete('nfts', metadataIdsForDelete, 'metadataId');
+  await clients.db.delete('metadatas', metadataIdsForDelete);
   console.log('Deleted');
 };
 
 export const stripNonAudio: Processor = {
   name,
-  trigger: nonAudioTracks,
+  trigger: nonAudioMetadata,
   processorFunction,
   initialCursor: undefined
 };

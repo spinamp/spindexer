@@ -5,8 +5,9 @@ import slugify from 'slugify';
 import { CatalogClient } from '../../clients/catalog';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
+import { Metadata } from '../metadata';
 import { MusicPlatform } from '../platform';
-import { ProcessedTrack, Track } from '../track';
+import { ProcessedTrack } from '../track';
 
 export const recoverCatalogAddress = (body: any, signature: string) => {
   const bodyString = JSON.stringify(body);
@@ -15,37 +16,37 @@ export const recoverCatalogAddress = (body: any, signature: string) => {
   return recovered;
 };
 
-export const verifyCatalogTrack = (track: Track) => {
+export const verifyCatalogTrack = (metadataRecord: Metadata) => {
   const CATALOG_ETHEREUM_ADDRESS = '0xc236541380fc0C2C05c2F2c6c52a21ED57c37952'.toLowerCase();
-  if (!track.metadata) {
-    throw new Error(`Track metadata missing for track ${track.id}`)
+  if (!metadataRecord.metadata) {
+    throw new Error(`Full metadata missing for record ${metadataRecord.id}`)
   }
-  if (!track.metadata.origin) {
+  if (!metadataRecord.metadata.origin) {
     return false;
   }
-  const signature = track.metadata.origin.signature;
-  const body = track.metadata.body;
+  const signature = metadataRecord.metadata.origin.signature;
+  const body = metadataRecord.metadata.body;
   return signature && body && recoverCatalogAddress(body, signature) === CATALOG_ETHEREUM_ADDRESS;
 }
 
-export const getZoraPlatform = (track: Track) => {
-  if (track.platformId !== MusicPlatform.zora) {
+export const getZoraPlatform = (metadata: Metadata) => {
+  if (metadata.platformId !== MusicPlatform.zora) {
     throw new Error('Bad track platform being processed')
   }
-  if (verifyCatalogTrack(track)) {
+  if (verifyCatalogTrack(metadata)) {
     return MusicPlatform.catalog;
   } else {
     return MusicPlatform.zoraRaw
   }
 }
 
-const getTokenIdFromTrack = (track: Track) => {
-  return track.id.split('/')[1];
+const getTokenIdFromMetadata = (metadata: Metadata) => {
+  return metadata.id.split('/')[1];
 }
 
 
-const mapTrackID = (trackId: string): string => {
-  const [contractAddress, nftId] = trackId.split('/');
+const mapTrackID = (metadataId: string): string => {
+  const [contractAddress, nftId] = metadataId.split('/');
   return `ethereum/${formatAddress(contractAddress)}/${nftId}`;
 };
 
@@ -53,27 +54,27 @@ const mapArtistID = (artistId: string): string => {
   return `ethereum/${formatAddress(artistId)}`;
 };
 
-const mapTrack = (trackItem: {
-  track: Track;
+const mapTrack = (item: {
+  metadata: Metadata;
   platformTrackResponse?: any;
 }): ProcessedTrack => ({
-  id: mapTrackID(trackItem.track.id),
-  platformInternalId: trackItem.platformTrackResponse.id,
-  title: trackItem.platformTrackResponse.title,
-  slug: slugify(`${trackItem.platformTrackResponse.title} ${trackItem.track.createdAtTime.getTime()}`).toLowerCase(),
-  description: trackItem.platformTrackResponse.description,
+  id: mapTrackID(item.metadata.id),
+  platformInternalId: item.platformTrackResponse.id,
+  title: item.platformTrackResponse.title,
+  slug: slugify(`${item.platformTrackResponse.title} ${item.metadata.createdAtTime.getTime()}`).toLowerCase(),
+  description: item.platformTrackResponse.description,
   platformId: MusicPlatform.catalog,
-  lossyAudioIPFSHash: trackItem.platformTrackResponse.ipfs_hash_lossy_audio,
-  lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${trackItem.platformTrackResponse.ipfs_hash_lossy_audio}`,
-  createdAtTime: trackItem.track.createdAtTime,
-  createdAtEthereumBlockNumber: trackItem.track.createdAtEthereumBlockNumber,
-  lossyArtworkIPFSHash: trackItem.platformTrackResponse.ipfs_hash_lossy_artwork,
-  lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${trackItem.platformTrackResponse.ipfs_hash_lossy_artwork}`,
+  lossyAudioIPFSHash: item.platformTrackResponse.ipfs_hash_lossy_audio,
+  lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${item.platformTrackResponse.ipfs_hash_lossy_audio}`,
+  createdAtTime: item.metadata.createdAtTime,
+  createdAtEthereumBlockNumber: item.metadata.createdAtEthereumBlockNumber,
+  lossyArtworkIPFSHash: item.platformTrackResponse.ipfs_hash_lossy_artwork,
+  lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${item.platformTrackResponse.ipfs_hash_lossy_artwork}`,
   websiteUrl:
-    trackItem.platformTrackResponse.artist.handle && trackItem.platformTrackResponse.short_url
-      ? `https://beta.catalog.works/${trackItem.platformTrackResponse.artist.handle}/${trackItem.platformTrackResponse.short_url}`
+  item.platformTrackResponse.artist.handle && item.platformTrackResponse.short_url
+      ? `https://beta.catalog.works/${item.platformTrackResponse.artist.handle}/${item.platformTrackResponse.short_url}`
       : 'https://beta.catalog.works',
-  artistId: mapArtistID(trackItem.platformTrackResponse.artist.id),
+  artistId: mapArtistID(item.platformTrackResponse.artist.id),
 });
 
 export const mapArtistProfile = (platformResponse: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
@@ -92,14 +93,14 @@ export const mapArtistProfile = (platformResponse: any, createdAtTime: Date, cre
   }
 };
 
-const addPlatformTrackData = async (tracks: Track[], client: CatalogClient) => {
-  const trackTokenIds = tracks.map(t => getTokenIdFromTrack(t));
+const addPlatformTrackData = async (metadatas: Metadata[], client: CatalogClient) => {
+  const trackTokenIds = metadatas.map(m => getTokenIdFromMetadata(m));
   const platformTracks = await client.fetchCatalogTracksByNFT(trackTokenIds);
   const platformTrackDataByTokenId = _.keyBy(platformTracks, 'nft_id');
-  const platformTrackData: { track: Track, platformTrackResponse: any }[]
-    = tracks.map(track => ({
-      track,
-      platformTrackResponse: platformTrackDataByTokenId[getTokenIdFromTrack(track)]
+  const platformTrackData: { metadata: Metadata, platformTrackResponse: any }[]
+    = metadatas.map(metadata => ({
+      metadata,
+      platformTrackResponse: platformTrackDataByTokenId[getTokenIdFromMetadata(metadata)]
     }));
   return platformTrackData;
 }

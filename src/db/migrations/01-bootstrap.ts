@@ -15,9 +15,25 @@ const INITIAL_TABLES = [
       table.string('contractAddress');
       table.string('platformId');
       table.foreign('platformId').references('id').inTable('platforms');
-      table.string('trackId');
-      table.foreign('trackId').references('id').inTable('tracks');
+      table.string('metadataId');
     }
+  },
+  {
+    name: 'metadatas', create: (table: Knex.CreateTableBuilder) => {
+      table.string('id').primary();
+      table.datetime('createdAtTime', { precision: 3 });
+      table.bigint('createdAtEthereumBlockNumber');
+      table.string('platformId');
+      table.foreign('platformId').references('id').inTable('platforms');
+      table.string('metadataIPFSHash');
+      table.string('tokenURI', 20000);
+      table.string('tokenMetadataURI', 20000);
+      table.json('metadata');
+      table.string('metadataError', 3000);
+      table.string('mimeType');
+      table.boolean('processed');
+      table.boolean('processError');
+    },
   },
   {
     name: 'artists', create: (table: Knex.CreateTableBuilder) => {
@@ -42,23 +58,6 @@ const INITIAL_TABLES = [
       table.foreign('platformId').references('id').inTable('platforms');
       table.primary(['artistId', 'platformId']);
     }
-  },
-  {
-    name: 'tracks', create: (table: Knex.CreateTableBuilder) => {
-      table.string('id').primary();
-      table.datetime('createdAtTime', { precision: 3 });
-      table.bigint('createdAtEthereumBlockNumber');
-      table.string('platformId');
-      table.foreign('platformId').references('id').inTable('platforms');
-      table.string('metadataIPFSHash');
-      table.string('tokenURI', 20000);
-      table.string('tokenMetadataURI', 20000);
-      table.json('metadata');
-      table.string('metadataError', 3000);
-      table.string('mimeType');
-      table.boolean('processed');
-      table.boolean('processError');
-    },
   },
   {
     name: 'processedTracks', create: (table: Knex.CreateTableBuilder) => {
@@ -108,7 +107,6 @@ export const up = async (knex: Knex) => {
   await knex.raw(`GRANT SELECT ON "artists" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`GRANT SELECT ON "artistProfiles" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`GRANT SELECT ON "processedTracks" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
-  await knex.raw(`comment on table tracks is '@omit';`);
   await knex.raw(`comment on table processors is '@omit';`);
   await knex.raw(`comment on table knex_migrations is '@omit';`);
   await knex.raw(`comment on table knex_migrations_lock is '@omit';`);

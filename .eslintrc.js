@@ -10,6 +10,7 @@ module.exports = {
     },
   },
   rules: {
+    'object-curly-spacing': ['error', 'always'],
     '@typescript-eslint/quotes': [
       'error',
       'single',

@@ -1,47 +1,48 @@
 import _ from 'lodash';
 
-import { unprocessedPlatformTracks } from '../../triggers/missing';
+import { unprocessedPlatformMetadatas } from '../../triggers/missing';
 import { ArtistProfile, mapArtist } from '../../types/artist';
+import { Metadata } from '../../types/metadata';
 import { MusicPlatform, platformConfig, PlatformMapper } from '../../types/platform';
 import { Clients, Processor } from '../../types/processor';
 import { Record, RecordUpdate } from '../../types/record';
-import { Track, ProcessedTrack, mergeProcessedTracks } from '../../types/track';
+import { ProcessedTrack, mergeProcessedTracks } from '../../types/track';
 
 type ImplementedMusicPlatform = MusicPlatform.catalog | MusicPlatform.sound | MusicPlatform.noizd;
 
 const name = 'processTracks';
 
 const processPlatformTrackData = (platformTrackData: {
-  track: Track;
+  metadata: Metadata;
   platformTrackResponse: unknown;
 }[], platformMapper: PlatformMapper) => {
   const { mapArtistProfile, mapTrack } = platformMapper;
 
-  const { processedTracks, trackUpdates } = platformTrackData.reduce<
-    { processedTracks: ProcessedTrack[], trackUpdates: RecordUpdate<Track>[] }>
+  const { processedTracks, metadataUpdates } = platformTrackData.reduce<
+    { processedTracks: ProcessedTrack[], metadataUpdates: RecordUpdate<Metadata>[] }>
     ((accum, item) => {
       if (item.platformTrackResponse) {
         const processedTrack = mapTrack(item)
         accum.processedTracks.push(processedTrack);
-        accum.trackUpdates.push({
-          id: item.track.id,
+        accum.metadataUpdates.push({
+          id: item.metadata.id,
           processed: true,
         });
       } else {
-        accum.trackUpdates.push({
-          id: item.track.id,
+        accum.metadataUpdates.push({
+          id: item.metadata.id,
           processed: true,
           processError: true,
         });
       }
       return accum;
     },
-      { processedTracks: [], trackUpdates: [] }
+      { processedTracks: [], metadataUpdates: [] }
     );
-  const artistProfiles = _.uniqBy(platformTrackData.reduce<ArtistProfile[]>((profiles, trackData) => {
-    if (trackData.platformTrackResponse) {
+  const artistProfiles = _.uniqBy(platformTrackData.reduce<ArtistProfile[]>((profiles, item) => {
+    if (item.platformTrackResponse) {
       const artistProfile = {
-        ...mapArtistProfile(trackData.platformTrackResponse, trackData.track.createdAtTime, trackData.track.createdAtEthereumBlockNumber),
+        ...mapArtistProfile(item.platformTrackResponse, item.metadata.createdAtTime, item.metadata.createdAtEthereumBlockNumber),
       } as ArtistProfile;
       profiles.push(artistProfile);
     }
@@ -49,22 +50,22 @@ const processPlatformTrackData = (platformTrackData: {
   }, []), 'artistId');
   const artists = artistProfiles.map(profile => mapArtist(profile));
   return {
-    processedTracks, trackUpdates, artists, artistProfiles,
+    processedTracks, metadataUpdates, artists, artistProfiles,
   };
 }
 
-const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => async (tracks: Track[], clients: Clients) => {
-  console.log(`Getting ${platformId} API tracks for ids: ${tracks.map(t => t.id)}`);
+const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => async (metadatas: Metadata[], clients: Clients) => {
+  console.log(`Getting ${platformId} API tracks for ids: ${metadatas.map(m => m.id)}`);
   const platformMapper = platformConfig[platformId].mappers;
   if (!platformMapper) {
     throw new Error(`Platform mapper for ${platformId} not found`);
   }
-  const platformTrackData = await platformMapper.addPlatformTrackData(tracks, clients[platformId]);
+  const platformTrackData = await platformMapper.addPlatformTrackData(metadatas, clients[platformId]);
 
-  const { processedTracks, trackUpdates, artists, artistProfiles } = processPlatformTrackData(platformTrackData, platformMapper);
+  const { processedTracks, metadataUpdates, artists, artistProfiles } = processPlatformTrackData(platformTrackData, platformMapper);
   const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(processedTracks, clients.db, true);
 
-  await clients.db.update('tracks', trackUpdates);
+  await clients.db.update('metadatas', metadataUpdates);
   if (oldIds) {
     await clients.db.delete('processedTracks', oldIds);
   }
@@ -76,7 +77,7 @@ const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => asy
 export const processPlatformTracks: (platformId: ImplementedMusicPlatform, limit?:number) => Processor =
   (platformId: ImplementedMusicPlatform, limit?: number) => ({
     name,
-    trigger: unprocessedPlatformTracks(platformId, limit),
+    trigger: unprocessedPlatformMetadatas(platformId, limit),
     processorFunction: processorFunction(platformId),
     initialCursor: undefined,
   });

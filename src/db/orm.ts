@@ -1,5 +1,5 @@
+import { Metadata } from '../types/metadata';
 import { Record, RecordUpdate } from '../types/record';
-import { Track } from '../types/track';
 
 export const toDBRecord = (record: Record | RecordUpdate<unknown>) => {
   if ((record as any).createdAtTime) {
@@ -14,9 +14,9 @@ export const toDBRecords = (records: (Record | RecordUpdate<unknown>)[]) => {
 }
 
 const recordMapper: any = {
-  tracks: (tracks: Record[]): Track[] => tracks.map((t: any) => {
-    const metadata = typeof t.metadata === 'object' ? t.metadata : JSON.parse(t.metadata);
-    return ({ ...t, metadata });
+  metadatas: (metadatas: Record[]): Metadata[] => metadatas.map((m: any) => {
+    const metadata = typeof m.metadata === 'object' ? m.metadata : JSON.parse(m.metadata);
+    return ({ ...m, metadata });
   })
 }
 

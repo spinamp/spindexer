@@ -40,9 +40,11 @@ export const runProcessors = async (processors: Processor[]) => {
     }
   }
 
-  const numberOfTracks = await dbClient.getNumberRecords('tracks');
+  const numberOfNFTs = await dbClient.getNumberRecords('nfts');
+  const numberOfMetadatas = await dbClient.getNumberRecords('metadatas');
   const numberOfProcessedTracks = await dbClient.getNumberRecords('processedTracks');
-  console.info(`DB has ${numberOfTracks} tracks`);
+  console.info(`DB has ${numberOfNFTs} nfts`);
+  console.info(`DB has ${numberOfMetadatas} metadatas`);
   console.info(`DB has ${numberOfProcessedTracks} processed tracks`);
   await dbClient.close();
   return false;

@@ -5,11 +5,12 @@ import { NOIZDAPITrack, NOIZDClient } from '../../clients/noizd';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { isGif, isMP4 } from '../media';
+import { Metadata } from '../metadata';
 import { MusicPlatform } from '../platform';
-import { ProcessedTrack, Track } from '../track';
+import { ProcessedTrack } from '../track';
 
-const mapTrackID = (trackId: string): string => {
-  const [contractAddress, nftId] = trackId.split('/');
+const mapTrackID = (metadataId: string): string => {
+  const [contractAddress, nftId] = metadataId.split('/');
   return `ethereum/${formatAddress(contractAddress)}/${nftId}`;
 };
 
@@ -72,36 +73,36 @@ const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any)
   }
 }
 
-const mapTrack = (trackItem: {
-  track: Track;
+const mapTrack = (item: {
+  metadata: Metadata;
   platformTrackResponse?: any;
 }): ProcessedTrack => {
-  const processedTrack = mapAPITrack(trackItem.platformTrackResponse);
-  if (!trackItem.track) {
+  const processedTrack = mapAPITrack(item.platformTrackResponse);
+  if (!item.metadata) {
     return processedTrack;
   }
   return {
     ...processedTrack,
-    id: mapTrackID(trackItem.track.id),
-    lossyAudioURL: trackItem.platformTrackResponse.metadata.audio_url,
-    createdAtTime: processedTrack.createdAtTime || trackItem.track.createdAtTime,
-    createdAtEthereumBlockNumber: trackItem.track.createdAtEthereumBlockNumber,
+    id: mapTrackID(item.metadata.id),
+    lossyAudioURL: item.platformTrackResponse.metadata.audio_url,
+    createdAtTime: processedTrack.createdAtTime || item.metadata.createdAtTime,
+    createdAtEthereumBlockNumber: item.metadata.createdAtEthereumBlockNumber,
   };
 };
 
-const getTokenIdFromTrack = (track: Track) => {
-  return track.id.split('/')[1];
+const getTokenIdFromMetadata = (metadata: Metadata) => {
+  return metadata.id.split('/')[1];
 }
 
-const addPlatformTrackData = async (tracks: Track[], client: NOIZDClient) => {
-  const trackTokenIds = tracks.map(t => getTokenIdFromTrack(t));
+const addPlatformTrackData = async (metadatas: Metadata[], client: NOIZDClient) => {
+  const trackTokenIds = metadatas.map(m => getTokenIdFromMetadata(m));
   const platformNFTs = await client.fetchNFTs(trackTokenIds);
   const platformTracks = platformNFTs.map(nft => ({ ...nft.music, metadata: nft.metadata }));
   const platformTrackByTokenId = _.keyBy(platformTracks, 'metadata.id');
-  const platformTrackData: { track: Track, platformTrackResponse: any }[]
-    = tracks.map(track => ({
-      track,
-      platformTrackResponse: platformTrackByTokenId[getTokenIdFromTrack(track)]
+  const platformTrackData: { metadata: Metadata, platformTrackResponse: any }[]
+    = metadatas.map(metadata => ({
+      metadata,
+      platformTrackResponse: platformTrackByTokenId[getTokenIdFromMetadata(metadata)]
     }));
   return platformTrackData;
 }

@@ -4,11 +4,12 @@ import slugify from 'slugify';
 import { SoundClient } from '../../clients/sound';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
+import { Metadata } from '../metadata';
 import { MusicPlatform } from '../platform';
-import { Track, ProcessedTrack } from '../track';
+import { ProcessedTrack } from '../track';
 
-const mapTrackID = (trackId: string): string => {
-  const [contractAddress, editionId] = trackId.split('/');
+const mapTrackID = (metadataId: string): string => {
+  const [contractAddress, editionId] = metadataId.split('/');
   return `ethereum/${formatAddress(contractAddress)}/${editionId}`;
 };
 
@@ -16,25 +17,25 @@ const mapArtistID = (artistId: string): string => {
   return `ethereum/${formatAddress(artistId)}`;
 };
 
-const mapTrack = (trackItem: {
-  track: Track;
+const mapTrack = (item: {
+  metadata: Metadata;
   platformTrackResponse: any;
 }): ProcessedTrack => ({
-  id: mapTrackID(trackItem.track.id),
-  platformInternalId: trackItem.platformTrackResponse.id,
-  title: trackItem.platformTrackResponse.title,
-  slug: slugify(`${trackItem.platformTrackResponse.title} ${trackItem.track.createdAtTime.getTime()}`).toLowerCase(),
-  description: trackItem.platformTrackResponse.description,
+  id: mapTrackID(item.metadata.id),
+  platformInternalId: item.platformTrackResponse.id,
+  title: item.platformTrackResponse.title,
+  slug: slugify(`${item.platformTrackResponse.title} ${item.metadata.createdAtTime.getTime()}`).toLowerCase(),
+  description: item.platformTrackResponse.description,
   platformId: MusicPlatform.sound,
-  lossyAudioURL: trackItem.platformTrackResponse.tracks[0].audio.url,
-  createdAtTime: trackItem.track.createdAtTime,
-  createdAtEthereumBlockNumber: trackItem.track.createdAtEthereumBlockNumber,
-  lossyArtworkURL: trackItem.platformTrackResponse.coverImage.url,
+  lossyAudioURL: item.platformTrackResponse.tracks[0].audio.url,
+  createdAtTime: item.metadata.createdAtTime,
+  createdAtEthereumBlockNumber: item.metadata.createdAtEthereumBlockNumber,
+  lossyArtworkURL: item.platformTrackResponse.coverImage.url,
   websiteUrl:
-    trackItem.platformTrackResponse.artist.soundHandle && trackItem.platformTrackResponse.titleSlug
-      ? `https://www.sound.xyz/${trackItem.platformTrackResponse.artist.soundHandle}/${trackItem.platformTrackResponse.titleSlug}`
+  item.platformTrackResponse.artist.soundHandle && item.platformTrackResponse.titleSlug
+      ? `https://www.sound.xyz/${item.platformTrackResponse.artist.soundHandle}/${item.platformTrackResponse.titleSlug}`
       : 'https://www.sound.xyz',
-  artistId: mapArtistID(trackItem.platformTrackResponse.artist.user.publicAddress),
+  artistId: mapArtistID(item.platformTrackResponse.artist.user.publicAddress),
 });
 
 export const mapArtistProfile = (platformResponse: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
@@ -53,14 +54,14 @@ export const mapArtistProfile = (platformResponse: any, createdAtTime: Date, cre
   }
 };
 
-const addPlatformTrackData = async (tracks: Track[], client: SoundClient) => {
-  const trackIds = tracks.map(t=>t.id);
+const addPlatformTrackData = async (metadatas: Metadata[], client: SoundClient) => {
+  const metadataIds = metadatas.map(m=>m.id);
   const platformTracks = await client.getAllMintedReleases();
-  const platformTracksWithTrackID = platformTracks.map(platformTrack => ({
+  const platformTracksWithMetadataId = platformTracks.map(platformTrack => ({
     ...platformTrack,
-    trackId: `${formatAddress(platformTrack?.artist?.contract?.address)}/${platformTrack?.mintInfo?.editionId}`,
-  })).filter(platformTrack=> trackIds.includes(platformTrack.trackId));
-  const platformTracksWithAudioPromises = platformTracksWithTrackID.map(async platformTrack => {
+    metadataId: `${formatAddress(platformTrack?.artist?.contract?.address)}/${platformTrack?.mintInfo?.editionId}`,
+  })).filter(platformTrack=> metadataIds.includes(platformTrack.trackId));
+  const platformTracksWithAudioPromises = platformTracksWithMetadataId.map(async platformTrack => {
     if(platformTrack.tracks.length > 1) {
       throw new Error('Sound release with multiple tracks not yet implemented');
     }
@@ -73,9 +74,9 @@ const addPlatformTrackData = async (tracks: Track[], client: SoundClient) => {
     };
   });
   const platformTracksWithAudio = await Promise.all(platformTracksWithAudioPromises);
-  const platformTrackDataByTrackId = _.keyBy(platformTracksWithAudio, 'trackId');
-  const platformTrackData: { track: Track, platformTrackResponse: any }[]
-    = tracks.map(track => ({ track, platformTrackResponse: platformTrackDataByTrackId[track.id] }));
+  const platformTrackDataByMetadataId = _.keyBy(platformTracksWithAudio, 'metadata');
+  const platformTrackData: { metadata: Metadata, platformTrackResponse: any }[]
+    = metadatas.map(metadata => ({ metadata, platformTrackResponse: platformTrackDataByMetadataId[metadata.id] }));
   return platformTrackData;
 }
 

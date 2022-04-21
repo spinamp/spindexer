@@ -8,7 +8,7 @@ export type NFT = Record & {
   contractAddress: string
   tokenId: BigInt
   platformId: MusicPlatform
-  trackId: string
+  metadataId: string
 }
 
 export const getNFTContractCalls = (nft: NFT) => {
@@ -26,20 +26,20 @@ export const getNFTContractCalls = (nft: NFT) => {
 // This code checks each record. A more efficient version could probably just
 // do a bulk query to check all at once. With that improvement, would also then
 // be better to make this function pure.
-export const filterNewTrackNFTs = async (nfts: NFT[], dbClient: DBClient) => {
-  let newTrackNFTs = [];
-  let newTrackIds: any = {};
+export const filterNewMetadatas = async (nfts: NFT[], dbClient: DBClient) => {
+  let newMetadatas = [];
+  let newMetadataIds: any = {};
   for (let i = 0; i < nfts.length; i++) {
     const nft = nfts[i];
-    if (!nft || !nft.trackId) {
+    if (!nft || !nft.metadataId) {
       console.error({ nft });
       throw new Error('Error processing NFT');
     }
-    const isExistingTrack = (await dbClient.recordExists('tracks', nft.trackId)) || newTrackIds[nft.trackId];
-    if (!isExistingTrack) {
-      newTrackIds[nft.trackId] = true;
-      newTrackNFTs.push(nft);
+    const isExistingMetadata = (await dbClient.recordExists('metadatas', nft.metadataId)) || newMetadataIds[nft.metadataId];
+    if (!isExistingMetadata) {
+      newMetadataIds[nft.metadataId] = true;
+      newMetadatas.push(nft);
     }
   }
-  return newTrackNFTs;
+  return newMetadatas;
 }

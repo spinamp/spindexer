@@ -9,7 +9,6 @@ import { DBClient, Wheres } from './db';
 import config from './knexfile';
 import { fromDBRecords, toDBRecord, toDBRecords } from './orm';
 
-
 const loadDB = async () => {
   const currentConfig = config[process.env.NODE_ENV]
   const initialConfig = { ...currentConfig, connection: { ...currentConfig.connection, database: 'postgres' } };

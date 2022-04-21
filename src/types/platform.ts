@@ -1,8 +1,9 @@
 import { ArtistProfile } from './artist';
+import { Metadata } from './metadata';
 import catalogMappers from './platforms/catalog';
 import noizdMappers from './platforms/noizd';
 import soundMappers from './platforms/sound';
-import { Track, ProcessedTrack } from './track';
+import { ProcessedTrack } from './track';
 
 export enum MusicPlatform {
   sound = 'sound',
@@ -23,12 +24,12 @@ export const INITIAL_PLATFORM_ENUMS = [
 ]
 
 export type PlatformMapper = {
-  addPlatformTrackData: (tracks: Track[], client: any) => Promise<{
-    track: Track;
+  addPlatformTrackData: (metadatas: Metadata[], client: any) => Promise<{
+    metadata: Metadata;
     platformTrackResponse: unknown;
   }[]>;
-  mapTrack: (trackItem: {
-    track: Track;
+  mapTrack: (item: {
+    metadata: Metadata;
     platformTrackResponse: unknown;
   }) => ProcessedTrack;
   mapAPITrack?: (trackItem: unknown) => ProcessedTrack;

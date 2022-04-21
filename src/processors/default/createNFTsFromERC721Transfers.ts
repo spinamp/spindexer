@@ -8,12 +8,10 @@ import { NFT } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';
 
-import { createTracksFromNFTs } from './createTracksFromNFTs';
-
-const NAME = 'createTracksFromERC721Transfers';
+const NAME = 'createNFTsFromERC721Transfers';
 
 const processorFunction = (contract: ERC721Contract, name: string) =>
-  async ({newCursor, items}: {newCursor: Cursor, items: ethers.Event[]}, clients: Clients) => {
+  async ({ newCursor, items }: {newCursor: Cursor, items: ethers.Event[]}, clients: Clients) => {
     const newMints = items.filter(transfer => {
       return transfer.args!.from === ETHEREUM_NULL_ADDRESS;
     })
@@ -34,19 +32,14 @@ const processorFunction = (contract: ERC721Contract, name: string) =>
         contractAddress: formatAddress(contract.address),
         tokenId,
         platformId: contract.platform,
-        trackId: contract.buildTrackId(contract.address, tokenId)
+        metadataId: contract.buildNFTMetadataId(contract.address, tokenId)
       };
     });
-    const newTracks = await createTracksFromNFTs(newNFTs, clients.db, clients.eth);
-    const unburnedTracks = newTracks.filter(t=>t.tokenURI);
-    const unburnedTracksById = _.keyBy(unburnedTracks, 'id');
-    const unburnedNFTs = newNFTs.filter(nft => unburnedTracksById[nft.trackId]);
-    await clients.db.insert('tracks', unburnedTracks);
-    await clients.db.insert('nfts', unburnedNFTs);
+    await clients.db.insert('nfts', newNFTs);
     await clients.db.updateProcessor(name, newCursor);
   };
 
-export const createTracksFromERC721TransfersProcessor: (contract: ERC721Contract) => Processor = (contract: ERC721Contract) => ({
+export const createNFTsFromERC721TransfersProcessor: (contract: ERC721Contract) => Processor = (contract: ERC721Contract) => ({
   name: `${NAME}_${contract.address}`,
   trigger: newERC721Transfers(contract),
   processorFunction: processorFunction(contract, `${NAME}_${contract.address}`),
