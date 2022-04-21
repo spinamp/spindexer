@@ -1,11 +1,13 @@
 import { BigNumber, ethers } from 'ethers';
 import _ from 'lodash';
+
 import { newERC721Transfers } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
 import { buildERC721Id, ERC721Contract, ETHEREUM_NULL_ADDRESS } from '../../types/ethereum';
 import { NFT } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';
+
 import { createTracksFromNFTs } from './createTracksFromNFTs';
 
 const NAME = 'createTracksFromERC721Transfers';

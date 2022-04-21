@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import './types/env';
 import http from 'http';
+
 import postgraphile from 'postgraphile';
 
 const DATABASE_URL = `postgresql://${process.env.POSTGRES_USERNAME_OPEN}:${process.env.POSTGRES_PASSWORD_OPEN}@${process.env.POSTGRES_HOST}:5432/${process.env.POSTGRES_DATABASE}${process.env.NODE_ENV === 'production'? '?ssl=true' : ''}`;

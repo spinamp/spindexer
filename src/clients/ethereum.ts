@@ -1,12 +1,13 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract, Provider } from 'ethcall';
 import { BigNumber, ethers } from 'ethers';
+
 import MetaABI from '../abis/MetaABI.json';
 import { rollPromises } from '../utils/rollingPromises';
 
 export enum ValidContractCallFunction {
-  tokenURI = "tokenURI",
-  tokenMetadataURI = "tokenMetadataURI"
+  tokenURI = 'tokenURI',
+  tokenMetadataURI = 'tokenMetadataURI'
 }
 
 export type EthCall = {

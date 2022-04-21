@@ -1,11 +1,14 @@
 import knex, { Knex } from 'knex';
-import { DBClient, Wheres } from './db';
-import { Record } from '../types/record';
 import _ from 'lodash';
+
+import { Record } from '../types/record';
+import { RecordUpdate } from '../types/record';
 import { Cursor } from '../types/trigger';
+
+import { DBClient, Wheres } from './db';
 import config from './knexfile';
 import { fromDBRecords, toDBRecord, toDBRecords } from './orm';
-import { RecordUpdate } from '../types/record';
+
 
 const loadDB = async () => {
   const currentConfig = config[process.env.NODE_ENV]

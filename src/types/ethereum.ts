@@ -1,6 +1,7 @@
-import { ValidContractCallFunction } from "../clients/ethereum"
-import { formatAddress } from "./address"
-import { MusicPlatform } from "./platform"
+import { ValidContractCallFunction } from '../clients/ethereum'
+
+import { formatAddress } from './address'
+import { MusicPlatform } from './platform'
 
 export const ETHEREUM_NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 

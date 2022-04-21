@@ -1,12 +1,14 @@
-import { Axios } from "axios";
-import { CatalogClient } from "../clients/catalog";
-import { EthClient } from "../clients/ethereum";
-import { IPFSClient } from "../clients/ipfs";
-import { SoundClient } from "../clients/sound";
-import { NOIZDClient } from "../clients/noizd";
-import { SubgraphClient } from "../clients/subgraph";
-import { DBClient } from "../db/db";
-import { Cursor, Trigger } from "./trigger";
+import { Axios } from 'axios';
+
+import { CatalogClient } from '../clients/catalog';
+import { EthClient } from '../clients/ethereum';
+import { IPFSClient } from '../clients/ipfs';
+import { NOIZDClient } from '../clients/noizd';
+import { SoundClient } from '../clients/sound';
+import { SubgraphClient } from '../clients/subgraph';
+import { DBClient } from '../db/db';
+
+import { Cursor, Trigger } from './trigger';
 
 export type Clients = {
   eth: EthClient,

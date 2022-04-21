@@ -1,4 +1,5 @@
 import { DBClient } from '../db/db';
+
 import { CONTRACT_TYPES_BY_ADDRESS, NFTContractTypes } from './ethereum';
 import { MusicPlatform, platformConfig } from './platform';
 import { Record } from './record';

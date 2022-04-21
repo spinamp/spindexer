@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import '../src/types/env';
 import knex from 'knex';
+
 import config from '../src/db/knexfile';
 
 const bootstrapDB = async () => {

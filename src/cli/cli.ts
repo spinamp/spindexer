@@ -1,12 +1,14 @@
 import 'dotenv/config';
-import yargs from 'yargs/yargs';
-import { hideBin } from 'yargs/helpers';
-import { DBClient } from '../db/db';
-import { getMetadataURL, ProcessedTrack, Track } from '../types/track';
-import prompt from 'prompt';
 import _ from 'lodash';
+import prompt from 'prompt';
+import { hideBin } from 'yargs/helpers';
+import yargs from 'yargs/yargs';
+
+import { DBClient } from '../db/db';
 import { MusicPlatform, platformConfig } from '../types/platform';
 import { verifyCatalogTrack } from '../types/platforms/catalog';
+import { getMetadataURL, ProcessedTrack, Track } from '../types/track';
+
 
 const logMetadataDups = async (dbClient: DBClient) => {
   const { db, indexes } = await dbClient.getFullDB();

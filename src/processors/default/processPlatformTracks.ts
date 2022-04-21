@@ -1,9 +1,10 @@
 import _ from 'lodash';
+
 import { unprocessedPlatformTracks } from '../../triggers/missing';
 import { ArtistProfile, mapArtist } from '../../types/artist';
-import { Record, RecordUpdate } from '../../types/record';
 import { MusicPlatform, platformConfig, PlatformMapper } from '../../types/platform';
 import { Clients, Processor } from '../../types/processor';
+import { Record, RecordUpdate } from '../../types/record';
 import { Track, ProcessedTrack, mergeProcessedTracks } from '../../types/track';
 
 type ImplementedMusicPlatform = MusicPlatform.catalog | MusicPlatform.sound | MusicPlatform.noizd;

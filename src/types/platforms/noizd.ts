@@ -1,11 +1,12 @@
-import _ from "lodash";
-import { NOIZDAPITrack, NOIZDClient } from "../../clients/noizd";
-import { formatAddress } from "../address";
-import { MusicPlatform } from "../platform";
-import { ProcessedTrack, Track } from "../track";
+import _ from 'lodash';
+import slugify from 'slugify';
+
+import { NOIZDAPITrack, NOIZDClient } from '../../clients/noizd';
+import { formatAddress } from '../address';
+import { ArtistProfile } from '../artist';
 import { isGif, isMP4 } from '../media';
-import { ArtistProfile } from "../artist";
-import slugify from "slugify";
+import { MusicPlatform } from '../platform';
+import { ProcessedTrack, Track } from '../track';
 
 const mapTrackID = (trackId: string): string => {
   const [contractAddress, nftId] = trackId.split('/');

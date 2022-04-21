@@ -1,12 +1,12 @@
-import db from './db/sql-db';
-import subgraph from './clients/subgraph';
-import ethereum from './clients/ethereum';
 import axios from './clients/axios';
-import ipfs from './clients/ipfs';
 import catalog from './clients/catalog';
+import ethereum from './clients/ethereum';
+import ipfs from './clients/ipfs';
 import noizd from './clients/noizd';
-import { Clients, Processor } from './types/processor';
 import sound from './clients/sound';
+import subgraph from './clients/subgraph';
+import db from './db/sql-db';
+import { Clients, Processor } from './types/processor';
 
 export const runProcessors = async (processors: Processor[]) => {
   const dbClient = await db.init();

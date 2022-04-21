@@ -1,10 +1,11 @@
-import _ from "lodash";
-import slugify from "slugify";
-import { SoundClient } from "../../clients/sound";
-import { formatAddress } from "../address";
-import { ArtistProfile } from "../artist";
-import { MusicPlatform } from "../platform";
-import { Track, ProcessedTrack } from "../track";
+import _ from 'lodash';
+import slugify from 'slugify';
+
+import { SoundClient } from '../../clients/sound';
+import { formatAddress } from '../address';
+import { ArtistProfile } from '../artist';
+import { MusicPlatform } from '../platform';
+import { Track, ProcessedTrack } from '../track';
 
 const mapTrackID = (trackId: string): string => {
   const [contractAddress, editionId] = trackId.split('/');

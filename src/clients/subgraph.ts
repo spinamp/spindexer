@@ -1,4 +1,5 @@
 import { request, gql } from 'graphql-request'
+
 import { MusicPlatform } from '../types/platform';
 
 export type SubgraphClient = {

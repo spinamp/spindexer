@@ -1,9 +1,10 @@
 import _ from 'lodash';
+
 import { newPlatformTracks } from '../../triggers/newPlatformTracks';
 import { mapArtist } from '../../types/artist';
 import { MusicPlatform, platformConfig } from '../../types/platform';
-import { Record } from '../../types/record';
 import { Clients, Processor } from '../../types/processor';
+import { Record } from '../../types/record';
 import { mergeProcessedTracks } from '../../types/track';
 
 const NAME = 'createProcessedTracksFromAPI';

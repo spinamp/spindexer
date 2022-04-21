@@ -1,4 +1,4 @@
-import axios, { Axios, AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 
 const isRetryable = (error: AxiosError) => {
   return !!(
@@ -18,7 +18,7 @@ const wait = (time: number) => {
   );
 }
 
-const retry = (axios: Axios, error: AxiosError) => {
+const retry = (error: AxiosError) => {
   if (!error.config) {
     throw error
   } else {
@@ -34,7 +34,7 @@ const init = async () => {
         return Promise.reject(error);
       }
       await wait(seconds);
-      return retry(axios, error);
+      return retry(error);
     } else {
       return Promise.reject(error);
     }

@@ -48,9 +48,9 @@ export const getTracksFrom = async (cursor: string): Promise<NOIZDAPITrack[]> =>
     params: {
       $order: '[["created", "ASC"]]',
       $where: {
-        '$artist.approved_artist$': { "$eq": true },
-        'hidden': { "$eq": false },
-        created: { "$gt": createdUTC }
+        '$artist.approved_artist$': { '$eq': true },
+        'hidden': { '$eq': false },
+        created: { '$gt': createdUTC }
       },
       hidden: false,
       $limit: 20,

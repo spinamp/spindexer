@@ -1,8 +1,10 @@
-import _ from "lodash";
-import slugify from "slugify";
-import { DBClient } from "../db/db";
-import { MusicPlatform } from "./platform";
-import { Record, TimeField } from "./record"
+import _ from 'lodash';
+import slugify from 'slugify';
+
+import { DBClient } from '../db/db';
+
+import { MusicPlatform } from './platform';
+import { Record, TimeField } from './record'
 
 export type Artist = Record & {
   name: string;

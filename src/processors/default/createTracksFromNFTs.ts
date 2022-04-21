@@ -1,4 +1,5 @@
 import _ from 'lodash';
+
 import { EthClient, ValidContractCallFunction } from '../../clients/ethereum';
 import { SubgraphNFT } from '../../clients/subgraph';
 import { DBClient } from '../../db/db';

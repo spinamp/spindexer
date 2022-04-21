@@ -89,12 +89,12 @@ const INITIAL_TABLES = [
 ];
 
 const INITIAL_PLATFORM_ENUMS = [
-  { id: "sound" },
-  { id: "zora" },
-  { id: "noizd" },
-  { id: "catalog" },
-  { id: "zoraRaw" },
-  { id: "other" }
+  { id: 'sound' },
+  { id: 'zora' },
+  { id: 'noizd' },
+  { id: 'catalog' },
+  { id: 'zoraRaw' },
+  { id: 'other' }
 ]
 
 export const up = async (knex: Knex) => {

@@ -1,6 +1,5 @@
 module.exports = {
   root: true,
-  extends: '@react-native-community',
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'import'],
   settings: {
@@ -11,6 +10,14 @@ module.exports = {
     },
   },
   rules: {
+    '@typescript-eslint/quotes': [
+      'error',
+      'single',
+      {
+        'avoidEscape': true,
+        'allowTemplateLiterals': true
+      }
+    ],
     'import/order': [
       'error',
       {

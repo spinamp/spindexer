@@ -2,9 +2,10 @@
 // It should no longer be in use, though is being kept until
 // the migration is 100% completed.
 
+const _ = require('lodash');
+
 const orig = require('../../app/src/db/preloadedData/preloadedData.json');
 const neww = require('../localdb/db.json');
-const _ = require('lodash');
 
 const origTracks = orig.tracks.items; // map
 const origArtists = orig.artists.items; // map

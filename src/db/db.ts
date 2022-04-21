@@ -1,5 +1,5 @@
-import { Cursor } from "../types/trigger"
-import { Record, RecordUpdate } from "../types/record"
+import { Record, RecordUpdate } from '../types/record'
+import { Cursor } from '../types/trigger'
 
 export type WhereFunc = 'where'
   | 'whereNull'

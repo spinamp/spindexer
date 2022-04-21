@@ -1,11 +1,12 @@
-import { MusicPlatform } from '../platform';
-import { ProcessedTrack, Track } from '../track';
 import { toUtf8Bytes, verifyMessage } from 'ethers/lib/utils';
-import { formatAddress } from '../address';
-import { ArtistProfile } from '../artist';
-import { CatalogClient } from '../../clients/catalog';
 import _ from 'lodash';
 import slugify from 'slugify';
+
+import { CatalogClient } from '../../clients/catalog';
+import { formatAddress } from '../address';
+import { ArtistProfile } from '../artist';
+import { MusicPlatform } from '../platform';
+import { ProcessedTrack, Track } from '../track';
 
 export const recoverCatalogAddress = (body: any, signature: string) => {
   const bodyString = JSON.stringify(body);

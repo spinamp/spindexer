@@ -1,9 +1,10 @@
+import { Axios, AxiosResponse, AxiosError } from 'axios';
+
+import { IPFSClient } from '../../clients/ipfs';
+import { DBClient } from '../../db/db';
 import { missingTrackMetadata } from '../../triggers/missing';
 import { Clients, Processor } from '../../types/processor';
 import { getMetadataURL, Track } from '../../types/track';
-import { Axios, AxiosResponse, AxiosError } from 'axios';
-import { DBClient } from '../../db/db';
-import { IPFSClient } from '../../clients/ipfs';
 
 const name = 'addTrackMetadata';
 

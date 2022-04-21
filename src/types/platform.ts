@@ -1,25 +1,25 @@
-import { ArtistProfile } from "./artist";
+import { ArtistProfile } from './artist';
 import catalogMappers from './platforms/catalog';
-import soundMappers from './platforms/sound';
 import noizdMappers from './platforms/noizd';
-import { Track, ProcessedTrack } from "./track";
+import soundMappers from './platforms/sound';
+import { Track, ProcessedTrack } from './track';
 
 export enum MusicPlatform {
-  sound = "sound",
-  zora = "zora",
-  noizd = "noizd",
-  catalog = "catalog",
-  zoraRaw = "zoraRaw",
-  other = "other"
+  sound = 'sound',
+  zora = 'zora',
+  noizd = 'noizd',
+  catalog = 'catalog',
+  zoraRaw = 'zoraRaw',
+  other = 'other'
 }
 
 export const INITIAL_PLATFORM_ENUMS = [
-  "sound",
-  "zora",
-  "noizd",
-  "catalog",
-  "zoraRaw",
-  "other"
+  'sound',
+  'zora',
+  'noizd',
+  'catalog',
+  'zoraRaw',
+  'other'
 ]
 
 export type PlatformMapper = {
