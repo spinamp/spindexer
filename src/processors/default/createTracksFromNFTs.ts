@@ -29,7 +29,6 @@ export const createTracksFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethC
     return callIndexes;
   });
   const callResults = await ethClient.call(flatContractCalls);
-  console.log({callResults})
   const newTracks = newTrackNFTs.map((nft, index) => {
     console.info(`Processing nft for track ${nft.trackId}`);
     const track: Track = {
