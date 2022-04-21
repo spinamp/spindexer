@@ -2,6 +2,7 @@ import _ from "lodash";
 import { ValidContractCallFunction } from "../clients/ethereum";
 import { extractHashFromURL } from "../clients/ipfs";
 import { DBClient } from "../db/db";
+import { CONTRACT_TYPES_BY_ADDRESS, NFTContractTypes } from "./ethereum";
 import { MusicPlatform, platformConfig } from "./platform"
 import { Record } from "./record"
 
@@ -36,9 +37,11 @@ export type Track = Record & {
 }
 
 export const getMetadataURL = (track: Track): (string | null | undefined) => {
-  const metadataField = platformConfig[track.platformId].contractMetadataField;
-  const metadataURL = track[metadataField];
-  return metadataURL;
+  if(track.platformId === 'zora') {
+    return track.tokenMetadataURI
+  } else {
+    return track.tokenURI
+  };
 }
 
 export const getMetadataIPFSHash = (track: Track): (string | null | undefined) => {

@@ -50,11 +50,11 @@ export const runProcessors = async (processors: Processor[]) => {
 
 const runProcessor = async (processor: Processor, clients: Clients) => {
   const cursor = await clients.db.getCursor(processor.name) || processor.initialCursor;
-  const newTriggerItems = await processor.trigger(clients, cursor);
-  if (newTriggerItems.length === 0) {
+  const triggerOutput = await processor.trigger(clients, cursor);
+  if (Array.isArray(triggerOutput) && triggerOutput.length === 0) {
     return true;
   }
   console.info(`Running ${processor.name} processor.`)
-  await processor.processorFunction(newTriggerItems, clients);
+  await processor.processorFunction(triggerOutput, clients);
   return false;
 }

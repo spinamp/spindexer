@@ -8,4 +8,11 @@ type GetIfCursor<T> =
   T extends Cursor ? Cursor
   : undefined
 
-export type Trigger<_, OptionalCursor> = (clients: Clients, cursor: GetIfCursor<OptionalCursor>) => Promise<any[]>;
+type TriggerOutputItems = any[];
+
+export type TriggerOutput = TriggerOutputItems | {
+  items: TriggerOutputItems
+  newCursor: Cursor
+}
+
+export type Trigger<_, OptionalCursor> = (clients: Clients, cursor: GetIfCursor<OptionalCursor>) => Promise<TriggerOutput>;

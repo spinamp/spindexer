@@ -22,6 +22,6 @@ export type Clients = {
 export type Processor = {
   name: string,
   trigger: Trigger<Clients, Cursor | undefined>,
-  processorFunction: (newTriggerItems: any[], clients: Clients) => Promise<void>;
+  processorFunction: (newTriggerItems: any, clients: Clients) => Promise<void>;
   initialCursor: Cursor | undefined;
 };
