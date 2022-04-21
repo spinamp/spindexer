@@ -9,7 +9,7 @@ export const zoraMetadatas: Trigger<Clients, undefined> = async (clients: Client
       ['and'],
       ['whereNotNull', ['metadata']],
       ['and'],
-      ['whereNotNull', ['metadataError']],
+      ['whereNull', ['metadataError']],
     ]
   )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return metadatas;

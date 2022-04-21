@@ -82,6 +82,10 @@ const init = async (): Promise<DBClient> => {
       return count[0].count;
     },
     getRecords: getRecordsFunc(db),
+    rawSQL: async (raw: string) => {
+      console.log(`Querying for ${raw}`);
+      return await db.raw(raw);
+    },
     update: async (tableName: string, recordUpdates: RecordUpdate<unknown>[], idField: string = 'id') => {
       console.log(`Updating records`);
       if (recordUpdates?.length > 0) {

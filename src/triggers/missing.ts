@@ -1,3 +1,6 @@
+import knex from 'knex';
+
+import { getNFTContractCalls } from '../types/nft';
 import { MusicPlatform } from '../types/platform';
 import { Clients } from '../types/processor';
 import { Trigger } from '../types/trigger';
@@ -43,10 +46,8 @@ export const unprocessedPlatformMetadatas: (platformId: MusicPlatform, limit?: n
 // We query for all NFTs which do not have a corresponding record in the metadata table
 // matching their metadataId
 export const unprocessedNFTs: Trigger<Clients, undefined> = async (clients: Clients) => {
-  const nfts = (await clients.db.getRecords('nfts',
-    [
-      ['whereNull', ['processed']],
-    ]
-  )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+  const nfts = (await clients.db.rawSQL(
+    `select n.* from nfts n left outer join metadatas m on n."metadataId"=m.id where m.id is null;`
+  )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return nfts;
 };

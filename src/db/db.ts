@@ -27,6 +27,7 @@ export type DBClient = {
   delete: (tableName: string, ids: string[], idField?: string) => Promise<void>;
   updateProcessor: (processor: string, lastCursor: Cursor) => Promise<void>;
   getNumberRecords: (tableName: string) => Promise<any>;
+  rawSQL: (raw: string) => Promise<any>;
   recordExists: (tableName: string, recordID: string) => Promise<boolean>;
   getFullDB?: () => Promise<any>;
   close: () => Promise<void>;
