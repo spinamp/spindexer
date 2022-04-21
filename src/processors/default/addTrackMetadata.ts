@@ -6,7 +6,6 @@ import { DBClient } from '../../db/db';
 import { IPFSClient } from '../../clients/ipfs';
 
 const name = 'addTrackMetadata';
-const MAX_CONCURRENT_REQUESTS = 40;
 
 const getMetadataForTrack = (track: Track, timeout: number, axios: Axios, ipfs: IPFSClient): any => {
   const metadataURL = getMetadataURL(track);
@@ -44,7 +43,7 @@ const processorFunction = async (batch: Track[], clients: Clients) => {
       if (activeRequests === 0 && count === batch.length) {
         resolve(true);
       } else {
-        while (activeRequests < MAX_CONCURRENT_REQUESTS && count < batch.length) {
+        while (activeRequests < parseInt(process.env.MAX_CONCURRENT_ROLLING_REQUESTS!) && count < batch.length) {
           const track = batch[count];
           console.info(`Processing track ${count} with id ${track.id}`);
           getMetadataForTrack(track, parseInt(process.env.METADATA_REQUEST_TIMEOUT!), clients.axios, clients.ipfs).then((response: AxiosResponse) => {

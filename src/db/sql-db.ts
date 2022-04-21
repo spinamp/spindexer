@@ -48,7 +48,7 @@ const init = async (): Promise<DBClient> => {
   const db = await loadDB();
   return ({
     getCursor: async (processor: string): Promise<(string | undefined)> => {
-      console.log(`Querying for processor cursor`);
+      console.log(`Querying for processor cursor for ${processor}`);
       const cursorResult = await db('processors').where('id', processor).select('cursor');
       return cursorResult[0]?.cursor;
     },

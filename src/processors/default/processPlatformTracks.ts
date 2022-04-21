@@ -3,7 +3,7 @@ import { unprocessedPlatformTracks } from '../../triggers/missing';
 import { ArtistProfile, mapArtist } from '../../types/artist';
 import { Record, RecordUpdate } from '../../types/record';
 import { MusicPlatform, platformConfig, PlatformMapper } from '../../types/platform';
-import { Clients } from '../../types/processor';
+import { Clients, Processor } from '../../types/processor';
 import { Track, ProcessedTrack, mergeProcessedTracks } from '../../types/track';
 
 type ImplementedMusicPlatform = MusicPlatform.catalog | MusicPlatform.sound | MusicPlatform.noizd;
@@ -72,9 +72,10 @@ const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => asy
   await clients.db.upsert('processedTracks', mergedProcessedTracks);
 };
 
-export const processPlatformTracks = (platformId: ImplementedMusicPlatform, limit?: number) => ({
-  name,
-  trigger: unprocessedPlatformTracks(platformId, limit),
-  processorFunction: processorFunction(platformId),
-  initialCursor: undefined,
-});
+export const processPlatformTracks: (platformId: ImplementedMusicPlatform, limit?:number) => Processor =
+  (platformId: ImplementedMusicPlatform, limit?: number) => ({
+    name,
+    trigger: unprocessedPlatformTracks(platformId, limit),
+    processorFunction: processorFunction(platformId),
+    initialCursor: undefined,
+  });

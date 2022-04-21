@@ -5,13 +5,16 @@ import { addTrackMetadataIPFSHash } from './processors/default/addTrackMetadataI
 import { categorizeZora } from './processors/default/categorizeZora';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
 import { createTracksFromNFTsProcessor } from './processors/default/createTracksFromNFTs';
+import { createTracksFromERC721TransfersProcessor } from './processors/default/createTracksFromERC721Transfers';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
 import { stripNonAudio } from './processors/default/stripNonAudio';
 import { runProcessors } from './runner';
 import { MusicPlatform } from './types/platform';
+import { NewCatalogContract } from './types/ethereum';
 
 const PROCESSORS = [
   createTracksFromNFTsProcessor,
+  createTracksFromERC721TransfersProcessor(NewCatalogContract),
   addTrackMetadataIPFSHash,
   addTrackMetadata,
   stripNonAudio,
