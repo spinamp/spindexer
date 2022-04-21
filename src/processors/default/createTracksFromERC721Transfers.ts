@@ -36,14 +36,12 @@ const processorFunction = (contract: ERC721Contract, name: string) =>
       };
     });
     const newTracks = await createTracksFromNFTs(newNFTs, clients.db, clients.eth);
-    const unburnedTracks = newTracks.filter(t=>t.tokenURI)
-    console.log({unburnedTracks})
-    console.log({newNFTs})
-    console.log({name, newCursor})
-    process.exit(0);
-    // await clients.db.insert('tracks', unburnedTracks);
-    // await clients.db.insert('nfts', newNFTs);
-    // await clients.db.updateProcessor(name, newCursor);
+    const unburnedTracks = newTracks.filter(t=>t.tokenURI);
+    const unburnedTracksById = _.keyBy(unburnedTracks, 'id');
+    const unburnedNFTs = newNFTs.filter(nft => unburnedTracksById[nft.trackId]);
+    await clients.db.insert('tracks', unburnedTracks);
+    await clients.db.insert('nfts', unburnedNFTs);
+    await clients.db.updateProcessor(name, newCursor);
   };
 
 export const createTracksFromERC721TransfersProcessor: (contract: ERC721Contract) => Processor = (contract: ERC721Contract) => ({

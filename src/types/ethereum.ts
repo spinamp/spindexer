@@ -41,7 +41,7 @@ export const NewCatalogContract:ERC721Contract = {
 };
 
 export const CONTRACT_TYPES_BY_ADDRESS = {
-  '0xbfeec0dc1fdf46dcb66b7150f6ae8fffdd2725f2': 'zora'
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7': 'zora'
 };
 
 export function buildERC721Id(contractAddress: string, tokenId: BigInt): string {
