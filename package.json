@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
+    "lint": "npx eslint . --fix",
     "start": "NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem ts-node src/index.ts",
     "cli": "ts-node src/cli/cli.ts",
     "build": "tsc",

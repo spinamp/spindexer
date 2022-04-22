@@ -1,8 +1,8 @@
 import { Clients } from '../types/processor';
 import { Trigger } from '../types/trigger';
 
-export const nonAudioTracks: Trigger<Clients, undefined> = async (clients: Clients) => {
-  const tracks = (await clients.db.getRecords('tracks',
+export const nonAudioMetadata: Trigger<Clients, undefined> = async (clients: Clients) => {
+  const metadatas = (await clients.db.getRecords('metadatas',
     [
       [
         'whereIn', ['mimeType',
@@ -27,5 +27,5 @@ export const nonAudioTracks: Trigger<Clients, undefined> = async (clients: Clien
         ]
       ]]
   )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
-  return tracks;
+  return metadatas;
 };

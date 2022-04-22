@@ -6,6 +6,9 @@ export type RollOutput<OutputType, ErrorType> = {
 
 type PromiseCreator<InputType, OutputType> = (input: InputType) => Promise<OutputType>;
 
+// This function effectively gets a batch of promises to process. It then sets up a buffer
+// of concurrent promise requests and flushes those requests through until all promises have
+// been resolved or errored.
 export async function rollPromises <InputType, OutputType, ErrorType>
 (promiseInputs: InputType[], promiseCreator: PromiseCreator<InputType, OutputType>): Promise<RollOutput<OutputType, ErrorType>[]> {
     let activeRequests = 0;

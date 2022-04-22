@@ -1,18 +1,18 @@
-import { zoraRawWithMetadata } from '../../triggers/zora';
+import { zoraMetadatas } from '../../triggers/zora';
+import { Metadata } from '../../types/metadata';
 import { getZoraPlatform } from '../../types/platforms/catalog';
 import { Clients, Processor } from '../../types/processor';
-import { Track } from '../../types/track';
 
 export const categorizeZora: Processor = {
   name: 'categorizeZora',
-  trigger: zoraRawWithMetadata,
-  processorFunction: async (tracks: Track[], clients: Clients) => {
-    console.log(`Processing updates for tracks with: ${tracks.map(t => t.platformId)}`);
-    const trackUpdates = tracks.map((t: Track) => ({
-      id: t.id,
-      platformId: getZoraPlatform(t),
+  trigger: zoraMetadatas,
+  processorFunction: async (metadatas: Metadata[], clients: Clients) => {
+    console.log(`Processing updates for metadatas with platforms: ${metadatas.map(m => m.platformId)}`);
+    const metadataUpdates = metadatas.map((m: Metadata) => ({
+      id: m.id,
+      platformId: getZoraPlatform(m),
     }));
-    await clients.db.update('tracks', trackUpdates);
+    await clients.db.update('metadatas', metadataUpdates);
     console.log('Updated');
   },
   initialCursor: undefined
