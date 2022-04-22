@@ -1,6 +1,3 @@
-import knex from 'knex';
-
-import { getNFTContractCalls } from '../types/nft';
 import { MusicPlatform } from '../types/platform';
 import { Clients } from '../types/processor';
 import { Trigger } from '../types/trigger';

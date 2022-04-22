@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { newERC721Transfers } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
-import { buildERC721Id, ERC721Contract, ETHEREUM_NULL_ADDRESS } from '../../types/ethereum';
+import { buildERC721Id, ERC721Contract, ETHEREUM_NULL_ADDRESS, NFTContractTypes } from '../../types/ethereum';
 import { NFT } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';
@@ -12,6 +12,8 @@ const NAME = 'createNFTsFromERC721Transfers';
 
 const processorFunction = (contract: ERC721Contract, name: string) =>
   async ({ newCursor, items }: {newCursor: Cursor, items: ethers.Event[]}, clients: Clients) => {
+    const contractTypeName = contract.contractType;
+    const contractType = NFTContractTypes[contractTypeName];
     const newMints = items.filter(transfer => {
       return transfer.args!.from === ETHEREUM_NULL_ADDRESS;
     })
@@ -26,13 +28,13 @@ const processorFunction = (contract: ERC721Contract, name: string) =>
     const newNFTs:NFT[] = newMints.map((mint) => {
       const tokenId = BigInt((mint.args!.tokenId as BigNumber).toString());
       return {
-        id: buildERC721Id(contract.address, tokenId),
+        id: contractType.buildNFTId(contract.address, tokenId),
         createdAtEthereumBlockNumber: '' + mint.blockNumber,
         createdAtTime: new Date(parseInt((mint as any).timestamp)),
         contractAddress: formatAddress(contract.address),
         tokenId,
         platformId: contract.platform,
-        metadataId: contract.buildNFTMetadataId(contract.address, tokenId)
+        metadataId: contractType.buildNFTMetadataId(contract.address, tokenId)
       };
     });
     await clients.db.insert('nfts', newNFTs);

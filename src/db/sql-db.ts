@@ -29,7 +29,7 @@ const recordExistsFunc = (db: Knex) => async (tableName: string, recordID: strin
   return !!record[0];
 }
 
-const getRecordsFunc = (db: Knex) => async <RecordType extends Record>(tableName: string, wheres?: Wheres): (Promise<RecordType[]>) => {
+const getRecordsFunc = (db: Knex) => async <RecordType>(tableName: string, wheres?: Wheres): (Promise<RecordType[]>) => {
   console.log(`Querying for records where ${JSON.stringify(wheres)}`);
   let query = db(tableName);
   if (wheres) {

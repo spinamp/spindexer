@@ -1,7 +1,7 @@
 import { DBClient } from '../db/db';
 
-import { CONTRACT_TYPES_BY_ADDRESS, NFTContractTypes } from './ethereum';
-import { MusicPlatform, platformConfig } from './platform';
+import { NFTContractTypes } from './ethereum';
+import { MusicPlatform, } from './platform';
 import { Record } from './record';
 
 export type NFT = Record & {
@@ -11,8 +11,7 @@ export type NFT = Record & {
   metadataId: string
 }
 
-export const getNFTContractCalls = (nft: NFT) => {
-  const contractTypeName = (CONTRACT_TYPES_BY_ADDRESS as any)[nft.contractAddress.toLowerCase()] || 'default';
+export const getNFTContractCalls = (nft: NFT, contractTypeName: string) => {
   const contractType = NFTContractTypes[contractTypeName];
   return contractType.contractCalls.map(call => {
     return {

@@ -5,11 +5,10 @@ import ipfs from './clients/ipfs';
 import noizd from './clients/noizd';
 import sound from './clients/sound';
 import subgraph from './clients/subgraph';
-import db from './db/sql-db';
+import { DBClient } from './db/db';
 import { Clients, Processor } from './types/processor';
 
-export const runProcessors = async (processors: Processor[]) => {
-  const dbClient = await db.init();
+export const runProcessors = async (processors: Processor[], dbClient: DBClient) => {
   const subgraphClient = subgraph.init(process.env.SUBGRAPH_ENDPOINT!);
   const ethClient = await ethereum.init();
   const axiosClient = await axios.init();

@@ -1,3 +1,4 @@
+import { ERC721Contract } from '../types/ethereum';
 import { Metadata } from '../types/metadata';
 import { Record, RecordUpdate } from '../types/record';
 
@@ -17,7 +18,15 @@ const recordMapper: any = {
   metadatas: (metadatas: Record[]): Metadata[] => metadatas.map((m: any) => {
     const metadata = typeof m.metadata === 'object' ? m.metadata : JSON.parse(m.metadata);
     return ({ ...m, metadata });
-  })
+  }),
+  erc721Contracts: (erc721Contracts: Record[]): ERC721Contract[] => erc721Contracts.map((c: any) => {
+    return ({
+      address: c.id,
+      platform: c.platformId,
+      startingBlock: c.startingBlock,
+      contractType: c.contractType,
+    });
+  }),
 }
 
 export const fromDBRecord = (record: any): Record => {
