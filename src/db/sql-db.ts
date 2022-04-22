@@ -55,12 +55,12 @@ const init = async (): Promise<DBClient> => {
       return cursorResult[0]?.cursor;
     },
     recordExists: recordExistsFunc(db),
-    insert: async (tableName: string, records: Record[]) => {
+    insert: async <RecordType>(tableName: string, records: RecordType[]) => {
       if (records.length === 0) {
         return;
       }
       console.log(`Inserting into ${tableName} ${records.length} records`);
-      const dbRecords = toDBRecords(records);
+      const dbRecords = toDBRecords(tableName, records);
       await db(tableName).insert(dbRecords);
     },
     updateProcessor: async (processor: string, lastCursor: Cursor) => {

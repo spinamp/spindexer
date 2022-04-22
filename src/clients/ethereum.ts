@@ -18,7 +18,7 @@ export type EthCall = {
 
 export type EthClient = {
   call: (ethCalls: EthCall[]) => Promise<unknown[]>;
-  getERC721TransferEventsFrom: (fromBlock: string, toBlock: string, contractAddress: string) => Promise<ethers.Event[]>;
+  getEventsFrom: (fromBlock: string, toBlock: string, contractAddress: string, eventFilter: string) => Promise<ethers.Event[]>;
   getBlockTimestamps:  (blockHashes: string[]) => Promise<number[]>;
   getLatestBlockNumber: () => Promise<number>;
 }
@@ -37,9 +37,9 @@ const init = async ():Promise<EthClient> => {
       const data = await ethcallProvider.tryAll(calls);
       return data;
     },
-    getERC721TransferEventsFrom: async (fromBlock: string, toBlock: string, contractAddress: string) => {
+    getEventsFrom: async (fromBlock: string, toBlock: string, contractAddress: string, eventFilter: string) => {
       const contract = new ethers.Contract(contractAddress, MetaABI.abi, provider);
-      const filter = contract.filters.Transfer();
+      const filter = contract.filters[eventFilter]();
       const events = await contract.queryFilter(filter, BigNumber.from(fromBlock).toHexString(), BigNumber.from(toBlock).toHexString());
       return events;
     },

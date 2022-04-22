@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { newERC721Transfers } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
-import { buildERC721Id, ERC721Contract, ETHEREUM_NULL_ADDRESS, NFTContractTypes } from '../../types/ethereum';
+import { ERC721Contract, ETHEREUM_NULL_ADDRESS, NFTContractTypes } from '../../types/ethereum';
 import { NFT } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';

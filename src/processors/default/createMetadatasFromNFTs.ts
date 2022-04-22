@@ -35,6 +35,9 @@ export const createMetadatasFromNFTs = async (nfts: NFT[], dbClient: DBClient, e
   const callResults = await ethClient.call(flatContractCalls);
   const newMetadatas = nftsWithNewMetadata.map((nft, index) => {
     console.info(`Processing nft with metadata id ${nft.metadataId}`);
+    if(!nft.metadataId) {
+      throw new Error('Tried to process NFT with no metadataId');
+    }
     const metadata: Metadata = {
       id: formatAddress(nft.metadataId),
       platformId: nft.platformId,
