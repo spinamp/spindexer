@@ -34,6 +34,7 @@ export const up = async (knex: Knex) => {
     table.string('contractType');
   });
   await knex('erc721Contracts').insert(INITIAL_CONTRACTS);
+  await knex.raw(`GRANT SELECT ON "erc721Contracts" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
 };
 
 exports.down = async (knex: Knex) => {

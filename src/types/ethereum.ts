@@ -46,5 +46,6 @@ export function buildERC721Id(contractAddress: string, tokenId: BigInt): string 
 
 export enum ContractTypeName {
   default = 'default',
-  zora = 'zora'
+  zora = 'zora',
+  soundArtistProfileCreator = 'soundArtistProfileCreator'
 }
