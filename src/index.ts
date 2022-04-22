@@ -10,12 +10,14 @@ import { createProcessedTracksFromAPI } from './processors/default/createProcess
 import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
 import { runProcessors } from './runner';
-import { NewCatalogContract } from './types/ethereum';
+import { ERC721_CONTRACTS, NewCatalogContract, NOIZDContract, ZoraContract } from './types/ethereum';
 import { MusicPlatform } from './types/platform';
 
+const ERC721TransferProcessors = ERC721_CONTRACTS.map(contract => createNFTsFromERC721TransfersProcessor(contract));
+
 const PROCESSORS = [
-  createNFTsFromSubgraphProcessor,
-  createNFTsFromERC721TransfersProcessor(NewCatalogContract),
+  // createNFTsFromSubgraphProcessor,
+  ...ERC721TransferProcessors,
   stripIgnoredNFTs,
   createMetadatasFromNFTsProcessor,
   addMetadataIPFSHashProcessor,
