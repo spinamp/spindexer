@@ -60,6 +60,7 @@ const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => asy
   if (!platformMapper) {
     throw new Error(`Platform mapper for ${platformId} not found`);
   }
+
   const platformTrackData = await platformMapper.addPlatformTrackData(metadatas, clients[platformId]);
 
   const { processedTracks, metadataUpdates, artists, artistProfiles } = processPlatformTrackData(platformTrackData, platformMapper);
