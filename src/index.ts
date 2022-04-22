@@ -21,7 +21,7 @@ const PROCESSORS = (erc721Contracts:ERC721Contract[]) => {
   const erc721TransferProcessors = erc721Contracts.map(contract => createNFTsFromERC721TransfersProcessor(contract));
   const erc721ContractsByAddress = _.keyBy(erc721Contracts, 'address');
   return [
-  // createSoundNFTsFromSubgraphProcessor,
+  createSoundNFTsFromSubgraphProcessor,
    ...erc721TransferProcessors,
   stripIgnoredNFTs,
   createMetadatasFromNFTsProcessor(erc721ContractsByAddress),
