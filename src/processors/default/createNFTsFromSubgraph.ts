@@ -1,12 +1,12 @@
 import _ from 'lodash';
 
 import { SubgraphNFT } from '../../clients/subgraph';
-import { newSubgraphNFTs  } from '../../triggers/newSubgraphNFTs';
+import { newSubgraphSoundNFTs  } from '../../triggers/newSubgraphNFTs';
 import { formatAddress } from '../../types/address';
 import { NFT } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 
-const name = 'createNFTsFromSubgraph' ;
+const name = 'createSoundNFTsFromSubgraph' ;
 
 const processorFunction = async (newBatch: SubgraphNFT[], clients: Clients) => {
   const newNFTs: NFT[] = newBatch.map(subgraphNFT => ({
@@ -23,9 +23,9 @@ const processorFunction = async (newBatch: SubgraphNFT[], clients: Clients) => {
   await clients.db.updateProcessor(name, lastCursor);
 };
 
-export const createNFTsFromSubgraphProcessor: Processor = {
+export const createSoundNFTsFromSubgraphProcessor: Processor = {
   name,
-  trigger: newSubgraphNFTs,
+  trigger: newSubgraphSoundNFTs,
   processorFunction,
   initialCursor: process.env.GLOBAL_STARTING_TIMESTAMP,
 };

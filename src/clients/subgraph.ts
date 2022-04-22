@@ -4,6 +4,7 @@ import { MusicPlatform } from '../types/platform';
 
 export type SubgraphClient = {
   getRecordsFrom: (timestamp: string) => Promise<SubgraphNFT[]>;
+  getSoundNFTsFrom: (timestamp: string) => Promise<SubgraphNFT[]>;
   getLatestRecord: () => Promise<SubgraphNFT>;
   getNFTsFrom: (timestamp: string) => Promise<SubgraphNFT[]>;
   getLatestNFT: () => Promise<SubgraphNFT>;
@@ -22,6 +23,18 @@ export type SubgraphNFT = {
 }
 
 const QUERIES = {
+  getSoundRecordsFrom: (timestamp: string) => gql`
+  {
+    nfts(where:{platform:sound, createdAtTimestamp_gte:${timestamp}}, orderBy:createdAtTimestamp, orderDirection: asc, first:${process.env.SUBGRAPH_QUERY_LIMIT}) {
+      id
+      contractAddress
+      tokenId
+      platform
+      track{id}
+      createdAtTimestamp
+      createdAtBlockNumber
+    }
+  }`,
   getRecordsFrom: (timestamp: string) => gql`
   {
     nfts(where:{createdAtTimestamp_gte:${timestamp}}, orderBy:createdAtTimestamp, orderDirection: asc, first:${process.env.SUBGRAPH_QUERY_LIMIT}) {
@@ -68,8 +81,8 @@ const recordIsInBatch = (record: SubgraphNFT, batch: SubgraphNFT[]) => {
 };
 
 const init = (endpoint: string) => {
-  const getRecordsFrom = async (timestamp: string) => {
-    const fromResponseData = await request(endpoint, QUERIES.getRecordsFrom(timestamp));
+  const getRecordsFrom = async (timestamp: string, query:(timestamp: string) => string = QUERIES.getRecordsFrom) => {
+    const fromResponseData = await request(endpoint, query(timestamp));
     const nextRecordBatch = fromResponseData[`nfts`];
 
     if (nextRecordBatch.length < process.env.SUBGRAPH_QUERY_LIMIT!) {
@@ -94,6 +107,9 @@ const init = (endpoint: string) => {
   const getNFTsFrom = async (timestamp: string): Promise<SubgraphNFT[]> => {
     return getRecordsFrom(timestamp);
   };
+  const getSoundNFTsFrom = async (timestamp: string): Promise<SubgraphNFT[]> => {
+    return getRecordsFrom(timestamp, QUERIES.getSoundRecordsFrom);
+  };
   const getLatestNFT = async () => {
     return getLatestRecord() as Promise<SubgraphNFT>;
   };
@@ -101,6 +117,7 @@ const init = (endpoint: string) => {
     getRecordsFrom,
     getLatestRecord,
     getNFTsFrom,
+    getSoundNFTsFrom,
     getLatestNFT
   }
 }
