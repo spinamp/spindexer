@@ -63,7 +63,7 @@ const addPlatformTrackData = async (metadatas: Metadata[], client: SoundClient) 
   })).filter(platformTrack=> metadataIds.includes(platformTrack.trackId));
   const platformTracksWithAudioPromises = platformTracksWithMetadataId.map(async platformTrack => {
     if(platformTrack.tracks.length > 1) {
-      throw new Error('Sound release with multiple tracks not yet implemented');
+      return { isError: true, error: new Error('Sound release with multiple tracks not yet implemented') };
     }
     return {
       ...platformTrack,
@@ -74,9 +74,18 @@ const addPlatformTrackData = async (metadatas: Metadata[], client: SoundClient) 
     };
   });
   const platformTracksWithAudio = await Promise.all(platformTracksWithAudioPromises);
-  const platformTrackDataByMetadataId = _.keyBy(platformTracksWithAudio, 'metadata');
+  const platformTrackDataByTrackId = _.keyBy(platformTracksWithAudio, 'trackId');
   const platformTrackData: { metadata: Metadata, platformTrackResponse: any }[]
-    = metadatas.map(metadata => ({ metadata, platformTrackResponse: platformTrackDataByMetadataId[metadata.id] }));
+    = metadatas.map(metadata => {
+      const platformTrackResponse = platformTrackDataByTrackId[metadata.id] || {
+        isError: true,
+        error: new Error(`Missing platform track data`)
+      }
+      return {
+        metadata,
+        platformTrackResponse
+      };
+    });
   return platformTrackData;
 }
 

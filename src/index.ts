@@ -7,8 +7,8 @@ import { createMetadatasFromNFTsProcessor } from './processors/default/createMet
 import { createNFTsFromERC721TransfersProcessor } from './processors/default/createNFTsFromERC721Transfers';
 import { createNFTsFromSubgraphProcessor } from './processors/default/createNFTsFromSubgraph';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
+import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
-import { stripNonAudio } from './processors/default/stripNonAudio';
 import { runProcessors } from './runner';
 import { NewCatalogContract } from './types/ethereum';
 import { MusicPlatform } from './types/platform';
@@ -16,6 +16,7 @@ import { MusicPlatform } from './types/platform';
 const PROCESSORS = [
   createNFTsFromSubgraphProcessor,
   createNFTsFromERC721TransfersProcessor(NewCatalogContract),
+  stripIgnoredNFTs,
   createMetadatasFromNFTsProcessor,
   addMetadataIPFSHashProcessor,
   addMetadataObjectProcessor,

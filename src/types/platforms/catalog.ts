@@ -98,10 +98,16 @@ const addPlatformTrackData = async (metadatas: Metadata[], client: CatalogClient
   const platformTracks = await client.fetchCatalogTracksByNFT(trackTokenIds);
   const platformTrackDataByTokenId = _.keyBy(platformTracks, 'nft_id');
   const platformTrackData: { metadata: Metadata, platformTrackResponse: any }[]
-    = metadatas.map(metadata => ({
-      metadata,
-      platformTrackResponse: platformTrackDataByTokenId[getTokenIdFromMetadata(metadata)]
-    }));
+    = metadatas.map(metadata => {
+      const platformTrackResponse = platformTrackDataByTokenId[getTokenIdFromMetadata(metadata)] || {
+        isError: true,
+        error: new Error(`Missing platform track data`)
+      }
+      return {
+        metadata,
+        platformTrackResponse
+      };
+  });
   return platformTrackData;
 }
 

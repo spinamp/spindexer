@@ -32,7 +32,7 @@ const INITIAL_TABLES = [
       table.string('metadataError', 3000);
       table.string('mimeType');
       table.boolean('processed');
-      table.boolean('processError');
+      table.string('processError', 3000);
     },
   },
   {

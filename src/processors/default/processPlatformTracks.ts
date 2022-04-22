@@ -14,25 +14,25 @@ const name = 'processTracks';
 
 const processPlatformTrackData = (platformTrackData: {
   metadata: Metadata;
-  platformTrackResponse: unknown;
+  platformTrackResponse: any;
 }[], platformMapper: PlatformMapper) => {
   const { mapArtistProfile, mapTrack } = platformMapper;
 
   const { processedTracks, metadataUpdates } = platformTrackData.reduce<
     { processedTracks: ProcessedTrack[], metadataUpdates: RecordUpdate<Metadata>[] }>
     ((accum, item) => {
-      if (item.platformTrackResponse) {
+      if (item.platformTrackResponse && item.platformTrackResponse.isError) {
+        accum.metadataUpdates.push({
+          id: item.metadata.id,
+          processed: true,
+          processError: item.platformTrackResponse.error,
+        });
+      } else {
         const processedTrack = mapTrack(item)
         accum.processedTracks.push(processedTrack);
         accum.metadataUpdates.push({
           id: item.metadata.id,
           processed: true,
-        });
-      } else {
-        accum.metadataUpdates.push({
-          id: item.metadata.id,
-          processed: true,
-          processError: true,
         });
       }
       return accum;
@@ -40,7 +40,7 @@ const processPlatformTrackData = (platformTrackData: {
       { processedTracks: [], metadataUpdates: [] }
     );
   const artistProfiles = _.uniqBy(platformTrackData.reduce<ArtistProfile[]>((profiles, item) => {
-    if (item.platformTrackResponse) {
+    if (item.platformTrackResponse && !item.platformTrackResponse.isError) {
       const artistProfile = {
         ...mapArtistProfile(item.platformTrackResponse, item.metadata.createdAtTime, item.metadata.createdAtEthereumBlockNumber),
       } as ArtistProfile;

@@ -13,7 +13,7 @@ export type Metadata = Record & {
   metadataError?: string
   mimeType?: string
   processed?: true
-  processError?: true
+  processError?: string
 }
 
 export const getMetadataURL = (metadata: Metadata): (string | null | undefined) => {

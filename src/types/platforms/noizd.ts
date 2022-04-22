@@ -98,12 +98,18 @@ const addPlatformTrackData = async (metadatas: Metadata[], client: NOIZDClient) 
   const trackTokenIds = metadatas.map(m => getTokenIdFromMetadata(m));
   const platformNFTs = await client.fetchNFTs(trackTokenIds);
   const platformTracks = platformNFTs.map(nft => ({ ...nft.music, metadata: nft.metadata }));
-  const platformTrackByTokenId = _.keyBy(platformTracks, 'metadata.id');
+  const platformTrackDataByTokenId = _.keyBy(platformTracks, 'metadata.id');
   const platformTrackData: { metadata: Metadata, platformTrackResponse: any }[]
-    = metadatas.map(metadata => ({
-      metadata,
-      platformTrackResponse: platformTrackByTokenId[getTokenIdFromMetadata(metadata)]
-    }));
+    = metadatas.map(metadata => {
+      const platformTrackResponse = platformTrackDataByTokenId[getTokenIdFromMetadata(metadata)] || {
+        isError: true,
+        error: new Error(`Missing platform track data`)
+      }
+      return {
+        metadata,
+        platformTrackResponse
+      };
+  });
   return platformTrackData;
 }
 
