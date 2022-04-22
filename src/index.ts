@@ -9,7 +9,6 @@ import { categorizeZora } from './processors/default/categorizeZora';
 import { createERC721ContractFromFactoryProcessor } from './processors/default/createERC721ContractFromFactoryProcessor';
 import { createMetadatasFromNFTsProcessor } from './processors/default/createMetadatasFromNFTs';
 import { createNFTsFromERC721TransfersProcessor } from './processors/default/createNFTsFromERC721Transfers';
-import { createNFTsFromSubgraphProcessor } from './processors/default/createNFTsFromSubgraph';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
 import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
@@ -25,7 +24,6 @@ const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryCo
   const factoryContractProcessors = factoryContracts.map(contract => createERC721ContractFromFactoryProcessor(contract));
 
   return [
-  // createNFTsFromSubgraphProcessor,
   ...factoryContractProcessors,
   ...erc721TransferProcessors,
   stripIgnoredNFTs,
