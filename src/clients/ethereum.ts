@@ -1,6 +1,7 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract, Provider } from 'ethcall';
 import { BigNumber, ethers } from 'ethers';
+import _ from 'lodash';
 
 import MetaABI from '../abis/MetaABI.json';
 import { rollPromises } from '../utils/rollingPromises';
@@ -18,10 +19,15 @@ export type EthCall = {
 
 export type EthClient = {
   call: (ethCalls: EthCall[]) => Promise<unknown[]>;
-  getEventsFrom: (fromBlock: string, toBlock: string, contractAddress: string, eventFilter: string) => Promise<ethers.Event[]>;
+  getEventsFrom: (fromBlock: string, toBlock: string, contractFilters: ContractFilter[]) => Promise<ethers.Event[]>;
   getBlockTimestamps:  (blockHashes: string[]) => Promise<number[]>;
   getLatestBlockNumber: () => Promise<number>;
 }
+
+export type ContractFilter = {
+  address: string,
+  filter: string
+};
 
 const init = async ():Promise<EthClient> => {
   const provider = new JsonRpcProvider(process.env.ETHEREUM_PROVIDER_ENDPOINT);
@@ -37,10 +43,23 @@ const init = async ():Promise<EthClient> => {
       const data = await ethcallProvider.tryAll(calls);
       return data;
     },
-    getEventsFrom: async (fromBlock: string, toBlock: string, contractAddress: string, eventFilter: string) => {
-      const contract = new ethers.Contract(contractAddress, MetaABI.abi, provider);
-      const filter = contract.filters[eventFilter]();
-      const events = await contract.queryFilter(filter, BigNumber.from(fromBlock).toHexString(), BigNumber.from(toBlock).toHexString());
+    getEventsFrom: async (fromBlock: string, toBlock: string, contractFilters: ContractFilter[]) => {
+      const filters = contractFilters.map(contractFilter => {
+        const contract = new ethers.Contract(contractFilter.address, MetaABI.abi, provider);
+        const filter = contract.filters[contractFilter.filter]();
+        return filter.topics![0];
+      });
+      const contractAddresses = _.uniq(contractFilters.map(c=>c.address));
+      const events = await provider.send('eth_getLogs', [{
+        address: contractAddresses,
+        topics: [
+          [ // topic[0]
+            ...filters
+          ]
+        ],
+        fromBlock: BigNumber.from(fromBlock).toHexString(),
+        toBlock: BigNumber.from(toBlock).toHexString(),
+      }]);
       return events;
     },
     getLatestBlockNumber:  async () => {

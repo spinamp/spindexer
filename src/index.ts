@@ -27,6 +27,7 @@ const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryCo
   ...factoryContractProcessors,
   ...erc721TransferProcessors,
   stripIgnoredNFTs,
+  createSoundMetadataIds,
   createMetadatasFromNFTsProcessor(erc721ContractsByAddress),
   addMetadataIPFSHashProcessor,
   addMetadataObjectProcessor,
