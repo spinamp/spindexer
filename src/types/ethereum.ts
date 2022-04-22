@@ -14,13 +14,15 @@ export type ERC721Contract = {
   contractType: ContractTypeName,
 }
 
+export type NFTContractType = {
+  contractCalls: ValidContractCallFunction[],
+  contractMetadataField: ValidContractCallFunction,
+  buildNFTId: (contractAddress: string, tokenId: BigInt) => string,
+  buildNFTMetadataId: (contractAddress: string, tokenId: BigInt) => string,
+}
+
 type NFTContractTypes = {
-  [type:string] : {
-    contractCalls: ValidContractCallFunction[],
-    contractMetadataField: ValidContractCallFunction,
-    buildNFTId: (contractAddress: string, tokenId: BigInt) => string,
-    buildNFTMetadataId: (contractAddress: string, tokenId: BigInt) => string,
-    }
+  [type:string] : NFTContractType
 }
 
 export const NFTContractTypes:NFTContractTypes = {
@@ -46,32 +48,3 @@ export enum ContractTypeName {
   default = 'default',
   zora = 'zora'
 }
-
-export const ZoraContract:ERC721Contract = {
-  address: '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7',
-  platform: MusicPlatform.zora,
-  startingBlock: '11565020',
-  contractType: ContractTypeName.zora,
-};
-
-export const NOIZDContract:ERC721Contract = {
-  address: '0xf5819e27b9bad9f97c177bf007c1f96f26d91ca6',
-  platform: MusicPlatform.noizd,
-  startingBlock: '13470560',
-  contractType: ContractTypeName.default,
-};
-
-export const NewCatalogContract:ERC721Contract = {
-  address: '0x0bc2a24ce568dad89691116d5b34deb6c203f342',
-  platform: MusicPlatform.catalog,
-  startingBlock: '14566825',
-  contractType: ContractTypeName.default,
-};
-
-export const ERC721_CONTRACTS = [
-  ZoraContract,
-  NOIZDContract,
-  NewCatalogContract,
-]
-
-export const CONTRACTS_BY_ADDRESS = _.keyBy(ERC721_CONTRACTS, 'address')

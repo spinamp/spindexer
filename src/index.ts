@@ -1,5 +1,8 @@
 import 'dotenv/config';
 import './types/env';
+import _ from 'lodash';
+
+import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
 import { categorizeZora } from './processors/default/categorizeZora';
@@ -10,16 +13,18 @@ import { createProcessedTracksFromAPI } from './processors/default/createProcess
 import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
 import { runProcessors } from './runner';
-import { ERC721_CONTRACTS, NewCatalogContract, NOIZDContract, ZoraContract } from './types/ethereum';
+import { ERC721Contract } from './types/ethereum';
 import { MusicPlatform } from './types/platform';
 
-const ERC721TransferProcessors = ERC721_CONTRACTS.map(contract => createNFTsFromERC721TransfersProcessor(contract));
 
-const PROCESSORS = [
+const PROCESSORS = (erc721Contracts:ERC721Contract[]) => {
+  const erc721TransferProcessors = erc721Contracts.map(contract => createNFTsFromERC721TransfersProcessor(contract));
+  const erc721ContractsByAddress = _.keyBy(erc721Contracts, 'address');
+  return [
   // createNFTsFromSubgraphProcessor,
-  ...ERC721TransferProcessors,
+   ...erc721TransferProcessors,
   stripIgnoredNFTs,
-  createMetadatasFromNFTsProcessor,
+  createMetadatasFromNFTsProcessor(erc721ContractsByAddress),
   addMetadataIPFSHashProcessor,
   addMetadataObjectProcessor,
   stripNonAudio,
@@ -28,10 +33,12 @@ const PROCESSORS = [
   processPlatformTracks(MusicPlatform.sound, 3),
   processPlatformTracks(MusicPlatform.noizd),
   createProcessedTracksFromAPI(MusicPlatform.noizd),
-];
+]};
 
 const updateDBLoop = async () => {
-  await runProcessors(PROCESSORS);
+  const dbClient = await db.init();
+  const erc721Contracts = await dbClient.getRecords<ERC721Contract>('erc721Contracts');
+  await runProcessors(PROCESSORS(erc721Contracts), dbClient);
 };
 
 process.on('SIGINT', () => {

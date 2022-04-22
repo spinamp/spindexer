@@ -20,7 +20,7 @@ export type Wheres = Where[];
 
 export type DBClient = {
   getCursor: (processor: string) => Promise<string | undefined>;
-  getRecords: <Type extends Record>(tableName: string, wheres?: Wheres) => Promise<Type[]>;
+  getRecords: <Type>(tableName: string, wheres?: Wheres) => Promise<Type[]>;
   insert: (tableName: string, rows: Record[]) => Promise<void>;
   update: (tableName: string, rows: RecordUpdate<unknown>[]) => Promise<void>;
   upsert: (tableName: string, rows: (Record | RecordUpdate<unknown>)[], idField?: string | string[]) => Promise<void>;
