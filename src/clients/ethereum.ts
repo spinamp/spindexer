@@ -60,7 +60,12 @@ const init = async ():Promise<EthClient> => {
         fromBlock: BigNumber.from(fromBlock).toHexString(),
         toBlock: BigNumber.from(toBlock).toHexString(),
       }]);
-      return events;
+      const iface = new ethers.utils.Interface(MetaABI.abi);
+      return events.map((event: ethers.Event) => ({
+        ...iface.parseLog(event),
+        blockNumber: BigNumber.from(event.blockNumber).toString(),
+        blockHash: event.blockHash,
+      }));
     },
     getLatestBlockNumber:  async () => {
       return await provider.getBlockNumber();

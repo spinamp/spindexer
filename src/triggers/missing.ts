@@ -44,7 +44,7 @@ export const unprocessedPlatformMetadatas: (platformId: MusicPlatform, limit?: n
 // matching their metadataId
 export const unprocessedNFTs: Trigger<Clients, undefined> = async (clients: Clients) => {
   const nfts = (await clients.db.rawSQL(
-    `select n.* from nfts n left outer join metadatas m on n."metadataId"=m.id where n."metadataId" is not null and m.id is null;`
+    `select * from erc721nfts where "tokenURI" is null;`
   )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   console.log({ nfts })
   return nfts;

@@ -86,12 +86,12 @@ const init = async (): Promise<DBClient> => {
       console.log(`Querying for ${raw}`);
       return await db.raw(raw);
     },
-    update: async (tableName: string, recordUpdates: RecordUpdate<unknown>[], idField: string = 'id') => {
+    update: async <RecordType>(tableName: string, recordUpdates: RecordType[], idField: string = 'id') => {
       console.log(`Updating records`);
       if (recordUpdates?.length > 0) {
         for (const update of recordUpdates) {
           const dbUpdate = toDBRecord(update);
-          const id = dbUpdate.id;
+          const id = (dbUpdate as any)[idField];
           const changes: any = { ...dbUpdate }
           delete changes.id
 

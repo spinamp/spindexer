@@ -4,12 +4,10 @@ import ethereum from './clients/ethereum';
 import ipfs from './clients/ipfs';
 import noizd from './clients/noizd';
 import sound from './clients/sound';
-import subgraph from './clients/subgraph';
 import { DBClient } from './db/db';
 import { Clients, Processor } from './types/processor';
 
 export const runProcessors = async (processors: Processor[], dbClient: DBClient) => {
-  const subgraphClient = subgraph.init(process.env.SUBGRAPH_ENDPOINT!);
   const ethClient = await ethereum.init();
   const axiosClient = await axios.init();
   const ipfsClient = await ipfs.init();
@@ -20,7 +18,6 @@ export const runProcessors = async (processors: Processor[], dbClient: DBClient)
   const clients: Clients = {
     eth: ethClient,
     db: dbClient,
-    subgraph: subgraphClient,
     axios: axiosClient,
     ipfs: ipfsClient,
     catalog: catalogClient,

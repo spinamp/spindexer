@@ -2,9 +2,9 @@ import { ValidContractCallFunction } from '../clients/ethereum';
 import { extractHashFromURL } from '../clients/ipfs';
 
 import { MusicPlatform } from './platform'
-import { Record } from './record'
 
-export type Metadata = Record & {
+export type Metadata = {
+  nftId: string,
   platformId: MusicPlatform,
   metadataIPFSHash?: string
   [ValidContractCallFunction.tokenURI]?: string

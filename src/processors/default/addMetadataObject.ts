@@ -17,7 +17,7 @@ const getMetadataObject = (metadataRecord: Metadata, timeout: number, axios: Axi
   if (metadataRecord.metadataIPFSHash) {
     queryURL = ipfs.getHTTPURL(metadataRecord.metadataIPFSHash);
   }
-  console.info(`Querying for metadata for id ${metadataRecord.id}: ${queryURL}`)
+  console.info(`Querying for metadata for nftId ${metadataRecord.nftId}: ${queryURL}`)
   return axios.get(queryURL, { timeout });
 }
 
@@ -28,11 +28,11 @@ const processorFunction = async (batch: Metadata[], clients: Clients) => {
 
   const results = await rollPromises<Metadata, AxiosResponse, AxiosError>(batch, processMetadataResponse);
 
-  const metadataUpdates = batch.map((metadataRecord, index): ({ id: string } & Partial<Metadata>) => {
+  const metadataUpdates = batch.map((metadataRecord, index): ({ nftId: string } & Partial<Metadata>) => {
     const metadata = results[index].response? results[index].response!.data : undefined;
     const metadataError = results[index].isError? results[index].error!.message : undefined;
     return {
-      id: metadataRecord.id,
+      nftId: metadataRecord.nftId,
       metadata: metadata? JSON.stringify(metadata) : null,
       mimeType: metadata? metadata.mimeType : null,
       metadataError,

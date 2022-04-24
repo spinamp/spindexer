@@ -7,8 +7,8 @@ import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIP
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
 import { categorizeZora } from './processors/default/categorizeZora';
 import { createERC721ContractFromFactoryProcessor } from './processors/default/createERC721ContractFromFactoryProcessor';
+import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
 import { createMetadatasFromNFTsProcessor } from './processors/default/createMetadatasFromNFTs';
-import { createNFTsFromERC721TransfersProcessor } from './processors/default/createNFTsFromERC721Transfers';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
 import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
@@ -20,23 +20,23 @@ import { MusicPlatform } from './types/platform';
 const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryContract[]) => {
   const erc721ContractsByAddress = _.keyBy(erc721Contracts, 'address');
 
-  const erc721TransferProcessors = erc721Contracts.map(contract => createNFTsFromERC721TransfersProcessor(contract));
   const factoryContractProcessors = factoryContracts.map(contract => createERC721ContractFromFactoryProcessor(contract));
+  const erc721TransferProcessors = erc721Contracts.map(contract => createERC721NFTsFromTransfersProcessor(contract));
 
   return [
   ...factoryContractProcessors,
   ...erc721TransferProcessors,
   // stripIgnoredNFTs,
   createMetadatasFromNFTsProcessor(erc721ContractsByAddress),
-  addMetadataIPFSHashProcessor,
-  addMetadataObjectProcessor,
+  // addMetadataIPFSHashProcessor,
+  // addMetadataObjectProcessor,
   // stripNonAudio,
   // categorizeZora,
   // createSoundMetadataIds,
-  processPlatformTracks(MusicPlatform.catalog),
-  processPlatformTracks(MusicPlatform.sound, 3),
-  processPlatformTracks(MusicPlatform.noizd),
-  createProcessedTracksFromAPI(MusicPlatform.noizd),
+  // processPlatformTracks(MusicPlatform.catalog),
+  // processPlatformTracks(MusicPlatform.sound, 3),
+  // processPlatformTracks(MusicPlatform.noizd),
+  // createProcessedTracksFromAPI(MusicPlatform.noizd),
 ]};
 
 const updateDBLoop = async () => {

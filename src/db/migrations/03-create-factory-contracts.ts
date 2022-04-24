@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-import { ContractTypeName } from '../../types/ethereum';
+import { FactoryContractTypeName } from '../../types/ethereum';
 import { MusicPlatform } from '../../types/platform';
 
 const INITIAL_CONTRACTS = [
@@ -8,7 +8,7 @@ const INITIAL_CONTRACTS = [
     id: '0x78e3adc0e811e4f93bd9f1f9389b923c9a3355c2',
     platformId: MusicPlatform.sound,
     startingBlock: '13725566',
-    contractType: ContractTypeName.soundArtistProfileCreator,
+    contractType: FactoryContractTypeName.soundArtistProfileCreator,
   },
 ]
 

@@ -5,9 +5,9 @@ import { Clients, Processor } from '../../types/processor';
 const name = 'addMetadataIPFSHash';
 
 const processorFunction = async (metadatas: Metadata[], clients: Clients) => {
-  console.log(`Processing updates from ${metadatas[0].id}`)
+  console.log(`Processing updates from ${metadatas[0].nftId}`)
   const metadataUpdates = metadatas.map(m => ({
-    id: m.id,
+    nftId: m.nftId,
     metadataIPFSHash: getMetadataIPFSHash(m)
   }))
   const filteredMetadataUpdates = metadataUpdates.filter(m => (m.metadataIPFSHash !== undefined));

@@ -3,9 +3,9 @@ import _ from 'lodash';
 
 import { newEditionsCreated } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
+import { NFT } from '../../types/erc721nft';
 import { ERC721Contract, ETHEREUM_NULL_ADDRESS, NFTContractTypes } from '../../types/ethereum';
 import { Metadata } from '../../types/metadata';
-import { NFT } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';
 

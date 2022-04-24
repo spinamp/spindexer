@@ -7,22 +7,12 @@ const INITIAL_TABLES = [
     }
   },
   {
-    name: 'nfts', create: (table: Knex.CreateTableBuilder) => {
+    name: 'erc721nfts', create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
       table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
       table.string('tokenId');
       table.string('contractAddress');
-      table.string('platformId');
-      table.foreign('platformId').references('id').inTable('platforms');
-      table.string('metadataId');
-    }
-  },
-  {
-    name: 'metadatas', create: (table: Knex.CreateTableBuilder) => {
-      table.string('id').primary();
-      table.datetime('createdAtTime', { precision: 3 });
-      table.bigint('createdAtEthereumBlockNumber');
       table.string('platformId');
       table.foreign('platformId').references('id').inTable('platforms');
       table.string('metadataIPFSHash');
@@ -33,7 +23,7 @@ const INITIAL_TABLES = [
       table.string('mimeType');
       table.boolean('processed');
       table.string('processError', 3000);
-    },
+    }
   },
   {
     name: 'artists', create: (table: Knex.CreateTableBuilder) => {
@@ -103,8 +93,7 @@ export const up = async (knex: Knex) => {
   });
   await Promise.all(promises);
   await knex.raw(`GRANT SELECT ON "platforms" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
-  await knex.raw(`GRANT SELECT ON "nfts" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
-  await knex.raw(`GRANT SELECT ON "metadatas" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "erc721nfts" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`GRANT SELECT ON "artists" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`GRANT SELECT ON "artistProfiles" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`GRANT SELECT ON "processedTracks" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
