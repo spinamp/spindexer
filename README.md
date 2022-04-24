@@ -47,14 +47,25 @@ In order to facilitate some of the above goals, the pipeline has seperate proces
 Processors check their progress using a trigger.
 
 ## Processors
-A processor is a combination of a trigger, optional cursor and processing function that decides what to do with new data.
+A processor is a combination of:
+ - a trigger, which determines whether or not a processor should run, and also gathers and provides input data to that processor
+ - an optional cursor, which may be used in tracking the progress of a processor
+ - a processing function that does something with new input data
+
+Whenever the pipeline binary starts, all processors run one by one. Each time a processor runs, it loops until it is completed. Processors could in theory be run in parallel, as the design of each processor should guarantee that order in which they run does not matter, but this guarantee has not been verified/tested and may have some imperfections because at the moment this simple ordered runner is sufficient.
 
 ## Triggers
-A trigger is a function that a processor runs to check if there is anything new for it to process. This may or may not involve a cursor, for example:
- - The NFT processor that tracks new NFT mints runs over all blocks one by one and will keep track of the most recent block it has processed in a cursor
- - The track metadata processor just queries for any tracks that have not yet had their metadata processed. It does not need to track a cursor, but rather just keeps going until the query is empty and there is nothing left for it to process.
+A trigger is a function that runs at the start of a processor. Triggers and their processors are stateful, as they effectively track progress as they run.
 
-Each processor should track its progress independently so that when future data sources and processors are added (eg: new smart contracts), that source can catch up and process independently of any others.
+Triggers and their processors need to ensure that they makes progress every time they run, no matter what, so that they avoid an infinite loop. This means that every time a processor runs, it must make some change to the database that ensures the same input will not arrive again in the next loop.
+
+There are 2 main ways in which these updates can result in progress:
+ - With extra trigger/processor metadata: A processor can store a cursor to track its progress (for example, latestEthereumBlockProcessed)
+ - Intrinsically, within the data it processes: A processor can modify the records from its input so that they do not trigger on the next run (For example, the metadata processor queries for any metadata records with null metadata field and null metadataError and processes them. Each run, it will modify every record by either adding the metadata field when successful, or adding the metadataError field when failing. This means that those records won't be part of future trigger.)
+
+It is usually preferable for a processor to track progress intrinsically, rather than with an extra cursor when possible. This tends to lead to looser coupling between processors and parrelelizabilty, so is a good principle to follow.
+
+Each processor should track its progress as precisely as possible, so that when future data sources and processors are added, that source can catch up and process independently of any others.
 
 Another way to think about triggers based on these examples:
  - Cursor based: In the first example, the dimension of progress, ie, time/blocks generally applies to a data source being ingested and the information about progress is stored directly by the processor. Other examples in this category could be: New tracks being added into the web3-music-subgraph, New Ethereum events, An nft transfer/change of ownership.
@@ -63,6 +74,3 @@ Another way to think about triggers based on these examples:
 *Note: This isn't perfect. There may be cases where there is a dependency across processors, For example, imagine Sound.xyz adds some feature where if you hold 2 golden eggs at the same time, you get a special platinum egg. In this case, there would be a dependency between nft ownership and platinum eggs. This means that if the nft ownership processor is completed but the golden egg processor is not, we would have to re-run the nft ownership processer again to make sure we didn't miss any instances where a user was temporarily holding 2 golden eggs and minted a platinum egg. Perhaps a more powerful design could also allow specifying explicit dependencies across sources for re-calculation.*
 
 In addition to fulfilling the above design goals, this kind of process architecture will make it super easy to parallelize the pipeline in future if ever needed.
-
-# Runner
-Each processor could in theory run in parallel, but at the moment there is a simple runner that just loops across all processors over and over until all are up to date.

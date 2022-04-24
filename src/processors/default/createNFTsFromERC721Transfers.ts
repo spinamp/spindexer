@@ -34,7 +34,6 @@ const processorFunction = (contract: ERC721Contract, name: string) =>
         contractAddress: formatAddress(contract.address),
         tokenId,
         platformId: contract.platform,
-        metadataId: contractType.buildNFTMetadataId(contract.address, tokenId)
       };
     });
     await clients.db.insert('nfts', newNFTs);

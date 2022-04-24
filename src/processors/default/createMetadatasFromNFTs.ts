@@ -4,7 +4,7 @@ import { EthClient, ValidContractCallFunction } from '../../clients/ethereum';
 import { DBClient } from '../../db/db';
 import { unprocessedNFTs } from '../../triggers/missing';
 import { formatAddress } from '../../types/address';
-import { ERC721Contract } from '../../types/ethereum';
+import { ERC721Contract, NFTContractTypes } from '../../types/ethereum';
 import { Metadata } from '../../types/metadata';
 import { filterNewMetadatas, getNFTContractCalls, NFT } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
@@ -14,7 +14,7 @@ const name = 'createMetadatasFromNFTs';
 export const createMetadatasFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethClient: EthClient, erc721ContractsByAddress: {[key:string]:ERC721Contract}) => {
   const nftsWithNewMetadata = await filterNewMetadatas(nfts, dbClient);
   const contractCalls = nftsWithNewMetadata.map(nft => {
-    const nftContractTypeName = erc721ContractsByAddress[nft.contractAddress].contractType;
+    const nftContractTypeName = erc721ContractsByAddress[nft.contractAddress]?.contractType || 'default';
     return getNFTContractCalls(nft, nftContractTypeName)
   });
   const flatContractCalls: {

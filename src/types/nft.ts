@@ -8,7 +8,6 @@ export type NFT = Record & {
   contractAddress: string
   tokenId: BigInt
   platformId: MusicPlatform
-  metadataId: string | null
 }
 
 export const getNFTContractCalls = (nft: NFT, contractTypeName: ERC721ContractTypeName) => {
