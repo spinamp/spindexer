@@ -17,20 +17,11 @@ const processorFunction = (contract: ERC721Contract, name: string) =>
     const newMints = items.filter(transfer => {
       return transfer.args!.from === ETHEREUM_NULL_ADDRESS;
     })
-    const mintsByBlock = _.groupBy(newMints, 'blockHash');
-    const blockHashes = Object.keys(mintsByBlock);
-    const timestamps = await clients.eth.getBlockTimestamps(blockHashes);
-    blockHashes.forEach((hash, index) => {
-      const timestamp = BigInt(timestamps[index]) * BigInt(1000);
-      const mints = mintsByBlock[hash];
-      mints.forEach(mint => (mint as ethers.Event & {timestamp:bigint}).timestamp = timestamp)
-    })
-    const newNFTs:ERC721NFT[] = newMints.map((mint) => {
+    const newNFTs:Partial<ERC721NFT>[] = newMints.map((mint) => {
       const tokenId = BigInt((mint.args!.tokenId as BigNumber).toString());
       return {
         id: contractType.buildNFTId(contract.address, tokenId),
         createdAtEthereumBlockNumber: '' + mint.blockNumber,
-        createdAtTime: new Date(parseInt((mint as any).timestamp)),
         contractAddress: formatAddress(contract.address),
         tokenId,
         platformId: contract.platform,

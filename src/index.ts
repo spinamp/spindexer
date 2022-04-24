@@ -5,6 +5,7 @@ import _ from 'lodash';
 import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
+import { addTimestampToERC721NFTs } from './processors/default/addTimestampToERC721NFTs';
 import { categorizeZora } from './processors/default/categorizeZora';
 import { createERC721ContractFromFactoryProcessor } from './processors/default/createERC721ContractFromFactoryProcessor';
 import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
@@ -26,8 +27,9 @@ const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryCo
   return [
   ...factoryContractProcessors,
   ...erc721TransferProcessors,
+
   // stripIgnoredNFTs,
-  createMetadatasFromNFTsProcessor(erc721ContractsByAddress),
+  // createMetadatasFromNFTsProcessor(erc721ContractsByAddress),
   // addMetadataIPFSHashProcessor,
   // addMetadataObjectProcessor,
   // stripNonAudio,

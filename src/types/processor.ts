@@ -1,5 +1,6 @@
 import { Axios } from 'axios';
 
+import { BlocksClient } from '../clients/blocks';
 import { CatalogClient } from '../clients/catalog';
 import { EthClient } from '../clients/ethereum';
 import { IPFSClient } from '../clients/ipfs';
@@ -12,6 +13,7 @@ import { Cursor, Trigger } from './trigger';
 export type Clients = {
   eth: EthClient,
   db: DBClient,
+  blocks: BlocksClient,
   axios: Axios,
   ipfs: IPFSClient,
   catalog: CatalogClient,
@@ -20,8 +22,8 @@ export type Clients = {
 }
 
 export type Processor = {
-  name: string,
+  name?: string,
   trigger: Trigger<Clients, Cursor | undefined>,
   processorFunction: (newTriggerItems: any, clients: Clients) => Promise<void>;
-  initialCursor: Cursor | undefined;
+  initialCursor?: Cursor | undefined;
 };
