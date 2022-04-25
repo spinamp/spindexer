@@ -9,6 +9,7 @@ const INITIAL_CONTRACTS = [
     platformId: MusicPlatform.sound,
     startingBlock: '13725566',
     contractType: FactoryContractTypeName.soundArtistProfileCreator,
+    gap: '500000'
   },
 ]
 
@@ -20,6 +21,7 @@ export const up = async (knex: Knex) => {
     table.foreign('platformId').references('id').inTable('platforms');
     table.string('startingBlock');
     table.string('contractType');
+    table.string('gap');
   });
   await knex('factoryContracts').insert(INITIAL_CONTRACTS);
   await knex.raw(`GRANT SELECT ON "factoryContracts" TO ${process.env.POSTGRES_USERNAME_OPEN}`);

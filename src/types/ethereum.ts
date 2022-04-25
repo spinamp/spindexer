@@ -18,6 +18,7 @@ export type FactoryContract = {
   platform: MusicPlatform,
   startingBlock: string,
   contractType: FactoryContractTypeName,
+  gap?: string
 }
 
 export type FactoryContractType = {

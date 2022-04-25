@@ -6,14 +6,13 @@ import { Trigger } from '../types/trigger';
 const NUMBER_OF_CONFIRMATIONS = BigInt(12);
 const MINIMUM_BLOCK_BATCH = BigInt(50);
 
-export const newEthereumEvents: (contractFilters: ContractFilter[]) => Trigger<Clients, string> =
-  (contractFilters: ContractFilter[]) => {
+export const newEthereumEvents: (contractFilters: ContractFilter[], gap?:string) => Trigger<Clients, string> =
+  (contractFilters: ContractFilter[], gap:string =  process.env.ETHEREUM_BLOCK_QUERY_GAP!) => {
     return async (clients: Clients, cursorJSON: string) => {
       const cursor = JSON.parse(cursorJSON);
       const cursorBlock = cursor.block;
       const rangeStart = BigInt(cursorBlock) + BigInt(1);
-      const gap =  BigInt(process.env.ETHEREUM_BLOCK_QUERY_GAP!)
-      let rangeEnd = BigInt(cursorBlock) + gap;
+      let rangeEnd = BigInt(cursorBlock) + BigInt(gap);
       const latestEthereumBlock = BigInt(await clients.eth.getLatestBlockNumber());
 
       // Wait for confirmations
@@ -48,11 +47,10 @@ export const newERC721Transfers: (contract: ERC721Contract) => Trigger<Clients, 
   (factoryContract: FactoryContract) => {
     const factoryContractTypeName = factoryContract.contractType;
     const newContractCreatedEvent = FactoryContractTypes[factoryContractTypeName].newContractCreatedEvent
-
     return newEthereumEvents([{
       address: factoryContract.address,
       filter: newContractCreatedEvent
-    }]);
+    }], factoryContract.gap? factoryContract.gap : undefined);
   };
 
   export const newEditionsCreated: (contract: ERC721Contract) => Trigger<Clients, string> =

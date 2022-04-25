@@ -48,6 +48,7 @@ const fromRecordMapper: any = {
       platform: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,
+      gap: c.gap,
     });
   }),
 }
