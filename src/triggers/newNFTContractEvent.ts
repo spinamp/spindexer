@@ -8,10 +8,12 @@ const MINIMUM_BLOCK_BATCH = BigInt(50);
 
 export const newEthereumEvents: (contractFilters: ContractFilter[]) => Trigger<Clients, string> =
   (contractFilters: ContractFilter[]) => {
-    return async (clients: Clients, cursor: string) => {
-      const rangeStart = BigInt(cursor) + BigInt(1);
+    return async (clients: Clients, cursorJSON: string) => {
+      const cursor = JSON.parse(cursorJSON);
+      const cursorBlock = cursor.block;
+      const rangeStart = BigInt(cursorBlock) + BigInt(1);
       const gap =  BigInt(process.env.ETHEREUM_BLOCK_QUERY_GAP!)
-      let rangeEnd = BigInt(cursor) + gap;
+      let rangeEnd = BigInt(cursorBlock) + gap;
       const latestEthereumBlock = BigInt(await clients.eth.getLatestBlockNumber());
 
       // Wait for confirmations
@@ -28,9 +30,10 @@ export const newEthereumEvents: (contractFilters: ContractFilter[]) => Trigger<C
       }
 
       const newEvents = await clients.eth.getEventsFrom(rangeStart.toString(), rangeEnd.toString(), contractFilters);
+      const newCursor = JSON.stringify({ block: rangeEnd.toString() });
       return {
         items: newEvents,
-        newCursor: rangeEnd.toString()
+        newCursor
       };
     }
   };

@@ -35,5 +35,5 @@ export const createERC721NFTsFromTransfersProcessor: (contract: ERC721Contract) 
   name: `${NAME}_${contract.address}`,
   trigger: newERC721Transfers(contract),
   processorFunction: processorFunction(contract, `${NAME}_${contract.address}`),
-  initialCursor: contract.startingBlock,
+  initialCursor: JSON.stringify({ block: contract.startingBlock }),
 });
