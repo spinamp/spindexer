@@ -40,7 +40,11 @@ export const mergeProcessedTracks = async (newProcessedTracks: ProcessedTrack[],
       ['whereIn', ['platformInternalId', platformInternalIds]]
     ]
   );
+  const newProcessedTracksById = _.keyBy(existingProcessedTracks, 'id');
   const existingProcessedTracksByPlatformId = _.keyBy(existingProcessedTracks, 'platformInternalId');
+  const oldIds = existingProcessedTracks.map(t => t.id).filter(id => {
+    newProcessedTracksById[id]
+  });
   const mergedProcessedTracks = newProcessedTracks.map(t => {
     if (prioritizeNew) {
       return {
@@ -56,7 +60,7 @@ export const mergeProcessedTracks = async (newProcessedTracks: ProcessedTrack[],
   });
   if (prioritizeNew) {
     return {
-      oldIds: existingProcessedTracks.map(t => t.id),
+      oldIds,
       mergedProcessedTracks
     }
   } else {

@@ -3,7 +3,7 @@ import slugify from 'slugify';
 
 import { SoundClient } from '../../clients/sound';
 import { formatAddress } from '../address';
-import { Artist, ArtistProfile } from '../artist';
+import { ArtistProfile } from '../artist';
 import { ERC721NFT } from '../erc721nft';
 import { MusicPlatform } from '../platform';
 import { Clients } from '../processor';
@@ -21,7 +21,6 @@ const mapTrack = (
   nft: ERC721NFT,
   apiTrack: any
 ): ProcessedTrack => {
-  console.dir(nft,{ depth: null });
   if (!nft.metadata.audio_url) {
     throw new Error('missing nft metadata audio_url');
   }
@@ -100,9 +99,17 @@ const createTracks =  async (newTrackIds:string[], trackMapping: { [trackId: str
 Promise<{
   newTracks: ProcessedTrack[],
   joins: NFTTrackJoin[],
-  errorNFTs: NFTProcessError[]
+  errorNFTs: NFTProcessError[],
   artistProfiles: ArtistProfile[]
 }> => {
+  if(newTrackIds.length === 0) {
+    return {
+      newTracks: [],
+      joins: [],
+      errorNFTs: [],
+      artistProfiles: []
+    }
+  }
   const apiTrackData = await getAPITrackData(newTrackIds, clients.sound);
 
   const newTracks:ProcessedTrack[] = [];

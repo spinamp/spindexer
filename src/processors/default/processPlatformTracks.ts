@@ -14,48 +14,6 @@ type ImplementedMusicPlatform = MusicPlatform.catalog | MusicPlatform.sound | Mu
 
 const name = 'processTracks';
 
-// const processPlatformTrackData = (platformTrackData: {
-//   nft: ERC721NFT;
-//   platformTrackResponse: any;
-// }[], platformMapper: PlatformMapper) => {
-//   const { mapArtistProfile, mapTrack } = platformMapper;
-
-//   const { processedTracks, metadataUpdates } = platformTrackData.reduce<
-//     { processedTracks: ProcessedTrack[], metadataUpdates: RecordUpdate<ERC721NFT>[] }>
-//     ((accum, item) => {
-//       if (item.platformTrackResponse && item.platformTrackResponse.isError) {
-//         accum.metadataUpdates.push({
-//           id: item.nft.id,
-//           processed: true,
-//           processError: item.platformTrackResponse.error,
-//         });
-//       } else {
-//         const processedTrack = mapTrack(item)
-//         accum.processedTracks.push(processedTrack);
-//         accum.metadataUpdates.push({
-//           id: item.nft.id,
-//           processed: true,
-//         });
-//       }
-//       return accum;
-//     },
-//       { processedTracks: [], metadataUpdates: [] }
-//     );
-//   const artistProfiles = _.uniqBy(platformTrackData.reduce<ArtistProfile[]>((profiles, item) => {
-//     if (item.platformTrackResponse && !item.platformTrackResponse.isError) {
-//       const artistProfile = {
-//         ...mapArtistProfile(item.platformTrackResponse, item.nft.createdAtTime, item.nft.createdAtEthereumBlockNumber),
-//       } as ArtistProfile;
-//       profiles.push(artistProfile);
-//     }
-//     return profiles
-//   }, []), 'artistId');
-//   const artists = artistProfiles.map(profile => mapArtist(profile));
-//   return {
-//     processedTracks, metadataUpdates, artists, artistProfiles,
-//   };
-// }
-
 const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => async (nfts: ERC721NFT[], clients: Clients) => {
   console.log(`Getting ${platformId} API tracks for ids: ${nfts.map(n => n.id)}`);
   const platformMapper = platformConfig[platformId].mappers;
@@ -72,8 +30,6 @@ const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => asy
 
   const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(newTracks, clients.db, true);
 
-  console.log({ oldIds })
-  // process.exit();
   if (errorNFTs.length !== 0) {
     await clients.db.insert(Table.erc721nftProcessErrors, errorNFTs);
   }
