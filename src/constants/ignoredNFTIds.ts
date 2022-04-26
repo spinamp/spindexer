@@ -8643,7 +8643,15 @@ const nonAudioNFTIds:string[] = [
   '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/10192',
   '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/10214',
   '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/10219',
-  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/10227'
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/10227',
+  '0x0bc2a24ce568dad89691116d5b34deb6c203f342/1',
+  '0x0bc2a24ce568dad89691116d5b34deb6c203f342/14',
+  '0x0bc2a24ce568dad89691116d5b34deb6c203f342/17',
+  '0x0bc2a24ce568dad89691116d5b34deb6c203f342/2',
+  '0x0bc2a24ce568dad89691116d5b34deb6c203f342/3',
+  '0x0bc2a24ce568dad89691116d5b34deb6c203f342/5',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/3313',
+
 ];
 
 export const ignoredNFTIds = nonAudioNFTIds;

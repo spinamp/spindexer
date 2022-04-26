@@ -13,14 +13,14 @@ export const missingCreatedAtTime: Trigger<undefined> = async (clients: Clients)
 };
 
 export const missingMetadataObject: Trigger<undefined> = async (clients: Clients) => {
-  const metadatas = (await clients.db.getRecords(Table.erc721nfts,
+  const nfts = (await clients.db.getRecords(Table.erc721nfts,
     [
       ['whereNull', ['metadata']],
       ['and'],
       ['whereNull', ['metadataError']],
     ]
   )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
-  return metadatas;
+  return nfts;
 };
 
 export const missingMetadataIPFSHash: Trigger<undefined> = async (clients: Clients) => {

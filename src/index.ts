@@ -28,12 +28,11 @@ const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryCo
   return [
   ...factoryContractProcessors,
   erc721TransferProcessors,
-
   stripIgnoredNFTs,
   addTimestampToERC721NFTs,
   getERC721TokenFieldsProcessor(erc721ContractsByAddress),
   addMetadataIPFSHashProcessor,
-  // addMetadataObjectProcessor,
+  addMetadataObjectProcessor,
   // stripNonAudio,
   // categorizeZora,
   // createSoundMetadataIds,
