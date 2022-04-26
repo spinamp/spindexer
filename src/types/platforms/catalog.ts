@@ -1,15 +1,17 @@
 import { toUtf8Bytes, verifyMessage } from 'ethers/lib/utils';
+
 // import _ from 'lodash';
 // import slugify from 'slugify';
 
+import { ArtistProfile } from '../artist';
 import { ERC721NFT } from '../erc721nft';
 import { MusicPlatform } from '../platform';
+import { Clients } from '../processor';
+import { NFTProcessError, ProcessedTrack } from '../track';
 
 // import { CatalogClient } from '../../clients/catalog';
 // import { formatAddress } from '../address';
 // import { ArtistProfile } from '../artist';
-// import { Metadata } from '../metadata';
-// import { ProcessedTrack } from '../track';
 
 export const recoverCatalogAddress = (body: any, signature: string) => {
   const bodyString = JSON.stringify(body);
@@ -113,8 +115,27 @@ export const getZoraPlatform = (nft: ERC721NFT) => {
 //   return platformTrackData;
 // }
 
-// export default {
-//   addPlatformTrackData,
-//   mapTrack,
-//   mapArtistProfile,
-// }
+
+const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } => {
+  throw new Error('not yet implemented');
+  return {};
+}
+
+const createTracks =  async (newTrackIds:string[], trackMapping: { [trackId: string]:ERC721NFT[] }, clients: Clients):
+Promise<{
+  newTracks: ProcessedTrack[],
+  errorNFTs: NFTProcessError[]
+  artistProfiles: ArtistProfile[]
+}> => {
+  throw new Error('not yet implemented');
+  return {} as any;
+}
+
+
+export default {
+  //   addPlatformTrackData,
+  //   mapTrack,
+  //   mapArtistProfile,
+  mapNFTsToTrackIds,
+  createTracks
+}

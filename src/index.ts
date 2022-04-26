@@ -35,9 +35,9 @@ const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryCo
   addMetadataObjectProcessor,
   stripNonAudio,
   categorizeZora,
+  processPlatformTracks(MusicPlatform.sound, 10),
   // createSoundMetadataIds,
   // processPlatformTracks(MusicPlatform.catalog),
-  // processPlatformTracks(MusicPlatform.sound, 3),
   // processPlatformTracks(MusicPlatform.noizd),
   // createProcessedTracksFromAPI(MusicPlatform.noizd),
 ]};

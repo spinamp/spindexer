@@ -1,12 +1,17 @@
 import _ from 'lodash';
 
-import { DBClient } from '../db/db';
+import { DBClient, Table } from '../db/db';
 
 import { MusicPlatform } from './platform'
 import { Record } from './record'
 
 export type SubgraphTrack = {
   id: string
+}
+
+export type NFTProcessError = {
+  erc721nftId: string;
+  processError: string;
 }
 
 export type ProcessedTrack = Record & {
@@ -25,7 +30,7 @@ export type ProcessedTrack = Record & {
 
 export const mergeProcessedTracks = async (newProcessedTracks: ProcessedTrack[], dbClient: DBClient, prioritizeNew: boolean) => {
   const platformInternalIds = newProcessedTracks.map(t => t.platformInternalId);
-  const existingProcessedTracks = await dbClient.getRecords<ProcessedTrack>('processedTracks',
+  const existingProcessedTracks = await dbClient.getRecords<ProcessedTrack>(Table.processedTracks,
     [
       ['whereIn', ['platformInternalId', platformInternalIds]]
     ]

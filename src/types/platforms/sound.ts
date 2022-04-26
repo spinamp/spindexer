@@ -3,48 +3,51 @@ import slugify from 'slugify';
 
 import { SoundClient } from '../../clients/sound';
 import { formatAddress } from '../address';
-import { ArtistProfile } from '../artist';
-import { Metadata } from '../metadata';
+import { Artist, ArtistProfile } from '../artist';
+import { ERC721NFT } from '../erc721nft';
 import { MusicPlatform } from '../platform';
-import { ProcessedTrack } from '../track';
+import { Clients } from '../processor';
+import { NFTProcessError, ProcessedTrack } from '../track';
 
-const mapTrackID = (metadataId: string): string => {
-  const [contractAddress, editionId] = metadataId.split('/');
-  return `ethereum/${formatAddress(contractAddress)}/${editionId}`;
+const mapAPITrackToArtistID = (apiTrack: any): string => {
+  return `ethereum/${formatAddress(apiTrack.artist.user.publicAddress)}`;
 };
 
-const mapArtistID = (artistId: string): string => {
-  return `ethereum/${formatAddress(artistId)}`;
+const mapAPITrackToTrackID = (apiTrack: any): string => {
+  return `ethereum/${formatAddress(apiTrack?.artist?.contract?.address)}/${apiTrack?.mintInfo?.editionId}`
 };
 
-const mapTrack = (item: {
-  metadata: Metadata;
-  platformTrackResponse: any;
-}): ProcessedTrack => {
-  console.dir(item.metadata,{ depth: null });
+const mapTrack = (
+  nft: ERC721NFT,
+  apiTrack: any
+): ProcessedTrack => {
+  console.dir(nft,{ depth: null });
+  if (!nft.metadata.audio_url) {
+    throw new Error('missing nft metadata audio_url');
+  }
   return ({
-  id: mapTrackID(item.metadata.id),
-  platformInternalId: item.platformTrackResponse.id,
-  title: item.platformTrackResponse.title,
-  slug: slugify(`${item.platformTrackResponse.title} ${item.metadata.createdAtTime.getTime()}`).toLowerCase(),
-  description: item.platformTrackResponse.description,
+  id: apiTrack.trackId,
+  platformInternalId: apiTrack.id,
+  title: apiTrack.title,
+  slug: slugify(`${apiTrack.title} ${nft.createdAtTime.getTime()}`).toLowerCase(),
+  description: apiTrack.description,
   platformId: MusicPlatform.sound,
-  lossyAudioURL: item.metadata.metadata.audio_url || item.platformTrackResponse.tracks[0].audio.url,
-  createdAtTime: item.metadata.createdAtTime,
-  createdAtEthereumBlockNumber: item.metadata.createdAtEthereumBlockNumber,
-  lossyArtworkURL: item.platformTrackResponse.coverImage.url,
+  lossyAudioURL: apiTrack.tracks[0].audio.url || nft.metadata.audio_url,
+  createdAtTime: nft.createdAtTime,
+  createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+  lossyArtworkURL: apiTrack.coverImage.url,
   websiteUrl:
-  item.platformTrackResponse.artist.soundHandle && item.platformTrackResponse.titleSlug
-      ? `https://www.sound.xyz/${item.platformTrackResponse.artist.soundHandle}/${item.platformTrackResponse.titleSlug}`
+  apiTrack.artist.soundHandle && apiTrack.titleSlug
+      ? `https://www.sound.xyz/${apiTrack.artist.soundHandle}/${apiTrack.titleSlug}`
       : 'https://www.sound.xyz',
-  artistId: mapArtistID(item.platformTrackResponse.artist.user.publicAddress),
+  artistId: mapAPITrackToArtistID(apiTrack),
 })};
 
-export const mapArtistProfile = (platformResponse: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
-  const artist = platformResponse.artist
+export const mapArtistProfile = (apiTrack: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
+  const artist = apiTrack.artist
   return {
     name: artist.name,
-    artistId: mapArtistID(artist.user.publicAddress),
+    artistId: mapAPITrackToArtistID(apiTrack),
     platformInternalId: artist.id,
     platformId: MusicPlatform.sound,
     avatarUrl: artist.user.avatar.url,
@@ -56,43 +59,83 @@ export const mapArtistProfile = (platformResponse: any, createdAtTime: Date, cre
   }
 };
 
-const addPlatformTrackData = async (metadatas: Metadata[], client: SoundClient) => {
-  const metadataIds = metadatas.map(m=>m.id);
-  const platformTracks = await client.getAllMintedReleases();
-  const platformTracksWithMetadataId = platformTracks.map(platformTrack => ({
-    ...platformTrack,
-    metadataId: `${formatAddress(platformTrack?.artist?.contract?.address)}/${platformTrack?.mintInfo?.editionId}`,
-  })).filter(platformTrack=> metadataIds.includes(platformTrack.metadataId));
-  const platformTracksWithAudioPromises = platformTracksWithMetadataId.map(async platformTrack => {
-    if(platformTrack.tracks.length > 1) {
+const getAPITrackData = async (trackIds: string[], client: SoundClient) => {
+  const apiResponse = await client.getAllMintedReleases();
+  const apiTracks = apiResponse.map(apiTrack => ({
+    ...apiTrack,
+    trackId: mapAPITrackToTrackID(apiTrack),
+  }))
+  const filteredAPITracks = apiTracks.filter(apiTrack => trackIds.includes(apiTrack.trackId));
+  filteredAPITracks.forEach(apiTrack => {
+    if(apiTrack.tracks.length > 1) {
       return { isError: true, error: new Error('Sound release with multiple tracks not yet implemented') };
     }
+  });
+  const audioAPITrackPromises= filteredAPITracks.map(async apiTrack => {
     return {
-      ...platformTrack,
+      ...apiTrack,
       tracks: [{
-        ...platformTrack.tracks[0],
-        audio: await client.audioFromTrack(platformTrack.tracks[0].id),
+        ...apiTrack.tracks[0],
+        audio: await client.audioFromTrack(apiTrack.tracks[0].id),
       }]
     };
   });
-  const platformTracksWithAudio = await Promise.all(platformTracksWithAudioPromises);
-  const platformTrackDataByMetadataId = _.keyBy(platformTracksWithAudio, 'metadataId');
-  const platformTrackData: { metadata: Metadata, platformTrackResponse: any }[]
-    = metadatas.map(metadata => {
-      const platformTrackResponse = platformTrackDataByMetadataId[metadata.id] || {
-        isError: true,
-        error: new Error(`Missing platform track data`)
-      }
-      return {
-        metadata,
-        platformTrackResponse
-      };
-    });
-  return platformTrackData;
+  const audioAPITracks = await Promise.all(audioAPITrackPromises);
+  const apiTrackByTrackId = _.keyBy(audioAPITracks, 'trackId');
+  return apiTrackByTrackId;
+}
+
+const mapNFTtoTrackID = (nft: ERC721NFT): string => {
+  const splitURI = nft.tokenURI!.split('/');
+  const editionId = splitURI[splitURI.length - 2];
+  return `ethereum/${formatAddress(nft.contractAddress)}/${editionId}`;
+};
+
+const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } => {
+  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
+}
+
+
+const createTracks =  async (newTrackIds:string[], trackMapping: { [trackId: string]:ERC721NFT[] }, clients: Clients):
+Promise<{
+  newTracks: ProcessedTrack[],
+  errorNFTs: NFTProcessError[]
+  artistProfiles: ArtistProfile[]
+}> => {
+  const apiTrackData = await getAPITrackData(newTrackIds, clients.sound);
+
+  const newTracks:ProcessedTrack[] = [];
+  const errorNFTs:NFTProcessError[] = [];
+  const artistProfiles:ArtistProfile[] = [];
+
+  newTrackIds.forEach(trackId => {
+    const trackNFT = trackMapping[trackId][0];
+    const apiTrack = apiTrackData[trackId];
+    if(!apiTrack) {
+      const trackNFTs = trackMapping[trackId];
+      trackNFTs.forEach(nft => {
+        errorNFTs.push({
+          erc721nftId: nft.id,
+          processError: `Missing api track`
+        });
+      })
+      return undefined;
+    }
+
+    newTracks.push(mapTrack(trackNFT, apiTrack));
+
+    const artistProfile = {
+      ...mapArtistProfile(apiTrack, trackNFT.createdAtTime, trackNFT.createdAtEthereumBlockNumber),
+    } as ArtistProfile;
+    artistProfiles.push(artistProfile);
+  });
+
+  const uniqueArtistProfiles = _.uniqBy(artistProfiles, 'artistId');
+
+  return { newTracks, errorNFTs, artistProfiles: uniqueArtistProfiles };
 }
 
 export default {
-  addPlatformTrackData,
-  mapTrack,
-  mapArtistProfile,
+  mapNFTsToTrackIds,
+  createTracks,
 }

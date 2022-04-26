@@ -39,15 +39,29 @@ export const missingMetadataPlatform: Trigger<undefined> = async (clients: Clien
   return metadatas;
 };
 
-export const unprocessedPlatformMetadatas: (platformId: MusicPlatform, limit?: number) => Trigger<undefined> = (platformId: MusicPlatform, limit?: number) => async (clients: Clients) => {
-  const metadatas = (await clients.db.getRecords(Table.erc721nfts,
-    [
-      ['whereNull', ['processed']],
-      ['andWhere', [{ platformId }]],
-    ]
-  )).slice(0, limit || parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
-  return metadatas;
-};
+export const erc721NFTsWithoutTracks: (platformId: MusicPlatform, limit?: number) => Trigger<undefined> =
+  (platformId: MusicPlatform, limit: number = parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)) => async (clients: Clients) => {
+    // This query joins nfts+tracks through the join table,
+    // and returns nfts where there is no corresponding track.
+    // It also filters out error tracks so that nfts where we fail
+    // to create a track are not repeated.
+    const query = `select n.* from "${Table.erc721nfts}" as n
+      LEFT OUTER JOIN "${Table.erc721nfts_processedTracks}" as j
+      ON n.id = j."erc721nftId"
+      LEFT OUTER JOIN "${Table.processedTracks}" as p
+      ON j."processedTrackId" = p.id
+      LEFT OUTER JOIN "${Table.erc721nftProcessErrors}" as e
+      ON n.id = e."erc721nftId"
+      WHERE p.id is NULL AND
+      e."processError" is NULL AND
+      n."platformId"='${platformId}'
+      ORDER BY n."createdAtTime"
+      LIMIT ${limit}`
+      const nfts = (await clients.db.rawSQL(
+        query
+      )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+    return nfts;
+  };
 
 export const unprocessedNFTs: Trigger<undefined> = async (clients: Clients) => {
   const nfts = (await clients.db.rawSQL(

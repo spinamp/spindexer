@@ -9,7 +9,9 @@ export enum Table {
   processedTracks = 'processedTracks',
   processors = 'processors',
   factoryContracts = 'factoryContracts',
-  erc721Contracts = 'erc721Contracts'
+  erc721Contracts = 'erc721Contracts',
+  erc721nfts_processedTracks = 'erc721nfts_processedTracks',
+  erc721nftProcessErrors = 'erc721nftProcessErrors'
 }
 
 export type WhereFunc = 'where'
@@ -40,6 +42,7 @@ export type DBClient = {
   getNumberRecords: (tableName: Table) => Promise<any>;
   rawSQL: (raw: string) => Promise<any>;
   recordExists: (tableName: Table, recordID: string) => Promise<boolean>;
+  recordsExist: (tableName: Table, recordIDs: string[]) => Promise<string[]>;
   getFullDB?: () => Promise<any>;
   close: () => Promise<void>;
 }

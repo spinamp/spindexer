@@ -29,6 +29,12 @@ const recordExistsFunc = (db: Knex) => async (tableName: string, recordID: strin
   return !!record[0];
 }
 
+const filterExistRecordsFunc = (db: Knex) => async (tableName: string, recordIDs: string[], idField: string = 'id') => {
+  console.log(`Querying for new records in ${recordIDs} on ${tableName}`);
+  const existingIds = await db(tableName).select([idField]).whereIn(idField, recordIDs)
+  return existingIds;
+}
+
 const getRecordsFunc = (db: Knex) => async <RecordType>(tableName: string, wheres?: Wheres): (Promise<RecordType[]>) => {
   console.log(`Querying for records in ${tableName}: ${JSON.stringify(wheres) || 'all'}`);
   let query = db(tableName);
@@ -55,6 +61,7 @@ const init = async (): Promise<DBClient> => {
       return cursorResult[0]?.cursor;
     },
     recordExists: recordExistsFunc(db),
+    recordsExist: filterExistRecordsFunc(db),
     insert: async <RecordType>(tableName: string, records: RecordType[]) => {
       if (records.length === 0) {
         return;
