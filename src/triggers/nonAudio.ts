@@ -8,6 +8,7 @@ export const nonAudioMetadata: Trigger<undefined> = async (clients: Clients) => 
       [
         'whereIn', ['mimeType',
           [
+            '',
             'text/plain',
             'image/png',
             'image/jpeg',

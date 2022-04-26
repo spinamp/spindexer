@@ -33,7 +33,7 @@ const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryCo
   getERC721TokenFieldsProcessor(erc721ContractsByAddress),
   addMetadataIPFSHashProcessor,
   addMetadataObjectProcessor,
-  // stripNonAudio,
+  stripNonAudio,
   // categorizeZora,
   // createSoundMetadataIds,
   // processPlatformTracks(MusicPlatform.catalog),
