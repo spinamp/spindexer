@@ -31,14 +31,6 @@ export const missingMetadataIPFSHash: Trigger<undefined> = async (clients: Clien
   return nfts;
 };
 
-export const missingMetadataPlatform: Trigger<undefined> = async (clients: Clients) => {
-  const metadatas = (await clients.db.getRecords(Table.erc721nfts,
-    [
-      ['whereNull', ['platformId']]
-    ])).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
-  return metadatas;
-};
-
 export const erc721NFTsWithoutTracks: (platformId: MusicPlatform, limit?: number) => Trigger<undefined> =
   (platformId: MusicPlatform, limit: number = parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)) => async (clients: Clients) => {
     // This query joins nfts+tracks through the join table,

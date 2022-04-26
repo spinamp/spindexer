@@ -3,7 +3,7 @@ import { Clients } from '../types/processor';
 import { Trigger } from '../types/trigger';
 
 export const nonAudioMetadata: Trigger<undefined> = async (clients: Clients) => {
-  const metadatas = (await clients.db.getRecords(Table.erc721nfts,
+  const nfts = (await clients.db.getRecords(Table.erc721nfts,
     [
       [
         'whereIn', ['mimeType',
@@ -29,5 +29,5 @@ export const nonAudioMetadata: Trigger<undefined> = async (clients: Clients) => 
         ]
       ]]
   )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
-  return metadatas;
+  return nfts;
 };

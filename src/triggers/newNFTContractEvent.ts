@@ -101,16 +101,3 @@ export const newERC721Transfers: (contracts: ERC721Contract[]) => Trigger<Cursor
       filter: newContractCreatedEvent
     }], factoryContract.gap? factoryContract.gap : undefined);
   };
-
-  // export const newEditionsCreated: (contract: ERC721Contract) => Trigger<Cursor> =
-  // (contract: ERC721Contract) => newEthereumEvents([{
-  //   address: contract.address,
-  //   filter: 'EditionCreated'
-  // }]);
-
-
-  // export const newEditionsPurchased: (contract: ERC721Contract) => Trigger<Cursor> =
-  // (contract: ERC721Contract) => newEthereumEvents([{
-  //   address: contract.address,
-  //   filter: 'EditionPurchased'
-  // }]);
