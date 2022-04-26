@@ -93,14 +93,6 @@ const getAPITrackData = async (trackIds: string[], client: CatalogClient) => {
   return apiTrackByTrackId;
 }
 
-export const mapTrackIdToContractAddress = (id: string) => {
-  return id.split('/')[0];
-}
-
-export const mapTrackIdToNFTId = (id: string) => {
-  return id.split('/')[1];
-}
-
 const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
@@ -160,9 +152,6 @@ Promise<{
 
 
 export default {
-  //   addPlatformTrackData,
-  //   mapTrack,
-  //   mapArtistProfile,
   mapNFTsToTrackIds,
   createTracks
 }
