@@ -1,17 +1,18 @@
+import { Table } from '../../db/db';
 import { missingMetadataIPFSHash } from '../../triggers/missing';
-import { Metadata, getMetadataIPFSHash } from '../../types/metadata';
+import { ERC721NFT } from '../../types/erc721nft';
+import { getMetadataIPFSHash } from '../../types/metadata';
 import { Clients, Processor } from '../../types/processor';
 
 const name = 'addMetadataIPFSHash';
 
-const processorFunction = async (metadatas: Metadata[], clients: Clients) => {
-  console.log(`Processing updates from ${metadatas[0].nftId}`)
-  const metadataUpdates = metadatas.map(m => ({
-    nftId: m.nftId,
-    metadataIPFSHash: getMetadataIPFSHash(m)
+const processorFunction = async (nfts: ERC721NFT[], clients: Clients) => {
+  console.log(`Processing updates for ${nfts.map(n=>n.id)}`)
+  const nftUpdates = nfts.map(n => ({
+    id: n.id,
+    metadataIPFSHash: getMetadataIPFSHash(n)
   }))
-  const filteredMetadataUpdates = metadataUpdates.filter(m => (m.metadataIPFSHash !== undefined));
-  await clients.db.update('metadatas', filteredMetadataUpdates);
+  await clients.db.update(Table.erc721nfts, nftUpdates);
 };
 
 export const addMetadataIPFSHashProcessor: Processor = {
