@@ -65,6 +65,7 @@ const init = async ():Promise<EthClient> => {
         ...iface.parseLog(event),
         blockNumber: BigNumber.from(event.blockNumber).toString(),
         blockHash: event.blockHash,
+        address: event.address
       }));
     },
     getLatestBlockNumber:  async () => {

@@ -3,10 +3,9 @@ import _, { range } from 'lodash';
 import { ContractFilter, EthClient } from '../clients/ethereum';
 import { ERC721Contract, EthereumContract, FactoryContract, FactoryContractTypes } from '../types/ethereum';
 import { Clients } from '../types/processor';
-import { Cursor, Trigger } from '../types/trigger';
+import { Cursor, Trigger, TriggerOutput } from '../types/trigger';
 
 const NUMBER_OF_CONFIRMATIONS = BigInt(12);
-const MINIMUM_BLOCK_BATCH = BigInt(50);
 
 const min = (a:bigint, b:bigint) => a < b ? a : b;
 
@@ -23,7 +22,7 @@ const calculateRange = (cursor: ContractsEventsCursor, gap:string) => {
   const mostStaleBlock = sortedBlocks[0];
   const mostStaleContracts = contractsByBlock[mostStaleBlock.toString()];
   const rangeStart:bigint = mostStaleBlock + BigInt(1);
-  console.log({ contractsByBlock, mostStaleContracts })
+
   let rangeEnd:bigint = rangeStart + BigInt(gap);
   if (sortedBlocks.length > 1 ) {
     rangeEnd = min(rangeEnd, sortedBlocks[1]);
@@ -38,9 +37,8 @@ type ContractsEventsCursor = {
 
 export const newEthereumEvents: (contracts: EthereumContract[], contractFilters: ContractFilter[], gap?:string) => Trigger<Cursor> =
   (contracts: EthereumContract[], contractFilters: ContractFilter[], gap:string =  process.env.ETHEREUM_BLOCK_QUERY_GAP!) => {
-    return async (clients: Clients, cursorJSON: string) => {
+    const triggerFunc = async (clients: Clients, cursorJSON: string = '{}'):Promise<TriggerOutput> => {
       const cursor:ContractsEventsCursor = JSON.parse(cursorJSON) || {};
-      console.dir({ msg:'processing cursor', cursor }, { depth: null });
       if (contracts.length === 0) {
         return [];
       }
@@ -57,11 +55,6 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
         rangeEnd = latestEthereumBlock - NUMBER_OF_CONFIRMATIONS
       }
 
-      // Ensure we have above the minimum batch of blocks to process
-      if (rangeEnd - rangeStart < MINIMUM_BLOCK_BATCH) {
-        return [];
-      }
-
       if (rangeStart > rangeEnd) {
         return [];
       }
@@ -74,15 +67,18 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
         newCursorObject[filter.address] = rangeEnd.toString();
       });
 
-      console.dir({ msg:'querying for events from', mostStaleContracts, rangeStart, rangeEnd, staleContractFilters, oldCursor: cursor, newCursorObject }, { depth: null });
-      process.exit();
       const newEvents = await clients.eth.getEventsFrom(rangeStart.toString(), rangeEnd.toString(), staleContractFilters);
       const newCursor = JSON.stringify(newCursorObject);
+      if(newEvents.length === 0 && mostStaleContracts.length !== contracts.length) {
+        console.log('Recursing trigger');
+        return triggerFunc(clients, newCursor);
+      }
       return {
         items: newEvents,
         newCursor
       };
     }
+    return triggerFunc;
   };
 
 
@@ -95,7 +91,7 @@ export const newERC721Transfers: (contracts: ERC721Contract[]) => Trigger<Cursor
     return newEthereumEvents(contracts, contractFilters);
   };
 
-  export const newERC721Contracts: (factoryContract: FactoryContract) => Trigger<Cursor> =
+  export const newERC721Contract: (factoryContract: FactoryContract) => Trigger<Cursor> =
   (factoryContract: FactoryContract) => {
     const factoryContractTypeName = factoryContract.contractType;
     const newContractCreatedEvent = FactoryContractTypes[factoryContractTypeName].newContractCreatedEvent;

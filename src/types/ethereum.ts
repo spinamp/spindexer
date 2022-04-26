@@ -36,7 +36,7 @@ export const FactoryContractTypes:FactoryContractTypes = {
   soundArtistProfileCreator: {
     newContractCreatedEvent: 'CreatedArtist',
     creationEventToERC721Contract: (event:any) => ({
-      address: event.args!.artistAddress,
+      address: formatAddress(event.args!.artistAddress),
       platform: MusicPlatform.sound,
       startingBlock: event.blockNumber,
       contractType: ERC721ContractTypeName.soundArtist,

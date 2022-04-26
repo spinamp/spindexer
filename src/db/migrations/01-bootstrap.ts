@@ -72,7 +72,7 @@ const INITIAL_TABLES = [
   {
     name: 'processors', create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
-      table.string('cursor');
+      table.string('cursor', 5000000);
     }
   },
 ];

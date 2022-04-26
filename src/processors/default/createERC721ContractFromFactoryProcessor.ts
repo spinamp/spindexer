@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import _ from 'lodash';
 
-import { newERC721Contracts } from '../../triggers/newNFTContractEvent';
+import { newERC721Contract } from '../../triggers/newNFTContractEvent';
 import { FactoryContract, FactoryContractTypes } from '../../types/ethereum';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';
@@ -21,7 +21,7 @@ const processorFunction = (factoryContract: FactoryContract, name: string) =>
 export const createERC721ContractFromFactoryProcessor: (factoryContract: FactoryContract) =>
 Processor = (factoryContract: FactoryContract) => ({
   name: `${NAME}_${factoryContract.address}`,
-  trigger: newERC721Contracts(factoryContract),
+  trigger: newERC721Contract(factoryContract),
   processorFunction: processorFunction(factoryContract, `${NAME}_${factoryContract.address}`),
-  initialCursor: JSON.stringify({ block: factoryContract.startingBlock }),
+  initialCursor: JSON.stringify({ [factoryContract.address]: factoryContract.startingBlock }),
 });
