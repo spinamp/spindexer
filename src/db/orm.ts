@@ -54,7 +54,7 @@ const fromRecordMapper: any = {
 }
 
 export const fromDBRecord = (record: any): Record => {
-  return { ...record, createdAtTime: new Date(record.createdAtTime) }
+  return { ...record, createdAtTime: record.createdAtTime? new Date(record.createdAtTime) : null }
 }
 
 export const fromDBRecords = (tableName: string, dbRecords: any[]) => {

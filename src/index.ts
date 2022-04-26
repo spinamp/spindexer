@@ -30,6 +30,7 @@ const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryCo
   erc721TransferProcessors,
 
   stripIgnoredNFTs,
+  addTimestampToERC721NFTs,
   // createMetadatasFromNFTsProcessor(erc721ContractsByAddress),
   // addMetadataIPFSHashProcessor,
   // addMetadataObjectProcessor,

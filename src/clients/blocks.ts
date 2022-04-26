@@ -15,7 +15,7 @@ const init = async () => {
       const { blocks } = await blocksAPI.request(
         gql`
           {
-            blocks( where: {number_in: ${blockNumbersForQuery}}) {
+            blocks(first:${blockNumbers.length}, where: {number_in: ${blockNumbersForQuery}}) {
               number
               timestamp
             }
