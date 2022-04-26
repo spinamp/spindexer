@@ -49,13 +49,9 @@ export const unprocessedPlatformMetadatas: (platformId: MusicPlatform, limit?: n
   return metadatas;
 };
 
-// This triggers gets all nfts which have not yet had their metadata record created.
-// We query for all NFTs which do not have a corresponding record in the metadata table
-// matching their metadataId
 export const unprocessedNFTs: Trigger<undefined> = async (clients: Clients) => {
   const nfts = (await clients.db.rawSQL(
     `select * from ${Table.erc721nfts} where "tokenURI" is null;`
   )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
-  console.log({ nfts })
   return nfts;
 };
