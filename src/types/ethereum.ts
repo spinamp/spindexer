@@ -8,15 +8,17 @@ import { MusicPlatform } from './platform'
 
 export const ETHEREUM_NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
+export type EthereumContract = {
+  address: string,
+  startingBlock: string,
+}
 
 export enum FactoryContractTypeName {
   soundArtistProfileCreator = 'soundArtistProfileCreator'
 }
 
-export type FactoryContract = {
-  address: string,
+export type FactoryContract = EthereumContract & {
   platform: MusicPlatform,
-  startingBlock: string,
   contractType: FactoryContractTypeName,
   gap?: string
 }
@@ -48,10 +50,8 @@ export enum ERC721ContractTypeName {
   soundArtist = 'soundArtist',
 }
 
-export type ERC721Contract = {
-  address: string,
+export type ERC721Contract = EthereumContract & {
   platform: MusicPlatform,
-  startingBlock: string,
   contractType: ERC721ContractTypeName,
 }
 

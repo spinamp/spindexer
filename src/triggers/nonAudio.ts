@@ -1,7 +1,7 @@
 import { Clients } from '../types/processor';
 import { Trigger } from '../types/trigger';
 
-export const nonAudioMetadata: Trigger<Clients, undefined> = async (clients: Clients) => {
+export const nonAudioMetadata: Trigger<undefined> = async (clients: Clients) => {
   const metadatas = (await clients.db.getRecords('metadatas',
     [
       [
