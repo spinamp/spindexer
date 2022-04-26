@@ -14,6 +14,11 @@ export type NFTProcessError = {
   processError: string;
 }
 
+export type NFTTrackJoin = {
+  erc721nftId: string;
+  processedTrackId: string;
+}
+
 export type ProcessedTrack = Record & {
   platformInternalId: string;
   title: string;

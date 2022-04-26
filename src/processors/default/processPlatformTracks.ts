@@ -67,20 +67,23 @@ const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => asy
   const trackIds = Object.keys(trackMapping);
   const existingTrackIds = await clients.db.recordsExist(Table.processedTracks, trackIds);
   const newTrackIds = trackIds.filter(id => !existingTrackIds.includes(id));
-  const { newTracks, errorNFTs, artistProfiles } = await platformMapper.createTracks(newTrackIds, trackMapping, clients);
+  const { newTracks, joins, errorNFTs, artistProfiles } = await platformMapper.createTracks(newTrackIds, trackMapping, clients);
   const artists = artistProfiles.map(profile => mapArtist(profile));
 
   const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(newTracks, clients.db, true);
 
+  console.log({ oldIds })
+  // process.exit();
   if (errorNFTs.length !== 0) {
     await clients.db.insert(Table.erc721nftProcessErrors, errorNFTs);
   }
-  if (oldIds) {
+  if (oldIds && oldIds.length !== 0) {
     await clients.db.delete(Table.processedTracks, oldIds);
   }
   await clients.db.upsert(Table.artists, artists);
   await clients.db.upsert(Table.artistProfiles, (artistProfiles as unknown as Record[]), ['artistId', 'platformId']);
   await clients.db.upsert(Table.processedTracks, mergedProcessedTracks);
+  await clients.db.insert(Table.erc721nfts_processedTracks, joins);
 };
 
 export const processPlatformTracks: (platformId: ImplementedMusicPlatform, limit?:number) => Processor =

@@ -112,7 +112,7 @@ const init = async (): Promise<DBClient> => {
         await db(tableName).whereIn(idField, ids).delete()
       }
     },
-    upsert: async (tableName: string, recordUpserts: (Record | RecordUpdate<unknown>)[], idField: string | string[] = 'id') => {
+    upsert: async <RecordType>(tableName: string, recordUpserts: RecordType[], idField: string | string[] = 'id') => {
       console.log(`Upserting records`);
       if (recordUpserts?.length > 0) {
         for (const upsert of recordUpserts) {

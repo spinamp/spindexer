@@ -7,7 +7,7 @@ import { Artist, ArtistProfile } from '../artist';
 import { ERC721NFT } from '../erc721nft';
 import { MusicPlatform } from '../platform';
 import { Clients } from '../processor';
-import { NFTProcessError, ProcessedTrack } from '../track';
+import { NFTProcessError, NFTTrackJoin, ProcessedTrack } from '../track';
 
 const mapAPITrackToArtistID = (apiTrack: any): string => {
   return `ethereum/${formatAddress(apiTrack.artist.user.publicAddress)}`;
@@ -99,20 +99,21 @@ const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } =
 const createTracks =  async (newTrackIds:string[], trackMapping: { [trackId: string]:ERC721NFT[] }, clients: Clients):
 Promise<{
   newTracks: ProcessedTrack[],
+  joins: NFTTrackJoin[],
   errorNFTs: NFTProcessError[]
   artistProfiles: ArtistProfile[]
 }> => {
   const apiTrackData = await getAPITrackData(newTrackIds, clients.sound);
 
   const newTracks:ProcessedTrack[] = [];
+  const joins:NFTTrackJoin[] = [];
   const errorNFTs:NFTProcessError[] = [];
   const artistProfiles:ArtistProfile[] = [];
 
   newTrackIds.forEach(trackId => {
-    const trackNFT = trackMapping[trackId][0];
+    const trackNFTs = trackMapping[trackId];
     const apiTrack = apiTrackData[trackId];
     if(!apiTrack) {
-      const trackNFTs = trackMapping[trackId];
       trackNFTs.forEach(nft => {
         errorNFTs.push({
           erc721nftId: nft.id,
@@ -122,17 +123,23 @@ Promise<{
       return undefined;
     }
 
-    newTracks.push(mapTrack(trackNFT, apiTrack));
+    newTracks.push(mapTrack(trackNFTs[0], apiTrack));
+    trackNFTs.forEach(nft => {
+      joins.push({
+        erc721nftId: nft.id,
+        processedTrackId: trackId
+      });
+    })
 
     const artistProfile = {
-      ...mapArtistProfile(apiTrack, trackNFT.createdAtTime, trackNFT.createdAtEthereumBlockNumber),
+      ...mapArtistProfile(apiTrack, trackNFTs[0].createdAtTime, trackNFTs[0].createdAtEthereumBlockNumber),
     } as ArtistProfile;
     artistProfiles.push(artistProfile);
   });
 
   const uniqueArtistProfiles = _.uniqBy(artistProfiles, 'artistId');
 
-  return { newTracks, errorNFTs, artistProfiles: uniqueArtistProfiles };
+  return { newTracks, joins, errorNFTs, artistProfiles: uniqueArtistProfiles };
 }
 
 export default {

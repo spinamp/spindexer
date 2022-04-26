@@ -6,7 +6,7 @@ import catalogMappers from './platforms/catalog';
 import noizdMappers from './platforms/noizd';
 import soundMappers from './platforms/sound';
 import { Clients } from './processor';
-import { NFTProcessError, ProcessedTrack } from './track';
+import { NFTProcessError, NFTTrackJoin, ProcessedTrack } from './track';
 
 export enum MusicPlatform {
   sound = 'sound',
@@ -32,6 +32,7 @@ export type PlatformMapper = {
   mapNFTsToTrackIds: (nfts:ERC721NFT[]) => { [trackId: string]:ERC721NFT[] }
   createTracks: (newTrackIds:string[], trackMapping: { [trackId: string]:ERC721NFT[] }, clients: Clients) => Promise<{
     newTracks: ProcessedTrack[],
+    joins: NFTTrackJoin[],
     errorNFTs: NFTProcessError[]
     artistProfiles: ArtistProfile[]
   }>

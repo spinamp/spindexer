@@ -7,7 +7,7 @@ import { ArtistProfile } from '../artist';
 import { ERC721NFT } from '../erc721nft';
 import { MusicPlatform } from '../platform';
 import { Clients } from '../processor';
-import { NFTProcessError, ProcessedTrack } from '../track';
+import { NFTProcessError, NFTTrackJoin, ProcessedTrack } from '../track';
 
 // import { CatalogClient } from '../../clients/catalog';
 // import { formatAddress } from '../address';
@@ -124,6 +124,7 @@ const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } =
 const createTracks =  async (newTrackIds:string[], trackMapping: { [trackId: string]:ERC721NFT[] }, clients: Clients):
 Promise<{
   newTracks: ProcessedTrack[],
+  joins: NFTTrackJoin[],
   errorNFTs: NFTProcessError[]
   artistProfiles: ArtistProfile[]
 }> => {
