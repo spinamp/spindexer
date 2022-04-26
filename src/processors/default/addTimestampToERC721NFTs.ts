@@ -1,6 +1,7 @@
 import { BigNumber, ethers } from 'ethers';
 import _ from 'lodash';
 
+import { missingCreatedAtTime } from '../../triggers/missing';
 import { newERC721Transfers } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
 import { ERC721NFT } from '../../types/erc721nft';
@@ -12,6 +13,8 @@ const processorFunction = async ({ items }: {items: ERC721NFT}, clients: Clients
     const blockNumbers = Object.keys(nftsByBlockNumber);
     const timestampsResponse = await clients.eth.getBlockTimestamps(blockNumbers);
     const timestampByBlockNumber = _.keyBy(timestampsResponse, 'number');
+    console.log({ blockNumbers, timestampByBlockNumber });
+    process.exit();
     // blockNumbers.forEach((blockNumber) => {
     //   const timestampMillis = BigInt(timestampByBlockNumber[blockNumber]) * BigInt(1000);
     //   const nfts:ERC721NFT[] = nftsByBlockNumber[blockNumber] as any;
@@ -21,6 +24,6 @@ const processorFunction = async ({ items }: {items: ERC721NFT}, clients: Clients
   };
 
 export const addTimestampToERC721NFTs: (contract: ERC721Contract) => Processor = (contract: ERC721Contract) => ({
-  trigger: newERC721Transfers(contract),
+  trigger: missingCreatedAtTime,
   processorFunction: processorFunction,
 });

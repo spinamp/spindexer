@@ -2,6 +2,7 @@ import { Knex } from 'knex';
 
 import { FactoryContractTypeName } from '../../types/ethereum';
 import { MusicPlatform } from '../../types/platform';
+import { Table } from '../db';
 
 const INITIAL_CONTRACTS = [
   {
@@ -15,7 +16,7 @@ const INITIAL_CONTRACTS = [
 
 export const up = async (knex: Knex) => {
   console.log('Running create factory contracts bootstrap');
-  await knex.schema.createTable('factoryContracts', (table: Knex.CreateTableBuilder) => {
+  await knex.schema.createTable(Table.factoryContracts, (table: Knex.CreateTableBuilder) => {
     table.string('id').primary();
     table.string('platformId');
     table.foreign('platformId').references('id').inTable('platforms');

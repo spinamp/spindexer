@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import _ from 'lodash';
 
+import { Table } from '../../db/db';
 import { newERC721Contract } from '../../triggers/newNFTContractEvent';
 import { FactoryContract, FactoryContractTypes } from '../../types/ethereum';
 import { Clients, Processor } from '../../types/processor';
@@ -14,7 +15,7 @@ const processorFunction = (factoryContract: FactoryContract, name: string) =>
     const factoryContractType = FactoryContractTypes[factoryContractTypeName];
     const eventToERC721Contract = factoryContractType.creationEventToERC721Contract;
     const newERC721ContractObjects = events.map(e => eventToERC721Contract(e));
-    await clients.db.insert('erc721Contracts', newERC721ContractObjects);
+    await clients.db.insert(Table.erc721Contracts, newERC721ContractObjects);
     await clients.db.updateProcessor(name, newCursor);
   };
 

@@ -2,6 +2,7 @@ import 'dotenv/config';
 import './types/env';
 import _ from 'lodash';
 
+import { Table } from './db/db';
 import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
@@ -28,7 +29,7 @@ const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryCo
   ...factoryContractProcessors,
   erc721TransferProcessors,
 
-  // stripIgnoredNFTs,
+  stripIgnoredNFTs,
   // createMetadatasFromNFTsProcessor(erc721ContractsByAddress),
   // addMetadataIPFSHashProcessor,
   // addMetadataObjectProcessor,
@@ -43,8 +44,8 @@ const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryCo
 
 const updateDBLoop = async () => {
   const dbClient = await db.init();
-  const erc721Contracts = await dbClient.getRecords<ERC721Contract>('erc721Contracts');
-  const factoryContracts = await dbClient.getRecords<FactoryContract>('factoryContracts');
+  const erc721Contracts = await dbClient.getRecords<ERC721Contract>(Table.erc721Contracts);
+  const factoryContracts = await dbClient.getRecords<FactoryContract>(Table.factoryContracts);
   await runProcessors(PROCESSORS(erc721Contracts, factoryContracts), dbClient);
 };
 

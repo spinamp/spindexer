@@ -1,13 +1,15 @@
 import { Knex } from 'knex';
 
+import { Table } from '../db';
+
 const INITIAL_TABLES = [
   {
-    name: 'platforms', create: (table: Knex.CreateTableBuilder) => {
+    name: Table.platforms, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
     }
   },
   {
-    name: 'erc721nfts', create: (table: Knex.CreateTableBuilder) => {
+    name: Table.erc721nfts, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
       table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
@@ -26,7 +28,7 @@ const INITIAL_TABLES = [
     }
   },
   {
-    name: 'artists', create: (table: Knex.CreateTableBuilder) => {
+    name: Table.artists, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
       table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
@@ -35,7 +37,7 @@ const INITIAL_TABLES = [
     }
   },
   {
-    name: 'artistProfiles', create: (table: Knex.CreateTableBuilder) => {
+    name: Table.artistProfiles, create: (table: Knex.CreateTableBuilder) => {
       table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
       table.string('platformInternalId');
@@ -50,7 +52,7 @@ const INITIAL_TABLES = [
     }
   },
   {
-    name: 'processedTracks', create: (table: Knex.CreateTableBuilder) => {
+    name: Table.processedTracks, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
       table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
@@ -70,7 +72,7 @@ const INITIAL_TABLES = [
     }
   },
   {
-    name: 'processors', create: (table: Knex.CreateTableBuilder) => {
+    name: Table.processors, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
       table.string('cursor', 5000000);
     }

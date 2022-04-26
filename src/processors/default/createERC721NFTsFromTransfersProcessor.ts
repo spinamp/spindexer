@@ -1,6 +1,7 @@
 import { BigNumber, ethers } from 'ethers';
 import _ from 'lodash';
 
+import { Table } from '../../db/db';
 import { newERC721Transfers } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
 import { ERC721NFT } from '../../types/erc721nft';
@@ -13,7 +14,7 @@ const NAME = 'createERC721NFTsFromTransfers';
 const processorFunction = (contracts: ERC721Contract[]) =>
   async ({ newCursor, items }: {newCursor: Cursor, items: ethers.Event[]}, clients: Clients) => {
     const contractsByAddress = _.keyBy(contracts, 'address');
-    const newNFTs = items.map(item => {
+    const newNFTs = items.map((item):Partial<ERC721NFT> | undefined => {
       const address = item.address;
       const contract = contractsByAddress[address];
       const contractTypeName = contract.contractType;
@@ -31,7 +32,7 @@ const processorFunction = (contracts: ERC721Contract[]) =>
         platformId: contract.platform,
       };
     });
-    await clients.db.insert('erc721nfts', newNFTs.filter(n=>!!n));
+    await clients.db.insert(Table.erc721nfts, newNFTs.filter(n=>!!n));
     await clients.db.updateProcessor(NAME, newCursor);
   };
 

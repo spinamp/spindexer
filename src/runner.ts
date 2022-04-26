@@ -5,7 +5,7 @@ import ethereum from './clients/ethereum';
 import ipfs from './clients/ipfs';
 import noizd from './clients/noizd';
 import sound from './clients/sound';
-import { DBClient } from './db/db';
+import { DBClient, Table } from './db/db';
 import { Clients, Processor } from './types/processor';
 
 export const runProcessors = async (processors: Processor[], dbClient: DBClient) => {
@@ -39,7 +39,7 @@ export const runProcessors = async (processors: Processor[], dbClient: DBClient)
     }
   }
 
-  const numberOfERC721NFTs = await dbClient.getNumberRecords('erc721nfts');
+  const numberOfERC721NFTs = await dbClient.getNumberRecords(Table.erc721nfts);
   // const numberOfMetadatas = await dbClient.getNumberRecords('metadatas');
   // const numberOfProcessedTracks = await dbClient.getNumberRecords('processedTracks');
   console.info(`DB has ${numberOfERC721NFTs} erc721 nfts`);

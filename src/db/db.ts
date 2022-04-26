@@ -1,6 +1,17 @@
 import { Record, RecordUpdate } from '../types/record'
 import { Cursor } from '../types/trigger'
 
+export enum Table {
+  platforms = 'platforms',
+  erc721nfts = 'erc721nfts',
+  artists = 'artists',
+  artistProfiles = 'artistProfiles',
+  processedTracks = 'processedTracks',
+  processors = 'processors',
+  factoryContracts = 'factoryContracts',
+  erc721Contracts = 'erc721Contracts'
+}
+
 export type WhereFunc = 'where'
   | 'whereNull'
   | 'andWhere'
@@ -20,15 +31,15 @@ export type Wheres = Where[];
 
 export type DBClient = {
   getCursor: (processor: string) => Promise<string | undefined>;
-  getRecords: <Type>(tableName: string, wheres?: Wheres) => Promise<Type[]>;
-  insert: <Type>(tableName: string, rows: Type[]) => Promise<void>;
-  update: <Type>(tableName: string, rows: Type[]) => Promise<void>;
-  upsert: (tableName: string, rows: (Record | RecordUpdate<unknown>)[], idField?: string | string[]) => Promise<void>;
-  delete: (tableName: string, ids: string[], idField?: string) => Promise<void>;
+  getRecords: <Type>(tableName: Table, wheres?: Wheres) => Promise<Type[]>;
+  insert: <Type>(tableName: Table, rows: Type[]) => Promise<void>;
+  update: <Type>(tableName: Table, rows: Type[]) => Promise<void>;
+  upsert: (tableName: Table, rows: (Record | RecordUpdate<unknown>)[], idField?: string | string[]) => Promise<void>;
+  delete: (tableName: Table, ids: string[], idField?: string) => Promise<void>;
   updateProcessor: (processor: string, lastCursor: Cursor) => Promise<void>;
-  getNumberRecords: (tableName: string) => Promise<any>;
+  getNumberRecords: (tableName: Table) => Promise<any>;
   rawSQL: (raw: string) => Promise<any>;
-  recordExists: (tableName: string, recordID: string) => Promise<boolean>;
+  recordExists: (tableName: Table, recordID: string) => Promise<boolean>;
   getFullDB?: () => Promise<any>;
   close: () => Promise<void>;
 }
