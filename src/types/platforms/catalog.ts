@@ -1,44 +1,46 @@
-// import { toUtf8Bytes, verifyMessage } from 'ethers/lib/utils';
+import { toUtf8Bytes, verifyMessage } from 'ethers/lib/utils';
 // import _ from 'lodash';
 // import slugify from 'slugify';
+
+import { ERC721NFT } from '../erc721nft';
+import { MusicPlatform } from '../platform';
 
 // import { CatalogClient } from '../../clients/catalog';
 // import { formatAddress } from '../address';
 // import { ArtistProfile } from '../artist';
 // import { Metadata } from '../metadata';
-// import { MusicPlatform } from '../platform';
 // import { ProcessedTrack } from '../track';
 
-// export const recoverCatalogAddress = (body: any, signature: string) => {
-//   const bodyString = JSON.stringify(body);
-//   const bodyHex = (toUtf8Bytes(bodyString));
-//   const recovered = verifyMessage(bodyHex, signature).toLowerCase();
-//   return recovered;
-// };
+export const recoverCatalogAddress = (body: any, signature: string) => {
+  const bodyString = JSON.stringify(body);
+  const bodyHex = (toUtf8Bytes(bodyString));
+  const recovered = verifyMessage(bodyHex, signature).toLowerCase();
+  return recovered;
+};
 
-// export const verifyCatalogTrack = (metadataRecord: Metadata) => {
-//   const CATALOG_ETHEREUM_ADDRESS = '0xc236541380fc0C2C05c2F2c6c52a21ED57c37952'.toLowerCase();
-//   if (!metadataRecord.metadata) {
-//     throw new Error(`Full metadata missing for record ${metadataRecord.nftId}`)
-//   }
-//   if (!metadataRecord.metadata.origin) {
-//     return false;
-//   }
-//   const signature = metadataRecord.metadata.origin.signature;
-//   const body = metadataRecord.metadata.body;
-//   return signature && body && recoverCatalogAddress(body, signature) === CATALOG_ETHEREUM_ADDRESS;
-// }
+export const verifyCatalogTrack = (nft: ERC721NFT) => {
+  const CATALOG_ETHEREUM_ADDRESS = '0xc236541380fc0C2C05c2F2c6c52a21ED57c37952'.toLowerCase();
+  if (!nft.metadata) {
+    throw new Error(`Full metadata missing for record ${nft.id}`)
+  }
+  if (!nft.metadata.origin) {
+    return false;
+  }
+  const signature = nft.metadata.origin.signature;
+  const body = nft.metadata.body;
+  return signature && body && recoverCatalogAddress(body, signature) === CATALOG_ETHEREUM_ADDRESS;
+}
 
-// export const getZoraPlatform = (metadata: Metadata) => {
-//   if (metadata.platformId !== MusicPlatform.zora) {
-//     throw new Error('Bad track platform being processed')
-//   }
-//   if (verifyCatalogTrack(metadata)) {
-//     return MusicPlatform.catalog;
-//   } else {
-//     return MusicPlatform.zoraRaw
-//   }
-// }
+export const getZoraPlatform = (nft: ERC721NFT) => {
+  if (nft.platformId !== MusicPlatform.zora) {
+    throw new Error('Bad track platform being processed')
+  }
+  if (verifyCatalogTrack(nft)) {
+    return MusicPlatform.catalog;
+  } else {
+    return MusicPlatform.zoraRaw
+  }
+}
 
 // const getTokenIdFromMetadata = (metadata: Metadata) => {
 //   return metadata.nftId.split('/')[1];

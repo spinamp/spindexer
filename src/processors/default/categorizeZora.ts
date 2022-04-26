@@ -1,18 +1,19 @@
-import { zoraMetadatas } from '../../triggers/zora';
-import { Metadata } from '../../types/metadata';
+import { Table } from '../../db/db';
+import { zoraNFTs } from '../../triggers/zora';
+import { ERC721NFT } from '../../types/erc721nft';
 import { getZoraPlatform } from '../../types/platforms/catalog';
 import { Clients, Processor } from '../../types/processor';
 
 export const categorizeZora: Processor = {
   name: 'categorizeZora',
-  trigger: zoraMetadatas,
-  processorFunction: async (metadatas: Metadata[], clients: Clients) => {
-    console.log(`Processing updates for metadatas with platforms: ${metadatas.map(m => m.platformId)}`);
-    const metadataUpdates = metadatas.map((m: Metadata) => ({
-      id: m.id,
-      platformId: getZoraPlatform(m),
+  trigger: zoraNFTs,
+  processorFunction: async (nfts: ERC721NFT[], clients: Clients) => {
+    console.log(`Processing updates for zora nfts with ids: ${nfts.map(n => n.id)}`);
+    const nftUpdates = nfts.map((n: ERC721NFT) => ({
+      id: n.id,
+      platformId: getZoraPlatform(n),
     }));
-    await clients.db.update('metadatas', metadataUpdates);
+    await clients.db.update(Table.erc721nfts, nftUpdates);
     console.log('Updated');
   },
   initialCursor: undefined

@@ -34,7 +34,7 @@ const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryCo
   addMetadataIPFSHashProcessor,
   addMetadataObjectProcessor,
   stripNonAudio,
-  // categorizeZora,
+  categorizeZora,
   // createSoundMetadataIds,
   // processPlatformTracks(MusicPlatform.catalog),
   // processPlatformTracks(MusicPlatform.sound, 3),
