@@ -1,6 +1,8 @@
+import { ERC721NFT } from '../types/erc721nft';
 import { ERC721Contract } from '../types/ethereum';
-import { Metadata } from '../types/metadata';
 import { IdField, Record, RecordUpdate } from '../types/record';
+
+import { Table } from './db';
 
 export const toDBRecord = <RecordType>(record: RecordType | RecordUpdate<unknown>) => {
   if ((record as any).createdAtTime) {
@@ -11,7 +13,7 @@ export const toDBRecord = <RecordType>(record: RecordType | RecordUpdate<unknown
 }
 
 const toRecordMapper: any = {
-  erc721Contracts: (erc721Contracts: ERC721Contract[]): IdField[] => erc721Contracts.map((c: any) => {
+  [Table.erc721Contracts]: (erc721Contracts: ERC721Contract[]): IdField[] => erc721Contracts.map((c: any) => {
     return ({
       id: c.address,
       platformId: c.platform,
@@ -30,11 +32,11 @@ export const toDBRecords = <RecordType>(tableName: string, records: (RecordType 
 }
 
 const fromRecordMapper: any = {
-  metadatas: (metadatas: Record[]): Metadata[] => metadatas.map((m: any) => {
-    const metadata = typeof m.metadata === 'object' ? m.metadata : JSON.parse(m.metadata);
-    return ({ ...m, metadata });
+  [Table.erc721nfts]: (nfts: Record[]): ERC721NFT[] => nfts.map((n: any) => {
+    const metadata = typeof n.metadata === 'object' ? n.metadata : JSON.parse(n.metadata);
+    return ({ ...n, metadata });
   }),
-  erc721Contracts: (erc721Contracts: Record[]): ERC721Contract[] => erc721Contracts.map((c: any) => {
+  [Table.erc721Contracts]: (erc721Contracts: Record[]): ERC721Contract[] => erc721Contracts.map((c: any) => {
     return ({
       address: c.id,
       platform: c.platformId,
@@ -42,7 +44,7 @@ const fromRecordMapper: any = {
       contractType: c.contractType,
     });
   }),
-  factoryContracts: (factoryContracts: Record[]): ERC721Contract[] => factoryContracts.map((c: any) => {
+  [Table.factoryContracts]: (factoryContracts: Record[]): ERC721Contract[] => factoryContracts.map((c: any) => {
     return ({
       address: c.id,
       platform: c.platformId,
