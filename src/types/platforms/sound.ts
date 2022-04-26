@@ -13,10 +13,6 @@ const mapAPITrackToArtistID = (apiTrack: any): string => {
   return `ethereum/${formatAddress(apiTrack.artist.user.publicAddress)}`;
 };
 
-const mapAPITrackToTrackID = (apiTrack: any): string => {
-  return `ethereum/${formatAddress(apiTrack?.artist?.contract?.address)}/${apiTrack?.mintInfo?.editionId}`
-};
-
 const mapTrack = (
   nft: ERC721NFT,
   apiTrack: any
@@ -59,28 +55,8 @@ export const mapArtistProfile = (apiTrack: any, createdAtTime: Date, createdAtEt
 };
 
 const getAPITrackData = async (trackIds: string[], client: SoundClient) => {
-  const apiResponse = await client.getAllMintedReleases();
-  const apiTracks = apiResponse.map(apiTrack => ({
-    ...apiTrack,
-    trackId: mapAPITrackToTrackID(apiTrack),
-  }))
-  const filteredAPITracks = apiTracks.filter(apiTrack => trackIds.includes(apiTrack.trackId));
-  filteredAPITracks.forEach(apiTrack => {
-    if(apiTrack.tracks.length > 1) {
-      return { isError: true, error: new Error('Sound release with multiple tracks not yet implemented') };
-    }
-  });
-  const audioAPITrackPromises= filteredAPITracks.map(async apiTrack => {
-    return {
-      ...apiTrack,
-      tracks: [{
-        ...apiTrack.tracks[0],
-        audio: await client.audioFromTrack(apiTrack.tracks[0].id),
-      }]
-    };
-  });
-  const audioAPITracks = await Promise.all(audioAPITrackPromises);
-  const apiTrackByTrackId = _.keyBy(audioAPITracks, 'trackId');
+  const apiResponse = await client.fetchTracksByTrackId(trackIds);
+  const apiTrackByTrackId = _.keyBy(apiResponse, 'trackId');
   return apiTrackByTrackId;
 }
 
@@ -93,7 +69,6 @@ const mapNFTtoTrackID = (nft: ERC721NFT): string => {
 const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
-
 
 const createTracks =  async (newTrackIds:string[], trackMapping: { [trackId: string]:ERC721NFT[] }, clients: Clients):
 Promise<{

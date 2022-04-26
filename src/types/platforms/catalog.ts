@@ -1,17 +1,14 @@
 import { toUtf8Bytes, verifyMessage } from 'ethers/lib/utils';
+import _ from 'lodash';
+import slugify from 'slugify';
 
-// import _ from 'lodash';
-// import slugify from 'slugify';
-
+import { CatalogClient } from '../../clients/catalog';
+import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { ERC721NFT } from '../erc721nft';
 import { MusicPlatform } from '../platform';
 import { Clients } from '../processor';
 import { NFTProcessError, NFTTrackJoin, ProcessedTrack } from '../track';
-
-// import { CatalogClient } from '../../clients/catalog';
-// import { formatAddress } from '../address';
-// import { ArtistProfile } from '../artist';
 
 export const recoverCatalogAddress = (body: any, signature: string) => {
   const bodyString = JSON.stringify(body);
@@ -44,81 +41,68 @@ export const getZoraPlatform = (nft: ERC721NFT) => {
   }
 }
 
-// const getTokenIdFromMetadata = (metadata: Metadata) => {
-//   return metadata.nftId.split('/')[1];
-// }
+const mapNFTtoTrackID = (nft: ERC721NFT): string => {
+  const [contractAddress, nftId] = nft.id.split('/');
+  return `ethereum/${formatAddress(contractAddress)}/${nftId}`;
+}
 
 
-// const mapTrackID = (metadataId: string): string => {
-//   const [contractAddress, nftId] = metadataId.split('/');
-//   return `ethereum/${formatAddress(contractAddress)}/${nftId}`;
-// };
+const mapAPITrackToArtistID = (apiTrack: any): string => {
+  return `ethereum/${formatAddress(apiTrack.artist.id)}`;
+};
 
-// const mapArtistID = (artistId: string): string => {
-//   return `ethereum/${formatAddress(artistId)}`;
-// };
+const mapTrack = (nft: ERC721NFT, apiTrack: any): ProcessedTrack => ({
+  id: apiTrack.trackId,
+  platformInternalId: apiTrack.id,
+  title: apiTrack.title,
+  slug: slugify(`${apiTrack.title} ${nft.createdAtTime.getTime()}`).toLowerCase(),
+  description: apiTrack.description,
+  platformId: MusicPlatform.catalog,
+  lossyAudioIPFSHash: apiTrack.ipfs_hash_lossy_audio,
+  lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${apiTrack.ipfs_hash_lossy_audio}`,
+  createdAtTime: nft.createdAtTime,
+  createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+  lossyArtworkIPFSHash: apiTrack.ipfs_hash_lossy_artwork,
+  lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${apiTrack.ipfs_hash_lossy_artwork}`,
+  websiteUrl:
+  apiTrack.artist.handle && apiTrack.short_url
+      ? `https://beta.catalog.works/${apiTrack.artist.handle}/${apiTrack.short_url}`
+      : 'https://beta.catalog.works',
+  artistId: mapAPITrackToArtistID(apiTrack),
+});
 
-// const mapTrack = (item: {
-//   metadata: Metadata;
-//   platformTrackResponse?: any;
-// }): ProcessedTrack => ({
-//   id: mapTrackID(item.metadata.id),
-//   platformInternalId: item.platformTrackResponse.id,
-//   title: item.platformTrackResponse.title,
-//   slug: slugify(`${item.platformTrackResponse.title} ${item.metadata.createdAtTime.getTime()}`).toLowerCase(),
-//   description: item.platformTrackResponse.description,
-//   platformId: MusicPlatform.catalog,
-//   lossyAudioIPFSHash: item.platformTrackResponse.ipfs_hash_lossy_audio,
-//   lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${item.platformTrackResponse.ipfs_hash_lossy_audio}`,
-//   createdAtTime: item.metadata.createdAtTime,
-//   createdAtEthereumBlockNumber: item.metadata.createdAtEthereumBlockNumber,
-//   lossyArtworkIPFSHash: item.platformTrackResponse.ipfs_hash_lossy_artwork,
-//   lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${item.platformTrackResponse.ipfs_hash_lossy_artwork}`,
-//   websiteUrl:
-//   item.platformTrackResponse.artist.handle && item.platformTrackResponse.short_url
-//       ? `https://beta.catalog.works/${item.platformTrackResponse.artist.handle}/${item.platformTrackResponse.short_url}`
-//       : 'https://beta.catalog.works',
-//   artistId: mapArtistID(item.platformTrackResponse.artist.id),
-// });
+export const mapArtistProfile = (apiTrack: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
+  const artist = apiTrack.artist;
+  return {
+    name: artist.name,
+    artistId: mapAPITrackToArtistID(apiTrack),
+    platformInternalId: artist.id,
+    platformId: MusicPlatform.catalog,
+    avatarUrl: artist.picture_uri,
+    websiteUrl: artist.handle
+      ? `https://beta.catalog.works/${artist.handle}`
+      : 'https://beta.catalog.works',
+    createdAtTime,
+    createdAtEthereumBlockNumber
+  }
+};
 
-// export const mapArtistProfile = (platformResponse: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
-//   const artist = platformResponse.artist;
-//   return {
-//     name: artist.name,
-//     artistId: mapArtistID(artist.id),
-//     platformInternalId: artist.id,
-//     platformId: MusicPlatform.catalog,
-//     avatarUrl: artist.picture_uri,
-//     websiteUrl: artist.handle
-//       ? `https://beta.catalog.works/${artist.handle}`
-//       : 'https://beta.catalog.works',
-//     createdAtTime,
-//     createdAtEthereumBlockNumber
-//   }
-// };
+const getAPITrackData = async (trackIds: string[], client: CatalogClient) => {
+  const apiResponse = await client.fetchTracksByTrackId(trackIds);
+  const apiTrackByTrackId = _.keyBy(apiResponse, 'trackId');
+  return apiTrackByTrackId;
+}
 
-// const addPlatformTrackData = async (metadatas: Metadata[], client: CatalogClient) => {
-//   const trackTokenIds = metadatas.map(m => getTokenIdFromMetadata(m));
-//   const platformTracks = await client.fetchCatalogTracksByNFT(trackTokenIds);
-//   const platformTrackDataByTokenId = _.keyBy(platformTracks, 'nft_id');
-//   const platformTrackData: { metadata: Metadata, platformTrackResponse: any }[]
-//     = metadatas.map(metadata => {
-//       const platformTrackResponse = platformTrackDataByTokenId[getTokenIdFromMetadata(metadata)] || {
-//         isError: true,
-//         error: new Error(`Missing platform track data`)
-//       }
-//       return {
-//         metadata,
-//         platformTrackResponse
-//       };
-//   });
-//   return platformTrackData;
-// }
+export const mapTrackIdToContractAddress = (id: string) => {
+  return id.split('/')[0];
+}
 
+export const mapTrackIdToNFTId = (id: string) => {
+  return id.split('/')[1];
+}
 
 const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } => {
-  throw new Error('not yet implemented');
-  return {};
+  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
 
 const createTracks =  async (newTrackIds:string[], trackMapping: { [trackId: string]:ERC721NFT[] }, clients: Clients):
@@ -128,9 +112,51 @@ Promise<{
   errorNFTs: NFTProcessError[]
   artistProfiles: ArtistProfile[]
 }> => {
-  throw new Error('not yet implemented');
-  return {} as any;
-}
+  if(newTrackIds.length === 0) {
+    return {
+      newTracks: [],
+      joins: [],
+      errorNFTs: [],
+      artistProfiles: []
+    }
+  }
+  const apiTrackData = await getAPITrackData(newTrackIds, clients.catalog);
+
+  const newTracks:ProcessedTrack[] = [];
+  const joins:NFTTrackJoin[] = [];
+  const errorNFTs:NFTProcessError[] = [];
+  const artistProfiles:ArtistProfile[] = [];
+
+  newTrackIds.forEach(trackId => {
+    const trackNFTs = trackMapping[trackId];
+    const apiTrack = apiTrackData[trackId];
+    if(!apiTrack) {
+      trackNFTs.forEach(nft => {
+        errorNFTs.push({
+          erc721nftId: nft.id,
+          processError: `Missing api track`
+        });
+      })
+      return undefined;
+    }
+
+    newTracks.push(mapTrack(trackNFTs[0], apiTrack));
+    trackNFTs.forEach(nft => {
+      joins.push({
+        erc721nftId: nft.id,
+        processedTrackId: trackId
+      });
+    })
+
+    const artistProfile = {
+      ...mapArtistProfile(apiTrack, trackNFTs[0].createdAtTime, trackNFTs[0].createdAtEthereumBlockNumber),
+    } as ArtistProfile;
+    artistProfiles.push(artistProfile);
+  });
+
+  const uniqueArtistProfiles = _.uniqBy(artistProfiles, 'artistId');
+
+  return { newTracks, joins, errorNFTs, artistProfiles: uniqueArtistProfiles };}
 
 
 export default {
