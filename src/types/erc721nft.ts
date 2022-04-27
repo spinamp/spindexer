@@ -15,8 +15,7 @@ export type ERC721NFT = Record & {
   metadata?: any
   metadataError?: string
   mimeType?: string
-  processed?: true
-  processError?: string
+  owner: string
 }
 
 export const getNFTContractCalls = (nft: ERC721NFT, contractTypeName: ERC721ContractTypeName) => {

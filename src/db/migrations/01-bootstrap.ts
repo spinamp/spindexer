@@ -23,8 +23,7 @@ const INITIAL_TABLES = [
       table.json('metadata');
       table.string('metadataError', 3000);
       table.string('mimeType');
-      table.boolean('processed');
-      table.string('processError', 3000);
+      table.string('owner');
     }
   },
   {
