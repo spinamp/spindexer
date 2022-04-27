@@ -41,7 +41,7 @@ export const fetchLatestTrackCursor = async (): Promise<string> => {
       $order: '[["created", "DESC"]]',
       $where: {
         '$artist.approved_artist$': { $eq: true },
-        hidden: false,
+        'hidden': { '$eq': false },
       },
       $limit: 1,
     },
@@ -57,7 +57,7 @@ export const getTracksFrom = async (cursor: string): Promise<NOIZDAPITrack[]> =>
       $where: {
         '$artist.approved_artist$': { '$eq': true },
         'hidden': { '$eq': false },
-        created: { '$gt': createdUTC }
+        'created': { '$gt': createdUTC }
       },
       hidden: false,
       $limit: 20,
