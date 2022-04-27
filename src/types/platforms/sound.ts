@@ -1,13 +1,11 @@
 import _ from 'lodash';
 import slugify from 'slugify';
 
-import { SoundClient } from '../../clients/sound';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { ERC721NFT } from '../erc721nft';
 import { MusicPlatform } from '../platform';
-import { Clients } from '../processor';
-import { NFTProcessError, NFTTrackJoin, ProcessedTrack } from '../track';
+import { ProcessedTrack } from '../track';
 
 const mapAPITrackToArtistID = (apiTrack: any): string => {
   return `ethereum/${formatAddress(apiTrack.artist.user.publicAddress)}`;
@@ -38,7 +36,7 @@ const mapTrack = (
   artistId: mapAPITrackToArtistID(apiTrack),
 })};
 
-export const mapArtistProfile = (apiTrack: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
+const mapArtistProfile = (apiTrack: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
   const artist = apiTrack.artist
   return {
     name: artist.name,
@@ -54,12 +52,6 @@ export const mapArtistProfile = (apiTrack: any, createdAtTime: Date, createdAtEt
   }
 };
 
-const getAPITrackData = async (trackIds: string[], client: SoundClient) => {
-  const apiResponse = await client.fetchTracksByTrackId(trackIds);
-  const apiTrackByTrackId = _.keyBy(apiResponse, 'trackId');
-  return apiTrackByTrackId;
-}
-
 const mapNFTtoTrackID = (nft: ERC721NFT): string => {
   const splitURI = nft.tokenURI!.split('/');
   const editionId = splitURI[splitURI.length - 2];
@@ -70,61 +62,8 @@ const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } =
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
 
-const createTracks =  async (newTrackIds:string[], trackMapping: { [trackId: string]:ERC721NFT[] }, clients: Clients):
-Promise<{
-  newTracks: ProcessedTrack[],
-  joins: NFTTrackJoin[],
-  errorNFTs: NFTProcessError[],
-  artistProfiles: ArtistProfile[]
-}> => {
-  if(newTrackIds.length === 0) {
-    return {
-      newTracks: [],
-      joins: [],
-      errorNFTs: [],
-      artistProfiles: []
-    }
-  }
-  const apiTrackData = await getAPITrackData(newTrackIds, clients.sound);
-
-  const newTracks:ProcessedTrack[] = [];
-  const joins:NFTTrackJoin[] = [];
-  const errorNFTs:NFTProcessError[] = [];
-  const artistProfiles:ArtistProfile[] = [];
-
-  newTrackIds.forEach(trackId => {
-    const trackNFTs = trackMapping[trackId];
-    const apiTrack = apiTrackData[trackId];
-    if(!apiTrack) {
-      trackNFTs.forEach(nft => {
-        errorNFTs.push({
-          erc721nftId: nft.id,
-          processError: `Missing api track`
-        });
-      })
-      return undefined;
-    }
-
-    newTracks.push(mapTrack(trackNFTs[0], apiTrack));
-    trackNFTs.forEach(nft => {
-      joins.push({
-        erc721nftId: nft.id,
-        processedTrackId: trackId
-      });
-    })
-
-    const artistProfile = {
-      ...mapArtistProfile(apiTrack, trackNFTs[0].createdAtTime, trackNFTs[0].createdAtEthereumBlockNumber),
-    } as ArtistProfile;
-    artistProfiles.push(artistProfile);
-  });
-
-  const uniqueArtistProfiles = _.uniqBy(artistProfiles, 'artistId');
-
-  return { newTracks, joins, errorNFTs, artistProfiles: uniqueArtistProfiles };
-}
-
 export default {
   mapNFTsToTrackIds,
-  createTracks,
+  mapTrack,
+  mapArtistProfile
 }

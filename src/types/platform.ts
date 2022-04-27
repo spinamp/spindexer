@@ -1,12 +1,9 @@
-// import { ArtistProfile } from './artist';
-// import { Metadata } from './metadata';
 import { ArtistProfile } from './artist';
 import { ERC721NFT } from './erc721nft';
 import catalogMappers from './platforms/catalog';
 import noizdMappers from './platforms/noizd';
 import soundMappers from './platforms/sound';
-import { Clients } from './processor';
-import { NFTProcessError, NFTTrackJoin, ProcessedTrack } from './track';
+import { ProcessedTrack } from './track';
 
 export enum MusicPlatform {
   sound = 'sound',
@@ -18,24 +15,9 @@ export enum MusicPlatform {
 }
 
 export type PlatformMapper = {
-  // addPlatformTrackData: (metadatas: Metadata[], client: any) => Promise<{
-  //   metadata: Metadata;
-  //   platformTrackResponse: unknown;
-  // }[]>;
-  // mapTrack: (item: {
-  //   metadata: Metadata;
-  //   platformTrackResponse: unknown;
-  // }) => ProcessedTrack;
-  // mapAPITrack?: (trackItem: unknown) => ProcessedTrack;
-  // mapAPITrackTime?: (trackItem: unknown) => Date;
-  // mapArtistProfile: (artistItem: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string) => ArtistProfile;
   mapNFTsToTrackIds: (nfts:ERC721NFT[]) => { [trackId: string]:ERC721NFT[] }
-  createTracks: (newTrackIds:string[], trackMapping: { [trackId: string]:ERC721NFT[] }, clients: Clients) => Promise<{
-    newTracks: ProcessedTrack[],
-    joins: NFTTrackJoin[],
-    errorNFTs: NFTProcessError[]
-    artistProfiles: ArtistProfile[]
-  }>
+  mapTrack: (nft: ERC721NFT, apiTrack: any) => ProcessedTrack
+  mapArtistProfile: (apiTrack: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string) => ArtistProfile
 }
 
 export type PlatformConfigItem = {

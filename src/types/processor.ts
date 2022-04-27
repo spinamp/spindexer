@@ -10,6 +10,10 @@ import { DBClient } from '../db/db';
 
 import { Cursor, Trigger } from './trigger';
 
+export type TrackAPIClient = {
+  fetchTracksByTrackId: (trackIds: string[]) => Promise<any[]>;
+}
+
 export type Clients = {
   eth: EthClient,
   db: DBClient,
@@ -23,7 +27,7 @@ export type Clients = {
 
 export type Processor = {
   name?: string,
-  trigger: Trigger<Clients, Cursor | undefined>,
+  trigger: Trigger<Cursor | undefined>,
   processorFunction: (newTriggerItems: any, clients: Clients) => Promise<void>;
   initialCursor?: Cursor | undefined;
 };
