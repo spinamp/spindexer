@@ -101,6 +101,17 @@ const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => asy
 
   const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(newTracks, clients.db, true);
 
+  if (existingTrackIds && existingTrackIds.length !== 0) {
+    existingTrackIds.map(trackId => {
+      const trackNFTs = trackMapping[trackId];
+      trackNFTs.forEach(nft => {
+        joins.push({
+          erc721nftId: nft.id,
+          processedTrackId: trackId
+        });
+      })
+    });
+  }
   if (errorNFTs.length !== 0) {
     await clients.db.insert(Table.erc721nftProcessErrors, errorNFTs);
   }
