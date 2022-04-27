@@ -18,6 +18,8 @@ export type PlatformMapper = {
   mapNFTsToTrackIds: (nfts:ERC721NFT[]) => { [trackId: string]:ERC721NFT[] }
   mapTrack: (nft: ERC721NFT, apiTrack: any) => ProcessedTrack
   mapArtistProfile: (apiTrack: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string) => ArtistProfile
+  mapAPITrack?: (apiTrack: any) => ProcessedTrack
+  mapAPITrackTime?: (apiTrack: any) => Date
 }
 
 export type PlatformConfigItem = {

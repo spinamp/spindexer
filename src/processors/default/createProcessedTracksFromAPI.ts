@@ -1,5 +1,6 @@
 import _ from 'lodash';
 
+import { Table } from '../../db/db';
 import { newPlatformTracks } from '../../triggers/newPlatformTracks';
 import { mapArtist } from '../../types/artist';
 import { MusicPlatform, platformConfig } from '../../types/platform';
@@ -27,9 +28,9 @@ const processorFunction = (platformId: APIMusicPlatform, name: string) => async 
   const processedTracks = apiTracks.map(apiTrack => mapAPITrack!(apiTrack));
   const { mergedProcessedTracks } = await mergeProcessedTracks(processedTracks, clients.db, false);
 
-  await clients.db.upsert('artists', artists);
-  await clients.db.upsert('artistProfiles', (artistProfiles as unknown as Record[]), ['artistId', 'platformId']);
-  await clients.db.upsert('processedTracks', mergedProcessedTracks);
+  await clients.db.upsert(Table.artists, artists);
+  await clients.db.upsert(Table.artistProfiles, (artistProfiles as unknown as Record[]), ['artistId', 'platformId']);
+  await clients.db.upsert(Table.processedTracks, mergedProcessedTracks);
   await clients.db.updateProcessor(name, lastCursor);
   console.info(`Processing completed, updated cursor to ${lastCursor}`);
 };

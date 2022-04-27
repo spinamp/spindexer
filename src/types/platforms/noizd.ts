@@ -39,6 +39,10 @@ export const mapArtistProfile = (apiTrack: any, createdAtTime: Date, createdAtEt
   };
 };
 
+const mapAPIIDToTrackId = (apiTrackId: string): string => {
+  return `noizd/${apiTrackId}`;
+};
+
 const mapAPITrackTime = (apiTrack: any) => new Date(apiTrack.created)
 
 const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any) => {
@@ -50,7 +54,7 @@ const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any)
       : cover.url;
 
   return {
-    id: apiTrack.id,
+    id: mapAPIIDToTrackId(apiTrack.id),
     platformInternalId: apiTrack.id,
     title: apiTrack.title,
     slug: slugify(`${apiTrack.title} ${mapAPITrackTime(apiTrack).getTime()}`).toLowerCase(),
@@ -90,5 +94,7 @@ const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } =
 export default {
   mapNFTsToTrackIds,
   mapTrack,
-  mapArtistProfile
+  mapArtistProfile,
+  mapAPITrack,
+  mapAPITrackTime
 }
