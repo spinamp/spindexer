@@ -1,12 +1,14 @@
+import { Table } from '../db/db';
 import { Clients } from '../types/processor';
 import { Trigger } from '../types/trigger';
 
-export const nonAudioMetadata: Trigger<Clients, undefined> = async (clients: Clients) => {
-  const metadatas = (await clients.db.getRecords('metadatas',
+export const nonAudioMetadata: Trigger<undefined> = async (clients: Clients) => {
+  const nfts = (await clients.db.getRecords(Table.erc721nfts,
     [
       [
         'whereIn', ['mimeType',
           [
+            '',
             'text/plain',
             'image/png',
             'image/jpeg',
@@ -27,5 +29,5 @@ export const nonAudioMetadata: Trigger<Clients, undefined> = async (clients: Cli
         ]
       ]]
   )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
-  return metadatas;
+  return nfts;
 };

@@ -1,8 +1,8 @@
 import { ignoredNFTIds } from '../constants/ignoredNFTIds';
 import { Clients } from '../types/processor';
-import { Trigger } from '../types/trigger';
+import { Cursor, Trigger } from '../types/trigger';
 
-export const ignoredNFTs: Trigger<Clients, string> = async (clients: Clients, cursor: string) => {
+export const ignoredNFTs: Trigger<Cursor> = async (clients: Clients, cursor: string) => {
   if(cursor === 'true') {
     return [];
   }

@@ -1,4 +1,6 @@
-import axios, { Axios, AxiosError } from 'axios';
+import axios from 'axios';
+
+import { formatAddress } from '../types/address';
 
 const noizdAPI = axios.create({
   timeout: 10000,
@@ -12,8 +14,13 @@ export type NOIZDClient = {
   fetchNFTs: (nftIds: string[]) => Promise<NOIZDAPINFT[]>;
   fetchLatestTrackCursor: () => Promise<string>;
   getTracksFrom: (cursor: string) => Promise<NOIZDAPITrack[]>;
+  fetchTracksByTrackId: (trackIds: string[]) => Promise<any[]>;
   getAPITrackCursor: (track: any) => string
 }
+
+const mapAPITrackToTrackID = (apiTrack: any): string => {
+  return `ethereum/${formatAddress(apiTrack.metadata.contract)}/${apiTrack.metadata.id}`;
+};
 
 const fetchNFTs = async (
   nftIds: string[],
@@ -63,12 +70,29 @@ const getAPITrackCursor = (track: any) => {
   return '' + new Date(track.created).getTime();
 }
 
+export const mapTrackIdToNFTId = (id: string) => {
+  const [chain, contractAddress, nftId] = id.split('/');
+  return nftId;
+}
+
+const fetchTracksByTrackId = async (trackIds: string[]) => {
+  const nftIds = trackIds.map(i => mapTrackIdToNFTId(i));
+  const apiNFTs = await fetchNFTs(nftIds);
+  const apiTracks = apiNFTs.map(apiNFT => ({
+    ...apiNFT.music,
+    metadata: apiNFT.metadata,
+    trackId: mapAPITrackToTrackID(apiNFT),
+  }))
+  return apiTracks;
+}
+
 const init = async () => {
   return {
     fetchNFTs,
     fetchLatestTrackCursor,
     getTracksFrom,
-    getAPITrackCursor
+    getAPITrackCursor,
+    fetchTracksByTrackId
   }
 }
 

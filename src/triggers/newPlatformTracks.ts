@@ -2,7 +2,7 @@ import { APIMusicPlatform } from '../processors/default/createProcessedTracksFro
 import { Clients } from '../types/processor';
 import { Cursor, Trigger } from '../types/trigger';
 
-export const newPlatformTracks: (platform: APIMusicPlatform) => Trigger<Clients, Cursor> =
+export const newPlatformTracks: (platform: APIMusicPlatform) => Trigger<Cursor> =
   (platform: APIMusicPlatform) => async (clients: Clients, cursor: Cursor) => {
     const latestTrackCursor = await clients[platform].fetchLatestTrackCursor();
     const lastProcessedCursor = latestTrackCursor;

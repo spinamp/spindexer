@@ -1,19 +1,16 @@
 import _ from 'lodash';
 
 import { EthClient, ValidContractCallFunction } from '../../clients/ethereum';
-import { DBClient } from '../../db/db';
+import { Table } from '../../db/db';
 import { unprocessedNFTs } from '../../triggers/missing';
-import { formatAddress } from '../../types/address';
-import { ERC721Contract, NFTContractTypes } from '../../types/ethereum';
-import { Metadata } from '../../types/metadata';
-import { filterNewMetadatas, getNFTContractCalls, NFT } from '../../types/nft';
+import { getNFTContractCalls, ERC721NFT } from '../../types/erc721nft';
+import { ERC721Contract } from '../../types/ethereum';
 import { Clients, Processor } from '../../types/processor';
 
-const name = 'createMetadatasFromNFTs';
+const name = 'getERC721TokenFields';
 
-export const createMetadatasFromNFTs = async (nfts: NFT[], dbClient: DBClient, ethClient: EthClient, erc721ContractsByAddress: {[key:string]:ERC721Contract}) => {
-  const nftsWithNewMetadata = await filterNewMetadatas(nfts, dbClient);
-  const contractCalls = nftsWithNewMetadata.map(nft => {
+export const getERC721TokenFields = async (nfts: ERC721NFT[], ethClient: EthClient, erc721ContractsByAddress: {[key:string]:ERC721Contract}) => {
+  const contractCalls = nfts.map(nft => {
     const nftContractTypeName = erc721ContractsByAddress[nft.contractAddress]?.contractType || 'default';
     return getNFTContractCalls(nft, nftContractTypeName)
   });
@@ -33,31 +30,32 @@ export const createMetadatasFromNFTs = async (nfts: NFT[], dbClient: DBClient, e
     return callIndexes;
   });
   const callResults = await ethClient.call(flatContractCalls);
-  const newMetadatas = nftsWithNewMetadata.map((nft, index) => {
-    console.info(`Processing nft with metadata id ${nft.metadataId}`);
-    const metadata: Metadata = {
-      id: formatAddress(nft.metadataId),
-      platformId: nft.platformId,
-      createdAtTime: nft.createdAtTime,
-      createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+  const nftUpdates = nfts.map((nft, index) => {
+    console.info(`Processing nft with id ${nft.id}`);
+    const nftUpdate: Partial<ERC721NFT> = {
+      id: nft.id,
     };
     const callIndexes = nftIndexToCalls[index];
     callIndexes.forEach(callIndex => {
       const key = flatContractCalls[callIndex].callFunction;
       const value = callResults[callIndex];
-      metadata[key] = value as string;
+      if(key === ValidContractCallFunction.tokenURI && value === null) {
+        nftUpdate.tokenURI = '';
+      } else {
+        nftUpdate[key] = value as string;
+      }
     });
-    return metadata;
+    return nftUpdate;
   });
-  return newMetadatas;
+  return nftUpdates;
 };
 
-const processorFunction = (erc721ContractsByAddress: {[key:string]:ERC721Contract}) => async (nfts: NFT[], clients: Clients) => {
-  const newMetadatas = await createMetadatasFromNFTs(nfts, clients.db, clients.eth, erc721ContractsByAddress);
-  await clients.db.insert('metadatas', newMetadatas);
+const processorFunction = (erc721ContractsByAddress: {[key:string]:ERC721Contract}) => async (nfts: ERC721NFT[], clients: Clients) => {
+  const nftMetadataUpdates = await getERC721TokenFields(nfts, clients.eth, erc721ContractsByAddress);
+  await clients.db.update(Table.erc721nfts, nftMetadataUpdates);
 };
 
-export const createMetadatasFromNFTsProcessor: (erc721ContractsByAddress: {[key:string]:ERC721Contract}) => Processor =
+export const getERC721TokenFieldsProcessor: (erc721ContractsByAddress: {[key:string]:ERC721Contract}) => Processor =
 (erc721ContractsByAddress: {[key:string]:ERC721Contract}) => ({
   name,
   trigger: unprocessedNFTs,

@@ -2,86 +2,77 @@ import { toUtf8Bytes, verifyMessage } from 'ethers/lib/utils';
 import _ from 'lodash';
 import slugify from 'slugify';
 
-import { CatalogClient } from '../../clients/catalog';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { Metadata } from '../metadata';
+import { ERC721NFT } from '../erc721nft';
 import { MusicPlatform } from '../platform';
 import { ProcessedTrack } from '../track';
 
-export const recoverCatalogAddress = (body: any, signature: string) => {
+const recoverCatalogAddress = (body: any, signature: string) => {
   const bodyString = JSON.stringify(body);
   const bodyHex = (toUtf8Bytes(bodyString));
   const recovered = verifyMessage(bodyHex, signature).toLowerCase();
   return recovered;
 };
 
-export const verifyCatalogTrack = (metadataRecord: Metadata) => {
+const verifyCatalogTrack = (nft: ERC721NFT) => {
   const CATALOG_ETHEREUM_ADDRESS = '0xc236541380fc0C2C05c2F2c6c52a21ED57c37952'.toLowerCase();
-  if (!metadataRecord.metadata) {
-    throw new Error(`Full metadata missing for record ${metadataRecord.id}`)
+  if (!nft.metadata) {
+    throw new Error(`Full metadata missing for record ${nft.id}`)
   }
-  if (!metadataRecord.metadata.origin) {
+  if (!nft.metadata.origin) {
     return false;
   }
-  const signature = metadataRecord.metadata.origin.signature;
-  const body = metadataRecord.metadata.body;
+  const signature = nft.metadata.origin.signature;
+  const body = nft.metadata.body;
   return signature && body && recoverCatalogAddress(body, signature) === CATALOG_ETHEREUM_ADDRESS;
 }
 
-export const getZoraPlatform = (metadata: Metadata) => {
-  if (metadata.platformId !== MusicPlatform.zora) {
+export const getZoraPlatform = (nft: ERC721NFT) => {
+  if (nft.platformId !== MusicPlatform.zora) {
     throw new Error('Bad track platform being processed')
   }
-  if (verifyCatalogTrack(metadata)) {
+  if (verifyCatalogTrack(nft)) {
     return MusicPlatform.catalog;
   } else {
     return MusicPlatform.zoraRaw
   }
 }
 
-const getTokenIdFromMetadata = (metadata: Metadata) => {
-  return metadata.id.split('/')[1];
+const mapNFTtoTrackID = (nft: ERC721NFT): string => {
+  const [contractAddress, nftId] = nft.id.split('/');
+  return `ethereum/${formatAddress(contractAddress)}/${nftId}`;
 }
 
-
-const mapTrackID = (metadataId: string): string => {
-  const [contractAddress, nftId] = metadataId.split('/');
-  return `ethereum/${formatAddress(contractAddress)}/${nftId}`;
+const mapAPITrackToArtistID = (apiTrack: any): string => {
+  return `ethereum/${formatAddress(apiTrack.artist.id)}`;
 };
 
-const mapArtistID = (artistId: string): string => {
-  return `ethereum/${formatAddress(artistId)}`;
-};
-
-const mapTrack = (item: {
-  metadata: Metadata;
-  platformTrackResponse?: any;
-}): ProcessedTrack => ({
-  id: mapTrackID(item.metadata.id),
-  platformInternalId: item.platformTrackResponse.id,
-  title: item.platformTrackResponse.title,
-  slug: slugify(`${item.platformTrackResponse.title} ${item.metadata.createdAtTime.getTime()}`).toLowerCase(),
-  description: item.platformTrackResponse.description,
+const mapTrack = (nft: ERC721NFT, apiTrack: any): ProcessedTrack => ({
+  id: apiTrack.trackId,
+  platformInternalId: apiTrack.id,
+  title: apiTrack.title,
+  slug: slugify(`${apiTrack.title} ${nft.createdAtTime.getTime()}`).toLowerCase(),
+  description: apiTrack.description,
   platformId: MusicPlatform.catalog,
-  lossyAudioIPFSHash: item.platformTrackResponse.ipfs_hash_lossy_audio,
-  lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${item.platformTrackResponse.ipfs_hash_lossy_audio}`,
-  createdAtTime: item.metadata.createdAtTime,
-  createdAtEthereumBlockNumber: item.metadata.createdAtEthereumBlockNumber,
-  lossyArtworkIPFSHash: item.platformTrackResponse.ipfs_hash_lossy_artwork,
-  lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${item.platformTrackResponse.ipfs_hash_lossy_artwork}`,
+  lossyAudioIPFSHash: apiTrack.ipfs_hash_lossy_audio,
+  lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${apiTrack.ipfs_hash_lossy_audio}`,
+  createdAtTime: nft.createdAtTime,
+  createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+  lossyArtworkIPFSHash: apiTrack.ipfs_hash_lossy_artwork,
+  lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${apiTrack.ipfs_hash_lossy_artwork}`,
   websiteUrl:
-  item.platformTrackResponse.artist.handle && item.platformTrackResponse.short_url
-      ? `https://beta.catalog.works/${item.platformTrackResponse.artist.handle}/${item.platformTrackResponse.short_url}`
+  apiTrack.artist.handle && apiTrack.short_url
+      ? `https://beta.catalog.works/${apiTrack.artist.handle}/${apiTrack.short_url}`
       : 'https://beta.catalog.works',
-  artistId: mapArtistID(item.platformTrackResponse.artist.id),
+  artistId: mapAPITrackToArtistID(apiTrack),
 });
 
-export const mapArtistProfile = (platformResponse: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
-  const artist = platformResponse.artist;
+const mapArtistProfile = (apiTrack: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
+  const artist = apiTrack.artist;
   return {
     name: artist.name,
-    artistId: mapArtistID(artist.id),
+    artistId: mapAPITrackToArtistID(apiTrack),
     platformInternalId: artist.id,
     platformId: MusicPlatform.catalog,
     avatarUrl: artist.picture_uri,
@@ -93,26 +84,12 @@ export const mapArtistProfile = (platformResponse: any, createdAtTime: Date, cre
   }
 };
 
-const addPlatformTrackData = async (metadatas: Metadata[], client: CatalogClient) => {
-  const trackTokenIds = metadatas.map(m => getTokenIdFromMetadata(m));
-  const platformTracks = await client.fetchCatalogTracksByNFT(trackTokenIds);
-  const platformTrackDataByTokenId = _.keyBy(platformTracks, 'nft_id');
-  const platformTrackData: { metadata: Metadata, platformTrackResponse: any }[]
-    = metadatas.map(metadata => {
-      const platformTrackResponse = platformTrackDataByTokenId[getTokenIdFromMetadata(metadata)] || {
-        isError: true,
-        error: new Error(`Missing platform track data`)
-      }
-      return {
-        metadata,
-        platformTrackResponse
-      };
-  });
-  return platformTrackData;
+const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } => {
+  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
 
 export default {
-  addPlatformTrackData,
+  mapNFTsToTrackIds,
   mapTrack,
-  mapArtistProfile,
+  mapArtistProfile
 }

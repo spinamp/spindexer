@@ -1,18 +1,13 @@
 import _ from 'lodash';
 import slugify from 'slugify';
 
-import { NOIZDAPITrack, NOIZDClient } from '../../clients/noizd';
+import { NOIZDAPITrack } from '../../clients/noizd';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
+import { ERC721NFT } from '../erc721nft';
 import { isGif, isMP4 } from '../media';
-import { Metadata } from '../metadata';
 import { MusicPlatform } from '../platform';
 import { ProcessedTrack } from '../track';
-
-const mapTrackID = (metadataId: string): string => {
-  const [contractAddress, nftId] = metadataId.split('/');
-  return `ethereum/${formatAddress(contractAddress)}/${nftId}`;
-};
 
 const getNoizdVideoPosterUrl = (url: string) => {
   return url.substr(0, url.lastIndexOf('.')) + '.jpg';
@@ -28,13 +23,13 @@ const getNoizdResizedUrl = (src: string, size?: number | string): string => {
   return [...urlParts, size, imageName].join('/');
 };
 
-const mapArtistID = (id: string) => `noizd/${id}`;
+const mapAPITrackToArtistID = (apiTrack: any) => `noizd/${apiTrack.artist.id}`;
 
-export const mapArtistProfile = (platformResponse: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
-  const artist = platformResponse.artist;
+export const mapArtistProfile = (apiTrack: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
+  const artist = apiTrack.artist;
   return {
     name: artist.username,
-    artistId: mapArtistID(artist.id),
+    artistId: mapAPITrackToArtistID(apiTrack),
     platformInternalId: artist.id,
     platformId: MusicPlatform.noizd,
     avatarUrl: artist.profile?.image_profile?.url,
@@ -44,7 +39,7 @@ export const mapArtistProfile = (platformResponse: any, createdAtTime: Date, cre
   };
 };
 
-const mapAPITrackID = (apiTrackId: string): string => {
+const mapAPIIDToTrackId = (apiTrackId: string): string => {
   return `noizd/${apiTrackId}`;
 };
 
@@ -59,7 +54,7 @@ const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any)
       : cover.url;
 
   return {
-    id: mapAPITrackID(apiTrack.id),
+    id: mapAPIIDToTrackId(apiTrack.id),
     platformInternalId: apiTrack.id,
     title: apiTrack.title,
     slug: slugify(`${apiTrack.title} ${mapAPITrackTime(apiTrack).getTime()}`).toLowerCase(),
@@ -69,54 +64,37 @@ const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrack: any)
     createdAtTime: mapAPITrackTime(apiTrack),
     lossyArtworkURL: artwork,
     websiteUrl: `https://noizd.com/assets/${apiTrack.id}`,
-    artistId: mapArtistID(apiTrack.artist.id),
+    artistId: mapAPITrackToArtistID(apiTrack),
   }
 }
 
-const mapTrack = (item: {
-  metadata: Metadata;
-  platformTrackResponse?: any;
-}): ProcessedTrack => {
-  const processedTrack = mapAPITrack(item.platformTrackResponse);
-  if (!item.metadata) {
+const mapTrack = (nft: ERC721NFT, apiTrack: any): ProcessedTrack => {
+  const processedTrack = mapAPITrack(apiTrack);
+  if (!nft.metadata) {
     return processedTrack;
   }
   return {
     ...processedTrack,
-    id: mapTrackID(item.metadata.id),
-    lossyAudioURL: item.platformTrackResponse.metadata.audio_url,
-    createdAtTime: processedTrack.createdAtTime || item.metadata.createdAtTime,
-    createdAtEthereumBlockNumber: item.metadata.createdAtEthereumBlockNumber,
+    id: mapNFTtoTrackID(nft),
+    lossyAudioURL: apiTrack.metadata.audio_url,
+    createdAtTime: processedTrack.createdAtTime || nft.createdAtTime,
+    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
   };
 };
 
-const getTokenIdFromMetadata = (metadata: Metadata) => {
-  return metadata.id.split('/')[1];
+const mapNFTtoTrackID = (nft: ERC721NFT): string => {
+  const [contractAddress, nftId] = nft.id.split('/');
+  return `ethereum/${formatAddress(contractAddress)}/${nftId}`;
 }
 
-const addPlatformTrackData = async (metadatas: Metadata[], client: NOIZDClient) => {
-  const trackTokenIds = metadatas.map(m => getTokenIdFromMetadata(m));
-  const platformNFTs = await client.fetchNFTs(trackTokenIds);
-  const platformTracks = platformNFTs.map(nft => ({ ...nft.music, metadata: nft.metadata }));
-  const platformTrackDataByTokenId = _.keyBy(platformTracks, 'metadata.id');
-  const platformTrackData: { metadata: Metadata, platformTrackResponse: any }[]
-    = metadatas.map(metadata => {
-      const platformTrackResponse = platformTrackDataByTokenId[getTokenIdFromMetadata(metadata)] || {
-        isError: true,
-        error: new Error(`Missing platform track data`)
-      }
-      return {
-        metadata,
-        platformTrackResponse
-      };
-  });
-  return platformTrackData;
+const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } => {
+  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
 
 export default {
-  addPlatformTrackData,
-  mapAPITrackTime,
-  mapAPITrack,
+  mapNFTsToTrackIds,
   mapTrack,
   mapArtistProfile,
+  mapAPITrack,
+  mapAPITrackTime
 }

@@ -1,50 +1,63 @@
+import { Table } from '../db/db';
 import { MusicPlatform } from '../types/platform';
 import { Clients } from '../types/processor';
 import { Trigger } from '../types/trigger';
 
-export const missingMetadataObject: Trigger<Clients, undefined> = async (clients: Clients) => {
-  const metadatas = (await clients.db.getRecords('metadatas',
+export const missingCreatedAtTime: Trigger<undefined> = async (clients: Clients) => {
+  const nfts = (await clients.db.getRecords(Table.erc721nfts,
+    [
+      ['whereNull', ['createdAtTime']],
+    ]
+  )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+  return nfts;
+};
+
+export const missingMetadataObject: Trigger<undefined> = async (clients: Clients) => {
+  const nfts = (await clients.db.getRecords(Table.erc721nfts,
     [
       ['whereNull', ['metadata']],
       ['and'],
       ['whereNull', ['metadataError']],
     ]
   )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
-  return metadatas;
+  return nfts;
 };
 
-export const missingMetadataIPFSHash: Trigger<Clients, undefined> = async (clients: Clients) => {
-  const metadatas = (await clients.db.getRecords('metadatas',
+export const missingMetadataIPFSHash: Trigger<undefined> = async (clients: Clients) => {
+  const nfts = (await clients.db.getRecords(Table.erc721nfts,
     [
       ['whereNull', ['metadataIPFSHash']]
     ])).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
-  return metadatas;
+  return nfts;
 };
 
-export const missingMetadataPlatform: Trigger<Clients, undefined> = async (clients: Clients) => {
-  const metadatas = (await clients.db.getRecords('metadatas',
-    [
-      ['whereNull', ['platformId']]
-    ])).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
-  return metadatas;
-};
+export const erc721NFTsWithoutTracks: (platformId: MusicPlatform, limit?: number) => Trigger<undefined> =
+  (platformId: MusicPlatform, limit: number = parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)) => async (clients: Clients) => {
+    // This query joins nfts+tracks through the join table,
+    // and returns nfts where there is no corresponding track.
+    // It also filters out error tracks so that nfts where we fail
+    // to create a track are not repeated.
+    const query = `select n.* from "${Table.erc721nfts}" as n
+      LEFT OUTER JOIN "${Table.erc721nfts_processedTracks}" as j
+      ON n.id = j."erc721nftId"
+      LEFT OUTER JOIN "${Table.processedTracks}" as p
+      ON j."processedTrackId" = p.id
+      LEFT OUTER JOIN "${Table.erc721nftProcessErrors}" as e
+      ON n.id = e."erc721nftId"
+      WHERE p.id is NULL AND
+      e."processError" is NULL AND
+      n."platformId"='${platformId}'
+      ORDER BY n."createdAtTime"
+      LIMIT ${limit}`
+      const nfts = (await clients.db.rawSQL(
+        query
+      )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+    return nfts;
+  };
 
-export const unprocessedPlatformMetadatas: (platformId: MusicPlatform, limit?: number) => Trigger<Clients, undefined> = (platformId: MusicPlatform, limit?: number) => async (clients: Clients) => {
-  const metadatas = (await clients.db.getRecords('metadatas',
-    [
-      ['whereNull', ['processed']],
-      ['andWhere', [{ platformId }]],
-    ]
-  )).slice(0, limit || parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
-  return metadatas;
-};
-
-// This triggers gets all nfts which have not yet had their metadata record created.
-// We query for all NFTs which do not have a corresponding record in the metadata table
-// matching their metadataId
-export const unprocessedNFTs: Trigger<Clients, undefined> = async (clients: Clients) => {
+export const unprocessedNFTs: Trigger<undefined> = async (clients: Clients) => {
   const nfts = (await clients.db.rawSQL(
-    `select n.* from nfts n left outer join metadatas m on n."metadataId"=m.id where m.id is null;`
+    `select * from ${Table.erc721nfts} where "tokenURI" is null;`
   )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return nfts;
 };

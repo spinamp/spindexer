@@ -2,43 +2,50 @@ import 'dotenv/config';
 import './types/env';
 import _ from 'lodash';
 
+import { Table } from './db/db';
 import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
+import { addTimestampToERC721NFTs } from './processors/default/addTimestampToERC721NFTs';
 import { categorizeZora } from './processors/default/categorizeZora';
-import { createMetadatasFromNFTsProcessor } from './processors/default/createMetadatasFromNFTs';
-import { createNFTsFromERC721TransfersProcessor } from './processors/default/createNFTsFromERC721Transfers';
-import { createSoundNFTsFromSubgraphProcessor } from './processors/default/createNFTsFromSubgraph';
+import { createERC721ContractFromFactoryProcessor } from './processors/default/createERC721ContractFromFactoryProcessor';
+import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
+import { getERC721TokenFieldsProcessor } from './processors/default/createMetadatasFromNFTs';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
 import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
 import { runProcessors } from './runner';
-import { ERC721Contract } from './types/ethereum';
+import { ERC721Contract, FactoryContract } from './types/ethereum';
 import { MusicPlatform } from './types/platform';
 
 
-const PROCESSORS = (erc721Contracts:ERC721Contract[]) => {
-  const erc721TransferProcessors = erc721Contracts.map(contract => createNFTsFromERC721TransfersProcessor(contract));
+const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryContract[]) => {
   const erc721ContractsByAddress = _.keyBy(erc721Contracts, 'address');
+
+  const factoryContractProcessors = factoryContracts.map(contract => createERC721ContractFromFactoryProcessor(contract));
+  const erc721TransferProcessors = createERC721NFTsFromTransfersProcessor(erc721Contracts);
+
   return [
-  createSoundNFTsFromSubgraphProcessor,
-   ...erc721TransferProcessors,
+  ...factoryContractProcessors,
+  erc721TransferProcessors,
   stripIgnoredNFTs,
-  createMetadatasFromNFTsProcessor(erc721ContractsByAddress),
+  addTimestampToERC721NFTs,
+  getERC721TokenFieldsProcessor(erc721ContractsByAddress),
   addMetadataIPFSHashProcessor,
   addMetadataObjectProcessor,
   stripNonAudio,
   categorizeZora,
+  processPlatformTracks(MusicPlatform.sound, 300),
   processPlatformTracks(MusicPlatform.catalog),
-  processPlatformTracks(MusicPlatform.sound, 3),
   processPlatformTracks(MusicPlatform.noizd),
   createProcessedTracksFromAPI(MusicPlatform.noizd),
 ]};
 
 const updateDBLoop = async () => {
   const dbClient = await db.init();
-  const erc721Contracts = await dbClient.getRecords<ERC721Contract>('erc721Contracts');
-  await runProcessors(PROCESSORS(erc721Contracts), dbClient);
+  const erc721Contracts = await dbClient.getRecords<ERC721Contract>(Table.erc721Contracts);
+  const factoryContracts = await dbClient.getRecords<FactoryContract>(Table.factoryContracts);
+  await runProcessors(PROCESSORS(erc721Contracts, factoryContracts), dbClient);
 };
 
 process.on('SIGINT', () => {

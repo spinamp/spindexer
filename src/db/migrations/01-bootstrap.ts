@@ -1,28 +1,20 @@
 import { Knex } from 'knex';
 
+import { Table } from '../db';
+
 const INITIAL_TABLES = [
   {
-    name: 'platforms', create: (table: Knex.CreateTableBuilder) => {
+    name: Table.platforms, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
     }
   },
   {
-    name: 'nfts', create: (table: Knex.CreateTableBuilder) => {
+    name: Table.erc721nfts, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
       table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
       table.string('tokenId');
       table.string('contractAddress');
-      table.string('platformId');
-      table.foreign('platformId').references('id').inTable('platforms');
-      table.string('metadataId');
-    }
-  },
-  {
-    name: 'metadatas', create: (table: Knex.CreateTableBuilder) => {
-      table.string('id').primary();
-      table.datetime('createdAtTime', { precision: 3 });
-      table.bigint('createdAtEthereumBlockNumber');
       table.string('platformId');
       table.foreign('platformId').references('id').inTable('platforms');
       table.string('metadataIPFSHash');
@@ -31,12 +23,11 @@ const INITIAL_TABLES = [
       table.json('metadata');
       table.string('metadataError', 3000);
       table.string('mimeType');
-      table.boolean('processed');
-      table.string('processError', 3000);
-    },
+      table.string('owner');
+    }
   },
   {
-    name: 'artists', create: (table: Knex.CreateTableBuilder) => {
+    name: Table.artists, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
       table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
@@ -45,7 +36,7 @@ const INITIAL_TABLES = [
     }
   },
   {
-    name: 'artistProfiles', create: (table: Knex.CreateTableBuilder) => {
+    name: Table.artistProfiles, create: (table: Knex.CreateTableBuilder) => {
       table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
       table.string('platformInternalId');
@@ -60,7 +51,7 @@ const INITIAL_TABLES = [
     }
   },
   {
-    name: 'processedTracks', create: (table: Knex.CreateTableBuilder) => {
+    name: Table.processedTracks, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
       table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
@@ -80,9 +71,9 @@ const INITIAL_TABLES = [
     }
   },
   {
-    name: 'processors', create: (table: Knex.CreateTableBuilder) => {
+    name: Table.processors, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
-      table.string('cursor');
+      table.string('cursor', 5000000);
     }
   },
 ];
@@ -103,8 +94,7 @@ export const up = async (knex: Knex) => {
   });
   await Promise.all(promises);
   await knex.raw(`GRANT SELECT ON "platforms" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
-  await knex.raw(`GRANT SELECT ON "nfts" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
-  await knex.raw(`GRANT SELECT ON "metadatas" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "erc721nfts" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`GRANT SELECT ON "artists" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`GRANT SELECT ON "artistProfiles" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`GRANT SELECT ON "processedTracks" TO ${process.env.POSTGRES_USERNAME_OPEN}`);

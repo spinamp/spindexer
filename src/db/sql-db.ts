@@ -29,8 +29,14 @@ const recordExistsFunc = (db: Knex) => async (tableName: string, recordID: strin
   return !!record[0];
 }
 
+const filterExistRecordsFunc = (db: Knex) => async (tableName: string, recordIDs: string[], idField: string = 'id') => {
+  console.log(`Querying for new records in ${recordIDs} on ${tableName}`);
+  const existingIdsSelect = await db(tableName).select([idField]).whereIn(idField, recordIDs)
+  return existingIdsSelect.map(i => i.id);
+}
+
 const getRecordsFunc = (db: Knex) => async <RecordType>(tableName: string, wheres?: Wheres): (Promise<RecordType[]>) => {
-  console.log(`Querying for records where ${JSON.stringify(wheres)}`);
+  console.log(`Querying for records in ${tableName}: ${JSON.stringify(wheres) || 'all'}`);
   let query = db(tableName);
   if (wheres) {
     wheres.forEach(where => {
@@ -55,12 +61,13 @@ const init = async (): Promise<DBClient> => {
       return cursorResult[0]?.cursor;
     },
     recordExists: recordExistsFunc(db),
-    insert: async (tableName: string, records: Record[]) => {
+    recordsExist: filterExistRecordsFunc(db),
+    insert: async <RecordType>(tableName: string, records: RecordType[]) => {
       if (records.length === 0) {
         return;
       }
       console.log(`Inserting into ${tableName} ${records.length} records`);
-      const dbRecords = toDBRecords(records);
+      const dbRecords = toDBRecords(tableName, records);
       await db(tableName).insert(dbRecords);
     },
     updateProcessor: async (processor: string, lastCursor: Cursor) => {
@@ -86,12 +93,12 @@ const init = async (): Promise<DBClient> => {
       console.log(`Querying for ${raw}`);
       return await db.raw(raw);
     },
-    update: async (tableName: string, recordUpdates: RecordUpdate<unknown>[], idField: string = 'id') => {
+    update: async <RecordType>(tableName: string, recordUpdates: RecordType[], idField: string = 'id') => {
       console.log(`Updating records`);
       if (recordUpdates?.length > 0) {
         for (const update of recordUpdates) {
           const dbUpdate = toDBRecord(update);
-          const id = dbUpdate.id;
+          const id = (dbUpdate as any)[idField];
           const changes: any = { ...dbUpdate }
           delete changes.id
 
@@ -105,7 +112,7 @@ const init = async (): Promise<DBClient> => {
         await db(tableName).whereIn(idField, ids).delete()
       }
     },
-    upsert: async (tableName: string, recordUpserts: (Record | RecordUpdate<unknown>)[], idField: string | string[] = 'id') => {
+    upsert: async <RecordType>(tableName: string, recordUpserts: RecordType[], idField: string | string[] = 'id') => {
       console.log(`Upserting records`);
       if (recordUpserts?.length > 0) {
         for (const upsert of recordUpserts) {

@@ -1,5 +1,5 @@
 import { ArtistProfile } from './artist';
-import { Metadata } from './metadata';
+import { ERC721NFT } from './erc721nft';
 import catalogMappers from './platforms/catalog';
 import noizdMappers from './platforms/noizd';
 import soundMappers from './platforms/sound';
@@ -14,27 +14,12 @@ export enum MusicPlatform {
   other = 'other'
 }
 
-export const INITIAL_PLATFORM_ENUMS = [
-  'sound',
-  'zora',
-  'noizd',
-  'catalog',
-  'zoraRaw',
-  'other'
-]
-
 export type PlatformMapper = {
-  addPlatformTrackData: (metadatas: Metadata[], client: any) => Promise<{
-    metadata: Metadata;
-    platformTrackResponse: unknown;
-  }[]>;
-  mapTrack: (item: {
-    metadata: Metadata;
-    platformTrackResponse: unknown;
-  }) => ProcessedTrack;
-  mapAPITrack?: (trackItem: unknown) => ProcessedTrack;
-  mapAPITrackTime?: (trackItem: unknown) => Date;
-  mapArtistProfile: (artistItem: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string) => ArtistProfile;
+  mapNFTsToTrackIds: (nfts:ERC721NFT[]) => { [trackId: string]:ERC721NFT[] }
+  mapTrack: (nft: ERC721NFT, apiTrack: any) => ProcessedTrack
+  mapArtistProfile: (apiTrack: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string) => ArtistProfile
+  mapAPITrack?: (apiTrack: any) => ProcessedTrack
+  mapAPITrackTime?: (apiTrack: any) => Date
 }
 
 export type PlatformConfigItem = {
