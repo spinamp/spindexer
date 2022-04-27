@@ -6,11 +6,11 @@ import { Record } from '../../types/record';
 
 const deleteRecords = (tableName:Table, processorName:string, idField: string = 'id') => async (records: Record[], clients: Clients) => {
   const ids:string[] = records.map(r => (r as any)[idField]);
-  processDelete(tableName, processorName, ids, clients);
+  await processDelete(tableName, processorName, ids, clients);
 };
 
 const deleteRecordIds = (tableName:Table, processorName:string) => async (ids: string[], clients: Clients) => {
-  processDelete(tableName, processorName, ids, clients);
+  await processDelete(tableName, processorName, ids, clients);
 };
 
 const processDelete = async (tableName:Table, processorName:string, ids: string[], clients: Clients) => {
