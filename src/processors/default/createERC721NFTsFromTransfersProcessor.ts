@@ -15,7 +15,7 @@ const processorFunction = (contracts: ERC721Contract[]) =>
   async ({ newCursor, items }: {newCursor: Cursor, items: ethers.Event[]}, clients: Clients) => {
     const contractsByAddress = _.keyBy(contracts, 'address');
     const newNFTs:Partial<ERC721NFT>[] = [];
-    const updates = [];
+    const updates:Partial<ERC721NFT>[] = [];
     items.forEach((item):Partial<ERC721NFT> | undefined => {
       const address = item.address;
       const contract = contractsByAddress[address];
@@ -39,6 +39,7 @@ const processorFunction = (contracts: ERC721Contract[]) =>
         owner: item.args!.to
       });
     });
+    await clients.db.update(Table.erc721nfts, updates);
     await clients.db.insert(Table.erc721nfts, newNFTs.filter(n=>!!n));
     await clients.db.updateProcessor(NAME, newCursor);
   };

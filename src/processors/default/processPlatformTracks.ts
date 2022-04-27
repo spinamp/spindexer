@@ -58,8 +58,12 @@ Promise<{
       })
       return undefined;
     }
+    const mappedTrack = mapTrack(trackNFTs[0], apiTrack);
+    if (!mappedTrack) {
+      return;
+    }
 
-    newTracks.push(mapTrack(trackNFTs[0], apiTrack));
+    newTracks.push(mappedTrack);
     trackNFTs.forEach(nft => {
       joins.push({
         erc721nftId: nft.id,

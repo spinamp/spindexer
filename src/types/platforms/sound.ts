@@ -15,7 +15,7 @@ const mapTrack = (
   nft: ERC721NFT,
   apiTrack: any
 ): ProcessedTrack => {
-  if (!nft.metadata.audio_url) {
+  if (!apiTrack.tracks[0].audio) {
     throw new Error('missing nft metadata audio_url');
   }
   return ({
