@@ -8,7 +8,7 @@ This code is intended to become a multi-stage processing pipeline that generates
 ## Requirements to run
  - NodeJS/yarn setup
  - Postgres installed
- - The Graph node setup with IPFS, postgres and https://github.com/spinamp/web3-music-subgraph running
+ - Postgres running
  - postgresql-client installed
 
 ## Running it
@@ -34,8 +34,8 @@ There are a few design goals for the code:
  - Allow extensions with additional metadata or data transformations being added without requiring a DB rebuild nor re-processing from the start
 
 # Infrastructure Architecture
- - The input comes from ethereum events that have been ingested via the Graph
- - This code is just a single nodejs typescript thing that does all the processing and saves state into memory and locally on disk in a JSON file. This could be changed to a proper DB like Postgres later on, but the current goal is to get working and polished first before using a proper DB.
+ - The main input comes from ethereum events that are ingested from an ethereum RPC
+ - This code is just a single nodejs typescript thing that does all the processing and saves state into a postgres db. 
  - The intention is that the code can eventually just be run in a labmda function automatically and trigger on every ethereum block doing small updates each block as needed.
 
 # Code/Data Architecture
