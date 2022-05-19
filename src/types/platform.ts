@@ -5,47 +5,42 @@ import noizdMappers from './platforms/noizd';
 import soundMappers from './platforms/sound';
 import { ProcessedTrack } from './track';
 
-export enum MusicPlatform {
+export enum MusicPlatformType {
   sound = 'sound',
-  zora = 'zora',
   noizd = 'noizd',
   catalog = 'catalog',
-  zoraRaw = 'zoraRaw',
-  other = 'other'
+  zora = 'zora',
+}
+
+export type MusicPlatform = {
+  id: string,
+  type: MusicPlatformType
 }
 
 export type PlatformMapper = {
   mapNFTsToTrackIds: (nfts:ERC721NFT[]) => { [trackId: string]:ERC721NFT[] }
   mapTrack: (nft: ERC721NFT, apiTrack: any) => ProcessedTrack
-  mapArtistProfile: (apiTrack: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string) => ArtistProfile
-  mapAPITrack?: (apiTrack: any) => ProcessedTrack
-  mapAPITrackTime?: (apiTrack: any) => Date
+  mapArtistProfile: ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT }) => ArtistProfile
 }
 
-export type PlatformConfigItem = {
-  mappers?: PlatformMapper
+export type MusicPlatformTypeConfig = {
+  mappers: PlatformMapper
   initialTrackCursor?: string
 };
 
-export type PlatformConfig = {
-  [key in MusicPlatform]: PlatformConfigItem
+export type MusicPlatformTypeConfigs = {
+  [key in MusicPlatformType]?: MusicPlatformTypeConfig
 }
 
-export const platformConfig: PlatformConfig = {
+export const platformConfigs: MusicPlatformTypeConfigs = {
   sound: {
     mappers: soundMappers,
   },
-  zora: {
-  },
   catalog: {
     mappers: catalogMappers,
-  },
-  zoraRaw: {
   },
   noizd: {
     mappers: noizdMappers,
     initialTrackCursor: '2020-04-07T21:11:16.494Z'
   },
-  other: {
-  }
 }

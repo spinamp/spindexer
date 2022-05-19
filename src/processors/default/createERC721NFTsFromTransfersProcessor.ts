@@ -35,7 +35,7 @@ const processorFunction = (contracts: ERC721Contract[]) =>
         createdAtEthereumBlockNumber: '' + item.blockNumber,
         contractAddress: formatAddress(contract.address),
         tokenId,
-        platformId: contract.platform,
+        platformId: contract.platformId,
         owner: item.args!.to
       });
     });

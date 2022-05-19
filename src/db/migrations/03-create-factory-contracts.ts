@@ -1,13 +1,12 @@
 import { Knex } from 'knex';
 
 import { FactoryContractTypeName } from '../../types/ethereum';
-import { MusicPlatform } from '../../types/platform';
 import { Table } from '../db';
 
 const INITIAL_CONTRACTS = [
   {
     id: '0x78e3adc0e811e4f93bd9f1f9389b923c9a3355c2',
-    platformId: MusicPlatform.sound,
+    platformId: 'sound',
     startingBlock: '13725566',
     contractType: FactoryContractTypeName.soundArtistProfileCreator,
     gap: '500000'

@@ -1,8 +1,8 @@
 import { Table } from '../../db/db';
 import { zoraNFTs } from '../../triggers/zora';
 import { ERC721NFT } from '../../types/erc721nft';
-import { getZoraPlatform } from '../../types/platforms/catalog';
 import { Clients, Processor } from '../../types/processor';
+import { getZoraPlatform } from '../../types/zora-contract';
 
 export const categorizeZora: Processor = {
   name: 'categorizeZora',

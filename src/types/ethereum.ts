@@ -4,7 +4,6 @@ import _ from 'lodash'
 import { ValidContractCallFunction } from '../clients/ethereum'
 
 import { formatAddress } from './address'
-import { MusicPlatform } from './platform'
 
 export const ETHEREUM_NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -18,7 +17,7 @@ export enum FactoryContractTypeName {
 }
 
 export type FactoryContract = EthereumContract & {
-  platform: MusicPlatform,
+  platformId: string,
   contractType: FactoryContractTypeName,
   gap?: string
 }
@@ -37,9 +36,9 @@ export const FactoryContractTypes:FactoryContractTypes = {
     newContractCreatedEvent: 'CreatedArtist',
     creationEventToERC721Contract: (event:any) => ({
       address: formatAddress(event.args!.artistAddress),
-      platform: MusicPlatform.sound,
+      platformId: 'sound',
       startingBlock: event.blockNumber,
-      contractType: ERC721ContractTypeName.soundArtist,
+      contractType: ERC721ContractTypeName.default,
     })
   },
 }
@@ -47,11 +46,10 @@ export const FactoryContractTypes:FactoryContractTypes = {
 export enum ERC721ContractTypeName {
   default = 'default',
   zora = 'zora',
-  soundArtist = 'soundArtist',
 }
 
 export type ERC721Contract = EthereumContract & {
-  platform: MusicPlatform,
+  platformId: string,
   contractType: ERC721ContractTypeName,
 }
 
@@ -59,7 +57,6 @@ export type ERC721ContractType = {
   contractCalls: ValidContractCallFunction[],
   contractMetadataField: ValidContractCallFunction,
   buildNFTId: (contractAddress: string, tokenId: BigInt) => string,
-  buildNFTMetadataId: (contractAddress: string, tokenId: BigInt) => string | null,
 }
 
 type ERC721ContractTypes = {
@@ -71,20 +68,12 @@ export const NFTContractTypes:ERC721ContractTypes = {
     contractCalls: [ValidContractCallFunction.tokenURI],
     contractMetadataField: ValidContractCallFunction.tokenURI,
     buildNFTId: buildERC721Id,
-    buildNFTMetadataId: buildERC721Id,
   },
   zora: {
     contractCalls: [ValidContractCallFunction.tokenURI, ValidContractCallFunction.tokenMetadataURI],
     contractMetadataField: ValidContractCallFunction.tokenMetadataURI,
     buildNFTId: buildERC721Id,
-    buildNFTMetadataId: buildERC721Id,
   },
-  soundArtist: {
-    contractCalls: [ValidContractCallFunction.tokenURI],
-    contractMetadataField: ValidContractCallFunction.tokenURI,
-    buildNFTId: buildERC721Id,
-    buildNFTMetadataId: () => null,
-  }
 }
 
 export function buildERC721Id(contractAddress: string, tokenId: BigInt): string {

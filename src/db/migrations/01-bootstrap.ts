@@ -2,10 +2,13 @@ import { Knex } from 'knex';
 
 import { Table } from '../db';
 
+const MUSIC_PLATFORM_TYPES = ['noizd', 'catalog', 'sound', 'zora'];
+
 const INITIAL_TABLES = [
   {
     name: Table.platforms, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
+      table.enu('type', MUSIC_PLATFORM_TYPES);
     }
   },
   {
@@ -79,12 +82,10 @@ const INITIAL_TABLES = [
 ];
 
 const INITIAL_PLATFORM_ENUMS = [
-  { id: 'sound' },
-  { id: 'zora' },
-  { id: 'noizd' },
-  { id: 'catalog' },
-  { id: 'zoraRaw' },
-  { id: 'other' }
+  { id: 'noizd', type: 'noizd' },
+  { id: 'catalog', type: 'catalog' },
+  { id: 'sound', type: 'sound' },
+  { id: 'zora', type: 'zora' },
 ]
 
 export const up = async (knex: Knex) => {

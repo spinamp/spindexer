@@ -1,4 +1,3 @@
-import { Record, RecordUpdate } from '../types/record'
 import { Cursor } from '../types/trigger'
 
 export enum Table {
