@@ -2,7 +2,6 @@ import _ from 'lodash';
 
 import { DBClient, Table } from '../db/db';
 
-import { MusicPlatform } from './platform'
 import { Record } from './record'
 
 export type SubgraphTrack = {
@@ -23,7 +22,7 @@ export type ProcessedTrack = Record & {
   platformInternalId: string;
   title: string;
   slug: string;
-  platformId: MusicPlatform;
+  platformId: string;
   lossyAudioIPFSHash?: string;
   lossyAudioURL: string;
   description?: string;
@@ -40,11 +39,8 @@ export const mergeProcessedTracks = async (newProcessedTracks: ProcessedTrack[],
       ['whereIn', ['platformInternalId', platformInternalIds]]
     ]
   );
-  const newProcessedTracksById = _.keyBy(existingProcessedTracks, 'id');
   const existingProcessedTracksByPlatformId = _.keyBy(existingProcessedTracks, 'platformInternalId');
-  const oldIds = existingProcessedTracks.map(t => t.id).filter(id => {
-    return newProcessedTracksById[id];
-  });
+  const oldIds = existingProcessedTracks.map(t => t.id);
 
   const mergedProcessedTracks = newProcessedTracks.map(t => {
     if (prioritizeNew) {

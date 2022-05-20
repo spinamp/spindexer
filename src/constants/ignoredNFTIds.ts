@@ -8853,6 +8853,21 @@ const nonAudioNFTIds:string[] = [
   '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/3993',
   '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/266',
   '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/3935',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/10511',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/10512',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/11136',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/11288',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/11307',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/11365',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/11374',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/11377',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/11964',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/11996',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/12440',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/12830',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/15452',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/15483',
+  '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/15504',
 ];
 
 export const ignoredNFTIds = nonAudioNFTIds;

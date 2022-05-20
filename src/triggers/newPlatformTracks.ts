@@ -1,16 +1,19 @@
-import { APIMusicPlatform } from '../processors/default/createProcessedTracksFromAPI';
-import { Clients } from '../types/processor';
+import { Clients, TrackAPIClientWithPremints } from '../types/processor';
 import { Cursor, Trigger } from '../types/trigger';
 
-export const newPlatformTracks: (platform: APIMusicPlatform) => Trigger<Cursor> =
-  (platform: APIMusicPlatform) => async (clients: Clients, cursor: Cursor) => {
-    const latestTrackCursor = await clients[platform].fetchLatestTrackCursor();
+export const newPlatformTracks: (platformId: string) => Trigger<Cursor> =
+  (platformId: string) => async (clients: Clients, cursor: Cursor) => {
+    const platformClient: TrackAPIClientWithPremints = (clients as any)[platformId];
+    if (!platformClient) {
+      throw new Error('API Platform client not found');
+    }
+    const latestTrackCursor = await platformClient.fetchLatestTrackCursor();
     const lastProcessedCursor = latestTrackCursor;
 
     if (lastProcessedCursor === cursor) {
       return [];
     }
 
-    const newTracks = await clients[platform].getTracksFrom(cursor as any);
+    const newTracks = await platformClient.getTracksFrom(cursor as any);
     return newTracks;
   };

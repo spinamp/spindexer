@@ -4,12 +4,10 @@ import { Table } from '../../db/db';
 import { erc721NFTsWithoutTracks } from '../../triggers/missing';
 import { ArtistProfile, mapArtist } from '../../types/artist';
 import { ERC721NFT } from '../../types/erc721nft';
-import { MusicPlatform, platformConfig } from '../../types/platform';
+import { MusicPlatform, platformConfigs } from '../../types/platform';
 import { Clients, Processor, TrackAPIClient } from '../../types/processor';
 import { Record } from '../../types/record';
 import { ProcessedTrack, mergeProcessedTracks, NFTProcessError, NFTTrackJoin } from '../../types/track';
-
-type ImplementedMusicPlatform = MusicPlatform.catalog | MusicPlatform.sound | MusicPlatform.noizd;
 
 const name = 'processTracks';
 
@@ -24,7 +22,7 @@ const createTracks =  async (
   trackMapping: { [trackId: string]:ERC721NFT[] },
   client: TrackAPIClient,
   mapTrack: (nft: ERC721NFT, apiTrack: any) => ProcessedTrack,
-  mapArtistProfile: (apiTrack: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string) => ArtistProfile):
+  mapArtistProfile: ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT }) => ArtistProfile):
 Promise<{
   newTracks: ProcessedTrack[],
   joins: NFTTrackJoin[],
@@ -72,7 +70,7 @@ Promise<{
     })
 
     const artistProfile = {
-      ...mapArtistProfile(apiTrack, trackNFTs[0].createdAtTime, trackNFTs[0].createdAtEthereumBlockNumber),
+      ...mapArtistProfile({ apiTrack, nft:trackNFTs[0] }),
     } as ArtistProfile;
     artistProfiles.push(artistProfile);
   });
@@ -82,13 +80,27 @@ Promise<{
   return { newTracks, joins, errorNFTs, artistProfiles: uniqueArtistProfiles };
 }
 
-const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => async (nfts: ERC721NFT[], clients: Clients) => {
-  console.log(`Getting ${platformId} API tracks for ids: ${nfts.map(n => n.id)}`);
-  const platformMapper = platformConfig[platformId].mappers;
-  if (!platformMapper) {
-    throw new Error(`Platform mapper for ${platformId} not found`);
+const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[], clients: Clients) => {
+  console.log(`Getting ${platform.id} API tracks for ids: ${nfts.map(n => n.id)}`);
+  const platformType = platformConfigs[platform.type];
+  if (!platformType) {
+    const errorNFTs = nfts.map(nft => ({
+        erc721nftId: nft.id,
+        processError: `Missing platform type for ${platform.id}`
+    }))
+    await clients.db.insert(Table.erc721nftProcessErrors, errorNFTs);
+    return;
   }
-  const { mapNFTsToTrackIds, mapTrack, mapArtistProfile } = platformMapper;
+  const platformClient = (clients as any)[platform.type];
+  if (!platformClient) {
+    const errorNFTs = nfts.map(nft => ({
+        erc721nftId: nft.id,
+        processError: `Missing platform client`
+    }))
+    await clients.db.insert(Table.erc721nftProcessErrors, errorNFTs);
+    return;
+  }
+  const { mapNFTsToTrackIds, mapTrack, mapArtistProfile } = platformType.mappers;
 
   const trackMapping = mapNFTsToTrackIds(nfts);
   const trackIds = Object.keys(trackMapping);
@@ -97,7 +109,7 @@ const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => asy
   const { newTracks, joins, errorNFTs, artistProfiles } = await createTracks(
     newTrackIds,
     trackMapping,
-    clients[platformId],
+    platformClient,
     mapTrack,
     mapArtistProfile
     );
@@ -128,10 +140,10 @@ const processorFunction = (platformId: Partial<ImplementedMusicPlatform>) => asy
   await clients.db.insert(Table.erc721nfts_processedTracks, joins);
 };
 
-export const processPlatformTracks: (platformId: ImplementedMusicPlatform, limit?:number) => Processor =
-  (platformId: ImplementedMusicPlatform, limit?: number) => ({
+export const processPlatformTracks: (platform: MusicPlatform, limit?:number) => Processor =
+  (platform: MusicPlatform, limit?: number) => ({
     name,
-    trigger: erc721NFTsWithoutTracks(platformId, limit),
-    processorFunction: processorFunction(platformId),
+    trigger: erc721NFTsWithoutTracks(platform.id, limit),
+    processorFunction: processorFunction(platform),
     initialCursor: undefined,
   });

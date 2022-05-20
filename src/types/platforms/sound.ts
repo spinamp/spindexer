@@ -24,7 +24,7 @@ const mapTrack = (
   title: apiTrack.title,
   slug: slugify(`${apiTrack.title} ${nft.createdAtTime.getTime()}`).toLowerCase(),
   description: apiTrack.description,
-  platformId: MusicPlatform.sound,
+  platformId: nft.platformId,
   lossyAudioURL: apiTrack.tracks[0].audio.url || nft.metadata.audio_url,
   createdAtTime: nft.createdAtTime,
   createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
@@ -36,19 +36,19 @@ const mapTrack = (
   artistId: mapAPITrackToArtistID(apiTrack),
 })};
 
-const mapArtistProfile = (apiTrack: any, createdAtTime: Date, createdAtEthereumBlockNumber?: string): ArtistProfile => {
+const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT }): ArtistProfile => {
   const artist = apiTrack.artist
   return {
     name: artist.name,
     artistId: mapAPITrackToArtistID(apiTrack),
     platformInternalId: artist.id,
-    platformId: MusicPlatform.sound,
+    platformId: nft!.platformId,
     avatarUrl: artist.user.avatar.url,
     websiteUrl: artist.soundHandle ?
       `https://www.sound.xyz/${artist.soundHandle}`
       : 'https://www.sound.xyz',
-    createdAtTime,
-    createdAtEthereumBlockNumber
+    createdAtTime: nft!.createdAtTime,
+    createdAtEthereumBlockNumber: nft!.createdAtEthereumBlockNumber
   }
 };
 

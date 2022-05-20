@@ -4,14 +4,19 @@ import { IPFSClient } from '../../clients/ipfs';
 import { Table } from '../../db/db';
 import { missingMetadataObject } from '../../triggers/missing';
 import { ERC721NFT } from '../../types/erc721nft';
+import { ERC721Contract, NFTContractTypes } from '../../types/ethereum';
 import { getMetadataURL } from '../../types/metadata';
 import { Clients, Processor } from '../../types/processor';
 import { rollPromises } from '../../utils/rollingPromises';
 
 const name = 'addMetadataObject';
 
-const getMetadataObject = (nft: ERC721NFT, timeout: number, axios: Axios, ipfs: IPFSClient): Promise<AxiosResponse> => {
-  const metadataURL = getMetadataURL(nft);
+const getMetadataObject = (nft: ERC721NFT, timeout: number, axios: Axios, ipfs: IPFSClient, erc721ContractsByAddress: {[key:string]:ERC721Contract}): Promise<AxiosResponse> => {
+  const address = nft.contractAddress;
+  const contract = erc721ContractsByAddress[address];
+  const contractTypeName = contract.contractType;
+
+  const metadataURL = getMetadataURL(nft, contractTypeName);
   if (!metadataURL) {
     return Promise.reject({ message:`Metadata metadataURL missing` });
   }
@@ -23,10 +28,10 @@ const getMetadataObject = (nft: ERC721NFT, timeout: number, axios: Axios, ipfs: 
   return axios.get(queryURL, { timeout });
 }
 
-const processorFunction = async (batch: ERC721NFT[], clients: Clients) => {
+const processorFunction = (erc721ContractsByAddress: {[key:string]:ERC721Contract}) => async (batch: ERC721NFT[], clients: Clients) => {
 
   const processMetadataResponse = (nft:ERC721NFT) =>
-    getMetadataObject(nft, parseInt(process.env.METADATA_REQUEST_TIMEOUT!), clients.axios, clients.ipfs);
+    getMetadataObject(nft, parseInt(process.env.METADATA_REQUEST_TIMEOUT!), clients.axios, clients.ipfs, erc721ContractsByAddress);
 
   const results = await rollPromises<ERC721NFT, AxiosResponse, AxiosError>(batch, processMetadataResponse);
 
@@ -44,9 +49,10 @@ const processorFunction = async (batch: ERC721NFT[], clients: Clients) => {
   console.info('Batch done');
 };
 
-export const addMetadataObjectProcessor: Processor = {
+export const addMetadataObjectProcessor: (erc721ContractsByAddress: {[key:string]:ERC721Contract}) => Processor =
+(erc721ContractsByAddress: {[key:string]:ERC721Contract}) => ({
   name,
   trigger: missingMetadataObject,
-  processorFunction,
+  processorFunction: processorFunction(erc721ContractsByAddress),
   initialCursor: undefined
-};
+});

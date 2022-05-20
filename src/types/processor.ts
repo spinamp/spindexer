@@ -8,10 +8,18 @@ import { NOIZDClient } from '../clients/noizd';
 import { SoundClient } from '../clients/sound';
 import { DBClient } from '../db/db';
 
+import { ProcessedTrack } from './track';
 import { Cursor, Trigger } from './trigger';
 
 export type TrackAPIClient = {
   fetchTracksByTrackId: (trackIds: string[]) => Promise<any[]>;
+}
+
+export type TrackAPIClientWithPremints = TrackAPIClient & {
+  fetchLatestTrackCursor: () => Promise<string>;
+  getTracksFrom: (cursor: string) => Promise<any[]>;
+  getAPITrackCursor: (track: any) => string
+  mapAPITrack: (apiTrack: any) => ProcessedTrack
 }
 
 export type Clients = {

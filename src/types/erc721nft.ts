@@ -1,14 +1,12 @@
 import { ValidContractCallFunction } from '../clients/ethereum';
-import { DBClient } from '../db/db';
 
 import { ERC721ContractTypeName, NFTContractTypes } from './ethereum';
-import { MusicPlatform, } from './platform';
 import { Record } from './record';
 
 export type ERC721NFT = Record & {
   contractAddress: string
   tokenId: BigInt
-  platformId: MusicPlatform
+  platformId: string
   metadataIPFSHash?: string
   [ValidContractCallFunction.tokenURI]?: string
   [ValidContractCallFunction.tokenMetadataURI]?: string

@@ -16,7 +16,7 @@ const toRecordMapper: any = {
   [Table.erc721Contracts]: (erc721Contracts: ERC721Contract[]): IdField[] => erc721Contracts.map((c: any) => {
     return ({
       id: c.address,
-      platformId: c.platform,
+      platformId: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,
     });
@@ -39,7 +39,7 @@ const fromRecordMapper: any = {
   [Table.erc721Contracts]: (erc721Contracts: Record[]): ERC721Contract[] => erc721Contracts.map((c: any) => {
     return ({
       address: c.id,
-      platform: c.platformId,
+      platformId: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,
     });
@@ -47,7 +47,7 @@ const fromRecordMapper: any = {
   [Table.factoryContracts]: (factoryContracts: Record[]): ERC721Contract[] => factoryContracts.map((c: any) => {
     return ({
       address: c.id,
-      platform: c.platformId,
+      platformId: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,
       gap: c.gap,

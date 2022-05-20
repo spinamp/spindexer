@@ -19,11 +19,12 @@ import { ERC721Contract, FactoryContract } from './types/ethereum';
 import { MusicPlatform } from './types/platform';
 
 
-const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryContract[]) => {
+const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryContract[], musicPlatforms: MusicPlatform[]) => {
   const erc721ContractsByAddress = _.keyBy(erc721Contracts, 'address');
 
   const factoryContractProcessors = factoryContracts.map(contract => createERC721ContractFromFactoryProcessor(contract));
   const erc721TransferProcessors = createERC721NFTsFromTransfersProcessor(erc721Contracts);
+  const platformTrackProcessors = musicPlatforms.map(musicPlatform => processPlatformTracks(musicPlatform));
 
   return [
   ...factoryContractProcessors,
@@ -31,21 +32,20 @@ const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryCo
   stripIgnoredNFTs,
   addTimestampToERC721NFTs,
   getERC721TokenFieldsProcessor(erc721ContractsByAddress),
-  addMetadataIPFSHashProcessor,
-  addMetadataObjectProcessor,
+  addMetadataIPFSHashProcessor(erc721ContractsByAddress),
+  addMetadataObjectProcessor(erc721ContractsByAddress),
   stripNonAudio,
   categorizeZora,
-  processPlatformTracks(MusicPlatform.sound, 300),
-  processPlatformTracks(MusicPlatform.catalog),
-  processPlatformTracks(MusicPlatform.noizd),
-  createProcessedTracksFromAPI(MusicPlatform.noizd),
+  ...platformTrackProcessors,
+  createProcessedTracksFromAPI('noizd'),
 ]};
 
 const updateDBLoop = async () => {
   const dbClient = await db.init();
   const erc721Contracts = await dbClient.getRecords<ERC721Contract>(Table.erc721Contracts);
   const factoryContracts = await dbClient.getRecords<FactoryContract>(Table.factoryContracts);
-  await runProcessors(PROCESSORS(erc721Contracts, factoryContracts), dbClient);
+  const musicPlatforms = await dbClient.getRecords<MusicPlatform>(Table.platforms);
+  await runProcessors(PROCESSORS(erc721Contracts, factoryContracts, musicPlatforms), dbClient);
 };
 
 process.on('SIGINT', () => {

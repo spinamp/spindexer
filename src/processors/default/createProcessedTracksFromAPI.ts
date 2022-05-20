@@ -3,21 +3,28 @@ import _ from 'lodash';
 import { Table } from '../../db/db';
 import { newPlatformTracks } from '../../triggers/newPlatformTracks';
 import { mapArtist } from '../../types/artist';
-import { MusicPlatform, platformConfig } from '../../types/platform';
-import { Clients, Processor } from '../../types/processor';
+import { MusicPlatformTypeConfig, platformConfigs } from '../../types/platform';
+import { Clients, Processor, TrackAPIClientWithPremints } from '../../types/processor';
 import { Record } from '../../types/record';
 import { mergeProcessedTracks } from '../../types/track';
 
 const NAME = 'createProcessedTracksFromAPI';
-export type APIMusicPlatform = MusicPlatform.noizd;
 
-const processorFunction = (platformId: APIMusicPlatform, name: string) => async (apiTracks: unknown[], clients: Clients) => {
+const processorFunction = (platformId: string, name: string) => async (apiTracks: unknown[], clients: Clients) => {
   console.info(`Processing ${apiTracks.length} api tracks from ${platformId}`);
-  const { mapAPITrack, mapArtistProfile, mapAPITrackTime } = platformConfig[platformId].mappers!;
-  const lastCursor = clients[platformId].getAPITrackCursor(apiTracks[apiTracks.length - 1]);
+  const platformConfig: MusicPlatformTypeConfig = (platformConfigs as any)[platformId];
+  if (!platformConfig) {
+    throw new Error('API Platform config not found');
+  }
+  const platformClient: TrackAPIClientWithPremints = (clients as any)[platformId];
+  if (!platformClient) {
+    throw new Error('API Platform client not found');
+  }
+  const { mapArtistProfile } = platformConfig.mappers;
+  const lastCursor = platformClient.getAPITrackCursor(apiTracks[apiTracks.length - 1]);
 
   const artistProfiles = _.uniqBy(apiTracks.map(apiTrack => {
-    return mapArtistProfile(apiTrack, mapAPITrackTime!(apiTrack));
+    return mapArtistProfile({ apiTrack });
   }), 'artistId');
 
   const artists = artistProfiles.map(profile => mapArtist(profile));
@@ -25,7 +32,7 @@ const processorFunction = (platformId: APIMusicPlatform, name: string) => async 
   // Because we assume an artist has the same ID across all profiles, we
   // don't need to worry about changing the artistId and artist{} fields in the processed
   // tracks and can just do a simple merge.
-  const processedTracks = apiTracks.map(apiTrack => mapAPITrack!(apiTrack));
+  const processedTracks = apiTracks.map(apiTrack => platformClient.mapAPITrack(apiTrack));
   const { mergedProcessedTracks } = await mergeProcessedTracks(processedTracks, clients.db, false);
 
   await clients.db.upsert(Table.artists, artists);
@@ -35,10 +42,15 @@ const processorFunction = (platformId: APIMusicPlatform, name: string) => async 
   console.info(`Processing completed, updated cursor to ${lastCursor}`);
 };
 
-export const createProcessedTracksFromAPI: (platformId: APIMusicPlatform) => Processor =
-  (platformId: APIMusicPlatform) => ({
+export const createProcessedTracksFromAPI: (platformId: string) => Processor =
+  (platformId: string) => {
+    const platformConfig: MusicPlatformTypeConfig = (platformConfigs as any)[platformId];
+    if (!platformConfig) {
+      throw new Error('API Platform config not found');
+    }
+    return ({
     name: `${NAME}_${platformId}`,
     trigger: newPlatformTracks(platformId),
     processorFunction: processorFunction(platformId, `${NAME}_${platformId}`),
-    initialCursor: platformConfig[platformId].initialTrackCursor,
-  });
+    initialCursor: platformConfig.initialTrackCursor,
+  })};

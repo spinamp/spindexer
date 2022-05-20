@@ -1,9 +1,6 @@
 import _ from 'lodash';
 import slugify from 'slugify';
 
-import { DBClient } from '../db/db';
-
-import { MusicPlatform } from './platform';
 import { Record, TimeField } from './record'
 
 export type Artist = Record & {
@@ -15,7 +12,7 @@ export type ArtistProfile = TimeField & {
   platformInternalId: string;
   artistId: string;
   name: string;
-  platformId: MusicPlatform;
+  platformId: string;
   avatarUrl?: string;
   websiteUrl?: string;
 }

@@ -22,6 +22,7 @@ export const up = async (knex: Knex) => {
   await knex.schema.createTable(JOIN_TABLE.name, JOIN_TABLE.create);
   await knex.schema.createTable(ERROR_TABLE.name, ERROR_TABLE.create);
   await knex.raw(`GRANT SELECT ON "erc721nfts_processedTracks" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`comment on table "erc721nftProcessErrors" is '@omit';`);
 };
 
 exports.down = async (knex: Knex) => {

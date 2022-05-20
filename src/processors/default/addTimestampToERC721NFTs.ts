@@ -1,4 +1,3 @@
-import { BigNumber, ethers } from 'ethers';
 import _ from 'lodash';
 
 import { Table } from '../../db/db';
