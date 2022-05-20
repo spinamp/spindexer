@@ -1,4 +1,4 @@
-OPERATIONS.md# Operations
+# Operations
 
 Here are some useful commands while operating things:
 
