@@ -1,4 +1,4 @@
-# Operations
+OPERATIONS.md# Operations
 
 Here are some useful commands while operating things:
 
@@ -9,6 +9,8 @@ update erc721nfts SET "metadataError"=null where "metadata" is null and "metadat
 
 ```sql
 -- Clear all erc721nfts where there was an error processing them into tracks to they can be tried again:
+select * from "erc721nftProcessErrors";
+
 delete from "erc721nftProcessErrors";
 ```
 

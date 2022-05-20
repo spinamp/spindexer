@@ -16,7 +16,7 @@ import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
 import { runProcessors } from './runner';
 import { ERC721Contract, FactoryContract } from './types/ethereum';
-import { MusicPlatform, MusicPlatformType } from './types/platform';
+import { MusicPlatform } from './types/platform';
 
 
 const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryContract[], musicPlatforms: MusicPlatform[]) => {

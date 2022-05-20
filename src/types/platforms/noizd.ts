@@ -44,7 +44,9 @@ const mapTrack = (nft: ERC721NFT, apiTrack: any): ProcessedTrack => {
 
 const mapNFTtoTrackID = (nft: ERC721NFT): string => {
   const [contractAddress, nftId] = nft.id.split('/');
-  return `ethereum/${formatAddress(contractAddress)}/${nftId}`;
+  const externalURL = nft.metadata.external_url;
+  const trackId = externalURL.split('/assets/')[1];
+  return `ethereum/${formatAddress(contractAddress)}/${trackId}`;
 }
 
 const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } => {
