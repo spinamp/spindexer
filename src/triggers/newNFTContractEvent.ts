@@ -43,7 +43,7 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
         return [];
       }
       contracts.forEach(contract => {
-        if(!cursor[contract.address]) {
+        if (!cursor[contract.address]) {
           cursor[contract.address] = contract.startingBlock;
         }
       });
@@ -69,7 +69,7 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
 
       const newEvents = await clients.eth.getEventsFrom(rangeStart.toString(), rangeEnd.toString(), staleContractFilters);
       const newCursor = JSON.stringify(newCursorObject);
-      if(newEvents.length === 0 && mostStaleContracts.length !== contracts.length) {
+      if (newEvents.length === 0 && mostStaleContracts.length !== contracts.length) {
         console.log('Recursing trigger');
         return triggerFunc(clients, newCursor);
       }

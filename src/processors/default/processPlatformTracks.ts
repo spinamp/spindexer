@@ -29,7 +29,7 @@ Promise<{
   errorNFTs: NFTProcessError[],
   artistProfiles: ArtistProfile[]
 }> => {
-  if(newTrackIds.length === 0) {
+  if (newTrackIds.length === 0) {
     return {
       newTracks: [],
       joins: [],
@@ -47,7 +47,7 @@ Promise<{
   newTrackIds.forEach(trackId => {
     const trackNFTs = trackMapping[trackId];
     const apiTrack = apiTrackData[trackId];
-    if(!apiTrack) {
+    if (!apiTrack) {
       trackNFTs.forEach(nft => {
         errorNFTs.push({
           erc721nftId: nft.id,

@@ -39,7 +39,7 @@ export const getERC721TokenFields = async (nfts: ERC721NFT[], ethClient: EthClie
     callIndexes.forEach(callIndex => {
       const key = flatContractCalls[callIndex].callFunction;
       const value = callResults[callIndex];
-      if(key === ValidContractCallFunction.tokenURI && value === null) {
+      if (key === ValidContractCallFunction.tokenURI && value === null) {
         nftUpdate.tokenURI = '';
       } else {
         nftUpdate[key] = value as string;

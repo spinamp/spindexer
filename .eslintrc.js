@@ -18,6 +18,7 @@ module.exports = {
     'space-infix-ops': ['error'],
     'object-curly-spacing': ['error', 'always'],
     'indent': ['error', 2],
+    'keyword-spacing': ['error', { 'after': true }],
     '@typescript-eslint/quotes': [
       'error',
       'single',

@@ -4,7 +4,7 @@ import { ERC721NFT } from './erc721nft';
 import { ERC721Contract, ERC721ContractTypeName } from './ethereum';
 
 export const getMetadataURL = (nft: ERC721NFT, contractTypeName: ERC721ContractTypeName): (string | null | undefined) => {
-  if(contractTypeName === 'zora') {
+  if (contractTypeName === 'zora') {
     return nft.tokenMetadataURI
   } else {
     return nft.tokenURI
