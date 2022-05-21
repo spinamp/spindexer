@@ -10,7 +10,9 @@ export enum Table {
   factoryContracts = 'factoryContracts',
   erc721Contracts = 'erc721Contracts',
   erc721nfts_processedTracks = 'erc721nfts_processedTracks',
-  erc721nftProcessErrors = 'erc721nftProcessErrors'
+  erc721nftProcessErrors = 'erc721nftProcessErrors',
+  ipfsPins = 'ipfsPins',
+  processedTracks_ipfsPins = 'processedTracks_ipfsPins'
 }
 
 export type WhereFunc = 'where'
