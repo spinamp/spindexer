@@ -30,11 +30,12 @@ const mapTrack = (
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
     lossyArtworkURL: apiTrack.coverImage.url,
     websiteUrl:
-  apiTrack.artist.soundHandle && apiTrack.titleSlug
-    ? `https://www.sound.xyz/${apiTrack.artist.soundHandle}/${apiTrack.titleSlug}`
-    : 'https://www.sound.xyz',
+      apiTrack.artist.soundHandle && apiTrack.titleSlug
+        ? `https://www.sound.xyz/${apiTrack.artist.soundHandle}/${apiTrack.titleSlug}`
+        : 'https://www.sound.xyz',
     artistId: mapAPITrackToArtistID(apiTrack),
-  })};
+  })
+};
 
 const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT }): ArtistProfile => {
   const artist = apiTrack.artist
