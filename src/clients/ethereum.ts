@@ -49,7 +49,7 @@ const init = async (): Promise<EthClient> => {
         const filter = contract.filters[contractFilter.filter]();
         return filter.topics![0];
       });
-      const contractAddresses = _.uniq(contractFilters.map(c=>c.address));
+      const contractAddresses = _.uniq(contractFilters.map(c => c.address));
       const events = await provider.send('eth_getLogs', [{
         address: contractAddresses,
         topics: [
@@ -74,7 +74,7 @@ const init = async (): Promise<EthClient> => {
     getBlockTimestamps: async (blockHashes: string[]) => {
       const getBlockByHash = provider.getBlock.bind(provider);
       const results = await rollPromises(blockHashes, getBlockByHash);
-      const failedBlocks = results.filter(result=>result.isError);
+      const failedBlocks = results.filter(result => result.isError);
       if (failedBlocks.length !== 0) {
         throw new Error('Failed to get all block timestamps');
       }

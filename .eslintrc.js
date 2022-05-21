@@ -22,6 +22,7 @@ module.exports = {
     'object-curly-spacing': 'off',
     '@typescript-eslint/object-curly-spacing': ['error', 'always'],
     'indent': 'off',
+    'arrow-spacing': ['error', { 'before': true, 'after': true }],
     '@typescript-eslint/indent': ['error', 2],
     'keyword-spacing': ['error', { 'after': true }],
     '@typescript-eslint/quotes': [
