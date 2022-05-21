@@ -16,7 +16,8 @@ module.exports = {
     '@typescript-eslint/type-annotation-spacing': ['error', { 'after': true }],
     'key-spacing': ['error', { 'afterColon': true }],
     'space-infix-ops': ['error'],
-    'object-curly-spacing': ['error', 'always'],
+    'object-curly-spacing': 'off',
+    '@typescript-eslint/object-curly-spacing': ['error', 'always'],
     'indent': ['error', 2],
     'keyword-spacing': ['error', { 'after': true }],
     '@typescript-eslint/quotes': [

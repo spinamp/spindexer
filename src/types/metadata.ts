@@ -11,7 +11,7 @@ export const getMetadataURL = (nft: ERC721NFT, contractTypeName: ERC721ContractT
   }
 }
 
-export const getMetadataIPFSHash = (nft: ERC721NFT, erc721ContractsByAddress: {[key: string]: ERC721Contract}): (string | null | undefined) => {
+export const getMetadataIPFSHash = (nft: ERC721NFT, erc721ContractsByAddress: { [key: string]: ERC721Contract }): (string | null | undefined) => {
   const address = nft.contractAddress;
   const contract = erc721ContractsByAddress[address];
   const contractTypeName = contract.contractType;
