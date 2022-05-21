@@ -24,7 +24,7 @@ const calculateRange = (cursor: ContractsEventsCursor, gap: string) => {
   const rangeStart: bigint = mostStaleBlock + BigInt(1);
 
   let rangeEnd: bigint = rangeStart + BigInt(gap);
-  if (sortedBlocks.length > 1 ) {
+  if (sortedBlocks.length > 1) {
     rangeEnd = min(rangeEnd, sortedBlocks[1]);
   }
 
@@ -47,6 +47,8 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
           cursor[contract.address] = contract.startingBlock;
         }
       });
+      // not all vars are const
+      // eslint-disable-next-line prefer-const
       let { rangeStart, rangeEnd, mostStaleContracts } = calculateRange(cursor, gap);
 
       // Check for confirmations
