@@ -7,7 +7,7 @@ import { Clients, Processor } from '../../types/processor';
 
 const name = 'addMetadataIPFSHash';
 
-const processorFunction = (erc721ContractsByAddress: { [key: string]: ERC721Contract }) =>  async (nfts: ERC721NFT[], clients: Clients) => {
+const processorFunction = (erc721ContractsByAddress: { [key: string]: ERC721Contract }) => async (nfts: ERC721NFT[], clients: Clients) => {
   console.log(`Processing updates for ${nfts.map(n => n.id)}`)
   const nftUpdates = nfts.map(n => ({
     id: n.id,

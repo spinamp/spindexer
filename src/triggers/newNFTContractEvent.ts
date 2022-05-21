@@ -36,7 +36,7 @@ type ContractsEventsCursor = {
 };
 
 export const newEthereumEvents: (contracts: EthereumContract[], contractFilters: ContractFilter[], gap?: string) => Trigger<Cursor> =
-  (contracts: EthereumContract[], contractFilters: ContractFilter[], gap: string =  process.env.ETHEREUM_BLOCK_QUERY_GAP!) => {
+  (contracts: EthereumContract[], contractFilters: ContractFilter[], gap: string = process.env.ETHEREUM_BLOCK_QUERY_GAP!) => {
     const triggerFunc = async (clients: Clients, cursorJSON = '{}'): Promise<TriggerOutput> => {
       const cursor: ContractsEventsCursor = JSON.parse(cursorJSON) || {};
       if (contracts.length === 0) {
@@ -82,7 +82,7 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
   };
 
 
-export const newERC721Transfers: (contracts: ERC721Contract[]) => Trigger<Cursor>  =
+export const newERC721Transfers: (contracts: ERC721Contract[]) => Trigger<Cursor> =
   (contracts: ERC721Contract[]) => {
     const contractFilters = contracts.map(contract => ({
       address: contract.address,

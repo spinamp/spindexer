@@ -20,7 +20,7 @@ export type EthCall = {
 export type EthClient = {
   call: (ethCalls: EthCall[]) => Promise<unknown[]>;
   getEventsFrom: (fromBlock: string, toBlock: string, contractFilters: ContractFilter[]) => Promise<ethers.Event[]>;
-  getBlockTimestamps:  (blockHashes: string[]) => Promise<number[]>;
+  getBlockTimestamps: (blockHashes: string[]) => Promise<number[]>;
   getLatestBlockNumber: () => Promise<number>;
 }
 
