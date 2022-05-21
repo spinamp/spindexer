@@ -53,4 +53,5 @@ export const createProcessedTracksFromAPI: (platformId: string) => Processor =
       trigger: newPlatformTracks(platformId),
       processorFunction: processorFunction(platformId, `${NAME}_${platformId}`),
       initialCursor: platformConfig.initialTrackCursor,
-    })};
+    })
+  };

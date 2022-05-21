@@ -6,7 +6,7 @@ export type Cursor = string;
 
 export type GetIfCursor<T> =
   T extends Cursor ? Cursor
-  : undefined
+    : undefined
 
 export type TriggerOutputItems = any[];
 

@@ -56,9 +56,9 @@ const processorFunction = (erc721ContractsByAddress: { [key: string]: ERC721Cont
 };
 
 export const getERC721TokenFieldsProcessor: (erc721ContractsByAddress: { [key: string]: ERC721Contract }) => Processor =
-(erc721ContractsByAddress: { [key: string]: ERC721Contract }) => ({
-  name,
-  trigger: unprocessedNFTs,
-  processorFunction: processorFunction(erc721ContractsByAddress),
-  initialCursor: undefined,
-});
+  (erc721ContractsByAddress: { [key: string]: ERC721Contract }) => ({
+    name,
+    trigger: unprocessedNFTs,
+    processorFunction: processorFunction(erc721ContractsByAddress),
+    initialCursor: undefined,
+  });

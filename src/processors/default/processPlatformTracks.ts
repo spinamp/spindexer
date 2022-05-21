@@ -17,7 +17,7 @@ const getAPITrackData = async (trackIds: string[], client: TrackAPIClient) => {
   return apiTrackByTrackId;
 }
 
-const createTracks =  async (
+const createTracks = async (
   newTrackIds: string[],
   trackMapping: { [trackId: string]: ERC721NFT[] },
   client: TrackAPIClient,
