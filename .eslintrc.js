@@ -13,6 +13,9 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
   ],
   rules: {
+    '@typescript-eslint/no-explicit-any': ['off'],
+    '@typescript-eslint/no-non-null-assertion': ['off'],
+    '@typescript-eslint/no-unused-vars': ['off'],
     '@typescript-eslint/type-annotation-spacing': ['error', { 'after': true }],
     'key-spacing': ['error', { 'afterColon': true }],
     'space-infix-ops': ['error'],
