@@ -99,5 +99,5 @@ export const newERC721Transfers: (contracts: ERC721Contract[]) => Trigger<Cursor
     return newEthereumEvents([factoryContract], [{
       address: factoryContract.address,
       filter: newContractCreatedEvent
-    }], factoryContract.gap? factoryContract.gap : undefined);
+    }], factoryContract.gap ? factoryContract.gap : undefined);
   };

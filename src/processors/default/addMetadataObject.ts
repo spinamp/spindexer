@@ -36,12 +36,12 @@ const processorFunction = (erc721ContractsByAddress: {[key:string]:ERC721Contrac
   const results = await rollPromises<ERC721NFT, AxiosResponse, AxiosError>(batch, processMetadataResponse);
 
   const nftUpdates = batch.map((nft, index): (Partial<ERC721NFT>) => {
-    const metadata = results[index].response? results[index].response!.data : undefined;
-    const metadataError = results[index].isError? results[index].error!.message : undefined;
+    const metadata = results[index].response ? results[index].response!.data : undefined;
+    const metadataError = results[index].isError ? results[index].error!.message : undefined;
     return {
       id: nft.id,
-      metadata: metadata? JSON.stringify(metadata) : null,
-      mimeType: metadata? metadata.mimeType : null,
+      metadata: metadata ? JSON.stringify(metadata) : null,
+      mimeType: metadata ? metadata.mimeType : null,
       metadataError,
     }
   });
