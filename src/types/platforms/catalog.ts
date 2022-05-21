@@ -51,7 +51,7 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT })
   }
 };
 
-const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } => {
+const mapNFTsToTrackIds = (nfts: ERC721NFT[]): { [trackId: string]: ERC721NFT[] } => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
 

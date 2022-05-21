@@ -18,8 +18,8 @@ const getAPITrackData = async (trackIds: string[], client: TrackAPIClient) => {
 }
 
 const createTracks =  async (
-  newTrackIds:string[],
-  trackMapping: { [trackId: string]:ERC721NFT[] },
+  newTrackIds: string[],
+  trackMapping: { [trackId: string]: ERC721NFT[] },
   client: TrackAPIClient,
   mapTrack: (nft: ERC721NFT, apiTrack: any) => ProcessedTrack,
   mapArtistProfile: ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT }) => ArtistProfile):
@@ -39,10 +39,10 @@ Promise<{
   }
   const apiTrackData = await getAPITrackData(newTrackIds, client);
 
-  const newTracks:ProcessedTrack[] = [];
-  const joins:NFTTrackJoin[] = [];
-  const errorNFTs:NFTProcessError[] = [];
-  const artistProfiles:ArtistProfile[] = [];
+  const newTracks: ProcessedTrack[] = [];
+  const joins: NFTTrackJoin[] = [];
+  const errorNFTs: NFTProcessError[] = [];
+  const artistProfiles: ArtistProfile[] = [];
 
   newTrackIds.forEach(trackId => {
     const trackNFTs = trackMapping[trackId];
@@ -70,7 +70,7 @@ Promise<{
     })
 
     const artistProfile = {
-      ...mapArtistProfile({ apiTrack, nft:trackNFTs[0] }),
+      ...mapArtistProfile({ apiTrack, nft: trackNFTs[0] }),
     } as ArtistProfile;
     artistProfiles.push(artistProfile);
   });
@@ -140,7 +140,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[],
   await clients.db.insert(Table.erc721nfts_processedTracks, joins);
 };
 
-export const processPlatformTracks: (platform: MusicPlatform, limit?:number) => Processor =
+export const processPlatformTracks: (platform: MusicPlatform, limit?: number) => Processor =
   (platform: MusicPlatform, limit?: number) => ({
     name,
     trigger: erc721NFTsWithoutTracks(platform.id, limit),

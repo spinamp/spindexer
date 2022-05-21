@@ -24,17 +24,17 @@ export type FactoryContract = EthereumContract & {
 
 export type FactoryContractType = {
   newContractCreatedEvent: string,
-  creationEventToERC721Contract: (event:ethers.Event) => ERC721Contract
+  creationEventToERC721Contract: (event: ethers.Event) => ERC721Contract
 }
 
 type FactoryContractTypes = {
   [type in FactoryContractTypeName]: FactoryContractType
 }
 
-export const FactoryContractTypes:FactoryContractTypes = {
+export const FactoryContractTypes: FactoryContractTypes = {
   soundArtistProfileCreator: {
     newContractCreatedEvent: 'CreatedArtist',
-    creationEventToERC721Contract: (event:any) => ({
+    creationEventToERC721Contract: (event: any) => ({
       address: formatAddress(event.args!.artistAddress),
       platformId: 'sound',
       startingBlock: event.blockNumber,
@@ -60,10 +60,10 @@ export type ERC721ContractType = {
 }
 
 type ERC721ContractTypes = {
-  [type in ERC721ContractTypeName] : ERC721ContractType
+  [type in ERC721ContractTypeName]: ERC721ContractType
 }
 
-export const NFTContractTypes:ERC721ContractTypes = {
+export const NFTContractTypes: ERC721ContractTypes = {
   default: {
     contractCalls: [ValidContractCallFunction.tokenURI],
     contractMetadataField: ValidContractCallFunction.tokenURI,

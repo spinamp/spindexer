@@ -10,10 +10,10 @@ const processorFunction = async (items: ERC721NFT, clients: Clients) => {
     const blockNumbers = Object.keys(nftsByBlockNumber);
     const timestampsResponse = await clients.blocks.fetchBlockTimestamps(blockNumbers);
     const responseByBlockNumber = _.keyBy(timestampsResponse, 'number');
-    const nftUpdates:Partial<ERC721NFT>[] = [];
+    const nftUpdates: Partial<ERC721NFT>[] = [];
     blockNumbers.forEach((blockNumber) => {
       const timestampMillis = BigInt(responseByBlockNumber[blockNumber].timestamp) * BigInt(1000);
-      const nfts:ERC721NFT[] = nftsByBlockNumber[blockNumber] as any;
+      const nfts: ERC721NFT[] = nftsByBlockNumber[blockNumber] as any;
       nfts.forEach(nft => nftUpdates.push({
         id: nft.id,
         createdAtTime: new Date(parseInt(timestampMillis.toString())),

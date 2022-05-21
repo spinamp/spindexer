@@ -58,7 +58,7 @@ const mapNFTtoTrackID = (nft: ERC721NFT): string => {
   return `ethereum/${formatAddress(nft.contractAddress)}/${editionId}`;
 };
 
-const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } => {
+const mapNFTsToTrackIds = (nfts: ERC721NFT[]): { [trackId: string]: ERC721NFT[] } => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
 

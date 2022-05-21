@@ -29,7 +29,7 @@ export type ContractFilter = {
   filter: string
 };
 
-const init = async ():Promise<EthClient> => {
+const init = async (): Promise<EthClient> => {
   const provider = new JsonRpcProvider(process.env.ETHEREUM_PROVIDER_ENDPOINT);
   const ethcallProvider = new Provider();
   await ethcallProvider.init(provider);
@@ -68,10 +68,10 @@ const init = async ():Promise<EthClient> => {
         address: event.address
       }));
     },
-    getLatestBlockNumber:  async () => {
+    getLatestBlockNumber: async () => {
       return await provider.getBlockNumber();
     },
-    getBlockTimestamps:  async (blockHashes: string[]) => {
+    getBlockTimestamps: async (blockHashes: string[]) => {
       const getBlockByHash = provider.getBlock.bind(provider);
       const results = await rollPromises(blockHashes, getBlockByHash);
       const failedBlocks = results.filter(result=>result.isError);

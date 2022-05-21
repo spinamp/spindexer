@@ -19,7 +19,7 @@ import { ERC721Contract, FactoryContract } from './types/ethereum';
 import { MusicPlatform } from './types/platform';
 
 
-const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryContract[], musicPlatforms: MusicPlatform[]) => {
+const PROCESSORS = (erc721Contracts: ERC721Contract[], factoryContracts: FactoryContract[], musicPlatforms: MusicPlatform[]) => {
   const erc721ContractsByAddress = _.keyBy(erc721Contracts, 'address');
 
   const factoryContractProcessors = factoryContracts.map(contract => createERC721ContractFromFactoryProcessor(contract));

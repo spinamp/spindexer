@@ -10,7 +10,7 @@ import { Cursor } from '../../types/trigger';
 const NAME = 'createERC721ContractFromFactoryProcessor';
 
 const processorFunction = (factoryContract: FactoryContract, name: string) =>
-  async ({ newCursor, items:events }: {newCursor: Cursor, items: ethers.Event[]}, clients: Clients) => {
+  async ({ newCursor, items: events }: {newCursor: Cursor, items: ethers.Event[]}, clients: Clients) => {
     const factoryContractTypeName = factoryContract.contractType;
     const factoryContractType = FactoryContractTypes[factoryContractTypeName];
     const eventToERC721Contract = factoryContractType.creationEventToERC721Contract;

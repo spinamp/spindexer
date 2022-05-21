@@ -13,6 +13,8 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
   ],
   rules: {
+    '@typescript-eslint/type-annotation-spacing': ['error', { 'after': true }],
+    'key-spacing': ['error', { 'afterColon': true }],
     'space-infix-ops': ['error'],
     'object-curly-spacing': ['error', 'always'],
     '@typescript-eslint/quotes': [

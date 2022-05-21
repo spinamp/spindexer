@@ -13,7 +13,7 @@ export async function rollPromises <InputType, OutputType, ErrorType>
 (promiseInputs: InputType[], promiseCreator: PromiseCreator<InputType, OutputType>): Promise<RollOutput<OutputType, ErrorType>[]> {
     let activeRequests = 0;
     let count = 0;
-    const outputs:RollOutput<OutputType, ErrorType>[] = [];
+    const outputs: RollOutput<OutputType, ErrorType>[] = [];
     const isDone = new Promise(resolve => {
       const fillQueueUntilDone = () => {
         if (activeRequests === 0 && count === promiseInputs.length) {
@@ -21,7 +21,7 @@ export async function rollPromises <InputType, OutputType, ErrorType>
         } else {
           while (activeRequests < parseInt(process.env.MAX_CONCURRENT_ROLLING_REQUESTS!) && count < promiseInputs.length) {
             const input = promiseInputs[count];
-            const output:RollOutput<OutputType, ErrorType> = {};
+            const output: RollOutput<OutputType, ErrorType> = {};
             outputs.push(output);
             promiseCreator(input).then((response: OutputType) => {
               output.response = response;

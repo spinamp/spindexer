@@ -14,9 +14,9 @@ const NAME = 'createERC721NFTsFromTransfers';
 const processorFunction = (contracts: ERC721Contract[]) =>
   async ({ newCursor, items }: {newCursor: Cursor, items: ethers.Event[]}, clients: Clients) => {
     const contractsByAddress = _.keyBy(contracts, 'address');
-    const newNFTs:Partial<ERC721NFT>[] = [];
-    const updates:Partial<ERC721NFT>[] = [];
-    items.forEach((item):Partial<ERC721NFT> | undefined => {
+    const newNFTs: Partial<ERC721NFT>[] = [];
+    const updates: Partial<ERC721NFT>[] = [];
+    items.forEach((item): Partial<ERC721NFT> | undefined => {
       const address = item.address;
       const contract = contractsByAddress[address];
       const contractTypeName = contract.contractType;
