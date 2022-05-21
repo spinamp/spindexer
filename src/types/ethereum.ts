@@ -56,7 +56,7 @@ export type ERC721Contract = EthereumContract & {
 export type ERC721ContractType = {
   contractCalls: ValidContractCallFunction[],
   contractMetadataField: ValidContractCallFunction,
-  buildNFTId: (contractAddress: string, tokenId: BigInt) => string,
+  buildNFTId: (contractAddress: string, tokenId: bigint) => string,
 }
 
 type ERC721ContractTypes = {
@@ -76,6 +76,6 @@ export const NFTContractTypes:ERC721ContractTypes = {
   },
 }
 
-export function buildERC721Id(contractAddress: string, tokenId: BigInt): string {
+export function buildERC721Id(contractAddress: string, tokenId: bigint): string {
   return `${formatAddress(contractAddress)}/${tokenId.toString()}`;
 }

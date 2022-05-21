@@ -42,4 +42,4 @@ export async function rollPromises <InputType, OutputType, ErrorType>
     });
     await isDone;
     return outputs;
-  };
+  }

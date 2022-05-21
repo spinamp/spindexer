@@ -9,6 +9,9 @@ module.exports = {
       },
     },
   },
+  extends: [
+    'plugin:@typescript-eslint/recommended',
+  ],
   rules: {
     'space-infix-ops': ['error'],
     'object-curly-spacing': ['error', 'always'],

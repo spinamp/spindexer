@@ -37,7 +37,7 @@ type ContractsEventsCursor = {
 
 export const newEthereumEvents: (contracts: EthereumContract[], contractFilters: ContractFilter[], gap?:string) => Trigger<Cursor> =
   (contracts: EthereumContract[], contractFilters: ContractFilter[], gap:string =  process.env.ETHEREUM_BLOCK_QUERY_GAP!) => {
-    const triggerFunc = async (clients: Clients, cursorJSON: string = '{}'):Promise<TriggerOutput> => {
+    const triggerFunc = async (clients: Clients, cursorJSON = '{}'):Promise<TriggerOutput> => {
       const cursor:ContractsEventsCursor = JSON.parse(cursorJSON) || {};
       if (contracts.length === 0) {
         return [];

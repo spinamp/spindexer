@@ -8,7 +8,7 @@ export const getMetadataURL = (nft: ERC721NFT, contractTypeName: ERC721ContractT
     return nft.tokenMetadataURI
   } else {
     return nft.tokenURI
-  };
+  }
 }
 
 export const getMetadataIPFSHash = (nft: ERC721NFT, erc721ContractsByAddress: {[key:string]:ERC721Contract}): (string | null | undefined) => {
