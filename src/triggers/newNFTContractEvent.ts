@@ -91,7 +91,7 @@ export const newERC721Transfers: (contracts: ERC721Contract[]) => Trigger<Cursor
     return newEthereumEvents(contracts, contractFilters);
   };
 
-  export const newERC721Contract: (factoryContract: FactoryContract) => Trigger<Cursor> =
+export const newERC721Contract: (factoryContract: FactoryContract) => Trigger<Cursor> =
   (factoryContract: FactoryContract) => {
     const factoryContractTypeName = factoryContract.contractType;
     const newContractCreatedEvent = FactoryContractTypes[factoryContractTypeName].newContractCreatedEvent;

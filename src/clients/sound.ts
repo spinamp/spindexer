@@ -34,7 +34,7 @@ const init = async () => {
     return respose.audioFromTrack.audio;
   };
   const getAllMintedReleasesFunction = async (
-    ): Promise<any[]> => {
+  ): Promise<any[]> => {
     const { getAllMintedReleases } = await soundAPI.request(
       gql`
         {

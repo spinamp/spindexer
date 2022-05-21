@@ -85,8 +85,8 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[],
   const platformType = platformConfigs[platform.type];
   if (!platformType) {
     const errorNFTs = nfts.map(nft => ({
-        erc721nftId: nft.id,
-        processError: `Missing platform type for ${platform.id}`
+      erc721nftId: nft.id,
+      processError: `Missing platform type for ${platform.id}`
     }))
     await clients.db.insert(Table.erc721nftProcessErrors, errorNFTs);
     return;
@@ -94,8 +94,8 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[],
   const platformClient = (clients as any)[platform.type];
   if (!platformClient) {
     const errorNFTs = nfts.map(nft => ({
-        erc721nftId: nft.id,
-        processError: `Missing platform client`
+      erc721nftId: nft.id,
+      processError: `Missing platform client`
     }))
     await clients.db.insert(Table.erc721nftProcessErrors, errorNFTs);
     return;
@@ -112,7 +112,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[],
     platformClient,
     mapTrack,
     mapArtistProfile
-    );
+  );
   const artists = artistProfiles.map(profile => mapArtist(profile));
 
   const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(newTracks, clients.db, true);

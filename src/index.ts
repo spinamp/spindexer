@@ -27,18 +27,18 @@ const PROCESSORS = (erc721Contracts: ERC721Contract[], factoryContracts: Factory
   const platformTrackProcessors = musicPlatforms.map(musicPlatform => processPlatformTracks(musicPlatform));
 
   return [
-  ...factoryContractProcessors,
-  erc721TransferProcessors,
-  stripIgnoredNFTs,
-  addTimestampToERC721NFTs,
-  getERC721TokenFieldsProcessor(erc721ContractsByAddress),
-  addMetadataIPFSHashProcessor(erc721ContractsByAddress),
-  addMetadataObjectProcessor(erc721ContractsByAddress),
-  stripNonAudio,
-  categorizeZora,
-  ...platformTrackProcessors,
-  createProcessedTracksFromAPI('noizd'),
-]};
+    ...factoryContractProcessors,
+    erc721TransferProcessors,
+    stripIgnoredNFTs,
+    addTimestampToERC721NFTs,
+    getERC721TokenFieldsProcessor(erc721ContractsByAddress),
+    addMetadataIPFSHashProcessor(erc721ContractsByAddress),
+    addMetadataObjectProcessor(erc721ContractsByAddress),
+    stripNonAudio,
+    categorizeZora,
+    ...platformTrackProcessors,
+    createProcessedTracksFromAPI('noizd'),
+  ]};
 
 const updateDBLoop = async () => {
   const dbClient = await db.init();
