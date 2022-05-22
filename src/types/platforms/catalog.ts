@@ -29,7 +29,7 @@ const mapTrack = (nft: ERC721NFT, apiTrack: any): ProcessedTrack => ({
   lossyArtworkIPFSHash: apiTrack.ipfs_hash_lossy_artwork,
   lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${apiTrack.ipfs_hash_lossy_artwork}`,
   websiteUrl:
-  apiTrack.artist.handle && apiTrack.short_url
+    apiTrack.artist.handle && apiTrack.short_url
       ? `https://beta.catalog.works/${apiTrack.artist.handle}/${apiTrack.short_url}`
       : 'https://beta.catalog.works',
   artistId: mapAPITrackToArtistID(apiTrack),
@@ -51,7 +51,7 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT })
   }
 };
 
-const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } => {
+const mapNFTsToTrackIds = (nfts: ERC721NFT[]): { [trackId: string]: ERC721NFT[] } => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
 

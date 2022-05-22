@@ -1,4 +1,4 @@
-const nonAudioNFTIds:string[] = [
+const nonAudioNFTIds: string[] = [
   '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/3',
   '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/4',
   '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7/8',

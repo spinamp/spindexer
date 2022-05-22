@@ -34,7 +34,7 @@ const init = async () => {
     return respose.audioFromTrack.audio;
   };
   const getAllMintedReleasesFunction = async (
-    ): Promise<any[]> => {
+  ): Promise<any[]> => {
     const { getAllMintedReleases } = await soundAPI.request(
       gql`
         {
@@ -85,7 +85,7 @@ const init = async () => {
     }))
     const filteredAPITracks = apiTracks.filter(apiTrack => trackIds.includes(apiTrack.trackId));
     filteredAPITracks.forEach(apiTrack => {
-      if(apiTrack.tracks.length > 1) {
+      if (apiTrack.tracks.length > 1) {
         return { isError: true, error: new Error('Sound release with multiple tracks not yet implemented') };
       }
     });

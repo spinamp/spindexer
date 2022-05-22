@@ -5,7 +5,7 @@ import { Record } from './record';
 
 export type ERC721NFT = Record & {
   contractAddress: string
-  tokenId: BigInt
+  tokenId: bigint
   platformId: string
   metadataIPFSHash?: string
   [ValidContractCallFunction.tokenURI]?: string

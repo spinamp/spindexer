@@ -19,7 +19,7 @@ import { ERC721Contract, FactoryContract } from './types/ethereum';
 import { MusicPlatform } from './types/platform';
 
 
-const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryContract[], musicPlatforms: MusicPlatform[]) => {
+const PROCESSORS = (erc721Contracts: ERC721Contract[], factoryContracts: FactoryContract[], musicPlatforms: MusicPlatform[]) => {
   const erc721ContractsByAddress = _.keyBy(erc721Contracts, 'address');
 
   const factoryContractProcessors = factoryContracts.map(contract => createERC721ContractFromFactoryProcessor(contract));
@@ -27,18 +27,18 @@ const PROCESSORS = (erc721Contracts:ERC721Contract[], factoryContracts:FactoryCo
   const platformTrackProcessors = musicPlatforms.map(musicPlatform => processPlatformTracks(musicPlatform));
 
   return [
-  ...factoryContractProcessors,
-  erc721TransferProcessors,
-  stripIgnoredNFTs,
-  addTimestampToERC721NFTs,
-  getERC721TokenFieldsProcessor(erc721ContractsByAddress),
-  addMetadataIPFSHashProcessor(erc721ContractsByAddress),
-  addMetadataObjectProcessor(erc721ContractsByAddress),
-  stripNonAudio,
-  categorizeZora,
-  ...platformTrackProcessors,
-  createProcessedTracksFromAPI('noizd'),
-]};
+    ...factoryContractProcessors,
+    erc721TransferProcessors,
+    stripIgnoredNFTs,
+    addTimestampToERC721NFTs,
+    getERC721TokenFieldsProcessor(erc721ContractsByAddress),
+    addMetadataIPFSHashProcessor(erc721ContractsByAddress),
+    addMetadataObjectProcessor(erc721ContractsByAddress),
+    stripNonAudio,
+    categorizeZora,
+    ...platformTrackProcessors,
+    createProcessedTracksFromAPI('noizd'),
+  ]};
 
 const updateDBLoop = async () => {
   const dbClient = await db.init();

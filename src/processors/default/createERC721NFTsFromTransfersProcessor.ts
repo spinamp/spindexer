@@ -12,18 +12,18 @@ import { Cursor } from '../../types/trigger';
 const NAME = 'createERC721NFTsFromTransfers';
 
 const processorFunction = (contracts: ERC721Contract[]) =>
-  async ({ newCursor, items }: {newCursor: Cursor, items: ethers.Event[]}, clients: Clients) => {
+  async ({ newCursor, items }: { newCursor: Cursor, items: ethers.Event[] }, clients: Clients) => {
     const contractsByAddress = _.keyBy(contracts, 'address');
-    const newNFTs:Partial<ERC721NFT>[] = [];
-    const updates:Partial<ERC721NFT>[] = [];
-    items.forEach((item):Partial<ERC721NFT> | undefined => {
+    const newNFTs: Partial<ERC721NFT>[] = [];
+    const updates: Partial<ERC721NFT>[] = [];
+    items.forEach((item): Partial<ERC721NFT> | undefined => {
       const address = item.address;
       const contract = contractsByAddress[address];
       const contractTypeName = contract.contractType;
       const contractType = NFTContractTypes[contractTypeName];
       const tokenId = BigInt((item.args!.tokenId as BigNumber).toString());
       const newMint = item.args!.from === ETHEREUM_NULL_ADDRESS;
-      if(!newMint) {
+      if (!newMint) {
         updates.push({
           id: contractType.buildNFTId(contract.address, tokenId),
           owner: item.args!.to
@@ -40,7 +40,7 @@ const processorFunction = (contracts: ERC721Contract[]) =>
       });
     });
     await clients.db.update(Table.erc721nfts, updates);
-    await clients.db.insert(Table.erc721nfts, newNFTs.filter(n=>!!n));
+    await clients.db.insert(Table.erc721nfts, newNFTs.filter(n => !!n));
     await clients.db.updateProcessor(NAME, newCursor);
   };
 

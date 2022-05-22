@@ -7,8 +7,8 @@ import { Clients, Processor } from '../../types/processor';
 
 const name = 'addMetadataIPFSHash';
 
-const processorFunction = (erc721ContractsByAddress: {[key:string]:ERC721Contract}) =>  async (nfts: ERC721NFT[], clients: Clients) => {
-  console.log(`Processing updates for ${nfts.map(n=>n.id)}`)
+const processorFunction = (erc721ContractsByAddress: { [key: string]: ERC721Contract }) => async (nfts: ERC721NFT[], clients: Clients) => {
+  console.log(`Processing updates for ${nfts.map(n => n.id)}`)
   const nftUpdates = nfts.map(n => ({
     id: n.id,
     metadataIPFSHash: getMetadataIPFSHash(n, erc721ContractsByAddress)
@@ -16,8 +16,8 @@ const processorFunction = (erc721ContractsByAddress: {[key:string]:ERC721Contrac
   await clients.db.update(Table.erc721nfts, nftUpdates);
 };
 
-export const addMetadataIPFSHashProcessor: (erc721ContractsByAddress: {[key:string]:ERC721Contract}) => Processor =
-(erc721ContractsByAddress: {[key:string]:ERC721Contract}) => ({
+export const addMetadataIPFSHashProcessor: (erc721ContractsByAddress: { [key: string]: ERC721Contract }) => Processor =
+(erc721ContractsByAddress: { [key: string]: ERC721Contract }) => ({
   name,
   trigger: missingMetadataIPFSHash,
   processorFunction: processorFunction(erc721ContractsByAddress),

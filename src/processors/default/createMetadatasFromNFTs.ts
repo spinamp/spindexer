@@ -9,7 +9,7 @@ import { Clients, Processor } from '../../types/processor';
 
 const name = 'getERC721TokenFields';
 
-export const getERC721TokenFields = async (nfts: ERC721NFT[], ethClient: EthClient, erc721ContractsByAddress: {[key:string]:ERC721Contract}) => {
+export const getERC721TokenFields = async (nfts: ERC721NFT[], ethClient: EthClient, erc721ContractsByAddress: { [key: string]: ERC721Contract }) => {
   const contractCalls = nfts.map(nft => {
     const nftContractTypeName = erc721ContractsByAddress[nft.contractAddress]?.contractType || 'default';
     return getNFTContractCalls(nft, nftContractTypeName)
@@ -39,7 +39,7 @@ export const getERC721TokenFields = async (nfts: ERC721NFT[], ethClient: EthClie
     callIndexes.forEach(callIndex => {
       const key = flatContractCalls[callIndex].callFunction;
       const value = callResults[callIndex];
-      if(key === ValidContractCallFunction.tokenURI && value === null) {
+      if (key === ValidContractCallFunction.tokenURI && value === null) {
         nftUpdate.tokenURI = '';
       } else {
         nftUpdate[key] = value as string;
@@ -50,15 +50,15 @@ export const getERC721TokenFields = async (nfts: ERC721NFT[], ethClient: EthClie
   return nftUpdates;
 };
 
-const processorFunction = (erc721ContractsByAddress: {[key:string]:ERC721Contract}) => async (nfts: ERC721NFT[], clients: Clients) => {
+const processorFunction = (erc721ContractsByAddress: { [key: string]: ERC721Contract }) => async (nfts: ERC721NFT[], clients: Clients) => {
   const nftMetadataUpdates = await getERC721TokenFields(nfts, clients.eth, erc721ContractsByAddress);
   await clients.db.update(Table.erc721nfts, nftMetadataUpdates);
 };
 
-export const getERC721TokenFieldsProcessor: (erc721ContractsByAddress: {[key:string]:ERC721Contract}) => Processor =
-(erc721ContractsByAddress: {[key:string]:ERC721Contract}) => ({
-  name,
-  trigger: unprocessedNFTs,
-  processorFunction: processorFunction(erc721ContractsByAddress),
-  initialCursor: undefined,
-});
+export const getERC721TokenFieldsProcessor: (erc721ContractsByAddress: { [key: string]: ERC721Contract }) => Processor =
+  (erc721ContractsByAddress: { [key: string]: ERC721Contract }) => ({
+    name,
+    trigger: unprocessedNFTs,
+    processorFunction: processorFunction(erc721ContractsByAddress),
+    initialCursor: undefined,
+  });
