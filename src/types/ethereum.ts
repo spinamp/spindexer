@@ -1,5 +1,4 @@
 import { ethers } from 'ethers'
-import _ from 'lodash'
 
 import { ValidContractCallFunction } from '../clients/ethereum'
 

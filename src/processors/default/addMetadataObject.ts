@@ -4,7 +4,7 @@ import { IPFSClient } from '../../clients/ipfs';
 import { Table } from '../../db/db';
 import { missingMetadataObject } from '../../triggers/missing';
 import { ERC721NFT } from '../../types/erc721nft';
-import { ERC721Contract, NFTContractTypes } from '../../types/ethereum';
+import { ERC721Contract } from '../../types/ethereum';
 import { getMetadataURL } from '../../types/metadata';
 import { Clients, Processor } from '../../types/processor';
 import { rollPromises } from '../../utils/rollingPromises';

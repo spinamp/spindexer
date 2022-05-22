@@ -1,5 +1,4 @@
 import { Table } from '../db/db';
-import { Clients } from '../types/processor';
 import { Trigger } from '../types/trigger';
 
 export const nonAudioMetadata: Trigger<undefined> = async (clients) => {

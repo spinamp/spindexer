@@ -1,4 +1,4 @@
-import { Clients, TrackAPIClientWithPremints } from '../types/processor';
+import { TrackAPIClientWithPremints } from '../types/processor';
 import { Cursor, Trigger } from '../types/trigger';
 
 export const newPlatformTracks: (platformId: string) => Trigger<Cursor> =

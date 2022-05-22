@@ -1,4 +1,3 @@
-import _ from 'lodash';
 
 import { EthClient, ValidContractCallFunction } from '../../clients/ethereum';
 import { Table } from '../../db/db';

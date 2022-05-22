@@ -1,6 +1,4 @@
 import { Table } from '../db/db';
-import { MusicPlatform } from '../types/platform';
-import { Clients } from '../types/processor';
 import { Trigger } from '../types/trigger';
 
 export const missingCreatedAtTime: Trigger<undefined> = async (clients) => {
