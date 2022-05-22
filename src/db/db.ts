@@ -12,7 +12,6 @@ export enum Table {
   erc721nfts_processedTracks = 'erc721nfts_processedTracks',
   erc721nftProcessErrors = 'erc721nftProcessErrors',
   ipfsPins = 'ipfsPins',
-  processedTracks_ipfsPins = 'processedTracks_ipfsPins'
 }
 
 export type WhereFunc = 'where'
