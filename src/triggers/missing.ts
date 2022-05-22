@@ -1,6 +1,7 @@
 import { Table } from '../db/db';
 import { Trigger } from '../types/trigger';
 
+
 export const missingCreatedAtTime: Trigger<undefined> = async (clients) => {
   const nfts = (await clients.db.getRecords(Table.erc721nfts,
     [
@@ -27,6 +28,16 @@ export const missingMetadataIPFSHash: Trigger<undefined> = async (clients) => {
       ['whereNull', ['metadataIPFSHash']]
     ])).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return nfts;
+};
+
+export const missingProcessedArtworks: Trigger<undefined> = async (clients) => {
+  const query = `select t.* from  "${Table.processedTracks}" as t
+  left join "${Table.processedArtworks}" as a on t.id = a."trackId"
+  where a.id is null
+  limit ${process.env.QUERY_TRIGGER_BATCH_SIZE!}`
+  return (await clients.db.rawSQL(
+    query
+  )).rows
 };
 
 export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Trigger<undefined> =

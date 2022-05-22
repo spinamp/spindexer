@@ -8,6 +8,7 @@ export type ERC721NFT = Record & {
   tokenId: bigint
   platformId: string
   metadataIPFSHash?: string
+  lossyArtworkURL: string
   [ValidContractNFTCallFunction.tokenURI]?: string
   [ValidContractNFTCallFunction.tokenMetadataURI]?: string
   metadata?: any
