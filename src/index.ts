@@ -13,6 +13,7 @@ import { createERC721NFTsFromTransfersProcessor } from './processors/default/cre
 import { getERC721TokenFieldsProcessor } from './processors/default/createMetadatasFromNFTs';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
 import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
+import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfs';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
 import { runProcessors } from './runner';
 import { ERC721Contract, FactoryContract } from './types/ethereum';
@@ -38,7 +39,10 @@ const PROCESSORS = (erc721Contracts: ERC721Contract[], factoryContracts: Factory
     categorizeZora,
     ...platformTrackProcessors,
     createProcessedTracksFromAPI('noizd'),
-  ]};
+    ipfsAudioPinner,
+    ipfsArtworkPinner,
+  ]
+};
 
 const updateDBLoop = async () => {
   const dbClient = await db.init();
