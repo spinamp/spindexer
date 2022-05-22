@@ -23,13 +23,13 @@ const loadDB = async () => {
   return db;
 }
 
-const recordExistsFunc = (db: Knex) => async (tableName: string, recordID: string, idField: string = 'id') => {
+const recordExistsFunc = (db: Knex) => async (tableName: string, recordID: string, idField = 'id') => {
   console.log(`Querying for record ${recordID} on ${tableName}`);
   const record = await db(tableName).where(idField, recordID)
   return !!record[0];
 }
 
-const filterExistRecordsFunc = (db: Knex) => async (tableName: string, recordIDs: string[], idField: string = 'id') => {
+const filterExistRecordsFunc = (db: Knex) => async (tableName: string, recordIDs: string[], idField = 'id') => {
   console.log(`Querying for new records in ${recordIDs} on ${tableName}`);
   const existingIdsSelect = await db(tableName).select([idField]).whereIn(idField, recordIDs)
   return existingIdsSelect.map(i => i.id);
@@ -93,7 +93,7 @@ const init = async (): Promise<DBClient> => {
       console.log(`Querying for ${raw}`);
       return await db.raw(raw);
     },
-    update: async <RecordType>(tableName: string, recordUpdates: RecordType[], idField: string = 'id') => {
+    update: async <RecordType>(tableName: string, recordUpdates: RecordType[], idField = 'id') => {
       console.log(`Updating records`);
       if (recordUpdates?.length > 0) {
         for (const update of recordUpdates) {
@@ -106,7 +106,7 @@ const init = async (): Promise<DBClient> => {
         }
       }
     },
-    delete: async (tableName: string, ids: string[], idField: string = 'id') => {
+    delete: async (tableName: string, ids: string[], idField = 'id') => {
       console.log(`Deleting records`);
       if (ids?.length > 0) {
         await db(tableName).whereIn(idField, ids).delete()

@@ -18,7 +18,7 @@ export type MusicPlatform = {
 }
 
 export type PlatformMapper = {
-  mapNFTsToTrackIds: (nfts:ERC721NFT[]) => { [trackId: string]:ERC721NFT[] }
+  mapNFTsToTrackIds: (nfts: ERC721NFT[]) => { [trackId: string]: ERC721NFT[] }
   mapTrack: (nft: ERC721NFT, apiTrack: any) => ProcessedTrack
   mapArtistProfile: ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT }) => ArtistProfile
 }

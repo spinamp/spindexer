@@ -49,8 +49,9 @@ export const createProcessedTracksFromAPI: (platformId: string) => Processor =
       throw new Error('API Platform config not found');
     }
     return ({
-    name: `${NAME}_${platformId}`,
-    trigger: newPlatformTracks(platformId),
-    processorFunction: processorFunction(platformId, `${NAME}_${platformId}`),
-    initialCursor: platformConfig.initialTrackCursor,
-  })};
+      name: `${NAME}_${platformId}`,
+      trigger: newPlatformTracks(platformId),
+      processorFunction: processorFunction(platformId, `${NAME}_${platformId}`),
+      initialCursor: platformConfig.initialTrackCursor,
+    })
+  };

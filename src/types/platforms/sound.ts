@@ -19,22 +19,23 @@ const mapTrack = (
     throw new Error('missing nft metadata audio_url');
   }
   return ({
-  id: apiTrack.trackId,
-  platformInternalId: apiTrack.id,
-  title: apiTrack.title,
-  slug: slugify(`${apiTrack.title} ${nft.createdAtTime.getTime()}`).toLowerCase(),
-  description: apiTrack.description,
-  platformId: nft.platformId,
-  lossyAudioURL: apiTrack.tracks[0].audio.url || nft.metadata.audio_url,
-  createdAtTime: nft.createdAtTime,
-  createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
-  lossyArtworkURL: apiTrack.coverImage.url,
-  websiteUrl:
-  apiTrack.artist.soundHandle && apiTrack.titleSlug
-      ? `https://www.sound.xyz/${apiTrack.artist.soundHandle}/${apiTrack.titleSlug}`
-      : 'https://www.sound.xyz',
-  artistId: mapAPITrackToArtistID(apiTrack),
-})};
+    id: apiTrack.trackId,
+    platformInternalId: apiTrack.id,
+    title: apiTrack.title,
+    slug: slugify(`${apiTrack.title} ${nft.createdAtTime.getTime()}`).toLowerCase(),
+    description: apiTrack.description,
+    platformId: nft.platformId,
+    lossyAudioURL: apiTrack.tracks[0].audio.url || nft.metadata.audio_url,
+    createdAtTime: nft.createdAtTime,
+    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    lossyArtworkURL: apiTrack.coverImage.url,
+    websiteUrl:
+      apiTrack.artist.soundHandle && apiTrack.titleSlug
+        ? `https://www.sound.xyz/${apiTrack.artist.soundHandle}/${apiTrack.titleSlug}`
+        : 'https://www.sound.xyz',
+    artistId: mapAPITrackToArtistID(apiTrack),
+  })
+};
 
 const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT }): ArtistProfile => {
   const artist = apiTrack.artist
@@ -58,7 +59,7 @@ const mapNFTtoTrackID = (nft: ERC721NFT): string => {
   return `ethereum/${formatAddress(nft.contractAddress)}/${editionId}`;
 };
 
-const mapNFTsToTrackIds = (nfts:ERC721NFT[]):{ [trackId: string]:ERC721NFT[] } => {
+const mapNFTsToTrackIds = (nfts: ERC721NFT[]): { [trackId: string]: ERC721NFT[] } => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
 

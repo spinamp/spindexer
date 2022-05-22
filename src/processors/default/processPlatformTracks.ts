@@ -17,9 +17,9 @@ const getAPITrackData = async (trackIds: string[], client: TrackAPIClient) => {
   return apiTrackByTrackId;
 }
 
-const createTracks =  async (
-  newTrackIds:string[],
-  trackMapping: { [trackId: string]:ERC721NFT[] },
+const createTracks = async (
+  newTrackIds: string[],
+  trackMapping: { [trackId: string]: ERC721NFT[] },
   client: TrackAPIClient,
   mapTrack: (nft: ERC721NFT, apiTrack: any) => ProcessedTrack,
   mapArtistProfile: ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT }) => ArtistProfile):
@@ -29,7 +29,7 @@ Promise<{
   errorNFTs: NFTProcessError[],
   artistProfiles: ArtistProfile[]
 }> => {
-  if(newTrackIds.length === 0) {
+  if (newTrackIds.length === 0) {
     return {
       newTracks: [],
       joins: [],
@@ -39,15 +39,15 @@ Promise<{
   }
   const apiTrackData = await getAPITrackData(newTrackIds, client);
 
-  const newTracks:ProcessedTrack[] = [];
-  const joins:NFTTrackJoin[] = [];
-  const errorNFTs:NFTProcessError[] = [];
-  const artistProfiles:ArtistProfile[] = [];
+  const newTracks: ProcessedTrack[] = [];
+  const joins: NFTTrackJoin[] = [];
+  const errorNFTs: NFTProcessError[] = [];
+  const artistProfiles: ArtistProfile[] = [];
 
   newTrackIds.forEach(trackId => {
     const trackNFTs = trackMapping[trackId];
     const apiTrack = apiTrackData[trackId];
-    if(!apiTrack) {
+    if (!apiTrack) {
       trackNFTs.forEach(nft => {
         errorNFTs.push({
           erc721nftId: nft.id,
@@ -70,7 +70,7 @@ Promise<{
     })
 
     const artistProfile = {
-      ...mapArtistProfile({ apiTrack, nft:trackNFTs[0] }),
+      ...mapArtistProfile({ apiTrack, nft: trackNFTs[0] }),
     } as ArtistProfile;
     artistProfiles.push(artistProfile);
   });
@@ -85,8 +85,8 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[],
   const platformType = platformConfigs[platform.type];
   if (!platformType) {
     const errorNFTs = nfts.map(nft => ({
-        erc721nftId: nft.id,
-        processError: `Missing platform type for ${platform.id}`
+      erc721nftId: nft.id,
+      processError: `Missing platform type for ${platform.id}`
     }))
     await clients.db.insert(Table.erc721nftProcessErrors, errorNFTs);
     return;
@@ -94,8 +94,8 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[],
   const platformClient = (clients as any)[platform.type];
   if (!platformClient) {
     const errorNFTs = nfts.map(nft => ({
-        erc721nftId: nft.id,
-        processError: `Missing platform client`
+      erc721nftId: nft.id,
+      processError: `Missing platform client`
     }))
     await clients.db.insert(Table.erc721nftProcessErrors, errorNFTs);
     return;
@@ -112,7 +112,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[],
     platformClient,
     mapTrack,
     mapArtistProfile
-    );
+  );
   const artists = artistProfiles.map(profile => mapArtist(profile));
 
   const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(newTracks, clients.db, true);
@@ -140,7 +140,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[],
   await clients.db.insert(Table.erc721nfts_processedTracks, joins);
 };
 
-export const processPlatformTracks: (platform: MusicPlatform, limit?:number) => Processor =
+export const processPlatformTracks: (platform: MusicPlatform, limit?: number) => Processor =
   (platform: MusicPlatform, limit?: number) => ({
     name,
     trigger: erc721NFTsWithoutTracks(platform.id, limit),
