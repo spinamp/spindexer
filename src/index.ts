@@ -10,9 +10,10 @@ import { addTimestampToERC721NFTs } from './processors/default/addTimestampToERC
 import { categorizeZora } from './processors/default/categorizeZora';
 import { createERC721ContractFromFactoryProcessor } from './processors/default/createERC721ContractFromFactoryProcessor';
 import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
-import { getERC721TokenFieldsProcessor } from './processors/default/createMetadatasFromNFTs';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
 import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
+import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
+import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
 import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfs';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
 import { runProcessors } from './runner';
@@ -29,6 +30,7 @@ const PROCESSORS = (erc721Contracts: ERC721Contract[], factoryContracts: Factory
 
   return [
     ...factoryContractProcessors,
+    getERC721ContractFieldsProcessor,
     erc721TransferProcessors,
     stripIgnoredNFTs,
     addTimestampToERC721NFTs,

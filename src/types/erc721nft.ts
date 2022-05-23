@@ -1,4 +1,4 @@
-import { ValidContractCallFunction } from '../clients/ethereum';
+import { ValidContractNFTCallFunction } from '../clients/ethereum';
 
 import { ERC721ContractTypeName, NFTContractTypes } from './ethereum';
 import { Record } from './record';
@@ -8,8 +8,8 @@ export type ERC721NFT = Record & {
   tokenId: bigint
   platformId: string
   metadataIPFSHash?: string
-  [ValidContractCallFunction.tokenURI]?: string
-  [ValidContractCallFunction.tokenMetadataURI]?: string
+  [ValidContractNFTCallFunction.tokenURI]?: string
+  [ValidContractNFTCallFunction.tokenMetadataURI]?: string
   metadata?: any
   metadataError?: string
   mimeType?: string
