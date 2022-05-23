@@ -4,7 +4,7 @@ import { IdField, Record, RecordUpdate } from '../types/record';
 
 import { Table } from './db';
 
-export const toDBRecord = <RecordType>(record: RecordType | RecordUpdate<unknown>) => {
+const toDBRecord = <RecordType>(record: RecordType | RecordUpdate<unknown>) => {
   if ((record as any).createdAtTime) {
     return { ...record, createdAtTime: (record as any).createdAtTime.toISOString() };
   } else {
@@ -19,6 +19,8 @@ const toRecordMapper: any = {
       platformId: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,
+      name: c.name,
+      symbol: c.symbol,
     });
   }),
 }
@@ -42,6 +44,8 @@ const fromRecordMapper: any = {
       platformId: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,
+      name: c.name,
+      symbol: c.symbol,
     });
   }),
   [Table.factoryContracts]: (factoryContracts: Record[]): ERC721Contract[] => factoryContracts.map((c: any) => {

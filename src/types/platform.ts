@@ -1,8 +1,8 @@
 import { ArtistProfile } from './artist';
 import { ERC721NFT } from './erc721nft';
-import catalogMappers from './platforms/catalog';
-import noizdMappers from './platforms/noizd';
-import soundMappers from './platforms/sound';
+import catalogMappers from './platforms-types/catalog';
+import noizdMappers from './platforms-types/noizd';
+import soundMappers from './platforms-types/sound';
 import { ProcessedTrack } from './track';
 
 export enum MusicPlatformType {

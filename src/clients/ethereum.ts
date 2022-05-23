@@ -6,15 +6,20 @@ import _ from 'lodash';
 import MetaABI from '../abis/MetaABI.json';
 import { rollPromises } from '../utils/rollingPromises';
 
-export enum ValidContractCallFunction {
+export enum ValidContractNFTCallFunction {
   tokenURI = 'tokenURI',
-  tokenMetadataURI = 'tokenMetadataURI'
+  tokenMetadataURI = 'tokenMetadataURI',
+}
+
+export enum ValidContractCallFunction {
+  name = 'name',
+  symbol = 'symbol'
 }
 
 export type EthCall = {
   contractAddress: string,
-  callFunction: ValidContractCallFunction,
-  callInput: string,
+  callFunction: ValidContractNFTCallFunction | ValidContractCallFunction,
+  callInput?: string,
 }
 
 export type EthClient = {
@@ -37,7 +42,7 @@ const init = async (): Promise<EthClient> => {
     call: async (ethCalls: EthCall[]) => {
       const calls = ethCalls.map(ethCall => {
         const contract = new Contract(ethCall.contractAddress, MetaABI.abi);
-        const call = contract[ethCall.callFunction](ethCall.callInput);
+        const call = ethCall.callInput ? contract[ethCall.callFunction](ethCall.callInput) : contract[ethCall.callFunction]();
         return call;
       })
       const data = await ethcallProvider.tryAll(calls);
