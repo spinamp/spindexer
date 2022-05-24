@@ -6,7 +6,7 @@ import { erc721NFTsWithoutTracks } from '../../triggers/missing';
 import { ArtistProfile, mapArtist } from '../../types/artist';
 import { ERC721NFT } from '../../types/erc721nft';
 import { ERC721Contract } from '../../types/ethereum';
-import { MusicPlatform, MusicPlatformType, platformConfigs } from '../../types/platform';
+import { MusicPlatform, platformConfigs } from '../../types/platform';
 import { Clients, Processor, TrackAPIClient } from '../../types/processor';
 import { Record } from '../../types/record';
 import { ProcessedTrack, mergeProcessedTracks, NFTProcessError, NFTTrackJoin } from '../../types/track';

@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import slugify from 'slugify';
 
+import { extractHashFromURL } from '../../clients/ipfs';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { ERC721NFT } from '../erc721nft';
@@ -16,14 +17,14 @@ const mapTrack = (
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
   }
   return ({
-    id: contract.address,
+    id: mapNFTtoTrackID(nft),
     platformInternalId: contract.address,
     title: contract.name || nft.metadata.name,
     slug: slugify(`${contract.name} ${nft.createdAtTime.getTime()}`).toLowerCase(),
     description: nft.metadata.description,
     platformId: contract.platformId,
-    lossyAudioIPFSHash: nft.metadata.animation_url,
-    lossyArtworkIPFSHash: nft.metadata.image,
+    lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url),
+    lossyArtworkIPFSHash: extractHashFromURL(nft.metadata.image),
     websiteUrl: nft.metadata.external_url,
     artistId: contract.platformId,
     createdAtTime: nft.createdAtTime,
