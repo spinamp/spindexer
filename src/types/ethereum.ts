@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 
-import { ValidContractCallFunction } from '../clients/ethereum'
+import { ValidContractNFTCallFunction } from '../clients/ethereum'
 
 import { formatAddress } from './address'
 
@@ -50,11 +50,13 @@ export enum ERC721ContractTypeName {
 export type ERC721Contract = EthereumContract & {
   platformId: string,
   contractType: ERC721ContractTypeName,
+  name?: string,
+  symbol?: string
 }
 
 export type ERC721ContractType = {
-  contractCalls: ValidContractCallFunction[],
-  contractMetadataField: ValidContractCallFunction,
+  contractCalls: ValidContractNFTCallFunction[],
+  contractMetadataField: ValidContractNFTCallFunction,
   buildNFTId: (contractAddress: string, tokenId: bigint) => string,
 }
 
@@ -64,13 +66,13 @@ type ERC721ContractTypes = {
 
 export const NFTContractTypes: ERC721ContractTypes = {
   default: {
-    contractCalls: [ValidContractCallFunction.tokenURI],
-    contractMetadataField: ValidContractCallFunction.tokenURI,
+    contractCalls: [ValidContractNFTCallFunction.tokenURI],
+    contractMetadataField: ValidContractNFTCallFunction.tokenURI,
     buildNFTId: buildERC721Id,
   },
   zora: {
-    contractCalls: [ValidContractCallFunction.tokenURI, ValidContractCallFunction.tokenMetadataURI],
-    contractMetadataField: ValidContractCallFunction.tokenMetadataURI,
+    contractCalls: [ValidContractNFTCallFunction.tokenURI, ValidContractNFTCallFunction.tokenMetadataURI],
+    contractMetadataField: ValidContractNFTCallFunction.tokenMetadataURI,
     buildNFTId: buildERC721Id,
   },
 }

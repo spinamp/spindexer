@@ -35,7 +35,7 @@ export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Tr
     // and returns nfts where there is no corresponding track.
     // It also filters out error tracks so that nfts where we fail
     // to create a track are not repeated.
-    const query = `select n.* from "${Table.erc721nfts}" as n
+    const nftQuery = `select n.* from "${Table.erc721nfts}" as n
       LEFT OUTER JOIN "${Table.erc721nfts_processedTracks}" as j
       ON n.id = j."erc721nftId"
       LEFT OUTER JOIN "${Table.processedTracks}" as p
@@ -48,7 +48,7 @@ export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Tr
       ORDER BY n."createdAtTime"
       LIMIT ${limit}`
     const nfts = (await clients.db.rawSQL(
-      query
+      nftQuery
     )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
     return nfts;
   };

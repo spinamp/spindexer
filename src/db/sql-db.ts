@@ -4,7 +4,7 @@ import { Cursor } from '../types/trigger';
 
 import { DBClient, Wheres } from './db';
 import config from './knexfile';
-import { fromDBRecords, toDBRecord, toDBRecords } from './orm';
+import { fromDBRecords, toDBRecords } from './orm';
 
 const loadDB = async () => {
   const currentConfig = config[process.env.NODE_ENV]
@@ -93,8 +93,8 @@ const init = async (): Promise<DBClient> => {
     update: async <RecordType>(tableName: string, recordUpdates: RecordType[], idField = 'id') => {
       console.log(`Updating records`);
       if (recordUpdates?.length > 0) {
-        for (const update of recordUpdates) {
-          const dbUpdate = toDBRecord(update);
+        const dbUpdates = toDBRecords(tableName, recordUpdates)
+        for (const dbUpdate of dbUpdates) {
           const id = (dbUpdate as any)[idField];
           const changes: any = { ...dbUpdate }
           delete changes.id
@@ -112,8 +112,8 @@ const init = async (): Promise<DBClient> => {
     upsert: async <RecordType>(tableName: string, recordUpserts: RecordType[], idField: string | string[] = 'id') => {
       console.log(`Upserting records`);
       if (recordUpserts?.length > 0) {
-        for (const upsert of recordUpserts) {
-          const dbUpsert = toDBRecord(upsert);
+        const dbUpserts = toDBRecords(tableName, recordUpserts)
+        for (const dbUpsert of dbUpserts) {
           await db(tableName)
             .insert(dbUpsert)
             .onConflict(idField as any)

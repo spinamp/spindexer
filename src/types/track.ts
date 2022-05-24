@@ -18,19 +18,18 @@ export type NFTTrackJoin = {
   processedTrackId: string;
 }
 
+type ProcessedTrackAudio = { lossyAudioURL: string } | { lossyAudioIPFSHash: string };
+type ProcessedTrackArtwork = { lossyArtworkURL: string } | { lossyArtworkIPFSHash: string };
+
 export type ProcessedTrack = Record & {
   platformInternalId: string;
   title: string;
   slug: string;
   platformId: string;
-  lossyAudioIPFSHash?: string;
-  lossyAudioURL: string;
   description?: string;
-  lossyArtworkIPFSHash?: string;
-  lossyArtworkURL: string;
   websiteUrl?: string;
   artistId: string;
-}
+} & ProcessedTrackAudio & ProcessedTrackArtwork;
 
 export const mergeProcessedTracks = async (newProcessedTracks: ProcessedTrack[], dbClient: DBClient, prioritizeNew: boolean) => {
   const platformInternalIds = newProcessedTracks.map(t => t.platformInternalId);

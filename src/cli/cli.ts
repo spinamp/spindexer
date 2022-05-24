@@ -6,7 +6,7 @@ import yargs from 'yargs/yargs';
 
 import { DBClient } from '../db/db';
 import { MusicPlatform, platformConfig } from '../types/platform';
-import { verifyCatalogTrack } from '../types/platforms/catalog';
+import { verifyCatalogTrack } from '../types/platforms-types/catalog';
 import { getMetadataURL, ProcessedTrack, Track } from '../types/track';
 
 

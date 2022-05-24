@@ -1,6 +1,6 @@
 # web3-music-pipeline
 
-This code is intended to become a multi-stage processing pipeline that generates a comprehensive web3 music database and:
+This is a multi-stage processing pipeline that generates a comprehensive web3 music database and:
  - Augments on-chain data with additional info needed (eg: from off-chain sources/ipfs)
  - Transforms data into a more comprehensive, robust schema
  - Saves and keeps alive an updated real time DB
