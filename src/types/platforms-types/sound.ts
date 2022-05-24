@@ -4,7 +4,6 @@ import slugify from 'slugify';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { ERC721NFT } from '../erc721nft';
-import { MusicPlatform } from '../platform';
 import { ProcessedTrack } from '../track';
 
 const mapAPITrackToArtistID = (apiTrack: any): string => {

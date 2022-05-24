@@ -1,14 +1,7 @@
-import _ from 'lodash';
-
 import { Table } from '../db/db';
-import { fromDBRecords } from '../db/orm';
-import { ERC721NFT } from '../types/erc721nft';
-import { ERC721Contract } from '../types/ethereum';
-import { MusicPlatform } from '../types/platform';
-import { Clients } from '../types/processor';
 import { Trigger } from '../types/trigger';
 
-export const missingCreatedAtTime: Trigger<undefined> = async (clients: Clients) => {
+export const missingCreatedAtTime: Trigger<undefined> = async (clients) => {
   const nfts = (await clients.db.getRecords(Table.erc721nfts,
     [
       ['whereNull', ['createdAtTime']],
@@ -17,7 +10,7 @@ export const missingCreatedAtTime: Trigger<undefined> = async (clients: Clients)
   return nfts;
 };
 
-export const missingMetadataObject: Trigger<undefined> = async (clients: Clients) => {
+export const missingMetadataObject: Trigger<undefined> = async (clients) => {
   const nfts = (await clients.db.getRecords(Table.erc721nfts,
     [
       ['whereNull', ['metadata']],
@@ -28,7 +21,7 @@ export const missingMetadataObject: Trigger<undefined> = async (clients: Clients
   return nfts;
 };
 
-export const missingMetadataIPFSHash: Trigger<undefined> = async (clients: Clients) => {
+export const missingMetadataIPFSHash: Trigger<undefined> = async (clients) => {
   const nfts = (await clients.db.getRecords(Table.erc721nfts,
     [
       ['whereNull', ['metadataIPFSHash']]
@@ -37,7 +30,7 @@ export const missingMetadataIPFSHash: Trigger<undefined> = async (clients: Clien
 };
 
 export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Trigger<undefined> =
-  (platformId: string, limit: number = parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)) => async (clients: Clients) => {
+  (platformId: string, limit: number = parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)) => async (clients) => {
     // This query joins nfts+tracks through the join table,
     // and returns nfts where there is no corresponding track.
     // It also filters out error tracks so that nfts where we fail
@@ -60,7 +53,7 @@ export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Tr
     return nfts;
   };
 
-export const unprocessedNFTs: Trigger<undefined> = async (clients: Clients) => {
+export const unprocessedNFTs: Trigger<undefined> = async (clients) => {
   const nfts = (await clients.db.rawSQL(
     `select * from ${Table.erc721nfts} where "tokenURI" is null;`
   )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));

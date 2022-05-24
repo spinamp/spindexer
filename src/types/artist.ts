@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import slugify from 'slugify';
 
 import { Record, TimeField } from './record'

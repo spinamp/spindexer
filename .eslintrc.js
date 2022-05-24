@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'import'],
+  plugins: ['@typescript-eslint', 'import', 'unused-imports'],
   settings: {
     'import/resolver': {
       'babel-module': {
@@ -26,6 +26,7 @@ module.exports = {
     'arrow-spacing': ['error', { 'before': true, 'after': true }],
     '@typescript-eslint/indent': ['error', 2],
     'keyword-spacing': ['error', { 'after': true }],
+    'unused-imports/no-unused-imports': 'error',
     '@typescript-eslint/quotes': [
       'error',
       'single',

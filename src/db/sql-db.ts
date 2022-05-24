@@ -1,5 +1,4 @@
 import knex, { Knex } from 'knex';
-import _ from 'lodash';
 
 import { Cursor } from '../types/trigger';
 

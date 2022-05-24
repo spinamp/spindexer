@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import _ from 'lodash';
 
 import { Table } from '../../db/db';
 import { newERC721Contract } from '../../triggers/newNFTContractEvent';

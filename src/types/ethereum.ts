@@ -1,5 +1,4 @@
 import { ethers } from 'ethers'
-import _ from 'lodash'
 
 import { ValidContractNFTCallFunction } from '../clients/ethereum'
 

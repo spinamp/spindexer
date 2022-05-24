@@ -1,6 +1,6 @@
-import _, { range } from 'lodash';
+import _ from 'lodash';
 
-import { ContractFilter, EthClient } from '../clients/ethereum';
+import { ContractFilter } from '../clients/ethereum';
 import { ERC721Contract, EthereumContract, FactoryContract, FactoryContractTypes } from '../types/ethereum';
 import { Clients } from '../types/processor';
 import { Cursor, Trigger, TriggerOutput } from '../types/trigger';
