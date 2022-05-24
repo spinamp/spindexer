@@ -1,8 +1,6 @@
 import knex, { Knex } from 'knex';
 import _ from 'lodash';
 
-import { Record } from '../types/record';
-import { RecordUpdate } from '../types/record';
 import { Cursor } from '../types/trigger';
 
 import { DBClient, Wheres } from './db';
