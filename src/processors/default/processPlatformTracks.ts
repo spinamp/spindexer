@@ -1,15 +1,30 @@
 import _ from 'lodash';
 
-import { Table } from '../../db/db';
+import { DBClient, Table } from '../../db/db';
+import { fromDBRecords } from '../../db/orm';
 import { erc721NFTsWithoutTracks } from '../../triggers/missing';
 import { ArtistProfile, mapArtist } from '../../types/artist';
 import { ERC721NFT } from '../../types/erc721nft';
-import { MusicPlatform, platformConfigs } from '../../types/platform';
+import { ERC721Contract } from '../../types/ethereum';
+import { MusicPlatform, MusicPlatformType, platformConfigs } from '../../types/platform';
 import { Clients, Processor, TrackAPIClient } from '../../types/processor';
 import { Record } from '../../types/record';
 import { ProcessedTrack, mergeProcessedTracks, NFTProcessError, NFTTrackJoin } from '../../types/track';
 
 const name = 'processTracks';
+
+const getNFTContracts = async (nfts: ERC721NFT[], dbClient: DBClient) => {
+  if (nfts.length === 0) {
+    throw new Error('Unexpected empty NFT array');
+  }
+  const contractAddresses = _.uniq(nfts.map((n: ERC721NFT) => n.contractAddress));
+  const contractAddressesString = JSON.stringify(contractAddresses).replace(/\"/g, "'").replace('[', '(').replace(']', ')');
+  const contractQuery = `select * from "${Table.erc721Contracts}" where id in ${contractAddressesString}`
+  const contracts: ERC721Contract[] = fromDBRecords(Table.erc721Contracts, (await dbClient.rawSQL(
+    contractQuery
+  )).rows);
+  return contracts;
+}
 
 const getAPITrackData = async (trackIds: string[], client: TrackAPIClient) => {
   const apiResponse = await client.fetchTracksByTrackId(trackIds);
@@ -17,18 +32,20 @@ const getAPITrackData = async (trackIds: string[], client: TrackAPIClient) => {
   return apiTrackByTrackId;
 }
 
+/* eslint-disable @typescript-eslint/indent */
 const createTracks = async (
   newTrackIds: string[],
   trackMapping: { [trackId: string]: ERC721NFT[] },
-  client: TrackAPIClient,
-  mapTrack: (nft: ERC721NFT, apiTrack: any) => ProcessedTrack,
-  mapArtistProfile: ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT }) => ArtistProfile):
-Promise<{
-  newTracks: ProcessedTrack[],
-  joins: NFTTrackJoin[],
-  errorNFTs: NFTProcessError[],
-  artistProfiles: ArtistProfile[]
-}> => {
+  client: TrackAPIClient | null,
+  mapTrack: (nft: ERC721NFT, apiTrack: any, contract?: ERC721Contract | undefined) => ProcessedTrack,
+  mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ERC721NFT, contract?: ERC721Contract | undefined }) => ArtistProfile,
+  contracts: ERC721Contract[]):
+  Promise<{
+    newTracks: ProcessedTrack[],
+    joins: NFTTrackJoin[],
+    errorNFTs: NFTProcessError[],
+    artistProfiles: ArtistProfile[]
+  }> => {
   if (newTrackIds.length === 0) {
     return {
       newTracks: [],
@@ -37,7 +54,10 @@ Promise<{
       artistProfiles: []
     }
   }
-  const apiTrackData = await getAPITrackData(newTrackIds, client);
+  let apiTrackData: any;
+  if (client) {
+    apiTrackData = await getAPITrackData(newTrackIds, client);
+  }
 
   const newTracks: ProcessedTrack[] = [];
   const joins: NFTTrackJoin[] = [];
@@ -46,8 +66,8 @@ Promise<{
 
   newTrackIds.forEach(trackId => {
     const trackNFTs = trackMapping[trackId];
-    const apiTrack = apiTrackData[trackId];
-    if (!apiTrack) {
+    const apiTrack = apiTrackData?.[trackId];
+    if (client && !apiTrack) {
       trackNFTs.forEach(nft => {
         errorNFTs.push({
           erc721nftId: nft.id,
@@ -56,7 +76,9 @@ Promise<{
       })
       return undefined;
     }
-    const mappedTrack = mapTrack(trackNFTs[0], apiTrack);
+    const firstNFT = trackNFTs[0];
+    const contract = contracts.find(c => c.address === firstNFT.contractAddress)
+    const mappedTrack = mapTrack(firstNFT, apiTrack, contract);
     if (!mappedTrack) {
       return;
     }
@@ -70,7 +92,7 @@ Promise<{
     })
 
     const artistProfile = {
-      ...mapArtistProfile({ apiTrack, nft: trackNFTs[0] }),
+      ...mapArtistProfile({ apiTrack, nft: trackNFTs[0], contract }),
     } as ArtistProfile;
     artistProfiles.push(artistProfile);
   });
@@ -81,7 +103,7 @@ Promise<{
 }
 
 const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[], clients: Clients) => {
-  console.log(`Getting ${platform.id} API tracks for ids: ${nfts.map(n => n.id)}`);
+  console.log(`Getting ${platform.id} API tracks for ids: ${nfts.map(nft => nft.id)}`);
   const platformType = platformConfigs[platform.type];
   if (!platformType) {
     const errorNFTs = nfts.map(nft => ({
@@ -91,8 +113,11 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[],
     await clients.db.insert(Table.erc721nftProcessErrors, errorNFTs);
     return;
   }
-  const platformClient = (clients as any)[platform.type];
-  if (!platformClient) {
+  let platformClient: TrackAPIClient | null = null;
+  if (platformType.clientName) {
+    platformClient = (clients as any)[platformType.clientName];
+  }
+  if (!platformClient && platformType.clientName !== null) {
     const errorNFTs = nfts.map(nft => ({
       erc721nftId: nft.id,
       processError: `Missing platform client`
@@ -102,6 +127,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[],
   }
   const { mapNFTsToTrackIds, mapTrack, mapArtistProfile } = platformType.mappers;
 
+  const contracts = await getNFTContracts(nfts, clients.db);
   const trackMapping = mapNFTsToTrackIds(nfts);
   const trackIds = Object.keys(trackMapping);
   const existingTrackIds = await clients.db.recordsExist(Table.processedTracks, trackIds);
@@ -111,7 +137,8 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[],
     trackMapping,
     platformClient,
     mapTrack,
-    mapArtistProfile
+    mapArtistProfile,
+    contracts
   );
   const artists = artistProfiles.map(profile => mapArtist(profile));
 

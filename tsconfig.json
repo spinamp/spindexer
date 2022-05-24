@@ -8,6 +8,9 @@
     "outDir": "dist",
     "rootDir": "./",
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "lib": [
+      "ES2021"
+    ]
   }
 }
