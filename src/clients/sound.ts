@@ -7,7 +7,16 @@ const soundAPI = new GraphQLClient(
 );
 
 const mapAPITrackToTrackID = (apiTrack: any): string => {
-  return `ethereum/${formatAddress(apiTrack?.artist?.contract?.address)}/${apiTrack?.mintInfo?.editionId}`
+  if(!apiTrack) {
+    throw new Error('Missing sound.xyz api track');
+  }
+  if(!apiTrack.artist || !apiTrack.artist.artistContractAddress) {
+    throw new Error('Missing sound.xyz api track artist');
+  }
+  if(!apiTrack.editionId) {
+    throw new Error('Missing sound.xyz api track editionId');
+  }
+  return `ethereum/${formatAddress(apiTrack.artist.artistContractAddress)}/${apiTrack.editionId}`
 };
 
 export type SoundClient = {
@@ -44,9 +53,7 @@ const init = async () => {
               title
               titleSlug
               description
-              mintInfo {
               editionId
-              }
               coverImage {
               id
               url
@@ -55,9 +62,7 @@ const init = async () => {
               id
               name
               soundHandle
-              contract {
-                  address
-              }
+              artistContractAddress
               user {
                   publicAddress
                   avatar {
