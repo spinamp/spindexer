@@ -10,11 +10,11 @@ type PromiseCreator<InputType, OutputType> = (input: InputType) => Promise<Outpu
 // of concurrent promise requests and flushes those requests through until all promises have
 // been resolved or errored.
 export async function rollPromises<InputType, OutputType, ErrorType>
-  (promiseInputs: InputType[],
-    promiseCreator: PromiseCreator<InputType, OutputType>,
-    maxRequests: number = parseInt(process.env.MAX_CONCURRENT_ROLLING_REQUESTS!),
-    maxPPM: number = parseInt(process.env.MAX_PROMISES_PER_MINUTE!)
-  ): Promise<RollOutput<OutputType, ErrorType>[]> {
+(promiseInputs: InputType[],
+  promiseCreator: PromiseCreator<InputType, OutputType>,
+  maxRequests: number = parseInt(process.env.MAX_CONCURRENT_ROLLING_REQUESTS!),
+  maxPPM: number = parseInt(process.env.MAX_PROMISES_PER_MINUTE!)
+): Promise<RollOutput<OutputType, ErrorType>[]> {
   let activeRequests = 0;
   let count = 0;
   let promisesPerMinute = 0;
