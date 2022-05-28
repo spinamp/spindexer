@@ -18,6 +18,12 @@ export type NFTTrackJoin = {
   processedTrackId: string;
 }
 
+export type Artworks = {
+  id: number;
+  cid: string;
+  size: string;
+}
+
 type ProcessedTrackAudio = { lossyAudioURL: string } | { lossyAudioIPFSHash: string };
 type ProcessedTrackArtwork = { lossyArtworkURL: string } | { lossyArtworkIPFSHash: string };
 
