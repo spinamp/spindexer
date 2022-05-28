@@ -1,11 +1,10 @@
-import { Axios, AxiosResponse, AxiosError } from 'axios';
+import { AxiosResponse } from 'axios';
 import _ from 'lodash';
 
 import { Table } from '../../db/db';
 import { unpinnedTrackContent } from '../../triggers/ipfs';
 import { Clients, Processor } from '../../types/processor';
-import { ProcessedTrack } from '../../types/track';
-import { RollOutput, rollPromises } from '../../utils/rollingPromises';
+import { rollPromises } from '../../utils/rollingPromises';
 
 const name = 'ipfsPinner';
 
