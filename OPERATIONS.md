@@ -2,6 +2,29 @@
 
 Here are some useful commands while operating things:
 
+## DB Management
+
+Save the database backup:
+```bash
+yarn save-db
+```
+
+Drop the database:
+```bash
+yarn connect-db-root
+```
+and then
+```sql
+drop database web3_music_pipeline;
+```
+
+Restore the database:
+```bash
+yarn restore-db
+```
+
+## SQL Queries
+
 ```sql
 -- Clear all erc721nfts where there was an error getting the object from the metadata url so that they can be tried again:
 update erc721nfts SET "metadataError"=null where "metadata" is null and "metadataError" is not null;
