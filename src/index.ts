@@ -14,8 +14,9 @@ import { createProcessedTracksFromAPI } from './processors/default/createProcess
 import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
-import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfs';
+import { ipfsAudioPinner, ipfsArtworkPinner, ipfsProcessedArtworksPinner } from './processors/default/ipfs';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
+import { processTrackArtworks } from './processors/default/processTrackArtworks';
 import { runProcessors } from './runner';
 import { ERC721Contract, FactoryContract } from './types/ethereum';
 import { MusicPlatform } from './types/platform';
@@ -41,8 +42,10 @@ const PROCESSORS = (erc721Contracts: ERC721Contract[], factoryContracts: Factory
     categorizeZora,
     ...platformTrackProcessors,
     createProcessedTracksFromAPI('noizd'), //TODO: noizd here is being used both as platformId and MusicPlatformType. Need to bring in the full noizd platform object here and avoid mixing them
+    processTrackArtworks,
     ipfsAudioPinner,
     ipfsArtworkPinner,
+    ipfsProcessedArtworksPinner,
   ]
 };
 
