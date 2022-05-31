@@ -1,3 +1,4 @@
+
 export type IPFSClient = {
   getHTTPURL: (ipfsURL: string) => string;
 }
@@ -10,11 +11,15 @@ export const isIPFSProtocol = (urlString: string) => {
   return url.protocol === 'ipfs:';
 };
 
+export const extractBaseCIDFromHash = (hash: string) => {
+  return hash.split('/')[0];
+}
+
 export const extractHashFromURL = (urlString: string) => {
   try {
     const url = new URL(urlString);
     if (url.protocol === 'ipfs:') {
-      return url.host;
+      return `${url.host}${url.pathname}`;
     }
     if (url.pathname.startsWith('/ipfs/')) {
       return url.pathname.slice(url.pathname.lastIndexOf('/ipfs/') + 6);
@@ -25,6 +30,9 @@ export const extractHashFromURL = (urlString: string) => {
     return '';
   } catch {
     if (urlString.startsWith('Qm')) {
+      return urlString;
+    }
+    if (urlString.startsWith('bafy')) {
       return urlString;
     }
     return '';
