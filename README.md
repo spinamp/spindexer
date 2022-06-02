@@ -10,6 +10,7 @@ This is a multi-stage processing pipeline that generates a comprehensive web3 mu
  - Postgres installed
  - Postgres running
  - postgresql-client installed
+ - ts-node installed globally
 
 ## Running it
  - Copy .env.example to .env and fill it in. Make sure to change the example passwords.
@@ -35,7 +36,7 @@ There are a few design goals for the code:
 
 # Infrastructure Architecture
  - The main input comes from ethereum events that are ingested from an ethereum RPC
- - This code is just a single nodejs typescript thing that does all the processing and saves state into a postgres db. 
+ - This code is just a single nodejs typescript thing that does all the processing and saves state into a postgres db.
  - The intention is that the code can eventually just be run in a labmda function automatically and trigger on every ethereum block doing small updates each block as needed.
 
 # Code/Data Architecture

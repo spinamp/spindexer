@@ -42,6 +42,8 @@ const processorFunction = (platformId: string, name: string) => async (apiTracks
   console.info(`Processing completed, updated cursor to ${lastCursor}`);
 };
 
+// TODO: platformId here is being used both as platformId and MusicPlatformType. Need to bring in the full
+// platform object here and avoid mixing them
 export const createProcessedTracksFromAPI: (platformId: string) => Processor =
   (platformId: string) => {
     const platformConfig: MusicPlatformTypeConfig = (platformConfigs as any)[platformId];

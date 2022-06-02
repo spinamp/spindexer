@@ -5,6 +5,7 @@ todos
 .env
 .env.backup
 .env.local
+.env.staging
 .env.production
 
 db-ssl-certificate.pem

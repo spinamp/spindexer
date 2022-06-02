@@ -2,6 +2,7 @@ import { ArtistProfile } from './artist';
 import { ERC721NFT } from './erc721nft';
 import { ERC721Contract } from './ethereum';
 import catalogMappers from './platforms-types/catalog';
+import chaos from './platforms-types/chaos';
 import noizdMappers from './platforms-types/noizd';
 import singleTrackMultiprintContract from './platforms-types/single-track-multiprint-contract';
 import soundMappers from './platforms-types/sound';
@@ -12,7 +13,8 @@ export enum MusicPlatformType {
   noizd = 'noizd',
   catalog = 'catalog',
   zora = 'zora',
-  'single-track-multiprint-contract' = 'single-track-multiprint-contract'
+  'single-track-multiprint-contract' = 'single-track-multiprint-contract',
+  chaos = 'chaos'
 }
 
 export type MusicPlatform = {
@@ -53,6 +55,10 @@ export const platformConfigs: MusicPlatformTypeConfigs = {
   },
   'single-track-multiprint-contract': {
     mappers: singleTrackMultiprintContract,
+    clientName: null,
+  },
+  'chaos': {
+    mappers: chaos,
     clientName: null,
   }
 }

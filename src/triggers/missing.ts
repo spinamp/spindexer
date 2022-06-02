@@ -44,6 +44,7 @@ export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Tr
       ON n.id = e."erc721nftId"
       WHERE p.id is NULL AND
       e."processError" is NULL AND
+      n."metadataError" is NULL AND
       n."platformId"='${platformId}'
       ORDER BY n."createdAtTime"
       LIMIT ${limit}`
