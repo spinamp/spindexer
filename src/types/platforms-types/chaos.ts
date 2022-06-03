@@ -45,7 +45,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ER
     artistId: contract.address,
     platformInternalId: contract.address,
     platformId: contract.platformId,
-    avatarUrl: 'https://pbs.twimg.com/profile_images/1511382001730920450/r-WPJO2T_400x400.jpg',
+    avatarUrl: 'https://lh3.googleusercontent.com/UMytoAeoFW6hGHO3vjIUD28qcKerddfLZP3i2R2g9FS_5IOe7aCSSPosI13VxTFIqw7PgpIOlUSMJrc5jDYf8VbC-4degSMuoXbISw=s0',
     websiteUrl: 'https://www.chaos.build/',
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber
