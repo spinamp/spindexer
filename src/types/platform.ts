@@ -1,8 +1,10 @@
+import { DBClient } from '../db/db';
 import { ArtistProfile } from './artist';
 import { ERC721NFT } from './erc721nft';
 import { ERC721Contract } from './ethereum';
 import catalogMappers from './platforms-types/catalog';
 import chaos from './platforms-types/chaos';
+import mintsongsV2 from './platforms-types/mintsongs-v2';
 import noizdMappers from './platforms-types/noizd';
 import singleTrackMultiprintContract from './platforms-types/single-track-multiprint-contract';
 import soundMappers from './platforms-types/sound';
@@ -25,7 +27,7 @@ export type MusicPlatform = {
 }
 
 export type PlatformMapper = {
-  mapNFTsToTrackIds: (nfts: ERC721NFT[]) => { [trackId: string]: ERC721NFT[] }
+  mapNFTsToTrackIds: (nfts: ERC721NFT[], dbClient?: DBClient) => Promise<{ [trackId: string]: ERC721NFT[] }>
   mapTrack: (nft: ERC721NFT, apiTrack: any, contract?: ERC721Contract) => ProcessedTrack
   mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ERC721NFT, contract?: ERC721Contract }) => ArtistProfile
 }
@@ -61,6 +63,10 @@ export const platformConfigs: MusicPlatformTypeConfigs = {
   },
   'chaos': {
     mappers: chaos,
+    clientName: null,
+  },
+  'mintsongs-v2': {
+    mappers: mintsongsV2,
     clientName: null,
   }
 }
