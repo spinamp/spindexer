@@ -14,12 +14,14 @@ export enum MusicPlatformType {
   catalog = 'catalog',
   zora = 'zora',
   'single-track-multiprint-contract' = 'single-track-multiprint-contract',
-  chaos = 'chaos'
+  chaos = 'chaos',
+  mintsongsV2 = 'mintsongs-v2'
 }
 
 export type MusicPlatform = {
   id: string,
   type: MusicPlatformType
+  name: string
 }
 
 export type PlatformMapper = {

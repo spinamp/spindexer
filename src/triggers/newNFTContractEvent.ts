@@ -72,7 +72,7 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
       const newEvents = await clients.eth.getEventsFrom(rangeStart.toString(), rangeEnd.toString(), staleContractFilters);
       const newCursor = JSON.stringify(newCursorObject);
       if (newEvents.length === 0 && mostStaleContracts.length !== contracts.length) {
-        console.log('Recursing trigger');
+        console.log(`No new events found across contracts, recursing trigger with new cursor from block ${rangeEnd.toString()}`);
         return triggerFunc(clients, newCursor);
       }
       return {

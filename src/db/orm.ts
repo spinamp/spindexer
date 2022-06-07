@@ -15,7 +15,7 @@ const toDBRecord = <RecordType>(record: RecordType | RecordUpdate<unknown>) => {
 const toRecordMapper: any = {
   [Table.erc721Contracts]: (erc721Contracts: ERC721Contract[]): IdField[] => erc721Contracts.map((c: any) => {
     return ({
-      id: c.address,
+      id: c.address.toLowerCase(),
       platformId: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,
