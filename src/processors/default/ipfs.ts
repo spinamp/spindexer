@@ -85,14 +85,14 @@ const processorFunction = async (cids: string[], clients: Clients) => {
 
 export const ipfsAudioPinner: Processor = ({
   name: 'ipfsAudioPinner',
-  trigger: unpinnedTrackContent('lossyAudioIPFSHash', 10), // 10 is the max on many pinning apis
+  trigger: unpinnedTrackContent('lossyAudioIPFSHash', 10), // 10 is the max on many pinning apis for querying if already pinned
   processorFunction: processorFunction,
   initialCursor: undefined
 });
 
 export const ipfsArtworkPinner: Processor = ({
   name: 'ipfsArtworkPinner',
-  trigger: unpinnedTrackContent('lossyArtworkIPFSHash', 10), // 10 is the max on many pinning apis
+  trigger: unpinnedTrackContent('lossyArtworkIPFSHash', 10), // 10 is the max on many pinning apis for querying if already pinned
   processorFunction: processorFunction,
   initialCursor: undefined
 });
