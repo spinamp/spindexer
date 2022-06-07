@@ -37,7 +37,7 @@ const createTracks = async (
   newTrackIds: string[],
   trackMapping: { [trackId: string]: ERC721NFT[] },
   client: TrackAPIClient | null,
-  mapTrack: (nft: ERC721NFT, apiTrack: any, contract?: ERC721Contract | undefined) => ProcessedTrack,
+  mapTrack: (nft: ERC721NFT, apiTrack: any, contract?: ERC721Contract | undefined, trackId?: string) => ProcessedTrack,
   mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ERC721NFT, contract?: ERC721Contract | undefined }) => ArtistProfile,
   contracts: ERC721Contract[]):
   Promise<{
@@ -78,7 +78,7 @@ const createTracks = async (
     }
     const firstNFT = trackNFTs[0];
     const contract = contracts.find(c => c.address === firstNFT.contractAddress)
-    const mappedTrack = mapTrack(firstNFT, apiTrack, contract);
+    const mappedTrack = mapTrack(firstNFT, apiTrack, contract, trackId);
     if (!mappedTrack) {
       return;
     }
@@ -128,7 +128,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[],
   const { mapNFTsToTrackIds, mapTrack, mapArtistProfile } = platformType.mappers;
 
   const contracts = await getNFTContracts(nfts, clients.db);
-  const trackMapping = mapNFTsToTrackIds(nfts);
+  const trackMapping = await mapNFTsToTrackIds(nfts, clients.db);
   const trackIds = Object.keys(trackMapping);
   const existingTrackIds = await clients.db.recordsExist(Table.processedTracks, trackIds);
   const newTrackIds = trackIds.filter(id => !existingTrackIds.includes(id));

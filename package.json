@@ -9,7 +9,7 @@
     "cli": "ts-node src/cli/cli.ts",
     "build": "tsc",
     "bootstrap-db": "NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem ts-node db/bootstrap.ts",
-    "serve": "source .env && DEBUG=graphile-build-pg NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem npx ts-node ./src/serve.ts",
+    "serve": "source .env && DEBUG=graphile-build-pg NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem npx ts-node ./src/serve.ts --cors",
     "connect-db-root": "source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -d postgres -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME",
     "connect-db": "source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -d $POSTGRES_DATABASE -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME",
     "save-db": "source .env && PGPASSWORD=$POSTGRES_PASSWORD pg_dump -f ./db/db_dump -b -C -d $POSTGRES_DATABASE -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME",

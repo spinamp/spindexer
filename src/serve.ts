@@ -26,6 +26,6 @@ http
       }
     )
   )
-  .listen(process.env.PORT || 3000);
+  .listen(process.env.POSTGRAPHILE_SERVE_PORT || 3000);
 
-console.log(`Listening on ${process.env.PORT || 3000}`)
+console.log(`Listening on ${process.env.POSTGRAPHILE_SERVE_PORT || 3000}`)
