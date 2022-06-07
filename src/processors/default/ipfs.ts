@@ -7,8 +7,6 @@ import { unpinnedTrackContent } from '../../triggers/ipfs';
 import { Clients, Processor } from '../../types/processor';
 import { rollPromises } from '../../utils/rollingPromises';
 
-const name = 'ipfsPinner';
-
 const ipfsPinEndpoint = `${process.env.IPFS_PIN_URL}`;
 const pinAuth = {
   headers: { Authorization: `Bearer ${process.env.IPFS_PIN_JWT}` }
@@ -86,14 +84,14 @@ const processorFunction = async (cids: string[], clients: Clients) => {
 };
 
 export const ipfsAudioPinner: Processor = ({
-  name,
+  name: 'ipfsAudioPinner',
   trigger: unpinnedTrackContent('lossyAudioIPFSHash', 10), // 10 is the max on many pinning apis
   processorFunction: processorFunction,
   initialCursor: undefined
 });
 
 export const ipfsArtworkPinner: Processor = ({
-  name,
+  name: 'ipfsArtworkPinner',
   trigger: unpinnedTrackContent('lossyArtworkIPFSHash', 10), // 10 is the max on many pinning apis
   processorFunction: processorFunction,
   initialCursor: undefined

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { Table } from '../db/db';
 import { Clients } from '../types/processor';
 import { ProcessedTrack } from '../types/track';
@@ -11,14 +12,17 @@ export const unpinnedTrackContent: (cidField: string, limit?: number) => Trigger
       WHERE (t."${cidField}" IS NOT NULL)
       AND (p.id is NULL)
       LIMIT ${limit}`
+
     const tracks = (await clients.db.rawSQL(
       query
     )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+
     const cids = tracks.map((track: ProcessedTrack) => {
       if (!(track as any)[cidField]) {
         throw new Error('Unexpected null ipfs cid')
       }
       return (track as any)[cidField];
     });
-    return cids;
+
+    return _.uniq(cids);
   };
