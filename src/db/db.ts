@@ -1,9 +1,11 @@
 import { Knex } from 'knex';
+
 import { Cursor } from '../types/trigger'
 
 export enum Table {
   platforms = 'platforms',
   erc721nfts = 'erc721nfts',
+  erc721Transfers = 'erc721Transfers',
   artists = 'artists',
   artistProfiles = 'artistProfiles',
   processedTracks = 'processedTracks',
@@ -16,11 +18,11 @@ export enum Table {
 }
 
 export type WhereFunc = 'where'
-| 'whereNull'
-| 'andWhere'
-| 'whereJsonPath'
-| 'whereNotNull'
-| 'whereIn';
+  | 'whereNull'
+  | 'andWhere'
+  | 'whereJsonPath'
+  | 'whereNotNull'
+  | 'whereIn';
 
 export type WhereField = 'and';
 

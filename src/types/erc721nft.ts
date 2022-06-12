@@ -16,6 +16,13 @@ export type ERC721NFT = Record & {
   owner: string
 }
 
+export type ERC721Transfer = Record & {
+  from: string
+  to: string
+  contractAddress: string
+  tokenId: bigint
+};
+
 export const getNFTContractCalls = (nft: ERC721NFT, contractTypeName: ERC721ContractTypeName) => {
   const contractType = NFTContractTypes[contractTypeName];
   return contractType.contractCalls.map(call => {
