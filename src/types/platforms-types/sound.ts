@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import slugify from 'slugify';
 
+import sound from '../../clients/sound';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { ERC721NFT } from '../erc721nft';
@@ -52,14 +53,10 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT })
   }
 };
 
-const mapNFTtoTrackID = (nft: ERC721NFT): string => {
-  const splitURI = nft.tokenURI!.split('/');
-  const editionId = splitURI[splitURI.length - 2];
-  return `ethereum/${formatAddress(nft.contractAddress)}/${editionId}`;
-};
-
 const mapNFTsToTrackIds = async (nfts: ERC721NFT[]): Promise<{ [trackId: string]: ERC721NFT[] }> => {
-  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
+  const soundClient = await sound.init();
+  const tracksByNFT = await soundClient.fetchTracksByNFT(nfts);
+  return _.groupBy(nfts, nft => tracksByNFT[nft.id]);
 }
 
 export default {

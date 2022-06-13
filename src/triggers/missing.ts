@@ -1,8 +1,8 @@
 import { Table } from '../db/db';
 import { Trigger } from '../types/trigger';
 
-export const missingCreatedAtTime: Trigger<undefined> = async (clients) => {
-  const nfts = (await clients.db.getRecords(Table.erc721nfts,
+export const missingCreatedAtTime: (tableName: Table) => Trigger<undefined> = (tableName: Table) => async (clients) => {
+  const nfts = (await clients.db.getRecords(tableName,
     [
       ['whereNull', ['createdAtTime']],
     ]

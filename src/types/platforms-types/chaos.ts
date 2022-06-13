@@ -4,7 +4,7 @@ import slugify from 'slugify';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { ERC721NFT } from '../erc721nft';
+import { ERC721NFT, getTrait } from '../erc721nft';
 import { ERC721Contract } from '../ethereum';
 import { ProcessedTrack } from '../track';
 
@@ -50,28 +50,6 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ER
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber
   }
-};
-
-const getTrait = (nft: ERC721NFT, type:String) => {
-  if(!nft.metadata) {
-    console.error({nft})
-    throw new Error('Missing nft metadata');
-  }
-  if(!nft.metadata.attributes) {
-    console.error({nft})
-    throw new Error('Missing attributes');
-  }
-  const attribute = nft.metadata.attributes.find((attribute:any) => {
-    if(!attribute || !attribute.trait_type) {
-      console.error({nft, type})
-      throw new Error('Unknown attribute/trait');
-    }
-    return attribute.trait_type.toLowerCase() === type.toLowerCase()
-  });
-  if (!attribute) {
-    throw new Error('Trait not found');
-  }
-  return attribute.value;
 };
 
 const getSong = (nft: ERC721NFT) => getTrait(nft, 'Song');
