@@ -51,8 +51,8 @@ const processorFunction = (contracts: ERC721Contract[]) =>
       });
     });
     await clients.db.insert(Table.erc721Transfers, transfers);
-    await clients.db.update(Table.erc721nfts, updates);
     await clients.db.insert(Table.erc721nfts, newNFTs.filter(n => !!n));
+    await clients.db.update(Table.erc721nfts, updates);
     await clients.db.updateProcessor(NAME, newCursor);
   };
 
