@@ -4,18 +4,21 @@ import _ from 'lodash';
 import { Table } from '../../db/db';
 import { newERC721Transfers } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
-import { ERC721NFT } from '../../types/erc721nft';
+import { ERC721NFT, ERC721Transfer } from '../../types/erc721nft';
 import { ERC721Contract, ETHEREUM_NULL_ADDRESS, NFTContractTypes } from '../../types/ethereum';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';
 
 const NAME = 'createERC721NFTsFromTransfers';
 
+const CHAIN = 'ethereum';
+
 const processorFunction = (contracts: ERC721Contract[]) =>
   async ({ newCursor, items }: { newCursor: Cursor, items: ethers.Event[] }, clients: Clients) => {
     const contractsByAddress = _.keyBy(contracts, 'address');
     const newNFTs: Partial<ERC721NFT>[] = [];
     const updates: Partial<ERC721NFT>[] = [];
+    const transfers: Partial<ERC721Transfer>[] = [];
     items.forEach((item): Partial<ERC721NFT> | undefined => {
       const address = item.address;
       const contract = contractsByAddress[address];
@@ -23,6 +26,14 @@ const processorFunction = (contracts: ERC721Contract[]) =>
       const contractType = NFTContractTypes[contractTypeName];
       const tokenId = BigInt((item.args!.tokenId as BigNumber).toString());
       const newMint = item.args!.from === ETHEREUM_NULL_ADDRESS;
+      transfers.push({
+        id: `${CHAIN}/${item.blockNumber}/${item.logIndex}`,
+        contractAddress: formatAddress(contract.address),
+        from: item.args!.from,
+        to: item.args!.to,
+        tokenId,
+        createdAtEthereumBlockNumber: '' + item.blockNumber,
+      });
       if (!newMint) {
         updates.push({
           id: contractType.buildNFTId(contract.address, tokenId),
@@ -39,8 +50,9 @@ const processorFunction = (contracts: ERC721Contract[]) =>
         owner: item.args!.to
       });
     });
-    await clients.db.update(Table.erc721nfts, updates);
+    await clients.db.insert(Table.erc721Transfers, transfers);
     await clients.db.insert(Table.erc721nfts, newNFTs.filter(n => !!n));
+    await clients.db.update(Table.erc721nfts, updates);
     await clients.db.updateProcessor(NAME, newCursor);
   };
 

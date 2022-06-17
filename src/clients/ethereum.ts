@@ -68,6 +68,7 @@ const init = async (): Promise<EthClient> => {
       const iface = new ethers.utils.Interface(MetaABI.abi);
       return events.map((event: ethers.Event) => ({
         ...iface.parseLog(event),
+        logIndex: BigNumber.from(event.logIndex).toString(),
         blockNumber: BigNumber.from(event.blockNumber).toString(),
         blockHash: event.blockHash,
         address: event.address

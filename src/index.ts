@@ -6,7 +6,7 @@ import { Table } from './db/db';
 import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
-import { addTimestampToERC721NFTs } from './processors/default/addTimestampToERC721NFTs';
+import { addTimestampToERC721NFTs, addTimestampToERC721Transfers } from './processors/default/addTimestampToERC721NFTs';
 import { categorizeZora } from './processors/default/categorizeZora';
 import { createERC721ContractFromFactoryProcessor } from './processors/default/createERC721ContractFromFactoryProcessor';
 import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
@@ -34,6 +34,7 @@ const PROCESSORS = (erc721Contracts: ERC721Contract[], factoryContracts: Factory
     getERC721ContractFieldsProcessor,
     erc721TransferProcessors,
     stripIgnoredNFTs,
+    addTimestampToERC721Transfers,
     addTimestampToERC721NFTs,
     getERC721TokenFieldsProcessor(erc721ContractsByAddress),
     addMetadataIPFSHashProcessor(erc721ContractsByAddress),

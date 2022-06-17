@@ -1,19 +1,20 @@
 import { gql, GraphQLClient } from 'graphql-request';
 
 import { formatAddress } from '../types/address';
+import { ERC721NFT } from '../types/erc721nft';
 
 const soundAPI = new GraphQLClient(
   'https://api.sound.xyz/graphql',
 );
 
 const mapAPITrackToTrackID = (apiTrack: any): string => {
-  if(!apiTrack) {
+  if (!apiTrack) {
     throw new Error('Missing sound.xyz api track');
   }
-  if(!apiTrack.artist || !apiTrack.artist.artistContractAddress) {
+  if (!apiTrack.artist || !apiTrack.artist.artistContractAddress) {
     throw new Error('Missing sound.xyz api track artist');
   }
-  if(!apiTrack.editionId) {
+  if (!apiTrack.editionId) {
     throw new Error('Missing sound.xyz api track editionId');
   }
   return `ethereum/${formatAddress(apiTrack.artist.artistContractAddress)}/${apiTrack.editionId}`
@@ -44,10 +45,10 @@ const init = async () => {
   };
   const getAllMintedReleasesFunction = async (
   ): Promise<any[]> => {
-    const { getAllMintedReleases } = await soundAPI.request(
+    const { allMintedReleases } = await soundAPI.request(
       gql`
         {
-          getAllMintedReleases {
+          allMintedReleases {
               id
               createdAt
               title
@@ -80,8 +81,69 @@ const init = async () => {
       }
       `,
     );
-    return getAllMintedReleases;
+    return allMintedReleases;
   };
+
+  const getNFTTitle = (nft: ERC721NFT) => {
+    if (!nft.metadata) {
+      console.error({ nft })
+      throw new Error('Missing nft metadata');
+    }
+    if (!nft.metadata.name) {
+      console.error({ nft })
+      throw new Error('Missing name');
+    }
+    const splitName = nft.metadata.name.split('#');
+    if (splitName.length !== 2) {
+      console.error({ nft })
+      throw new Error('Name split by # failed');
+    }
+    return splitName[0].trim();
+  }
+
+  const nftMatchesTrack = (nft: ERC721NFT, apiTrack: any) => {
+    const sameArtistAsNFT = formatAddress(apiTrack.artist.artistContractAddress) === formatAddress(nft.contractAddress);
+    const sameTrackAsNFT = apiTrack.title.trim() === getNFTTitle(nft);
+    return sameArtistAsNFT && sameTrackAsNFT;
+  }
+
+  const fetchTracksByNFT = async (nfts: ERC721NFT[]) => {
+    const apiResponse = await getAllMintedReleasesFunction();
+    const apiTracks = apiResponse.map(apiTrack => ({
+      ...apiTrack,
+      trackId: mapAPITrackToTrackID(apiTrack),
+    }))
+
+    const filteredAPITracks = apiTracks.filter(apiTrack => {
+      const matchedNFT = nfts.find((nft: ERC721NFT) => nftMatchesTrack(nft, apiTrack));
+      return !!matchedNFT;
+    });
+    filteredAPITracks.forEach(apiTrack => {
+      if (apiTrack.tracks.length > 1) {
+        return { isError: true, error: new Error('Sound release with multiple tracks not yet implemented') };
+      }
+    });
+    const audioAPITrackPromises = filteredAPITracks.map(async apiTrack => {
+      return {
+        ...apiTrack,
+        tracks: [{
+          ...apiTrack.tracks[0],
+          audio: await audioFromTrack(apiTrack.tracks[0].id),
+        }]
+      };
+    });
+    const audioAPITracks = await Promise.all(audioAPITrackPromises);
+    return nfts.reduce((accum, nft) => {
+      const nftTrack = audioAPITracks.find(track => nftMatchesTrack(nft, track));
+      if (!nftTrack || !nftTrack.trackId) {
+        console.dir({ nftTrack, nft })
+        throw new Error('No track found for NFT')
+      }
+      accum[nft.id] = nftTrack.trackId;
+      return accum;
+    }, {} as any);
+  };
+
   const fetchTracksByTrackId = async (trackIds: string[]) => {
     const apiResponse = await getAllMintedReleasesFunction();
     const apiTracks = apiResponse.map(apiTrack => ({
@@ -106,10 +168,12 @@ const init = async () => {
     const audioAPITracks = await Promise.all(audioAPITrackPromises);
     return audioAPITracks;
   };
+
   return {
     audioFromTrack,
     getAllMintedReleases: getAllMintedReleasesFunction,
-    fetchTracksByTrackId
+    fetchTracksByTrackId,
+    fetchTracksByNFT
   };
 }
 

@@ -90,6 +90,11 @@ const init = async (): Promise<DBClient> => {
       console.log(`Querying for ${raw}`);
       return await db.raw(raw);
     },
+    rawBoundSQL: async (raw: string, bindings: any[]) => {
+      console.log(`Querying for ${raw} with bindings`);
+      return await db.raw(raw, ...bindings);
+    },
+    getDB: () => db,
     update: async <RecordType>(tableName: string, recordUpdates: RecordType[], idField = 'id') => {
       console.log(`Updating records`);
       if (recordUpdates?.length > 0) {

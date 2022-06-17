@@ -1,13 +1,11 @@
 import { AxiosResponse } from 'axios';
 import _ from 'lodash';
-import { extractBaseCIDFromHash } from '../../clients/ipfs';
 
+import { extractBaseCIDFromHash } from '../../clients/ipfs';
 import { Table } from '../../db/db';
 import { unpinnedTrackContent, unpinnedProcessedArtworks } from '../../triggers/ipfs';
 import { Clients, Processor } from '../../types/processor';
 import { rollPromises } from '../../utils/rollingPromises';
-
-const name = 'ipfsPinner';
 
 const ipfsPinEndpoint = `${process.env.IPFS_PIN_URL}`;
 const pinAuth = {
@@ -34,7 +32,7 @@ const processorFunction = async (cids: string[], clients: Clients) => {
   const existingBaseCids = existingPinResponses.map((p: any) => p.pin.cid);
   const newPins = baseCIDs.filter(cid => !existingBaseCids.includes(cid));
 
-  const pinsToInsert = existingPinResponses.reduce((accum:any, pinResponse: any) => {
+  const pinsToInsert = existingPinResponses.reduce((accum: any, pinResponse: any) => {
     const baseCID = pinResponse.pin.cid;
     const existingCIDs = baseCIDLookups[baseCID];
     existingCIDs.forEach(cid => {
@@ -86,15 +84,15 @@ const processorFunction = async (cids: string[], clients: Clients) => {
 };
 
 export const ipfsAudioPinner: Processor = ({
-  name,
-  trigger: unpinnedTrackContent('lossyAudioIPFSHash', 10), // 10 is the max on many pinning apis
+  name: 'ipfsAudioPinner',
+  trigger: unpinnedTrackContent('lossyAudioIPFSHash', 10), // 10 is the max on many pinning apis for querying if already pinned
   processorFunction: processorFunction,
   initialCursor: undefined
 });
 
 export const ipfsArtworkPinner: Processor = ({
-  name,
-  trigger: unpinnedTrackContent('lossyArtworkIPFSHash', 10), // 10 is the max on many pinning apis
+  name: 'ipfsArtworkPinner',
+  trigger: unpinnedTrackContent('lossyArtworkIPFSHash', 10), // 10 is the max on many pinning apis for querying if already pinned
   processorFunction: processorFunction,
   initialCursor: undefined
 });

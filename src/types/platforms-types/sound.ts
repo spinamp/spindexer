@@ -1,9 +1,11 @@
 import _ from 'lodash';
 import slugify from 'slugify';
 
+import { extractHashFromURL } from '../../clients/ipfs';
+import sound from '../../clients/sound';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { ERC721NFT } from '../erc721nft';
+import { ERC721NFT, getNFTMetadataField } from '../erc721nft';
 import { ProcessedTrack } from '../track';
 
 const mapAPITrackToArtistID = (apiTrack: any): string => {
@@ -25,6 +27,8 @@ const mapTrack = (
     description: apiTrack.description,
     platformId: nft.platformId,
     lossyAudioURL: apiTrack.tracks[0].audio.url || nft.metadata.audio_url,
+    lossyArtworkIPFSHash: extractHashFromURL(getNFTMetadataField(nft, 'image')),
+    lossyAudioIPFSHash: extractHashFromURL(getNFTMetadataField(nft, 'animation_url')),
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
     lossyArtworkURL: apiTrack.coverImage.url,
@@ -52,14 +56,10 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT })
   }
 };
 
-const mapNFTtoTrackID = (nft: ERC721NFT): string => {
-  const splitURI = nft.tokenURI!.split('/');
-  const editionId = splitURI[splitURI.length - 2];
-  return `ethereum/${formatAddress(nft.contractAddress)}/${editionId}`;
-};
-
-const mapNFTsToTrackIds = (nfts: ERC721NFT[]): { [trackId: string]: ERC721NFT[] } => {
-  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
+const mapNFTsToTrackIds = async (nfts: ERC721NFT[]): Promise<{ [trackId: string]: ERC721NFT[] }> => {
+  const soundClient = await sound.init();
+  const tracksByNFT = await soundClient.fetchTracksByNFT(nfts);
+  return _.groupBy(nfts, nft => tracksByNFT[nft.id]);
 }
 
 export default {
