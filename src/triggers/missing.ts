@@ -29,16 +29,6 @@ export const missingMetadataIPFSHash: Trigger<undefined> = async (clients) => {
   return nfts;
 };
 
-export const missingProcessedArtworks: Trigger<undefined> = async (clients) => {
-  const query = `select t.* from  "${Table.processedTracks}" as t
-  left join "${Table.processedArtworks}" as a on t.id = a."trackId"
-  where a.id is null
-  limit ${process.env.QUERY_TRIGGER_BATCH_SIZE!}`
-  return (await clients.db.rawSQL(
-    query
-  )).rows
-};
-
 export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Trigger<undefined> =
   (platformId: string, limit: number = parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)) => async (clients) => {
     // This query joins nfts+tracks through the join table,

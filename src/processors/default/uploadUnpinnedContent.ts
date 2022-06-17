@@ -3,17 +3,13 @@ import http from 'node:http';
 import https from 'node:https';
 import Path from 'node:path';
 
-import im from 'imagemagick';
 import { create } from 'ipfs-http-client';
 import tempDirectory from 'temp-dir';
 
 import { Table } from '../../db/db';
-import { missingProcessedArtworks } from '../../triggers/missing';
 import { Clients } from '../../types/processor';
 import { ProcessedTrack } from '../../types/track';
 import { rollPromises } from '../../utils/rollingPromises';
-
-const name = 'addMetadataIPFSHash';
 
 function imageBuffer(url: string): Promise<Buffer> {
   console.log(`Downloading ${url}`)
@@ -31,22 +27,6 @@ function imageBuffer(url: string): Promise<Buffer> {
       });
     });
   })
-}
-
-async function resizeImage(originalPath: string, size: string): Promise<Buffer> {
-  let resizedBuffer = null;
-  const buffer = await withTempPath(function (outPath) {
-    console.log(`resizing image to ${size} ${outPath}`)
-    return new Promise(function (resolve, reject) {
-      im.convert([originalPath, '-resize', size, outPath],
-        async function (err, stdout) {
-          if (err) reject(err);
-          resizedBuffer = await readFile(outPath)
-          resolve(resizedBuffer);
-        });
-    })
-  }, 'png');
-  return buffer;
 }
 
 async function uploadBuffer(buffer: Buffer) {
@@ -75,41 +55,39 @@ async function temporaryWrite(buffer: Buffer, callback: (path: string) => Promis
     await callback(path);
   })
 }
-// when i use ProcessedTrack it claims lossyArtworkURL does not exist :shrug:
-const processArtwork = async function (clients: Clients, nft: any): Promise<void> {
-  console.log(`processing ${nft.lossyArtworkURL}`)
-  const buffer = await imageBuffer(nft.lossyArtworkURL);
-  return temporaryWrite(buffer, async function (originalPath) {
-    console.log(`wrote image to ${originalPath}`)
-    let imageProcessingResults: any = null;
-    try {
-      const [largeImageBuffer, thumbnailImageBuffer]
-        = await Promise.all([resizeImage(originalPath, '700x700'), resizeImage(originalPath, '200x200')]);
-      const [coverCid, thumnailCid] = await Promise.all([uploadBuffer(largeImageBuffer), uploadBuffer(thumbnailImageBuffer)])
-      imageProcessingResults = [
-        { cid: coverCid.toString(), size: 'cover', trackId: nft.id },
-        { cid: thumnailCid.toString(), size: 'thumbnail', trackId: nft.id }
-      ]
-    } catch (e: any) {
-      imageProcessingResults = [
-        { error: e.toString(), size: 'cover', trackId: nft.id },
-        { error: e.toString(), size: 'thumbnail', trackId: nft.id }
-      ]
-    } finally {
-      await clients.db.insert(Table.processedArtworks, imageProcessingResults);
-    }
-  });
+const uploadContent = async function (clients: Clients, nft: any): Promise<void> {
+  // todo
+
+  // console.log(`processing ${nft.lossyArtworkURL}`)
+  // const buffer = await imageBuffer(nft.lossyArtworkURL);
+  // return temporaryWrite(buffer, async function (originalPath) {
+  //   console.log(`wrote image to ${originalPath}`)
+  //   let imageProcessingResults: any = null;
+  //   try {
+  //     const [largeImageBuffer, thumbnailImageBuffer]
+  //       = await Promise.all([resizeImage(originalPath, '700x700'), resizeImage(originalPath, '200x200')]);
+  //     const [coverCid, thumnailCid] = await Promise.all([uploadBuffer(largeImageBuffer), uploadBuffer(thumbnailImageBuffer)])
+  //     imageProcessingResults = [
+  //       { cid: coverCid.toString(), size: 'cover', trackId: nft.id },
+  //       { cid: thumnailCid.toString(), size: 'thumbnail', trackId: nft.id }
+  //     ]
+  //   } catch (e: any) {
+  //     imageProcessingResults = [
+  //       { error: e.toString(), size: 'cover', trackId: nft.id },
+  //       { error: e.toString(), size: 'thumbnail', trackId: nft.id }
+  //     ]
+  //   } finally {
+  //     await clients.db.insert(Table.processedArtworks, imageProcessingResults);
+  //   }
+  // });
 }
 
 const processorFunction = async (items: Array<ProcessedTrack>, clients: Clients) => {
-  const boundPromiseCreator = processArtwork.bind(null, clients);
-  const maxPPM = parseInt(process.env.MAX_IMAGEMAGIC_PER_MINUTE!);
-  const maxCP = parseInt(process.env.MAX_CONCURRENT_IMAGEMAGIC!);
-  const results = await rollPromises<ProcessedTrack, void, Error>(items, boundPromiseCreator, maxCP, maxPPM);
+  const boundPromiseCreator = uploadContent.bind(null, clients);
+  const results = await rollPromises<ProcessedTrack, void, Error>(items, boundPromiseCreator);
 }
 
 export const processTrackArtworks = {
-  name: 'processTrackArtworks',
-  trigger: missingProcessedArtworks,
+  trigger:  // todo
   processorFunction: processorFunction,
 };
