@@ -45,10 +45,10 @@ const init = async () => {
   };
   const getAllMintedReleasesFunction = async (
   ): Promise<any[]> => {
-    const { getAllMintedReleases } = await soundAPI.request(
+    const { allMintedReleases } = await soundAPI.request(
       gql`
         {
-          getAllMintedReleases {
+          allMintedReleases {
               id
               createdAt
               title
@@ -81,7 +81,7 @@ const init = async () => {
       }
       `,
     );
-    return getAllMintedReleases;
+    return allMintedReleases;
   };
 
   const getNFTTitle = (nft: ERC721NFT) => {

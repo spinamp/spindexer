@@ -1,4 +1,3 @@
-import { id } from 'ethers/lib/utils';
 import _ from 'lodash';
 import slugify from 'slugify';
 
@@ -18,11 +17,11 @@ const extractArtistIdFromNFT = (nft: ERC721NFT) => {
   const artistURL = nft.metadata.external_url;
   const prefix = artistURL.slice(0,28);
   if (prefix !== 'https://www.mintsongs.com/u/') {
-    throw new Error("Unexpected mintsongs artist url prefix");
+    throw new Error('Unexpected mintsongs artist url prefix');
   }
   const artistAddress = artistURL.slice(28,70);
   if (artistAddress.length !== 42) {
-    throw new Error("Unexpected artist address length");
+    throw new Error('Unexpected artist address length');
   }
   return `ethereum/${artistAddress}`;
 }
@@ -48,7 +47,7 @@ const mapTrack = (
     platformId: 'mintsongs',
     lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url),
     lossyArtworkIPFSHash: extractHashFromURL(nft.metadata.image),
-    websiteUrl:  nft.metadata.external_url,
+    websiteUrl: nft.metadata.external_url,
     artistId: extractArtistIdFromNFT(nft),
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
@@ -68,7 +67,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ER
     platformInternalId: extractArtistIdFromNFT(nft),
     platformId: 'mintsongs',
     avatarUrl: `${process.env.IPFS_ENDPOINT}${extractHashFromURL(nft.metadata.image)}`,
-    websiteUrl:  nft.metadata.external_url,
+    websiteUrl: nft.metadata.external_url,
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber
   }
@@ -84,11 +83,11 @@ const mapNFTsToTrackIds = async (nfts: ERC721NFT[], dbClient?: DBClient): Promis
   if (!dbClient) {
     throw new Error('DB Client not provided to mintsongs mapper')
   }
-  const nftsByDedupField =  _.groupBy(nfts, nft => nft.metadata[METADATA_DEDUP_FIELD]);
+  const nftsByDedupField = _.groupBy(nfts, nft => nft.metadata[METADATA_DEDUP_FIELD]);
 
   const dedupFieldKeys = Object.keys(nftsByDedupField);
 
-  const dedupFieldKeysQuery = dedupFieldKeys.map((key:any) => '?').join(',')
+  const dedupFieldKeysQuery = dedupFieldKeys.map((key: any) => '?').join(',')
 
   // The below query does the following:
   // - Gets the lowest tokenId that matches each nft to be mapped based on the dedup field (eg: matching name)
