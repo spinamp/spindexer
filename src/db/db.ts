@@ -15,15 +15,15 @@ export enum Table {
   erc721nfts_processedTracks = 'erc721nfts_processedTracks',
   erc721nftProcessErrors = 'erc721nftProcessErrors',
   ipfsPins = 'ipfsPins',
-  processedArtworks = 'processedArtworks'
+  ipfsUploads = 'ipfsUploads'
 }
 
 export type WhereFunc = 'where'
-  | 'whereNull'
-  | 'andWhere'
-  | 'whereJsonPath'
-  | 'whereNotNull'
-  | 'whereIn';
+| 'whereNull'
+| 'andWhere'
+| 'whereJsonPath'
+| 'whereNotNull'
+| 'whereIn';
 
 export type WhereField = 'and';
 
