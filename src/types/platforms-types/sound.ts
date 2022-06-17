@@ -1,10 +1,11 @@
 import _ from 'lodash';
 import slugify from 'slugify';
 
+import { extractHashFromURL } from '../../clients/ipfs';
 import sound from '../../clients/sound';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { ERC721NFT } from '../erc721nft';
+import { ERC721NFT, getNFTMetadataField } from '../erc721nft';
 import { ProcessedTrack } from '../track';
 
 const mapAPITrackToArtistID = (apiTrack: any): string => {
@@ -26,6 +27,8 @@ const mapTrack = (
     description: apiTrack.description,
     platformId: nft.platformId,
     lossyAudioURL: apiTrack.tracks[0].audio.url || nft.metadata.audio_url,
+    lossyArtworkIPFSHash: extractHashFromURL(getNFTMetadataField(nft, 'image')),
+    lossyAudioIPFSHash: extractHashFromURL(getNFTMetadataField(nft, 'animation_url')),
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
     lossyArtworkURL: apiTrack.coverImage.url,

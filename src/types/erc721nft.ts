@@ -34,6 +34,19 @@ export const getNFTContractCalls = (nft: ERC721NFT, contractTypeName: ERC721Cont
   });
 };
 
+export const getNFTMetadataField = (nft: ERC721NFT, field: string) => {
+  if (!nft) {
+    throw new Error('NFT missing');
+  }
+  if (!nft.metadata) {
+    throw new Error('Missing NFT metadata')
+  }
+  if (!nft.metadata[field]) {
+    throw new Error(`NFT metadata missing ${field}`)
+  }
+  return nft.metadata[field];
+}
+
 export const getTrait = (nft: ERC721NFT, type: string) => {
   if (!nft.metadata) {
     console.error({ nft })
