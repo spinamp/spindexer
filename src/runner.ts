@@ -6,9 +6,10 @@ import ipfs from './clients/ipfs';
 import noizd from './clients/noizd';
 import sound from './clients/sound';
 import { DBClient, Table } from './db/db';
+import db from './db/sql-db';
 import { Clients, Processor } from './types/processor';
 
-export const runProcessors = async (processors: Processor[], dbClient: DBClient) => {
+export const initClients = async (existingDBClient?: DBClient) => {
   const ethClient = await ethereum.init();
   const blocksClient = await blocks.init();
   const axiosClient = await axios.init();
@@ -17,9 +18,9 @@ export const runProcessors = async (processors: Processor[], dbClient: DBClient)
   const soundClient = await sound.init();
   const noizdClient = await noizd.init();
 
-  const clients: Clients = {
+  return {
     eth: ethClient,
-    db: dbClient,
+    db: existingDBClient || await db.init(),
     blocks: blocksClient,
     axios: axiosClient,
     ipfs: ipfsClient,
@@ -27,6 +28,9 @@ export const runProcessors = async (processors: Processor[], dbClient: DBClient)
     sound: soundClient,
     noizd: noizdClient
   };
+}
+export const runProcessors = async (processors: Processor[], dbClient: DBClient) => {
+  const clients = await initClients(dbClient);
 
   // This runs each processor until completion serially. We could consider
   // alternate orders or parallelization in future or allow for explicit

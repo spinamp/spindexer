@@ -4,7 +4,7 @@ export type RollOutput<OutputType, ErrorType> = {
   error?: ErrorType;
 }
 
-type PromiseCreator<InputType, OutputType> = (input: InputType) => Promise<OutputType>;
+type PromiseCreator<InputType, OutputType> = (input: InputType, count?: number) => Promise<OutputType>;
 
 // This function effectively gets a batch of promises to process. It then sets up a buffer
 // of concurrent promise requests and flushes those requests through until all promises have
@@ -35,7 +35,7 @@ export async function rollPromises<InputType, OutputType, ErrorType>
           const input = promiseInputs[count];
           const output: RollOutput<OutputType, ErrorType> = {};
           outputs.push(output);
-          promiseCreator(input).then((response: OutputType) => {
+          promiseCreator(input, count).then((response: OutputType) => {
             output.response = response;
             activeRequests--;
           }).catch((error: ErrorType) => {
