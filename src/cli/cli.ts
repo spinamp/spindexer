@@ -1,8 +1,14 @@
 import 'dotenv/config';
 import '../types/env';
+import fs from 'fs';
+import https from 'https';
+
+import { request, gql } from 'graphql-request';
+import _ from 'lodash';
 import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs/yargs';
 
+import axios from '../clients/axios';
 import { DBClient, Table } from '../db/db';
 import { initClients } from '../runner';
 import { Clients } from '../types/processor';
@@ -231,6 +237,63 @@ import { rollPromises } from '../utils/rollingPromises';
 //   });
 // }
 
+function pad100(number: number) {
+  const s = '00' + number;
+  return s.substring(s.length - 3);
+}
+
+const PLAYLIST_API = 'https://us-central1-spinamp-prod.cloudfunctions.net/playlist/';
+const IPFS_GATEWAY_URL = 'https://snowfork.mo.cloudinary.net/';
+const OUTPUT_DIR = `export/`
+const exportPlaylist = async(clients: Clients, id: string) => {
+  const ax = await axios.init();
+  const response = await ax.get(`${PLAYLIST_API}${id}`);
+  const trackIDs = response.data.trackIds;
+  const tracks = await getSpecificTracks(clients, trackIDs)
+  let count = 0;
+  console.log(`Downloading ${tracks.length} tracks`)
+  tracks.map((track, index) => {
+
+    const trackAudioUrl =
+    track.lossyAudioIpfsHash && track.lossyAudioIpfsHash !== ''
+      ? `${IPFS_GATEWAY_URL}${track.lossyAudioIpfsHash}?resource_type=video`
+      : track.lossyAudioUrl;
+
+    const trackFileName = `${pad100(index)}_${track.title.split(' ').join('_')}_${track.artist.split(' ').join('_')}`.replace('/','_');
+    console.log(`Downloading ${trackFileName} from ${trackAudioUrl}`);
+    const file = fs.createWriteStream(`${OUTPUT_DIR}${trackFileName}.mp3`);
+    https.get(trackAudioUrl, (trackResponse) => {
+      trackResponse.pipe(file);
+      file.on('finish', () => {
+        file.close();
+        count++;
+        console.log(`Downloaded ${count} of ${tracks.length}`);
+      });
+    });
+  });
+}
+
+const downloadSaveTrack = (track: any, index: number) => {
+  const trackAudioUrl =
+track.lossyAudioIpfsHash && track.lossyAudioIpfsHash !== ''
+  ? `${IPFS_GATEWAY_URL}${track.lossyAudioIpfsHash}`
+  : track.lossyAudioUrl;
+
+  const trackFileName = `${index}_${track.title.split(' ').join('_')}_${track.artist.split(' ').join('_')}`.replace('/','_');
+  console.log(`Downloading ${trackFileName} from ${trackAudioUrl}`);
+  const file = fs.createWriteStream(`${OUTPUT_DIR}${trackFileName}.mp3`);
+  return new Promise(function(resolve, reject) {
+    https.get(trackAudioUrl, (response) => {
+      response.pipe(file);
+      file.on('finish', () => {
+        file.close();
+        console.log(`Download of ${trackAudioUrl} Completed`);
+        resolve(undefined);
+      });
+    });
+  });
+}
+
 const primeAudioCache = async (clients: Clients) => {
   const cids = await getTrackAudioCIDs(clients.db);
   console.log(`Priming ${cids.length} cids`);
@@ -246,6 +309,40 @@ const primeAudioCache = async (clients: Clients) => {
   };
   await rollPromises(cids, primeCID);
   console.log('Completed.')
+}
+
+const getSpecificTracks = async (clients: Clients, trackIDs: string[]) => {
+  const idQuery = (trackIDs || []).map(id => `"${id}"`).toString();
+  const q = gql`query MyQuery {
+    allProcessedTracks(filter: {id: {in: [${idQuery}]}}) {
+      totalCount
+      edges {
+        node {
+          id
+          title
+          lossyAudioIpfsHash
+          lossyAudioUrl
+          artistId
+          artistByArtistId {
+            name
+          }
+        }
+      }
+    }
+  }
+  `
+
+  const URL = 'https://api.spinamp.xyz/graphql';
+  const response = await request(URL, q);
+  const tracks = response.allProcessedTracks.edges.map((e: any) => ({
+    id: e.node.id,
+    title: e.node.title,
+    lossyAudioIpfsHash: e.node.lossyAudioIpfsHash,
+    lossyAudioUrl: e.node.lossyAudioUrl,
+    artist: e.node.artistByArtistId.name,
+  }))
+  const sortedTracks = _.sortBy(tracks, track => trackIDs.indexOf(track.id));
+  return sortedTracks;
 }
 
 export const getTrackAudioCIDs = async (dbClient: DBClient, limit?: number) => {
@@ -399,6 +496,11 @@ const start = async () => {
       return yargs
     }, async () => {
       await primeAudioCache(clients);
+    })
+    .command('export-playlist', 'export a playlist', async (yargs) => {
+      return yargs.argv
+    }, async ({ id }) => {
+      await exportPlaylist(clients, id as string);
     })
     .parse()
 }
