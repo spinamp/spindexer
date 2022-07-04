@@ -119,10 +119,16 @@ const init = async (): Promise<DBClient> => {
       if (recordUpserts?.length > 0) {
         const dbUpserts = toDBRecords(tableName, recordUpserts)
         for (const dbUpsert of dbUpserts) {
-          await db(tableName)
-            .insert(dbUpsert)
-            .onConflict(idField as any)
-            .merge()
+          try {
+            await db(tableName)
+              .insert(dbUpsert)
+              .onConflict(idField as any)
+              .merge()
+          } catch (error) {
+            console.error('Error upsert record:');
+            console.dir({ dbUpsert }, { depth: null });
+            throw error;
+          }
         }
       }
     },
