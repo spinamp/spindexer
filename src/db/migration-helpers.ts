@@ -29,10 +29,28 @@ export const addErc721Contract = async(knex: Knex, contract: IndexedErc721Contra
 }
 
 export const removeErc721Contract = async(knex: Knex, contract: IndexedErc721Contract) => {
-  await knex.raw(`delete from "${Table.erc721Contracts}" where id = '${contract.id}'`);
   const result = await knex.raw(`select cursor from processors where id='createERC721NFTsFromTransfers';`);
   const parsedCursor = JSON.parse(result.rows[0].cursor);
   delete parsedCursor[contract.id];
   const updatedCursor = JSON.stringify(parsedCursor);
   await knex.raw(`update processors set cursor='${updatedCursor}' where id='createERC721NFTsFromTransfers';`);
+  await knex.raw(`
+  WITH erc721nft_processedTrack_deletes AS (
+    delete from "${Table.erc721nfts_processedTracks}" enpt 
+    using "${Table.erc721nfts}" en, "${Table.processedTracks}" pt, "${Table.erc721Contracts}" ec 
+    where ec.id = '${contract.id}'
+    and en."contractAddress" = '${contract.id}'
+    and enpt."erc721nftId" = en.id
+    and enpt."processedTrackId" = pt.id 
+    returning enpt."processedTrackId"
+  )
+  delete from "${Table.processedTracks}" 
+  where "${Table.processedTracks}".id 
+  in (
+    select erc721nft_processedTrack_deletes."processedTrackId" 
+    from erc721nft_processedTrack_deletes
+  );
+  `)
+  await knex.raw(`delete from "${Table.erc721nfts}" where "contractAddress" = '${contract.id}'`);
+  await knex.raw(`delete from "${Table.erc721Contracts}" where id = '${contract.id}';`);
 }
