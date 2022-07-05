@@ -1,12 +1,14 @@
-import { Knex } from "knex";
-import { ERC721Contract } from "../types/ethereum";
-import { MusicPlatform } from "../types/platform";
-import { Table } from "./db";
-import { toDBRecords } from "./orm";
+import { Knex } from 'knex';
+
+import { ERC721Contract, IndexedErc721Contract } from '../types/ethereum';
+import { MusicPlatform } from '../types/platform';
+
+import { Table } from './db';
+import { toDBRecords } from './orm';
 
 export const addPlatform = async (knex: Knex, platform: MusicPlatform, contract: ERC721Contract) => {
   await knex(Table.platforms).insert([platform]);
-  const dbContracts  = toDBRecords(Table.erc721Contracts, [contract])
+  const dbContracts = toDBRecords(Table.erc721Contracts, [contract])
   await knex(Table.erc721Contracts).insert(dbContracts);
 }
 
@@ -20,4 +22,17 @@ export const removePlatform = async (knex: Knex, platform: MusicPlatform, contra
   await knex.raw(`delete from "${Table.erc721Contracts}" where id in ('${contract.address}')`)
   await knex.raw(`delete from "${Table.platforms}" where id = '${platform.id}'`)
 
+}
+
+export const addErc721Contract = async(knex: Knex, contract: IndexedErc721Contract) => {
+  await knex(Table.erc721Contracts).insert([contract])
+}
+
+export const removeErc721Contract = async(knex: Knex, contract: IndexedErc721Contract) => {
+  await knex.raw(`delete from "${Table.erc721Contracts}" where id = '${contract.id}'`);
+  const result = await knex.raw(`select cursor from processors where id='createERC721NFTsFromTransfers';`);
+  const parsedCursor = JSON.parse(result.rows[0].cursor);
+  delete parsedCursor[contract.id];
+  const updatedCursor = JSON.stringify(parsedCursor);
+  await knex.raw(`update processors set cursor='${updatedCursor}' where id='createERC721NFTsFromTransfers';`);
 }
