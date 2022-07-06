@@ -19,7 +19,8 @@ export const removePlatform = async (knex: Knex, platform: MusicPlatform, contra
   delete parsedCursor[contract.address];
   const updatedCursor = JSON.stringify(parsedCursor);
   await knex.raw(`update processors set cursor='${updatedCursor}' where id='createERC721NFTsFromTransfers';`);
-  await knex.raw(`delete from "${Table.erc721Contracts}" where id in ('${contract.address}')`)
+  await knex.raw(`delete from "${Table.erc721Contracts}" where "platformId" = '${platform.id}'`);
+  await knex.raw(`delete from "${Table.artistProfiles}" where "platformId" = '${platform.id}'`)  
   await knex.raw(`delete from "${Table.platforms}" where id = '${platform.id}'`)
 
 }
@@ -41,31 +42,18 @@ export const removeErc721Contract = async(knex: Knex, contract: ERC721Contract) 
   delete parsedCursor[contract.address];
   const updatedCursor = JSON.stringify(parsedCursor);
   await knex.raw(`update processors set cursor='${updatedCursor}' where id='createERC721NFTsFromTransfers';`);
-  await knex.raw(`
-    WITH erc721nft_processedTrack_deletes AS (
-      delete from "${Table.erc721nfts_processedTracks}" enpt
-      using "${Table.erc721nfts}" en, "${Table.processedTracks}" pt, "${Table.erc721Contracts}" ec
-      where ec.id = '${contract.address}'
-      and en."contractAddress" = '${contract.address}'
-      and enpt."erc721nftId" = en.id
-      and enpt."processedTrackId" = pt.id
-      returning enpt."processedTrackId", enpt."erc721nftId"
-    ),
-    deletedTracks AS (
-      delete from "${Table.processedTracks}"
-      where "${Table.processedTracks}".id
-      in (
-        select erc721nft_processedTrack_deletes."processedTrackId"
-        from erc721nft_processedTrack_deletes
-      )
-    )
-    delete from "${Table.erc721nftProcessErrors}"
-    where "${Table.erc721nftProcessErrors}"."erc721nftId"
-    in (
-      select erc721nft_processedTrack_deletes."erc721nftId"
-      from erc721nft_processedTrack_deletes
-    );
-  `);
+
+  await knex(Table.erc721nfts_processedTracks)
+    .whereILike('erc721nftId', `%${contract.address}%`)
+    .del()
+
+  await knex(Table.processedTracks)
+    .whereILike('id', `%${contract.address}%`)
+    .del()
+  
+  await knex(Table.erc721nftProcessErrors)
+    .whereILike('erc721nftId', `%${contract.address}%`)
+    .del()
   await knex.raw(`delete from "${Table.erc721Transfers}" where "contractAddress" = '${contract.address}';`);
   await knex.raw(`delete from "${Table.erc721nfts}" where "contractAddress" = '${contract.address}'`);
   await knex.raw(`delete from "${Table.erc721Contracts}" where id = '${contract.address}';`);
