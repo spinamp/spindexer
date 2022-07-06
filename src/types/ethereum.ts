@@ -80,10 +80,3 @@ export const NFTContractTypes: ERC721ContractTypes = {
 export function buildERC721Id(contractAddress: string, tokenId: bigint): string {
   return `${formatAddress(contractAddress)}/${tokenId.toString()}`;
 }
-
-export type IndexedErc721Contract = {
-  id: string;
-  platformId: string;
-  startingBlock: string;
-  contractType: string;
-}
