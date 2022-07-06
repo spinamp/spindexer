@@ -25,15 +25,17 @@ export const removePlatform = async (knex: Knex, platform: MusicPlatform, contra
 }
 
 export const addErc721Contract = async(knex: Knex, contract: ERC721Contract) => {
-  await knex(Table.erc721Contracts).insert([{
-    id: contract.address,
-    startingBlock: contract.startingBlock,
-    platformId: contract.platformId,
-    contractType: contract.contractType,
-  }])
+  if (!contract.address || contract.address.length === 0) {
+    throw new Error('Invalid contract address');
+  }
+  const dbContracts = toDBRecords(Table.erc721Contracts, [contract]);
+  await knex(Table.erc721Contracts).insert(dbContracts)
 }
 
 export const removeErc721Contract = async(knex: Knex, contract: ERC721Contract) => {
+  if (!contract.address || contract.address.length === 0) {
+    throw new Error('Invalid contract address');
+  }
   const result = await knex.raw(`select cursor from processors where id='createERC721NFTsFromTransfers';`);
   const parsedCursor = JSON.parse(result.rows[0].cursor);
   delete parsedCursor[contract.address];
@@ -41,26 +43,26 @@ export const removeErc721Contract = async(knex: Knex, contract: ERC721Contract) 
   await knex.raw(`update processors set cursor='${updatedCursor}' where id='createERC721NFTsFromTransfers';`);
   await knex.raw(`
     WITH erc721nft_processedTrack_deletes AS (
-      delete from "${Table.erc721nfts_processedTracks}" enpt 
-      using "${Table.erc721nfts}" en, "${Table.processedTracks}" pt, "${Table.erc721Contracts}" ec 
+      delete from "${Table.erc721nfts_processedTracks}" enpt
+      using "${Table.erc721nfts}" en, "${Table.processedTracks}" pt, "${Table.erc721Contracts}" ec
       where ec.id = '${contract.address}'
       and en."contractAddress" = '${contract.address}'
       and enpt."erc721nftId" = en.id
-      and enpt."processedTrackId" = pt.id 
+      and enpt."processedTrackId" = pt.id
       returning enpt."processedTrackId", enpt."erc721nftId"
     ),
     deletedTracks AS (
-      delete from "${Table.processedTracks}" 
-      where "${Table.processedTracks}".id 
+      delete from "${Table.processedTracks}"
+      where "${Table.processedTracks}".id
       in (
-        select erc721nft_processedTrack_deletes."processedTrackId" 
+        select erc721nft_processedTrack_deletes."processedTrackId"
         from erc721nft_processedTrack_deletes
       )
     )
     delete from "${Table.erc721nftProcessErrors}"
-    where "${Table.erc721nftProcessErrors}"."erc721nftId" 
+    where "${Table.erc721nftProcessErrors}"."erc721nftId"
     in (
-      select erc721nft_processedTrack_deletes."erc721nftId" 
+      select erc721nft_processedTrack_deletes."erc721nftId"
       from erc721nft_processedTrack_deletes
     );
   `);
