@@ -16,7 +16,7 @@ export const removePlatform = async (knex: Knex, platform: MusicPlatform, contra
   await knex.raw(`delete from "${Table.erc721nfts}" where "platformId" = '${platform.id}'`)
   const result = await knex.raw(`select cursor from processors where id='createERC721NFTsFromTransfers';`);
   const parsedCursor = JSON.parse(result.rows[0].cursor);
-  delete parsedCursor[contract.address];
+  delete parsedCursor[contract.address.toLowerCase()];
   const updatedCursor = JSON.stringify(parsedCursor);
   await knex.raw(`update processors set cursor='${updatedCursor}' where id='createERC721NFTsFromTransfers';`);
   await knex.raw(`delete from "${Table.erc721Contracts}" where "platformId" = '${platform.id}'`);
@@ -39,7 +39,7 @@ export const removeErc721Contract = async(knex: Knex, contract: ERC721Contract) 
   }
   const result = await knex.raw(`select cursor from processors where id='createERC721NFTsFromTransfers';`);
   const parsedCursor = JSON.parse(result.rows[0].cursor);
-  delete parsedCursor[contract.address];
+  delete parsedCursor[contract.address.toLowerCase()];
   const updatedCursor = JSON.stringify(parsedCursor);
   await knex.raw(`update processors set cursor='${updatedCursor}' where id='createERC721NFTsFromTransfers';`);
 
