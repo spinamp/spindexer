@@ -54,7 +54,7 @@ export const removeErc721Contract = async(knex: Knex, contract: ERC721Contract) 
   await knex(Table.erc721nftProcessErrors)
     .whereILike('erc721nftId', `%${contract.address}%`)
     .del()
-  await knex.raw(`delete from "${Table.erc721Transfers}" where "contractAddress" = '${contract.address}';`);
-  await knex.raw(`delete from "${Table.erc721nfts}" where "contractAddress" = '${contract.address}'`);
-  await knex.raw(`delete from "${Table.erc721Contracts}" where id = '${contract.address}';`);
+  await knex.raw(`delete from "${Table.erc721Transfers}" where "contractAddress" ilike '${contract.address}';`);
+  await knex.raw(`delete from "${Table.erc721nfts}" where "contractAddress" ilike '${contract.address}'`);
+  await knex.raw(`delete from "${Table.erc721Contracts}" where id ilike '${contract.address}';`);
 }
