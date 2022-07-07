@@ -14,7 +14,6 @@ const mapTrack: MapTrack = (
   apiTrack: any,
   contract?: ERC721Contract,
   trackId?: string,
-  overrides?: Partial<ProcessedTrack>
 ): ProcessedTrack => {
   if (!contract) {
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
@@ -32,7 +31,7 @@ const mapTrack: MapTrack = (
     artistId: contract.platformId,
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
-    ...overrides
+    ...contract.typeMetadata?.overrides?.track
   })
 };
 

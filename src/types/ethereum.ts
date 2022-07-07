@@ -48,16 +48,18 @@ export enum ERC721ContractTypeName {
   zora = 'zora',
 }
 
+export type TypeMetadata = {
+  overrides: {
+    track?: ProcessedTrackAudio & ProcessedTrackArtwork 
+  }
+}
+
 export type ERC721Contract = EthereumContract & {
   platformId: string,
   contractType: ERC721ContractTypeName,
   name?: string,
   symbol?: string,
-  typeMetadata?: {
-    overrides: {
-      track?: ProcessedTrackAudio & ProcessedTrackArtwork 
-    }
-  }
+  typeMetadata?: TypeMetadata
 }
 
 export type ERC721ContractType = {

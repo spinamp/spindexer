@@ -42,4 +42,4 @@ export type Processor = {
   initialCursor?: Cursor | undefined;
 };
 
-export type MapTrack = (nft: ERC721NFT, apiTrack: any, contract?: ERC721Contract | undefined, trackId?: string, overrides?: Partial<ProcessedTrack>) => ProcessedTrack;
+export type MapTrack = (nft: ERC721NFT, apiTrack: any, contract?: ERC721Contract | undefined, trackId?: string) => ProcessedTrack;

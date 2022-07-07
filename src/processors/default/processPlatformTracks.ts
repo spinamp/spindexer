@@ -78,7 +78,7 @@ const createTracks = async (
     }
     const firstNFT = trackNFTs[0];
     const contract = contracts.find(c => c.address === firstNFT.contractAddress)
-    const mappedTrack = mapTrack(firstNFT, apiTrack, contract, trackId, contract?.typeMetadata?.overrides?.track);
+    const mappedTrack = mapTrack(firstNFT, apiTrack, contract, trackId);
     if (!mappedTrack) {
       return;
     }
