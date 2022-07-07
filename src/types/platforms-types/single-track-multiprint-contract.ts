@@ -6,12 +6,15 @@ import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { ERC721NFT } from '../erc721nft';
 import { ERC721Contract } from '../ethereum';
+import { MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
-const mapTrack = (
+const mapTrack: MapTrack = (
   nft: ERC721NFT,
   apiTrack: any,
   contract?: ERC721Contract,
+  trackId?: string,
+  overrides?: Partial<ProcessedTrack>
 ): ProcessedTrack => {
   if (!contract) {
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
@@ -29,26 +32,11 @@ const mapTrack = (
     artistId: contract.platformId,
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    ...overrides
   })
 };
 
 const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ERC721NFT, contract?: ERC721Contract }): ArtistProfile => {
-  if (!nft) {
-    throw new Error(`NFT missing for mapArtistProfile for nft`)
-  }
-  if (!contract) {
-    throw new Error(`Contract missing for mapArtistProfile for nft ${nft.id}`)
-  }
-  return {
-    name: contract.platformId, //set in db when contract is created in db
-    artistId: contract.platformId,
-    platformInternalId: contract.platformId,
-    platformId: contract.platformId,
-    avatarUrl: undefined,
-    websiteUrl: nft.metadata.external_url,
-    createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber
-  }
 };
 
 const mapNFTtoTrackID = (nft: ERC721NFT): string => {

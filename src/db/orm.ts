@@ -21,6 +21,7 @@ const toRecordMapper: any = {
       contractType: c.contractType,
       name: c.name,
       symbol: c.symbol,
+      typeMetadata: c.typeMetadata
     });
   }),
 }
@@ -46,6 +47,7 @@ const fromRecordMapper: any = {
       contractType: c.contractType,
       name: c.name,
       symbol: c.symbol,
+      typeMetadata: c.typeMetadata
     });
   }),
   [Table.factoryContracts]: (factoryContracts: Record[]): ERC721Contract[] => factoryContracts.map((c: any) => {

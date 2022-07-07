@@ -11,6 +11,7 @@ export const unpinnedTrackContent: (cidField: string, limit?: number) => Trigger
       LEFT OUTER JOIN "${Table.ipfsPins}" as p
       ON t."${cidField}" = p.id
       WHERE (t."${cidField}" IS NOT NULL)
+      AND (t."${cidField}" <> '')
       AND (p.id is NULL)
       LIMIT ${limit}`
 

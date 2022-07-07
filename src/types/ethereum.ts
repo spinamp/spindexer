@@ -3,6 +3,7 @@ import { ethers } from 'ethers'
 import { ValidContractNFTCallFunction } from '../clients/ethereum'
 
 import { formatAddress } from './address'
+import { ProcessedTrackArtwork, ProcessedTrackAudio } from './track'
 
 export const ETHEREUM_NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -51,7 +52,12 @@ export type ERC721Contract = EthereumContract & {
   platformId: string,
   contractType: ERC721ContractTypeName,
   name?: string,
-  symbol?: string
+  symbol?: string,
+  typeMetadata?: {
+    overrides: {
+      track?: ProcessedTrackAudio & ProcessedTrackArtwork 
+    }
+  }
 }
 
 export type ERC721ContractType = {

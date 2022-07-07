@@ -7,7 +7,7 @@ import { ArtistProfile, mapArtist } from '../../types/artist';
 import { ERC721NFT } from '../../types/erc721nft';
 import { ERC721Contract } from '../../types/ethereum';
 import { MusicPlatform, platformConfigs } from '../../types/platform';
-import { Clients, Processor, TrackAPIClient } from '../../types/processor';
+import { Clients, MapTrack, Processor, TrackAPIClient } from '../../types/processor';
 import { Record } from '../../types/record';
 import { ProcessedTrack, mergeProcessedTracks, NFTProcessError, NFTTrackJoin } from '../../types/track';
 
@@ -37,7 +37,7 @@ const createTracks = async (
   newTrackIds: string[],
   trackMapping: { [trackId: string]: ERC721NFT[] },
   client: TrackAPIClient | null,
-  mapTrack: (nft: ERC721NFT, apiTrack: any, contract?: ERC721Contract | undefined, trackId?: string) => ProcessedTrack,
+  mapTrack: MapTrack,
   mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ERC721NFT, contract?: ERC721Contract | undefined }) => ArtistProfile,
   contracts: ERC721Contract[]):
   Promise<{
@@ -78,7 +78,7 @@ const createTracks = async (
     }
     const firstNFT = trackNFTs[0];
     const contract = contracts.find(c => c.address === firstNFT.contractAddress)
-    const mappedTrack = mapTrack(firstNFT, apiTrack, contract, trackId);
+    const mappedTrack = mapTrack(firstNFT, apiTrack, contract, trackId, contract?.typeMetadata?.overrides?.track);
     if (!mappedTrack) {
       return;
     }
