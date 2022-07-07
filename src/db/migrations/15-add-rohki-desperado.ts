@@ -9,7 +9,7 @@ import { addPlatform, removeErc721Contract, removePlatform } from '../migration-
 const ROHKI_PLATFORM = {
   id: 'rohki',
   type: MusicPlatformType['single-track-multiprint-contract'],
-  name: 'rohki desperado',
+  name: 'RŌHKI',
 }
 
 const ROHKI_DESPERADO: ERC721Contract = {
