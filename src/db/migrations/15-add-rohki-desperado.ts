@@ -20,8 +20,15 @@ const ROHKI_DESPERADO: ERC721Contract = {
   typeMetadata: {
     overrides: {
       track: {
-        lossyAudioURL: 'https://www.rohki.xyz/audio/ROHKI-Desperado.mp3?gubed=true',
-        lossyArtworkURL: 'https://arweave.net/lQEtDj_2BVTfl13ZVDomDl-xQdMbo6VssVlGUK_e_Oo/immersive.gif'
+        lossyAudioIPFSHash: 'QmcnpLmiLpMNMMpcJkKjKTgwcsUyUWTstFtRZat6TYsmBV',
+        lossyArtworkIPFSHash: 'QmZWbY9VtabJ6ZRieUo5LoetBuBBETKeJhjF5upstj29jp',
+        title: 'Desperado',
+        slug: 'desperado-1652645244000',
+      },
+      artist: {
+        name: 'RŌHKI',
+        avatarUrl: 'https://lh3.googleusercontent.com/jyOxrrZ5Nhton5vIAL10yCFexExXjLWhU_KfGYNjm7pC1conv3BzH1PUYGqyD_4cvAEskqs-gOCN5uhCbuKVdorh_MRwqitEjuWzDJs=s0',
+        websiteUrl: 'https://www.rohki.xyz/'
       }
     }
   }
