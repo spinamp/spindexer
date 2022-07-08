@@ -19,11 +19,10 @@ const mapTrack: MapTrack = (
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
   }
 
-  const track: ProcessedTrack = {
+  const track: Partial<ProcessedTrack> = {
     id: mapNFTtoTrackID(nft),
     platformInternalId: contract.address,
     title: contract.name || nft.metadata.name,
-    slug: '',
     description: nft.metadata.description,
     platformId: contract.platformId,
     lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url),
@@ -37,7 +36,7 @@ const mapTrack: MapTrack = (
 
   track.slug = slugify(`${track.title} ${nft.createdAtTime.getTime()}`).toLowerCase();
 
-  return track
+  return track as ProcessedTrack;
 };
 
 const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ERC721NFT, contract?: ERC721Contract }): ArtistProfile => {
