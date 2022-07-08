@@ -22,7 +22,7 @@ const mapTrack: MapTrack = (
     id: mapNFTtoTrackID(nft),
     platformInternalId: contract.address,
     title: contract.name || nft.metadata.name,
-    slug: slugify(`${contract.name} ${nft.createdAtTime.getTime()}`).toLowerCase(),
+    slug: slugify(`${contract.typeMetadata?.overrides?.track?.title ?? contract.name} ${nft.createdAtTime.getTime()}`).toLowerCase(),
     description: nft.metadata.description,
     platformId: contract.platformId,
     lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url),
