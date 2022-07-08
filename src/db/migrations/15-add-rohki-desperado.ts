@@ -23,6 +23,7 @@ const ROHKI_DESPERADO: ERC721Contract = {
         lossyAudioIPFSHash: 'QmcnpLmiLpMNMMpcJkKjKTgwcsUyUWTstFtRZat6TYsmBV',
         lossyArtworkIPFSHash: 'QmZWbY9VtabJ6ZRieUo5LoetBuBBETKeJhjF5upstj29jp',
         title: 'Desperado',
+        websiteUrl: 'https://www.rohki.xyz/'
       },
       artist: {
         name: 'RŌHKI',
