@@ -10,6 +10,7 @@ import yargs from 'yargs/yargs';
 
 import axios from '../clients/axios';
 import { DBClient, Table } from '../db/db';
+import { clearERC721Contract, clearERC721ContractTracks } from '../db/migration-helpers';
 import { initClients } from '../runner';
 import { Clients } from '../types/processor';
 import { rollPromises } from '../utils/rollingPromises';
@@ -351,6 +352,14 @@ export const getTrackAudioCIDs = async (dbClient: DBClient, limit?: number) => {
   return cids.filter((c: string | undefined | null) => !!c);
 };
 
+const clearContract = async(clients: Clients, address: string) => {
+  clearERC721Contract(clients.db.getDB(), { address })
+}
+
+const clearContractTracks = async(clients: Clients, address: string) => {
+  clearERC721ContractTracks(clients.db.getDB(), { address })
+}
+
 const start = async () => {
   const clients = await initClients();
   // .command('printMissingIPFS', 'print all tracks with missing ipfs hashes', async (yargs) => {
@@ -502,6 +511,19 @@ const start = async () => {
     }, async ({ id }) => {
       await exportPlaylist(clients, id as string);
     })
+    .command('clear-contract', 'clear a contract\'s stuff from the db', async (yargs) => {
+      return yargs.argv
+    }, async ({ address }) => {
+      await clearContract(clients, address as string);
+      console.log('Done.')
+    })
+    .command('clear-contract-tracks', 'clear a contract\'s tracks from the db', async (yargs) => {
+      return yargs.argv
+    }, async ({ address }) => {
+      await clearContractTracks(clients, address as string);
+      console.log('Done.')
+    })
+    .option('address', { string: true })
     .parse()
 }
 
