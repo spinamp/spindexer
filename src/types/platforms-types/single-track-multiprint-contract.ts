@@ -6,21 +6,23 @@ import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { ERC721NFT } from '../erc721nft';
 import { ERC721Contract } from '../ethereum';
+import { MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
-const mapTrack = (
+const mapTrack: MapTrack = (
   nft: ERC721NFT,
   apiTrack: any,
   contract?: ERC721Contract,
+  trackId?: string,
 ): ProcessedTrack => {
   if (!contract) {
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
   }
-  return ({
+
+  const track: Partial<ProcessedTrack> = {
     id: mapNFTtoTrackID(nft),
     platformInternalId: contract.address,
     title: contract.name || nft.metadata.name,
-    slug: slugify(`${contract.name} ${nft.createdAtTime.getTime()}`).toLowerCase(),
     description: nft.metadata.description,
     platformId: contract.platformId,
     lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url),
@@ -29,7 +31,12 @@ const mapTrack = (
     artistId: contract.platformId,
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
-  })
+    ...contract.typeMetadata?.overrides?.track
+  };
+
+  track.slug = slugify(`${track.title} ${nft.createdAtTime.getTime()}`).toLowerCase();
+
+  return track as ProcessedTrack;
 };
 
 const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ERC721NFT, contract?: ERC721Contract }): ArtistProfile => {
@@ -47,7 +54,8 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ER
     avatarUrl: undefined,
     websiteUrl: nft.metadata.external_url,
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber
+    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    ...contract.typeMetadata?.overrides?.artist
   }
 };
 

@@ -3,6 +3,8 @@ import { ethers } from 'ethers'
 import { ValidContractNFTCallFunction } from '../clients/ethereum'
 
 import { formatAddress } from './address'
+import { ArtistProfile } from './artist'
+import { ProcessedTrack } from './track'
 
 export const ETHEREUM_NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -47,11 +49,19 @@ export enum ERC721ContractTypeName {
   zora = 'zora',
 }
 
+export type TypeMetadata = {
+  overrides: {
+    track?: Partial<ProcessedTrack>,
+    artist?: Partial<ArtistProfile>
+  }
+}
+
 export type ERC721Contract = EthereumContract & {
   platformId: string,
   contractType: ERC721ContractTypeName,
   name?: string,
-  symbol?: string
+  symbol?: string,
+  typeMetadata?: TypeMetadata
 }
 
 export type ERC721ContractType = {

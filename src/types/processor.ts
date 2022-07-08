@@ -8,6 +8,8 @@ import { NOIZDClient } from '../clients/noizd';
 import { SoundClient } from '../clients/sound';
 import { DBClient } from '../db/db';
 
+import { ERC721NFT } from './erc721nft';
+import { ERC721Contract } from './ethereum';
 import { ProcessedTrack } from './track';
 import { Cursor, Trigger } from './trigger';
 
@@ -39,3 +41,5 @@ export type Processor = {
   processorFunction: (newTriggerItems: any, clients: Clients) => Promise<void>;
   initialCursor?: Cursor | undefined;
 };
+
+export type MapTrack = (nft: ERC721NFT, apiTrack: any, contract?: ERC721Contract | undefined, trackId?: string) => ProcessedTrack;
