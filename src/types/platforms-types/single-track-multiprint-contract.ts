@@ -18,11 +18,12 @@ const mapTrack: MapTrack = (
   if (!contract) {
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
   }
-  return ({
+
+  const track: ProcessedTrack = {
     id: mapNFTtoTrackID(nft),
     platformInternalId: contract.address,
     title: contract.name || nft.metadata.name,
-    slug: slugify(`${contract.typeMetadata?.overrides?.track?.title ?? contract.name} ${nft.createdAtTime.getTime()}`).toLowerCase(),
+    slug: '',
     description: nft.metadata.description,
     platformId: contract.platformId,
     lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url),
@@ -32,7 +33,11 @@ const mapTrack: MapTrack = (
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
     ...contract.typeMetadata?.overrides?.track
-  })
+  };
+
+  track.slug = slugify(`${track.title} ${nft.createdAtTime.getTime()}`).toLowerCase();
+
+  return track
 };
 
 const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ERC721NFT, contract?: ERC721Contract }): ArtistProfile => {
