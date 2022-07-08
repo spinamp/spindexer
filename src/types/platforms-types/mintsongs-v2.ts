@@ -9,10 +9,6 @@ import { ERC721NFT } from '../erc721nft';
 import { ERC721Contract } from '../ethereum';
 import { ProcessedTrack } from '../track';
 
-const mapTrackIDToInternalId = (trackId: string): string => {
-  return trackId.split('/')[2];
-};
-
 const extractArtistIdFromNFT = (nft: ERC721NFT) => {
   const artistURL = nft.metadata.external_url;
   const prefix = artistURL.slice(0,28);
@@ -40,7 +36,7 @@ const mapTrack = (
   }
   return ({
     id: trackId,
-    platformInternalId: mapTrackIDToInternalId(trackId),
+    platformInternalId: nft.metadata.name,
     title: nft.metadata.title,
     slug: slugify(`${nft.metadata.title} ${nft.createdAtTime.getTime()}`).toLowerCase(),
     description: nft.metadata.description,
@@ -73,48 +69,28 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ER
   }
 };
 
-const mapFirstNFTtoTrackID = (nft: ERC721NFT, dedupedNFT: ERC721NFT): string => {
-  return `ethereum/${formatAddress(nft.contractAddress)}/${dedupedNFT.tokenId}`;
+const mapNFTtoLatestTrackID = (nft: ERC721NFT, dupNFTs: ERC721NFT[]): string => {
+  const primaryNFT = selectPrimaryNFTForTrackMapper(dupNFTs);
+  return `ethereum/${formatAddress(primaryNFT.contractAddress)}/${primaryNFT.tokenId}`;
 };
 
-const METADATA_DEDUP_FIELD = 'name';
+const selectPrimaryNFTForTrackMapper = (nfts: ERC721NFT[]) => {
+  const sortedNFTs = _.sortBy(nfts, 'tokenId');
+  const lastNFT = sortedNFTs[sortedNFTs.length - 1];
+  return lastNFT;
+}
 
 const mapNFTsToTrackIds = async (nfts: ERC721NFT[], dbClient?: DBClient): Promise<{ [trackId: string]: ERC721NFT[] }> => {
   if (!dbClient) {
     throw new Error('DB Client not provided to mintsongs mapper')
   }
-  const nftsByDedupField = _.groupBy(nfts, nft => nft.metadata[METADATA_DEDUP_FIELD]);
 
-  const dedupFieldKeys = Object.keys(nftsByDedupField);
-
-  const dedupFieldKeysQuery = dedupFieldKeys.map((key: any) => '?').join(',')
-
-  // The below query does the following:
-  // - Gets the lowest tokenId that matches each nft to be mapped based on the dedup field (eg: matching name)
-  const existingDedupKeysQuery = `
-  select
-  metadata ->> '${METADATA_DEDUP_FIELD}' as dedup_field,
-  MIN(CAST("tokenId" AS bigint)) as "tokenId"
-  from "erc721nfts"
-  where "platformId"='mintsongs'  and
-  metadata ->> '${METADATA_DEDUP_FIELD}' in (${dedupFieldKeysQuery})
-  GROUP BY dedup_field
-  `
-
-  const firstMatchingNFTs = (await dbClient.rawBoundSQL(
-    existingDedupKeysQuery,
-    [dedupFieldKeys]
-  )).rows;
-
-  const firstNFTsByDedup = _.keyBy(firstMatchingNFTs, 'dedup_field');
+  const nftsByMetadataName = _.groupBy(nfts, (nft) => {
+    return nft.metadata.name;
+  });
 
   const nftsByTrackId = _.groupBy(nfts, (nft) => {
-    const dedupValue = nft.metadata[METADATA_DEDUP_FIELD];
-    const dedupedNFT = firstNFTsByDedup[dedupValue];
-    if (!dedupedNFT) {
-      throw new Error('Error, could not dedup nfts properly');
-    }
-    return mapFirstNFTtoTrackID(nft, dedupedNFT)
+    return mapNFTtoLatestTrackID(nft, nftsByMetadataName[nft.metadata.name])
   });
 
   return nftsByTrackId;
@@ -123,5 +99,6 @@ const mapNFTsToTrackIds = async (nfts: ERC721NFT[], dbClient?: DBClient): Promis
 export default {
   mapNFTsToTrackIds,
   mapTrack,
-  mapArtistProfile
+  mapArtistProfile,
+  selectPrimaryNFTForTrackMapper,
 }

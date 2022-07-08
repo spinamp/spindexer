@@ -1,4 +1,5 @@
 import { DBClient } from '../db/db';
+
 import { ArtistProfile } from './artist';
 import { ERC721NFT } from './erc721nft';
 import { ERC721Contract } from './ethereum';
@@ -30,6 +31,7 @@ export type PlatformMapper = {
   mapNFTsToTrackIds: (nfts: ERC721NFT[], dbClient?: DBClient) => Promise<{ [trackId: string]: ERC721NFT[] }>
   mapTrack: (nft: ERC721NFT, apiTrack: any, contract?: ERC721Contract) => ProcessedTrack
   mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ERC721NFT, contract?: ERC721Contract }) => ArtistProfile
+  selectPrimaryNFTForTrackMapper?: (nfts: ERC721NFT[]) => ERC721NFT
 }
 
 export type MusicPlatformTypeConfig = {

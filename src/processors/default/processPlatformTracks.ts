@@ -39,7 +39,9 @@ const createTracks = async (
   client: TrackAPIClient | null,
   mapTrack: MapTrack,
   mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ERC721NFT, contract?: ERC721Contract | undefined }) => ArtistProfile,
-  contracts: ERC721Contract[]):
+  contracts: ERC721Contract[],
+  selectPrimaryNFTForTrackMapper?: (nfts: ERC721NFT[]) => ERC721NFT
+):
   Promise<{
     newTracks: ProcessedTrack[],
     joins: NFTTrackJoin[],
@@ -76,9 +78,9 @@ const createTracks = async (
       })
       return undefined;
     }
-    const firstNFT = trackNFTs[0];
-    const contract = contracts.find(c => c.address === firstNFT.contractAddress)
-    const mappedTrack = mapTrack(firstNFT, apiTrack, contract, trackId);
+    const primaryNFTForTrack = selectPrimaryNFTForTrackMapper ? selectPrimaryNFTForTrackMapper(trackNFTs) : trackNFTs[0];
+    const contract = contracts.find(c => c.address === primaryNFTForTrack.contractAddress)
+    const mappedTrack = mapTrack(primaryNFTForTrack, apiTrack, contract, trackId);
     if (!mappedTrack) {
       return;
     }
@@ -125,7 +127,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[],
     await clients.db.insert(Table.erc721nftProcessErrors, errorNFTs);
     return;
   }
-  const { mapNFTsToTrackIds, mapTrack, mapArtistProfile } = platformType.mappers;
+  const { mapNFTsToTrackIds, mapTrack, mapArtistProfile, selectPrimaryNFTForTrackMapper } = platformType.mappers;
 
   const contracts = await getNFTContracts(nfts, clients.db);
   const trackMapping = await mapNFTsToTrackIds(nfts, clients.db);
@@ -138,7 +140,8 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: ERC721NFT[],
     platformClient,
     mapTrack,
     mapArtistProfile,
-    contracts
+    contracts,
+    selectPrimaryNFTForTrackMapper
   );
   const artists = artistProfiles.map(profile => mapArtist(profile));
 
