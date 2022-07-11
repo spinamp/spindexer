@@ -11,7 +11,6 @@ export type ERC721NFT = Record & {
   [ValidContractNFTCallFunction.tokenURI]?: string
   [ValidContractNFTCallFunction.tokenMetadataURI]?: string
   metadata?: any
-  metadataError?: string
   mimeType?: string
   owner: string
 }

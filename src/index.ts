@@ -12,6 +12,7 @@ import { createERC721ContractFromFactoryProcessor } from './processors/default/c
 import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
 import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
+import { errorProcessor } from './processors/default/errorProcessor';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
 import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfs';
@@ -44,6 +45,7 @@ const PROCESSORS = (erc721Contracts: ERC721Contract[], factoryContracts: Factory
     createProcessedTracksFromAPI('noizd'), //TODO: noizd here is being used both as platformId and MusicPlatformType. Need to bring in the full noizd platform object here and avoid mixing them
     ipfsAudioPinner,
     ipfsArtworkPinner,
+    errorProcessor(updateDBLoop)
   ]
 };
 

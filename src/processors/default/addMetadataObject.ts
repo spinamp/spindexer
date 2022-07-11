@@ -35,17 +35,25 @@ const processorFunction = (erc721ContractsByAddress: { [key: string]: ERC721Cont
 
   const results = await rollPromises<ERC721NFT, AxiosResponse, AxiosError>(batch, processMetadataResponse);
 
+  const metadataErrors: { metadataError: string, erc721nftId: string }[] = [];
   const nftUpdates = batch.map((nft, index): (Partial<ERC721NFT>) => {
     const metadata = results[index].response ? results[index].response!.data : undefined;
     const metadataError = results[index].isError ? results[index].error!.message : undefined;
+    if (metadataError){
+      metadataErrors.push({
+        erc721nftId: nft.id, 
+        metadataError
+      });
+    }
     return {
       id: nft.id,
       metadata: metadata ? JSON.stringify(metadata) : null,
       mimeType: metadata ? metadata.mimeType : null,
-      metadataError,
     }
   });
   await clients.db.update(Table.erc721nfts, nftUpdates);
+  await clients.db.upsert(Table.erc721nftProcessErrors,metadataErrors, 'erc721nftId');
+
   console.info('Batch done');
 };
 

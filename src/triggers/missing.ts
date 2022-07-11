@@ -11,21 +11,25 @@ export const missingCreatedAtTime: (tableName: Table) => Trigger<undefined> = (t
 };
 
 export const missingMetadataObject: Trigger<undefined> = async (clients) => {
-  const nfts = (await clients.db.getRecords(Table.erc721nfts,
-    [
-      ['whereNull', ['metadata']],
-      ['and'],
-      ['whereNull', ['metadataError']],
-    ]
-  )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+  const nftQuery = `select * from ${Table.erc721nfts} n
+    left outer join "${Table.erc721nftProcessErrors}" enpe
+    on n.id = enpe."erc721nftId"
+    where enpe."metadataError" is null
+    and n.metadata is null  
+  `
+  const nfts = (await clients.db.rawSQL(nftQuery))
+    .rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return nfts;
 };
 
 export const missingMetadataIPFSHash: Trigger<undefined> = async (clients) => {
-  const nfts = (await clients.db.getRecords(Table.erc721nfts,
-    [
-      ['whereNull', ['metadataIPFSHash']]
-    ])).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+  const nftQuery = `select * from ${Table.erc721nfts} n
+  left outer join "${Table.erc721nftProcessErrors}" enpe 
+  on n.id = enpe."erc721nftId" 
+  where enpe."metadataError" is null
+  and n."metadataIPFSHash" is null`;
+  const nfts = (await clients.db.rawSQL(nftQuery))
+    .rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return nfts;
 };
 
@@ -44,7 +48,7 @@ export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Tr
       ON n.id = e."erc721nftId"
       WHERE p.id is NULL AND
       e."processError" is NULL AND
-      n."metadataError" is NULL AND
+      e."metadataError" is NULL AND
       n."platformId"='${platformId}'
       ORDER BY n."createdAtTime"
       LIMIT ${limit}`
