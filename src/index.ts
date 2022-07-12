@@ -45,7 +45,7 @@ const PROCESSORS = (erc721Contracts: ERC721Contract[], factoryContracts: Factory
     createProcessedTracksFromAPI('noizd'), //TODO: noizd here is being used both as platformId and MusicPlatformType. Need to bring in the full noizd platform object here and avoid mixing them
     ipfsAudioPinner,
     ipfsArtworkPinner,
-    errorProcessor(updateDBLoop)
+    errorProcessor
   ]
 };
 
