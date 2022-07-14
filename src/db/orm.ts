@@ -1,5 +1,6 @@
 import { ERC721NFT } from '../types/erc721nft';
-import { ERC721Contract } from '../types/ethereum';
+import { ERC721Contract, FactoryContract } from '../types/ethereum';
+import { MusicPlatformType } from '../types/platform';
 import { IdField, Record, RecordUpdate } from '../types/record';
 
 import { Table } from './db';
@@ -15,13 +16,22 @@ const toDBRecord = <RecordType>(record: RecordType | RecordUpdate<unknown>) => {
 const toRecordMapper: any = {
   [Table.erc721Contracts]: (erc721Contracts: ERC721Contract[]): IdField[] => erc721Contracts.map((c: any) => {
     return ({
-      id: c.address.toLowerCase(),
+      id: c.platformId === MusicPlatformType.nina ? c.address : c.address.toLowerCase(),
       platformId: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,
       name: c.name,
       symbol: c.symbol,
       typeMetadata: c.typeMetadata
+    });
+  }),
+  [Table.factoryContracts]: (factoryContracts: FactoryContract[]): IdField[] => factoryContracts.map((c: any) => {
+    return ({
+      id: c.platformId === MusicPlatformType.nina ? c.address : c.address.toLowerCase(),
+      platformId: c.platformId,
+      startingBlock: c.startingBlock,
+      contractType: c.contractType,
+      gap: c.gap
     });
   }),
 }

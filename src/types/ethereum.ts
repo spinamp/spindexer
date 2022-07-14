@@ -10,11 +10,12 @@ export const ETHEREUM_NULL_ADDRESS = '0x0000000000000000000000000000000000000000
 
 export type EthereumContract = {
   address: string,
-  startingBlock: string,
+  startingBlock?: string,
 }
 
 export enum FactoryContractTypeName {
-  soundArtistProfileCreator = 'soundArtistProfileCreator'
+  soundArtistProfileCreator = 'soundArtistProfileCreator',
+  ninaMintCreator = 'ninaMintCreator'
 }
 
 export type FactoryContract = EthereumContract & {
@@ -42,11 +43,18 @@ export const FactoryContractTypes: FactoryContractTypes = {
       contractType: ERC721ContractTypeName.default,
     })
   },
+  ninaMintCreator: {
+    newContractCreatedEvent: 'not implemeted',
+    creationEventToERC721Contract: (event: any) => {
+      throw 'creationEventToERC721Contract not implemented'
+    }
+  }
 }
 
 export enum ERC721ContractTypeName {
   default = 'default',
   zora = 'zora',
+  nina = 'nina'
 }
 
 export type TypeMetadata = {
@@ -85,6 +93,11 @@ export const NFTContractTypes: ERC721ContractTypes = {
     contractMetadataField: ValidContractNFTCallFunction.tokenMetadataURI,
     buildNFTId: buildERC721Id,
   },
+  nina: {
+    contractCalls: [],
+    buildNFTId: () => {throw 'not implementd buildNFTID'},
+    contractMetadataField: ValidContractNFTCallFunction.tokenURI
+  }
 }
 
 export function buildERC721Id(contractAddress: string, tokenId: bigint): string {

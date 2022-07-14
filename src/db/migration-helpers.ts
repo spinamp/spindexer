@@ -1,5 +1,6 @@
 import { Knex } from 'knex';
 
+import { FactoryContract } from '../types/ethereum';
 import { MusicPlatform } from '../types/platform';
 
 import { Table } from './db';
@@ -26,6 +27,21 @@ export const removePlatform = async (knex: Knex, platform: MusicPlatform, contra
   await knex.raw(`delete from "${Table.artistProfiles}" where "platformId" = '${platform.id}'`)
   await knex.raw(`delete from "${Table.platforms}" where id = '${platform.id}'`)
 
+}
+
+export const addFatoryContract = async(knex: Knex, contract: FactoryContract) => {
+  if (!contract.address || contract.address.length === 0) {
+    throw new Error('Invalid contract address');
+  }
+  const dbContracts = toDBRecords(Table.factoryContracts, [contract]);
+  await knex(Table.factoryContracts).insert(dbContracts)
+}
+
+export const removeFatoryContract = async(knex: Knex, contract: FactoryContract) => {
+  if (!contract.address || contract.address.length === 0) {
+    throw new Error('Invalid contract address');
+  }
+  await knex(Table.factoryContracts).whereILike('id', contract.address).del()
 }
 
 export const addErc721Contract = async(knex: Knex, contract: ERC721ContractAddress) => {
