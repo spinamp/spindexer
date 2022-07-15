@@ -1,11 +1,8 @@
 import { Metaplex, convertToPublickKey } from '@metaplex-foundation/js';
 import { web3 } from '@project-serum/anchor';
-import axios from 'axios';
-import slugify from 'slugify';
 
 import { Table } from '../../db/db';
 import { ninaContractsWithoutNfts } from '../../triggers/nina';
-import { Artist } from '../../types/artist';
 import { ERC721NFT } from '../../types/erc721nft';
 import { ERC721Contract } from '../../types/ethereum';
 import { Clients, Processor } from '../../types/processor';
@@ -23,57 +20,22 @@ export const createNinaNfts: Processor = {
 
     const nfts = (await Promise.all(metadataAccounts.map(async (metadataAccount) => {
 
-      const metadataJson = (await axios.get(metadataAccount!.uri)).data
       const mintAddress = metadataAccount!.mint.toBase58();
 
-      const createdAtTime = new Date(metadataJson.properties.date);
 
-      const details: ERC721NFT = {
+      const details: Partial<ERC721NFT> = {
         id: mintAddress,
-        metadata: metadataJson,
         contractAddress: mintAddress,
         platformId: contracts.find(contract => contract.address === mintAddress)!.platformId,
         tokenMetadataURI: metadataAccount!.uri,
-        createdAtTime,
-        tokenId: BigInt(10),
-        owner: '',
         tokenURI: metadataAccount!.uri
       }
       return details
     })))
-    // ignore nfts with no metadata
-      .filter(nft => nft.metadata)
 
 
-    // sort nfts by date
-    const sortedNfts = nfts.sort((a,b) => a.createdAtTime.getTime() - b.createdAtTime.getTime())
-    const uniqueArtistsNfts: { [artistName: string]: ERC721NFT } = {};
 
-    for (const artistNft of sortedNfts){
-      try {
-        if (!uniqueArtistsNfts[artistNft.metadata.properties.artist]){
-          uniqueArtistsNfts[artistNft.metadata.properties.artist] = artistNft;
-        }
-      } catch (e){
-        console.log('error checking for dupe artist', e);
-        console.log(artistNft)
-        console.log(uniqueArtistsNfts)
-      }
-    }
-
-    // insert new artists
-    const artists: Artist[] = Object.values(uniqueArtistsNfts)
-      .map(nft => ({
-        createdAtTime: nft.createdAtTime,
-        id: `nina/${nft.metadata.properties.artist.replace(' ', '-')}`,
-        name: nft.metadata.properties.artist,
-        slug: slugify(`${nft.metadata.properties.artist} ${nft.createdAtTime.getTime()}`).toLowerCase(),
-        createdAtEthereumBlockNumber: '100'
-      }))
-
-
-    await clients.db.insert<ERC721NFT>(Table.erc721nfts, nfts)
-    await clients.db.insert<Artist>(Table.artists, artists)
+    await clients.db.insert<Partial<ERC721NFT>>(Table.erc721nfts, nfts)
   },
   initialCursor: undefined
 };
