@@ -41,6 +41,10 @@ export const removeFactoryContract = async(knex: Knex, contract: FactoryContract
   if (!contract.address || contract.address.length === 0) {
     throw new Error('Invalid contract address');
   }
+
+  await knex.raw(`delete from "${Table.erc721nfts}" where "platformId" = '${contract.platformId}'`)
+  await knex.raw(`delete from "${Table.erc721Contracts}" where "platformId" = '${contract.platformId}'`)
+
   await knex(Table.factoryContracts).whereILike('id', contract.address).del()
 }
 
