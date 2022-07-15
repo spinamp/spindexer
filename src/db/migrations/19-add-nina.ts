@@ -21,6 +21,25 @@ const NINA: FactoryContract = {
 export const up = async (knex: Knex) => {
   await knex.raw(`ALTER TABLE platforms drop constraint "platforms_type_check"`);
   await knex.raw(`ALTER TABLE "${Table.platforms}" add constraint "platforms_type_check" CHECK (type = ANY (ARRAY['nina'::text, 'noizd'::text, 'catalog'::text, 'sound'::text, 'zora'::text, 'single-track-multiprint-contract'::text, 'chaos'::text, 'mintsongs-v2'::text]))`);
+
+  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" drop constraint "erc721nfts_processedtracks_erc721nftid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" add constraint "erc721nfts_processedtracks_erc721nftid_foreign" foreign key ("erc721nftId") references "${Table.erc721nfts}" (id) on delete cascade`);      
+
+  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" drop constraint "erc721nfts_processedtracks_processedtrackid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" add constraint "erc721nfts_processedtracks_processedtrackid_foreign" foreign key ("processedTrackId") references "${Table.processedTracks}" (id) on delete cascade`);      
+
+  await knex.raw(`ALTER TABLE "${Table.processedTracks}" drop constraint "processedtracks_artistid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.processedTracks}" add constraint "processedtracks_artistid_foreign" foreign key ("artistId") references "${Table.artists}" (id) on delete cascade`);      
+
+  await knex.raw(`ALTER TABLE "${Table.processedTracks}" drop constraint "processedtracks_platformid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.processedTracks}" add constraint "processedtracks_platformid_foreign" foreign key ("platformId") references "${Table.platforms}" (id) on delete cascade`);      
+
+  await knex.raw(`ALTER TABLE "${Table.artistProfiles}" drop constraint "artistprofiles_artistid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.artistProfiles}" add constraint "artistprofiles_artistid_foreign" foreign key ("artistId") references "${Table.artists}" (id) on delete cascade`);      
+
+  await knex.raw(`ALTER TABLE "${Table.artistProfiles}" drop constraint "artistprofiles_platformid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.artistProfiles}" add constraint "artistprofiles_platformid_foreign" foreign key ("platformId") references "${Table.platforms}" (id) on delete cascade`);      
+
   await knex(Table.platforms).insert([NINA_PLATFORM]);
   await addFactoryContract(knex, NINA)
 }
@@ -31,4 +50,22 @@ export const down = async (knex: Knex) => {
   await removePlatform(knex, NINA_PLATFORM, NINA)
   await knex.raw(`ALTER TABLE platforms drop constraint "platforms_type_check"`);
   await knex.raw(`ALTER TABLE "${Table.platforms}" add constraint "platforms_type_check" CHECK (type = ANY (ARRAY['noizd'::text, 'catalog'::text, 'sound'::text, 'zora'::text, 'single-track-multiprint-contract'::text, 'chaos'::text, 'mintsongs-v2'::text]))`);
+
+  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" drop constraint "erc721nfts_processedtracks_erc721nftid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" add constraint "erc721nfts_processedtracks_erc721nftid_foreign" foreign key ("erc721nftId") references "${Table.erc721nfts}" (id)`);      
+
+  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" drop constraint "erc721nfts_processedtracks_processedtrackid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" add constraint "erc721nfts_processedtracks_processedtrackid_foreign" foreign key ("processedTrackId") references "${Table.processedTracks}" (id)`);      
+
+  await knex.raw(`ALTER TABLE "${Table.processedTracks}" drop constraint "processedtracks_artistid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.processedTracks}" add constraint "processedtracks_artistid_foreign" foreign key ("artistId") references "${Table.artists}" (id)`);      
+
+  await knex.raw(`ALTER TABLE "${Table.processedTracks}" drop constraint "processedtracks_platformid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.processedTracks}" add constraint "processedtracks_platformid_foreign" foreign key ("platformId") references "${Table.platforms}" (id)`);      
+
+  await knex.raw(`ALTER TABLE "${Table.artistProfiles}" drop constraint "artistprofiles_artistid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.artistProfiles}" add constraint "artistprofiles_artistid_foreign" foreign key ("artistId") references "${Table.artists}" (id)`);      
+
+  await knex.raw(`ALTER TABLE "${Table.artistProfiles}" drop constraint "artistprofiles_platformid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.artistProfiles}" add constraint "artistprofiles_platformid_foreign" foreign key ("platformId") references "${Table.platforms}" (id)`);      
 }
