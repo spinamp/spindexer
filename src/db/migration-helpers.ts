@@ -29,7 +29,7 @@ export const removePlatform = async (knex: Knex, platform: MusicPlatform, contra
 
 }
 
-export const addFatoryContract = async(knex: Knex, contract: FactoryContract) => {
+export const addFactoryContract = async(knex: Knex, contract: FactoryContract) => {
   if (!contract.address || contract.address.length === 0) {
     throw new Error('Invalid contract address');
   }
@@ -37,7 +37,7 @@ export const addFatoryContract = async(knex: Knex, contract: FactoryContract) =>
   await knex(Table.factoryContracts).insert(dbContracts)
 }
 
-export const removeFatoryContract = async(knex: Knex, contract: FactoryContract) => {
+export const removeFactoryContract = async(knex: Knex, contract: FactoryContract) => {
   if (!contract.address || contract.address.length === 0) {
     throw new Error('Invalid contract address');
   }
