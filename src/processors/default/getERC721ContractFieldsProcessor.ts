@@ -2,7 +2,7 @@
 import { EthClient, ValidContractCallFunction } from '../../clients/ethereum';
 import { Table } from '../../db/db';
 import { fromDBRecords } from '../../db/orm';
-import { ERC721Contract } from '../../types/ethereum';
+import { ERC721Contract, ERC721ContractTypeName } from '../../types/ethereum';
 import { Clients } from '../../types/processor';
 import { Trigger } from '../../types/trigger';
 
@@ -59,7 +59,7 @@ const processorFunction = async (contracts: ERC721Contract[], clients: Clients) 
 
 export const unprocessedContracts: Trigger<undefined> = async (clients: Clients) => {
   const contracts = (await clients.db.rawSQL(
-    `select * from "${Table.erc721Contracts}" where "name" is null or "symbol" is null;`
+    `select * from "${Table.erc721Contracts}" where ("name" is null or "symbol" is null) and "contractType" != '${ERC721ContractTypeName.nina}';`
   )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return fromDBRecords(Table.erc721Contracts, contracts);
 };

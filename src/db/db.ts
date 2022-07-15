@@ -18,11 +18,12 @@ export enum Table {
 }
 
 export type WhereFunc = 'where'
-  | 'whereNull'
-  | 'andWhere'
-  | 'whereJsonPath'
-  | 'whereNotNull'
-  | 'whereIn';
+| 'whereNull'
+| 'andWhere'
+| 'whereJsonPath'
+| 'whereNotNull'
+| 'whereIn'
+| 'whereNotIn';
 
 export type WhereField = 'and';
 

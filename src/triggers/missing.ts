@@ -5,6 +5,7 @@ export const missingCreatedAtTime: (tableName: Table) => Trigger<undefined> = (t
   const nfts = (await clients.db.getRecords(tableName,
     [
       ['whereNull', ['createdAtTime']],
+      ['whereNotNull', ['createdAtEthereumBlockNumber']]
     ]
   )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return nfts;

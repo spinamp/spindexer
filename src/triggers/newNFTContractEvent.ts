@@ -43,7 +43,7 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
         return [];
       }
       contracts.forEach(contract => {
-        if (!cursor[contract.address]) {
+        if (!cursor[contract.address] && contract.startingBlock) {
           cursor[contract.address] = contract.startingBlock;
         }
       });
