@@ -12,8 +12,8 @@ const ROHKI_VROOM: ERC721Contract = {
   typeMetadata: {
     overrides: {
       track: {
-        // lossyAudioIPFSHash: 'QmcnpLmiLpMNMMpcJkKjKTgwcsUyUWTstFtRZat6TYsmBV',
-        // lossyArtworkIPFSHash: 'QmZWbY9VtabJ6ZRieUo5LoetBuBBETKeJhjF5upstj29jp',
+        lossyAudioIPFSHash: 'QmdWicgFzBY1pK2Bg9FjHTu8gvXH6bfvdS3v5XksBHPdZ8',
+        lossyArtworkIPFSHash: 'QmcjiGuADJz9v2MYVHt92Td5kEyHUhfCMQwvJav3c6a1Dv',
         title: 'Vroom',
         websiteUrl: 'https://www.rohki.xyz/'
       },
