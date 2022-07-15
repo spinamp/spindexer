@@ -15,7 +15,13 @@ export const createNinaContracts: Processor = {
   processorFunction: async (mintAddresses: string[], clients: Clients) => {
     console.log('create nina contracts processor with addresses', mintAddresses)
 
-    const connection = new web3.Connection('https://ssc-dao.genesysgo.net/');
+    const endpoint = process.env.SOLANA_PROVIDER_ENDPOINT;
+
+    if (!endpoint){
+      throw 'No solana endpoint configured'
+    }
+
+    const connection = new web3.Connection(endpoint);
 
     const metaplex = new Metaplex(connection);
     const metadataAccounts = (await metaplex.nfts().findAllByMintList(mintAddresses.map(address => convertToPublickKey(address))))
