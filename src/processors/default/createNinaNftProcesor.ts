@@ -1,7 +1,6 @@
 import { Metaplex, convertToPublickKey } from '@metaplex-foundation/js';
 import { web3 } from '@project-serum/anchor';
 import axios from 'axios';
-import knex from 'knex';
 import slugify from 'slugify';
 
 import { Table } from '../../db/db';
@@ -45,7 +44,6 @@ export const createNinaNfts: Processor = {
     // ignore nfts with no metadata
       .filter(nft => nft.metadata)
 
-    await clients.db.insert<ERC721NFT>(Table.erc721nfts, nfts)
 
     // sort nfts by date
     const sortedNfts = nfts.sort((a,b) => a.createdAtTime.getTime() - b.createdAtTime.getTime())
@@ -73,10 +71,9 @@ export const createNinaNfts: Processor = {
         createdAtEthereumBlockNumber: '100'
       }))
 
-    console.log('insert artists', artists)
 
-    await knex(Table.artists).insert(artists)
-    // .onConflict().ignore()
+    await clients.db.insert<ERC721NFT>(Table.erc721nfts, nfts)
+    await clients.db.insert<Artist>(Table.artists, artists)
   },
   initialCursor: undefined
 };

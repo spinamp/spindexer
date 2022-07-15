@@ -26,6 +26,7 @@ export const up = async (knex: Knex) => {
 }
 
 export const down = async (knex: Knex) => {
+  await knex.raw(`delete from "${Table.artists}" where id like '${NINA_PLATFORM.id}/%'`)
   await knex.raw(`delete from "${Table.erc721nfts}" where "platformId" = '${NINA_PLATFORM.id}'`)
   await knex.raw(`delete from "${Table.erc721Contracts}" where "platformId" = '${NINA_PLATFORM.id}'`)
   await removeFatoryContract(knex, NINA)
