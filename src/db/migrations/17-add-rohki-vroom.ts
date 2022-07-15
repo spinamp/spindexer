@@ -2,6 +2,7 @@
 import { Knex } from 'knex';
 
 import { ERC721Contract, ERC721ContractTypeName } from '../../types/ethereum';
+import { Table } from '../db';
 import { addErc721Contract, removeErc721Contract } from '../migration-helpers';
 
 const ROHKI_VROOM: ERC721Contract = {
@@ -27,9 +28,15 @@ const ROHKI_VROOM: ERC721Contract = {
 };
 
 export const up = async (knex: Knex) => {
+  await knex.raw(`ALTER TABLE "${Table.erc721nftProcessErrors}" drop constraint "erc721nftprocesserrors_erc721nftid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.erc721nftProcessErrors}" add constraint "erc721nftprocesserrors_erc721nftid_foreign" foreign key ("erc721nftId") references "${Table.erc721nfts}" (id) on delete cascade`);      
+
   await addErc721Contract(knex, ROHKI_VROOM)
 }
 
 export const down = async (knex: Knex) => {
+  await knex.raw(`ALTER TABLE "${Table.erc721nftProcessErrors}" drop constraint "erc721nftprocesserrors_erc721nftid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.erc721nftProcessErrors}" add constraint "erc721nftprocesserrors_erc721nftid_foreign" foreign key ("erc721nftId") references "${Table.erc721nfts}" (id)`);      
+
   await removeErc721Contract(knex, ROHKI_VROOM);
 }
