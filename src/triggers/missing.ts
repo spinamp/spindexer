@@ -12,8 +12,8 @@ export const missingCreatedAtTime: (tableName: Table) => Trigger<undefined> = (t
 };
 
 export const missingMetadataObject: Trigger<undefined> = async (clients) => {
-  const nftQuery = `select * from ${Table.erc721nfts} n
-    left outer join "${Table.erc721nftProcessErrors}" enpe
+  const nftQuery = `select * from ${Table.nfts} n
+    left outer join "${Table.nftProcessErrors}" enpe
     on n.id = enpe."erc721nftId"
     where enpe."metadataError" is null
     and n.metadata is null  
@@ -24,8 +24,8 @@ export const missingMetadataObject: Trigger<undefined> = async (clients) => {
 };
 
 export const missingMetadataIPFSHash: Trigger<undefined> = async (clients) => {
-  const nftQuery = `select * from ${Table.erc721nfts} n
-  left outer join "${Table.erc721nftProcessErrors}" enpe 
+  const nftQuery = `select * from ${Table.nfts} n
+  left outer join "${Table.nftProcessErrors}" enpe 
   on n.id = enpe."erc721nftId" 
   where enpe."metadataError" is null
   and n."metadataIPFSHash" is null`;
@@ -40,12 +40,12 @@ export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Tr
     // and returns nfts where there is no corresponding track.
     // It also filters out error tracks so that nfts where we fail
     // to create a track are not repeated.
-    const nftQuery = `select n.* from "${Table.erc721nfts}" as n
-      LEFT OUTER JOIN "${Table.erc721nfts_processedTracks}" as j
+    const nftQuery = `select n.* from "${Table.nfts}" as n
+      LEFT OUTER JOIN "${Table.nfts_processedTracks}" as j
       ON n.id = j."erc721nftId"
       LEFT OUTER JOIN "${Table.processedTracks}" as p
       ON j."processedTrackId" = p.id
-      LEFT OUTER JOIN "${Table.erc721nftProcessErrors}" as e
+      LEFT OUTER JOIN "${Table.nftProcessErrors}" as e
       ON n.id = e."erc721nftId"
       WHERE p.id is NULL AND
       e."processError" is NULL AND
@@ -63,7 +63,7 @@ export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Tr
 
 export const unprocessedNFTs: Trigger<undefined> = async (clients) => {
   const nfts = (await clients.db.rawSQL(
-    `select * from ${Table.erc721nfts} where "tokenURI" is null;`
+    `select * from ${Table.nfts} where "tokenURI" is null;`
   )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return nfts;
 };

@@ -13,7 +13,7 @@ export const categorizeZora: Processor = {
       id: n.id,
       platformId: getZoraPlatform(n),
     }));
-    await clients.db.update(Table.erc721nfts, nftUpdates);
+    await clients.db.update(Table.nfts, nftUpdates);
     console.log('Updated');
   },
   initialCursor: undefined

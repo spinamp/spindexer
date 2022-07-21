@@ -55,7 +55,7 @@ const PROCESSORS = (erc721Contracts: NftFactory[], factoryContracts: FactoryCont
 
 const updateDBLoop = async () => {
   const dbClient = await db.init();
-  const erc721Contracts = await dbClient.getRecords<NftFactory>(Table.erc721Contracts);
+  const erc721Contracts = await dbClient.getRecords<NftFactory>(Table.nftFactories);
   const factoryContracts = await dbClient.getRecords<FactoryContract>(Table.factoryContracts, [
     [
       'whereNotIn', ['contractType', [FactoryContractTypeName.ninaMintCreator]]

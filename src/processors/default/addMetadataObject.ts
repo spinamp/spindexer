@@ -51,8 +51,8 @@ const processorFunction = (erc721ContractsByAddress: { [key: string]: NftFactory
       mimeType: metadata ? metadata.mimeType : null,
     }
   });
-  await clients.db.update(Table.erc721nfts, nftUpdates);
-  await clients.db.upsert(Table.erc721nftProcessErrors,metadataErrors, 'erc721nftId');
+  await clients.db.update(Table.nfts, nftUpdates);
+  await clients.db.upsert(Table.nftProcessErrors,metadataErrors, 'erc721nftId');
 
   console.info('Batch done');
 };

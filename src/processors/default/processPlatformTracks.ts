@@ -19,8 +19,8 @@ const getNFTContracts = async (nfts: NFT[], dbClient: DBClient) => {
   }
   const contractAddresses = _.uniq(nfts.map((n: NFT) => n.contractAddress));
   const contractAddressesString = JSON.stringify(contractAddresses).replace(/\"/g, "'").replace('[', '(').replace(']', ')');
-  const contractQuery = `select * from "${Table.erc721Contracts}" where id in ${contractAddressesString}`
-  const contracts: NftFactory[] = fromDBRecords(Table.erc721Contracts, (await dbClient.rawSQL(
+  const contractQuery = `select * from "${Table.nftFactories}" where id in ${contractAddressesString}`
+  const contracts: NftFactory[] = fromDBRecords(Table.nftFactories, (await dbClient.rawSQL(
     contractQuery
   )).rows);
   return contracts;
@@ -112,7 +112,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
       erc721nftId: nft.id,
       processError: `Missing platform type for ${platform.id}`
     }))
-    await clients.db.upsert(Table.erc721nftProcessErrors, errorNFTs, 'erc721nftId');
+    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'erc721nftId');
     return;
   }
   let platformClient: TrackAPIClient | null = null;
@@ -124,7 +124,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
       erc721nftId: nft.id,
       processError: `Missing platform client`
     }))
-    await clients.db.upsert(Table.erc721nftProcessErrors, errorNFTs,'erc721nftId');
+    await clients.db.upsert(Table.nftProcessErrors, errorNFTs,'erc721nftId');
     return;
   }
   const { mapNFTsToTrackIds, mapTrack, mapArtistProfile, selectPrimaryNFTForTrackMapper } = platformType.mappers;
@@ -159,7 +159,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
     });
   }
   if (errorNFTs.length !== 0) {
-    await clients.db.upsert(Table.erc721nftProcessErrors, errorNFTs, 'erc721nftId');
+    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'erc721nftId');
   }
   if (oldIds && oldIds.length !== 0) {
     await clients.db.delete(Table.processedTracks, oldIds);
@@ -167,7 +167,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
   await clients.db.upsert(Table.artists, artists);
   await clients.db.upsert(Table.artistProfiles, (artistProfiles as unknown as Record[]), ['artistId', 'platformId']);
   await clients.db.upsert(Table.processedTracks, mergedProcessedTracks);
-  await clients.db.insert(Table.erc721nfts_processedTracks, joins);
+  await clients.db.insert(Table.nfts_processedTracks, joins);
 };
 
 export const processPlatformTracks: (platform: MusicPlatform, limit?: number) => Processor =

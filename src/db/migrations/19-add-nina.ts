@@ -9,7 +9,7 @@ import { addFactoryContract, removeFactoryContract, removePlatform } from '../mi
 const NINA_PLATFORM = {
   id: 'nina',
   type: MusicPlatformType.nina,
-  name: 'nina',
+  name: 'Nina',
 }
 
 const NINA: FactoryContract = {
@@ -19,14 +19,19 @@ const NINA: FactoryContract = {
 };
 
 export const up = async (knex: Knex) => {
+  await knex.schema.renameTable('erc721Contracts', Table.nftFactories);
+  await knex.schema.renameTable('erc721nfts_processedTracks', Table.nfts_processedTracks);
+  await knex.schema.renameTable('erc721nftProcessErrors', Table.nftProcessErrors);
+  await knex.schema.renameTable('erc721nfts', Table.nfts);
+
   await knex.raw(`ALTER TABLE platforms drop constraint "platforms_type_check"`);
   await knex.raw(`ALTER TABLE "${Table.platforms}" add constraint "platforms_type_check" CHECK (type = ANY (ARRAY['nina'::text, 'noizd'::text, 'catalog'::text, 'sound'::text, 'zora'::text, 'single-track-multiprint-contract'::text, 'chaos'::text, 'mintsongs-v2'::text]))`);
 
-  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" drop constraint "erc721nfts_processedtracks_erc721nftid_foreign"`);      
-  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" add constraint "erc721nfts_processedtracks_erc721nftid_foreign" foreign key ("erc721nftId") references "${Table.erc721nfts}" (id) on delete cascade`);      
+  await knex.raw(`ALTER TABLE "${Table.nfts_processedTracks}" drop constraint "erc721nfts_processedtracks_erc721nftid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.nfts_processedTracks}" add constraint "erc721nfts_processedtracks_erc721nftid_foreign" foreign key ("erc721nftId") references "${Table.nfts}" (id) on delete cascade`);      
 
-  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" drop constraint "erc721nfts_processedtracks_processedtrackid_foreign"`);      
-  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" add constraint "erc721nfts_processedtracks_processedtrackid_foreign" foreign key ("processedTrackId") references "${Table.processedTracks}" (id) on delete cascade`);      
+  await knex.raw(`ALTER TABLE "${Table.nfts_processedTracks}" drop constraint "erc721nfts_processedtracks_processedtrackid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.nfts_processedTracks}" add constraint "erc721nfts_processedtracks_processedtrackid_foreign" foreign key ("processedTrackId") references "${Table.processedTracks}" (id) on delete cascade`);      
 
   await knex.raw(`ALTER TABLE "${Table.processedTracks}" drop constraint "processedtracks_artistid_foreign"`);      
   await knex.raw(`ALTER TABLE "${Table.processedTracks}" add constraint "processedtracks_artistid_foreign" foreign key ("artistId") references "${Table.artists}" (id) on delete cascade`);      
@@ -49,12 +54,12 @@ export const up = async (knex: Knex) => {
     table.string('slug', 1020).alter();
   })
 
-  await knex.schema.alterTable(Table.erc721Contracts, table => {
+  await knex.schema.alterTable(Table.nftFactories, table => {
     table.enu('standard', Object.values(NFTStandard)).defaultTo(NFTStandard.ERC721)
   })
 
-  await knex.schema.alterTable(Table.erc721nfts, table => {
-    table.foreign('contractAddress').references('id').inTable(Table.erc721Contracts).onDelete('CASCADE')
+  await knex.schema.alterTable(Table.nfts, table => {
+    table.foreign('contractAddress').references('id').inTable(Table.nftFactories).onDelete('CASCADE')
   })
 
   await knex(Table.platforms).insert([NINA_PLATFORM]);
@@ -68,11 +73,11 @@ export const down = async (knex: Knex) => {
   await knex.raw(`ALTER TABLE platforms drop constraint "platforms_type_check"`);
   await knex.raw(`ALTER TABLE "${Table.platforms}" add constraint "platforms_type_check" CHECK (type = ANY (ARRAY['noizd'::text, 'catalog'::text, 'sound'::text, 'zora'::text, 'single-track-multiprint-contract'::text, 'chaos'::text, 'mintsongs-v2'::text]))`);
 
-  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" drop constraint "erc721nfts_processedtracks_erc721nftid_foreign"`);      
-  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" add constraint "erc721nfts_processedtracks_erc721nftid_foreign" foreign key ("erc721nftId") references "${Table.erc721nfts}" (id)`);      
+  await knex.raw(`ALTER TABLE "${Table.nfts_processedTracks}" drop constraint "erc721nfts_processedtracks_erc721nftid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.nfts_processedTracks}" add constraint "erc721nfts_processedtracks_erc721nftid_foreign" foreign key ("erc721nftId") references "${Table.nfts}" (id)`);      
 
-  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" drop constraint "erc721nfts_processedtracks_processedtrackid_foreign"`);      
-  await knex.raw(`ALTER TABLE "${Table.erc721nfts_processedTracks}" add constraint "erc721nfts_processedtracks_processedtrackid_foreign" foreign key ("processedTrackId") references "${Table.processedTracks}" (id)`);      
+  await knex.raw(`ALTER TABLE "${Table.nfts_processedTracks}" drop constraint "erc721nfts_processedtracks_processedtrackid_foreign"`);      
+  await knex.raw(`ALTER TABLE "${Table.nfts_processedTracks}" add constraint "erc721nfts_processedtracks_processedtrackid_foreign" foreign key ("processedTrackId") references "${Table.processedTracks}" (id)`);      
 
   await knex.raw(`ALTER TABLE "${Table.processedTracks}" drop constraint "processedtracks_artistid_foreign"`);      
   await knex.raw(`ALTER TABLE "${Table.processedTracks}" add constraint "processedtracks_artistid_foreign" foreign key ("artistId") references "${Table.artists}" (id)`);      
@@ -95,11 +100,16 @@ export const down = async (knex: Knex) => {
     table.string('slug', 255).alter();
   })
 
-  await knex.schema.alterTable(Table.erc721Contracts, table => {
+  await knex.schema.alterTable(Table.nftFactories, table => {
     table.dropColumn('standard')
   })
 
-  await knex.schema.alterTable(Table.erc721nfts, table => {
+  await knex.schema.alterTable(Table.nfts, table => {
     table.dropForeign('contractAddress')
   })
+
+  await knex.schema.renameTable(Table.nftFactories,'erc721Contracts');
+  await knex.schema.renameTable( Table.nfts_processedTracks,'erc721nfts_processedTracks');
+  await knex.schema.renameTable(Table.nftProcessErrors,'erc721nftProcessErrors');
+  await knex.schema.renameTable(Table.nfts,'erc721nfts');
 }

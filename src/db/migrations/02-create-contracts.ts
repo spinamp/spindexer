@@ -25,7 +25,7 @@ const INITIAL_CONTRACTS = [
 
 export const up = async (knex: Knex) => {
   console.log('Running create contracts bootstrap');
-  await knex.schema.createTable(Table.erc721Contracts, (table: Knex.CreateTableBuilder) => {
+  await knex.schema.createTable(Table.nftFactories, (table: Knex.CreateTableBuilder) => {
     table.string('id').primary();
     table.string('platformId');
     table.foreign('platformId').references('id').inTable('platforms');

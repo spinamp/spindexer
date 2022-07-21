@@ -3,7 +3,7 @@ import { Knex } from 'knex';
 import { Table } from '../db';
 
 const JOIN_TABLE = {
-  name: Table.erc721nfts_processedTracks, create: (table: Knex.CreateTableBuilder) => {
+  name: Table.nfts_processedTracks, create: (table: Knex.CreateTableBuilder) => {
     table.string('erc721nftId').references('id').inTable('erc721nfts');
     table.string('processedTrackId').references('id').inTable('processedTracks');
     table.primary(['erc721nftId','processedTrackId']);
@@ -11,7 +11,7 @@ const JOIN_TABLE = {
 };
 
 const ERROR_TABLE = {
-  name: Table.erc721nftProcessErrors, create: (table: Knex.CreateTableBuilder) => {
+  name: Table.nftProcessErrors, create: (table: Knex.CreateTableBuilder) => {
     table.string('erc721nftId').references('id').inTable('erc721nfts');
     table.primary(['erc721nftId']);
     table.string('processError', 3000);

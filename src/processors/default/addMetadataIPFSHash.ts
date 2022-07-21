@@ -13,7 +13,7 @@ const processorFunction = (erc721ContractsByAddress: { [key: string]: NftFactory
     id: n.id,
     metadataIPFSHash: getMetadataIPFSHash(n, erc721ContractsByAddress)
   }))
-  await clients.db.update(Table.erc721nfts, nftUpdates);
+  await clients.db.update(Table.nfts, nftUpdates);
 };
 
 export const addMetadataIPFSHashProcessor: (erc721ContractsByAddress: { [key: string]: NftFactory }) => Processor =

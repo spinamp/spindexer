@@ -25,8 +25,8 @@ const processorFunction = (table: Table) => async (items: Record, clients: Clien
 
 export const addTimestampToERC721NFTs = {
   name: 'addTimestampToERC721NFTs',
-  trigger: missingCreatedAtTime(Table.erc721nfts),
-  processorFunction: processorFunction(Table.erc721nfts),
+  trigger: missingCreatedAtTime(Table.nfts),
+  processorFunction: processorFunction(Table.nfts),
 };
 
 export const addTimestampToERC721Transfers = {

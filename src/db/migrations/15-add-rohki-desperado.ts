@@ -36,14 +36,14 @@ const ROHKI_DESPERADO: NftFactory = {
 };
 
 export const up = async (knex: Knex) => {
-  await knex.schema.alterTable(Table.erc721Contracts, table => {
+  await knex.schema.alterTable(Table.nftFactories, table => {
     table.jsonb('typeMetadata')
   })
   await addPlatform(knex, ROHKI_PLATFORM, ROHKI_DESPERADO)
 }
 
 export const down = async (knex: Knex) => {
-  await knex.schema.alterTable(Table.erc721Contracts, table => {
+  await knex.schema.alterTable(Table.nftFactories, table => {
     table.dropColumn('typeMetadata')
   })
   await removeErc721Contract(knex, ROHKI_DESPERADO);

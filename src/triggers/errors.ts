@@ -5,7 +5,7 @@ const NUMBER_OF_RETRIES = parseInt(process.env.NUMBER_OF_ERROR_RETRIES!);
 
 export const errorRetry: Trigger<undefined> = async (clients) => {
   const nftQuery = `select * 
-  from "${Table.erc721nftProcessErrors}"
+  from "${Table.nftProcessErrors}"
   where "numberOfRetries" < '${NUMBER_OF_RETRIES}'
   limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
 `

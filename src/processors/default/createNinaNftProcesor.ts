@@ -34,8 +34,8 @@ export const createNinaNfts: Processor = {
       symbol: account.metadata.symbol
     }));
 
-    await clients.db.insert<Partial<NftFactory>>(Table.erc721Contracts, nftFactories)
-    await clients.db.insert<Partial<NFT>>(Table.erc721nfts, nfts)
+    await clients.db.insert<Partial<NftFactory>>(Table.nftFactories, nftFactories)
+    await clients.db.insert<Partial<NFT>>(Table.nfts, nfts)
   },
   initialCursor: undefined
 };

@@ -18,7 +18,7 @@ export const addTimestampFromMetadata: Processor = {
       }
     })
 
-    await clients.db.upsert<NFT>(Table.erc721nfts, updatedNfts);
+    await clients.db.upsert<NFT>(Table.nfts, updatedNfts);
   },
   initialCursor: undefined
 };

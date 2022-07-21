@@ -12,7 +12,7 @@ const INITIAL_TABLES = [
     }
   },
   {
-    name: Table.erc721nfts, create: (table: Knex.CreateTableBuilder) => {
+    name: Table.nfts, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
       table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');

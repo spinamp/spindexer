@@ -14,7 +14,7 @@ const toDBRecord = <RecordType>(record: RecordType | RecordUpdate<unknown>) => {
 }
 
 const toRecordMapper: any = {
-  [Table.erc721Contracts]: (erc721Contracts: NftFactory[]): IdField[] => erc721Contracts.map((c: any) => {
+  [Table.nftFactories]: (erc721Contracts: NftFactory[]): IdField[] => erc721Contracts.map((c: any) => {
     return ({
       id: c.platformId === MusicPlatformType.nina ? c.address : c.address.toLowerCase(),
       platformId: c.platformId,
@@ -46,11 +46,11 @@ export const toDBRecords = <RecordType>(tableName: string, records: (RecordType 
 }
 
 const fromRecordMapper: any = {
-  [Table.erc721nfts]: (nfts: Record[]): NFT[] => nfts.map((n: any) => {
+  [Table.nfts]: (nfts: Record[]): NFT[] => nfts.map((n: any) => {
     const metadata = typeof n.metadata === 'object' ? n.metadata : JSON.parse(n.metadata);
     return ({ ...n, metadata });
   }),
-  [Table.erc721Contracts]: (erc721Contracts: Record[]): NftFactory[] => erc721Contracts.map((c: any) => {
+  [Table.nftFactories]: (erc721Contracts: Record[]): NftFactory[] => erc721Contracts.map((c: any) => {
     return ({
       address: c.id,
       platformId: c.platformId,

@@ -54,14 +54,14 @@ export const getERC721ContractFields = async (contracts: NftFactory[], ethClient
 
 const processorFunction = async (contracts: NftFactory[], clients: Clients) => {
   const contractUpdates = await getERC721ContractFields(contracts, clients.eth);
-  await clients.db.update(Table.erc721Contracts, contractUpdates);
+  await clients.db.update(Table.nftFactories, contractUpdates);
 };
 
 export const unprocessedContracts: Trigger<undefined> = async (clients: Clients) => {
   const contracts = (await clients.db.rawSQL(
-    `select * from "${Table.erc721Contracts}" where ("name" is null or "symbol" is null) and "standard" = '${NFTStandard.ERC721}';`
+    `select * from "${Table.nftFactories}" where ("name" is null or "symbol" is null) and "standard" = '${NFTStandard.ERC721}';`
   )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
-  return fromDBRecords(Table.erc721Contracts, contracts);
+  return fromDBRecords(Table.nftFactories, contracts);
 };
 
 export const getERC721ContractFieldsProcessor = {

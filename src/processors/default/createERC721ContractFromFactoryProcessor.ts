@@ -16,7 +16,7 @@ const processorFunction = (factoryContract: FactoryContract, name: string) =>
     if (eventToNftFactory){
       const newERC721ContractObjects = events.map(e => eventToNftFactory(e));
       console.log({ newERC721ContractObjects })
-      await clients.db.insert(Table.erc721Contracts, newERC721ContractObjects);
+      await clients.db.insert(Table.nftFactories, newERC721ContractObjects);
       await clients.db.updateProcessor(name, newCursor);
     } else {
       console.log('no eventToNftFactory specified')

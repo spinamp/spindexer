@@ -2,7 +2,7 @@ import { Table } from '../db/db';
 import { Trigger } from '../types/trigger';
 
 export const nonAudioMetadata: Trigger<undefined> = async (clients) => {
-  const nfts = (await clients.db.getRecords(Table.erc721nfts,
+  const nfts = (await clients.db.getRecords(Table.nfts,
     [
       [
         'whereIn', ['mimeType',

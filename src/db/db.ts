@@ -4,16 +4,16 @@ import { Cursor } from '../types/trigger'
 
 export enum Table {
   platforms = 'platforms',
-  erc721nfts = 'erc721nfts',
+  nfts = 'nfts',
   erc721Transfers = 'erc721Transfers',
   artists = 'artists',
   artistProfiles = 'artistProfiles',
   processedTracks = 'processedTracks',
   processors = 'processors',
   factoryContracts = 'factoryContracts',
-  erc721Contracts = 'erc721Contracts',
-  erc721nfts_processedTracks = 'erc721nfts_processedTracks',
-  erc721nftProcessErrors = 'erc721nftProcessErrors',
+  nftFactories = 'nftFactories',
+  nfts_processedTracks = 'nfts_processedTracks',
+  nftProcessErrors = 'nftProcessErrors',
   ipfsPins = 'ipfsPins',
 }
 

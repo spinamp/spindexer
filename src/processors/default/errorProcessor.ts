@@ -14,7 +14,7 @@ export const errorProcessor: Processor = {
       processError: undefined,
       numberOfRetries: n.numberOfRetries + 1
     }));
-    await clients.db.upsert(Table.erc721nftProcessErrors, nftUpdates, 'erc721nftId');
+    await clients.db.upsert(Table.nftProcessErrors, nftUpdates, 'erc721nftId');
   },
   initialCursor: undefined
 };

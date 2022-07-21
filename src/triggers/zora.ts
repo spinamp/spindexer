@@ -4,8 +4,8 @@ import { ZORA_CONTRACT_ADDRESS } from '../types/zora-contract';
 
 export const zoraNFTs: Trigger<undefined> = async (clients) => {
   const nftQuery = `select * 
-  from "${Table.erc721nfts}" en 
-  left outer join "${Table.erc721nftProcessErrors}" enpe 
+  from "${Table.nfts}" en 
+  left outer join "${Table.nftProcessErrors}" enpe 
   on en.id = enpe."erc721nftId" 
   where en."contractAddress" = '${ZORA_CONTRACT_ADDRESS}'
   and en.metadata is not null

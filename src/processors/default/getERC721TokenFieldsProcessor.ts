@@ -51,7 +51,7 @@ export const getERC721TokenFields = async (nfts: NFT[], ethClient: EthClient, er
 
 const processorFunction = (erc721ContractsByAddress: { [key: string]: NftFactory }) => async (nfts: NFT[], clients: Clients) => {
   const nftMetadataUpdates = await getERC721TokenFields(nfts, clients.eth, erc721ContractsByAddress);
-  await clients.db.update(Table.erc721nfts, nftMetadataUpdates);
+  await clients.db.update(Table.nfts, nftMetadataUpdates);
 };
 
 export const getERC721TokenFieldsProcessor: (erc721ContractsByAddress: { [key: string]: NftFactory }) => Processor =

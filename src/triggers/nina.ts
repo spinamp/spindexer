@@ -41,7 +41,7 @@ export const newNinaContracts: Trigger<undefined> = async (clients) => {
       )
   ).filter(x => x);
 
-  const existingContracts = (await clients.db.getRecords<NFT>(Table.erc721nfts, [
+  const existingContracts = (await clients.db.getRecords<NFT>(Table.nfts, [
     [
       'where', ['platformId', MusicPlatformType.nina]
     ]
@@ -59,7 +59,7 @@ export const missingCreatedAtTimeWithMetadataDate: Trigger<undefined> = async (c
 
   const nftQuery = `
     select *
-    from "${Table.erc721nfts}"
+    from "${Table.nfts}"
     where "createdAtTime" is null
     and metadata -> 'properties' -> 'date' is not null
     limit ${process.env.QUERY_TRIGGER_BATCH_SIZE}
