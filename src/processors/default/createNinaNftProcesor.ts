@@ -1,4 +1,4 @@
-import { Nft } from '@metaplex-foundation/js';
+import * as MetaplexFoundation from '@metaplex-foundation/js';
 
 import { Table } from '../../db/db';
 import { newNinaContracts } from '../../triggers/nina';
@@ -11,7 +11,7 @@ export const createNinaNfts: Processor = {
 
   name: 'createNinaNfts',
   trigger: newNinaContracts,
-  processorFunction: async (metadataAccounts: Nft[], clients: Clients) => {
+  processorFunction: async (metadataAccounts: MetaplexFoundation.Nft[], clients: Clients) => {
     const nfts = metadataAccounts.map((metadataAccount) => {
       const mintAddress = metadataAccount!.mint.toBase58();
 

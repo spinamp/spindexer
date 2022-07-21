@@ -1,4 +1,4 @@
-import { Metaplex } from '@metaplex-foundation/js';
+import * as MetaplexFoundation from '@metaplex-foundation/js';
 import { web3, AnchorProvider, Program, Wallet } from '@project-serum/anchor';
 import { Keypair } from '@solana/web3.js';
 
@@ -28,7 +28,7 @@ export const newNinaContracts: Trigger<undefined> = async (clients) => {
     provider,
   )
 
-  const metaplex = new Metaplex(connection);
+  const metaplex = new MetaplexFoundation.Metaplex(connection);
 
   // Fetch all releases from Solana via Anchor
   const releases = await nina.account.release.all();
