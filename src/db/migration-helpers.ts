@@ -76,7 +76,7 @@ export const clearERC721Contract = async(knex: Knex, contract: ERC721ContractAdd
   const updatedCursor = JSON.stringify(parsedCursor);
   await knex.raw(`update processors set cursor='${updatedCursor}' where id='createERC721NFTsFromTransfers';`);
 
-  clearERC721ContractTracks(knex, contract);
+  await clearERC721ContractTracks(knex, contract);
 
   await knex(Table.nftProcessErrors)
     .whereILike('erc721nftId', `%${contract.address}%`)
