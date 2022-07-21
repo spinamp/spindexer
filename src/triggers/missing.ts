@@ -51,8 +51,10 @@ export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Tr
       e."processError" is NULL AND
       e."metadataError" is NULL AND
       n."platformId"='${platformId}'
+      and n."createdAtTime" is NOT NULL
       ORDER BY n."createdAtTime"
       LIMIT ${limit}`
+
     const nfts = (await clients.db.rawSQL(
       nftQuery
     )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));

@@ -40,6 +40,16 @@ export const up = async (knex: Knex) => {
   await knex.raw(`ALTER TABLE "${Table.artistProfiles}" drop constraint "artistprofiles_platformid_foreign"`);      
   await knex.raw(`ALTER TABLE "${Table.artistProfiles}" add constraint "artistprofiles_platformid_foreign" foreign key ("platformId") references "${Table.platforms}" (id) on delete cascade`);      
 
+  await knex.schema.alterTable(Table.processedTracks, table => {
+    table.text('description').alter();
+    table.text('title').alter();
+    table.text('lossyArtworkURL').alter();
+    table.text('lossyAudioURL').alter();
+    table.text('websiteUrl').alter();
+    table.string('slug', 1020).alter();
+
+  })
+
   await knex(Table.platforms).insert([NINA_PLATFORM]);
   await addFactoryContract(knex, NINA)
 }
@@ -68,4 +78,14 @@ export const down = async (knex: Knex) => {
 
   await knex.raw(`ALTER TABLE "${Table.artistProfiles}" drop constraint "artistprofiles_platformid_foreign"`);      
   await knex.raw(`ALTER TABLE "${Table.artistProfiles}" add constraint "artistprofiles_platformid_foreign" foreign key ("platformId") references "${Table.platforms}" (id)`);      
+
+  await knex.schema.alterTable(Table.processedTracks, table => {
+    table.string('description', 50000).alter();
+    table.string('title', 255).alter();
+    table.string('lossyArtworkURL', 3000).alter();
+    table.string('lossyAudioURL', 3000).alter();
+    table.string('websiteUrl',3000).alter();
+    table.string('slug', 255).alter();
+
+  })
 }

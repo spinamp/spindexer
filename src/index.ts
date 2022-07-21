@@ -7,11 +7,11 @@ import { Table } from './db/db';
 import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
+import { addTimestampFromMetadata } from './processors/default/addTimestampFromMetadata';
 import { addTimestampToERC721NFTs, addTimestampToERC721Transfers } from './processors/default/addTimestampToERC721NFTs';
 import { categorizeZora } from './processors/default/categorizeZora';
 import { createERC721ContractFromFactoryProcessor } from './processors/default/createERC721ContractFromFactoryProcessor';
 import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
-import { createNinaContracts } from './processors/default/createNinaContracts';
 import { createNinaNfts } from './processors/default/createNinaNftProcesor';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
 import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
@@ -49,8 +49,8 @@ const PROCESSORS = (erc721Contracts: ERC721Contract[], factoryContracts: Factory
     ipfsAudioPinner,
     ipfsArtworkPinner,
     errorProcessor,
-    createNinaContracts,
-    createNinaNfts
+    createNinaNfts,
+    addTimestampFromMetadata,
   ]
 };
 

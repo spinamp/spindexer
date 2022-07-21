@@ -14,7 +14,7 @@ const name = 'addMetadataObject';
 const getMetadataObject = (nft: ERC721NFT, timeout: number, axios: Axios, ipfs: IPFSClient, erc721ContractsByAddress: { [key: string]: ERC721Contract }): Promise<AxiosResponse> => {
   const address = nft.contractAddress;
   const contract = erc721ContractsByAddress[address];
-  const contractTypeName = contract.contractType;
+  const contractTypeName = contract?.contractType;
 
   const metadataURL = getMetadataURL(nft, contractTypeName);
   if (!metadataURL) {
