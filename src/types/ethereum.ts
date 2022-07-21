@@ -8,7 +8,7 @@ import { ProcessedTrack } from './track'
 
 export const ETHEREUM_NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
-export type EthereumContract = {
+export type Contract = {
   address: string,
   startingBlock?: string,
 }
@@ -18,7 +18,7 @@ export enum FactoryContractTypeName {
   ninaMintCreator = 'ninaMintCreator'
 }
 
-export type FactoryContract = EthereumContract & {
+export type FactoryContract = Contract & {
   platformId: string,
   contractType: FactoryContractTypeName,
   gap?: string
@@ -26,35 +26,35 @@ export type FactoryContract = EthereumContract & {
 
 export type FactoryContractType = {
   newContractCreatedEvent: string,
-  creationEventToERC721Contract: (event: ethers.Event) => ERC721Contract
+  creationEventToNftFactory?: (event: ethers.Event) => NftFactory
 }
 
 type FactoryContractTypes = {
-  [type in FactoryContractTypeName]: FactoryContractType
+  [type in FactoryContractTypeName]?: FactoryContractType
 }
 
 export const FactoryContractTypes: FactoryContractTypes = {
   soundArtistProfileCreator: {
     newContractCreatedEvent: 'CreatedArtist',
-    creationEventToERC721Contract: (event: any) => ({
+    creationEventToNftFactory: (event: any) => ({
       address: formatAddress(event.args!.artistAddress),
       platformId: 'sound',
       startingBlock: event.blockNumber,
-      contractType: ERC721ContractTypeName.default,
+      contractType: NFTContractTypeName.default,
+      standard: NFTStandard.ERC721
     })
-  },
-  ninaMintCreator: {
-    newContractCreatedEvent: 'not implemeted',
-    creationEventToERC721Contract: (event: any) => {
-      throw 'creationEventToERC721Contract not implemented'
-    }
   }
 }
 
-export enum ERC721ContractTypeName {
+export enum NFTContractTypeName {
   default = 'default',
   zora = 'zora',
   nina = 'nina'
+}
+
+export enum NFTStandard {
+  ERC721 = 'erc721',
+  METAPLEX = 'metaplex'
 }
 
 export type TypeMetadata = {
@@ -64,22 +64,23 @@ export type TypeMetadata = {
   }
 }
 
-export type ERC721Contract = EthereumContract & {
+export type NftFactory = Contract & {
   platformId: string,
-  contractType: ERC721ContractTypeName,
+  contractType: NFTContractTypeName,
   name?: string,
   symbol?: string,
   typeMetadata?: TypeMetadata
+  standard: NFTStandard
 }
 
-export type ERC721ContractType = {
+export type NFTContractType = {
   contractCalls: ValidContractNFTCallFunction[],
   contractMetadataField: ValidContractNFTCallFunction,
   buildNFTId: (contractAddress: string, tokenId: bigint) => string,
 }
 
 type ERC721ContractTypes = {
-  [type in ERC721ContractTypeName]: ERC721ContractType
+  [type in NFTContractTypeName]?: NFTContractType
 }
 
 export const NFTContractTypes: ERC721ContractTypes = {
@@ -92,11 +93,6 @@ export const NFTContractTypes: ERC721ContractTypes = {
     contractCalls: [ValidContractNFTCallFunction.tokenURI, ValidContractNFTCallFunction.tokenMetadataURI],
     contractMetadataField: ValidContractNFTCallFunction.tokenMetadataURI,
     buildNFTId: buildERC721Id,
-  },
-  nina: {
-    contractCalls: [],
-    buildNFTId: () => {throw 'not implementd buildNFTID'},
-    contractMetadataField: ValidContractNFTCallFunction.tokenURI
   }
 }
 

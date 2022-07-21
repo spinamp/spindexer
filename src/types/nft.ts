@@ -1,9 +1,14 @@
 import { ValidContractNFTCallFunction } from '../clients/ethereum';
 
-import { ERC721ContractTypeName, NFTContractTypes } from './ethereum';
+import { NFTContractTypeName, NFTContractTypes, NFTStandard } from './ethereum';
 import { Record } from './record';
 
-export type ERC721NFT = Record & {
+export enum Chain {
+  ETHEREUM = 'ethereum',
+  SOLANA = 'solana'
+}
+
+export type NFT = Record & {
   contractAddress: string
   tokenId: bigint
   platformId: string
@@ -13,6 +18,7 @@ export type ERC721NFT = Record & {
   metadata?: any
   mimeType?: string
   owner: string
+  standard: NFTStandard;
 }
 
 export type ERC721Transfer = Record & {
@@ -22,9 +28,9 @@ export type ERC721Transfer = Record & {
   tokenId: bigint
 };
 
-export const getNFTContractCalls = (nft: ERC721NFT, contractTypeName: ERC721ContractTypeName) => {
+export const getNFTContractCalls = (nft: NFT, contractTypeName: NFTContractTypeName) => {
   const contractType = NFTContractTypes[contractTypeName];
-  return contractType.contractCalls.map(call => {
+  return contractType?.contractCalls.map(call => {
     return {
       contractAddress: nft.contractAddress,
       callFunction: call,
@@ -33,7 +39,7 @@ export const getNFTContractCalls = (nft: ERC721NFT, contractTypeName: ERC721Cont
   });
 };
 
-export const getNFTMetadataField = (nft: ERC721NFT, field: string) => {
+export const getNFTMetadataField = (nft: NFT, field: string) => {
   if (!nft) {
     throw new Error('NFT missing');
   }
@@ -46,7 +52,7 @@ export const getNFTMetadataField = (nft: ERC721NFT, field: string) => {
   return nft.metadata[field];
 }
 
-export const getTrait = (nft: ERC721NFT, type: string) => {
+export const getTrait = (nft: NFT, type: string) => {
   if (!nft.metadata) {
     console.error({ nft })
     throw new Error('Missing nft metadata');

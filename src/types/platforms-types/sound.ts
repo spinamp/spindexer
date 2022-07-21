@@ -5,7 +5,7 @@ import { extractHashFromURL } from '../../clients/ipfs';
 import sound from '../../clients/sound';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { ERC721NFT, getNFTMetadataField } from '../erc721nft';
+import { NFT, getNFTMetadataField } from '../nft';
 import { ProcessedTrack } from '../track';
 
 const mapAPITrackToArtistID = (apiTrack: any): string => {
@@ -13,7 +13,7 @@ const mapAPITrackToArtistID = (apiTrack: any): string => {
 };
 
 const mapTrack = (
-  nft: ERC721NFT,
+  nft: NFT,
   apiTrack: any
 ): ProcessedTrack => {
   if (!apiTrack.tracks[0].audio) {
@@ -40,7 +40,7 @@ const mapTrack = (
   })
 };
 
-const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT }): ArtistProfile => {
+const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): ArtistProfile => {
   const artist = apiTrack.artist
   return {
     name: artist.name,
@@ -56,7 +56,7 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT })
   }
 };
 
-const mapNFTsToTrackIds = async (nfts: ERC721NFT[]): Promise<{ [trackId: string]: ERC721NFT[] }> => {
+const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
   const soundClient = await sound.init();
   const tracksByNFT = await soundClient.fetchTracksByNFT(nfts);
   return _.groupBy(nfts, nft => tracksByNFT[nft.id]);

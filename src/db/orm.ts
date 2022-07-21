@@ -1,5 +1,5 @@
-import { ERC721NFT } from '../types/erc721nft';
-import { ERC721Contract, FactoryContract } from '../types/ethereum';
+import { NftFactory, FactoryContract } from '../types/ethereum';
+import { NFT } from '../types/nft';
 import { MusicPlatformType } from '../types/platform';
 import { IdField, Record, RecordUpdate } from '../types/record';
 
@@ -14,7 +14,7 @@ const toDBRecord = <RecordType>(record: RecordType | RecordUpdate<unknown>) => {
 }
 
 const toRecordMapper: any = {
-  [Table.erc721Contracts]: (erc721Contracts: ERC721Contract[]): IdField[] => erc721Contracts.map((c: any) => {
+  [Table.erc721Contracts]: (erc721Contracts: NftFactory[]): IdField[] => erc721Contracts.map((c: any) => {
     return ({
       id: c.platformId === MusicPlatformType.nina ? c.address : c.address.toLowerCase(),
       platformId: c.platformId,
@@ -22,7 +22,8 @@ const toRecordMapper: any = {
       contractType: c.contractType,
       name: c.name,
       symbol: c.symbol,
-      typeMetadata: c.typeMetadata
+      typeMetadata: c.typeMetadata,
+      standard: c.standard
     });
   }),
   [Table.factoryContracts]: (factoryContracts: FactoryContract[]): IdField[] => factoryContracts.map((c: any) => {
@@ -45,11 +46,11 @@ export const toDBRecords = <RecordType>(tableName: string, records: (RecordType 
 }
 
 const fromRecordMapper: any = {
-  [Table.erc721nfts]: (nfts: Record[]): ERC721NFT[] => nfts.map((n: any) => {
+  [Table.erc721nfts]: (nfts: Record[]): NFT[] => nfts.map((n: any) => {
     const metadata = typeof n.metadata === 'object' ? n.metadata : JSON.parse(n.metadata);
     return ({ ...n, metadata });
   }),
-  [Table.erc721Contracts]: (erc721Contracts: Record[]): ERC721Contract[] => erc721Contracts.map((c: any) => {
+  [Table.erc721Contracts]: (erc721Contracts: Record[]): NftFactory[] => erc721Contracts.map((c: any) => {
     return ({
       address: c.id,
       platformId: c.platformId,
@@ -57,10 +58,11 @@ const fromRecordMapper: any = {
       contractType: c.contractType,
       name: c.name,
       symbol: c.symbol,
-      typeMetadata: c.typeMetadata
+      typeMetadata: c.typeMetadata,
+      standard: c.standard
     });
   }),
-  [Table.factoryContracts]: (factoryContracts: Record[]): ERC721Contract[] => factoryContracts.map((c: any) => {
+  [Table.factoryContracts]: (factoryContracts: Record[]): FactoryContract[] => factoryContracts.map((c: any) => {
     return ({
       address: c.id,
       platformId: c.platformId,

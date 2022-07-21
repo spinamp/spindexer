@@ -1,8 +1,8 @@
 import { DBClient } from '../db/db';
 
 import { ArtistProfile } from './artist';
-import { ERC721NFT } from './erc721nft';
-import { ERC721Contract } from './ethereum';
+import { NftFactory } from './ethereum';
+import { NFT } from './nft';
 import catalogMappers from './platforms-types/catalog';
 import chaosMappers from './platforms-types/chaos';
 import mintsongsV2Mappers from './platforms-types/mintsongs-v2';
@@ -30,10 +30,10 @@ export type MusicPlatform = {
 }
 
 export type PlatformMapper = {
-  mapNFTsToTrackIds: (nfts: ERC721NFT[], dbClient?: DBClient) => Promise<{ [trackId: string]: ERC721NFT[] }>
-  mapTrack: (nft: ERC721NFT, apiTrack: any, contract?: ERC721Contract) => ProcessedTrack
-  mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ERC721NFT, contract?: ERC721Contract }) => ArtistProfile
-  selectPrimaryNFTForTrackMapper?: (nfts: ERC721NFT[]) => ERC721NFT
+  mapNFTsToTrackIds: (nfts: NFT[], dbClient?: DBClient) => Promise<{ [trackId: string]: NFT[] }>
+  mapTrack: (nft: NFT, apiTrack: any, contract?: NftFactory) => ProcessedTrack
+  mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NFT, contract?: NftFactory }) => ArtistProfile
+  selectPrimaryNFTForTrackMapper?: (nfts: NFT[]) => NFT
 }
 
 export type MusicPlatformTypeConfig = {

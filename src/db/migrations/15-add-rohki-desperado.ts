@@ -1,7 +1,7 @@
 
 import { Knex } from 'knex';
 
-import { ERC721Contract, ERC721ContractTypeName } from '../../types/ethereum';
+import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/ethereum';
 import { MusicPlatformType } from '../../types/platform';
 import { Table } from '../db';
 import { addPlatform, removeErc721Contract, removePlatform } from '../migration-helpers';
@@ -12,11 +12,12 @@ const ROHKI_PLATFORM = {
   name: 'RŌHKI',
 }
 
-const ROHKI_DESPERADO: ERC721Contract = {
+const ROHKI_DESPERADO: NftFactory = {
   address: '0xe8e7Eb47dD7eaFeC80c1EF7f0aE39beE6Dbce469',
   startingBlock: '14779299',
   platformId: ROHKI_PLATFORM.id,
-  contractType: ERC721ContractTypeName.default,
+  contractType: NFTContractTypeName.default,
+  standard: NFTStandard.METAPLEX,
   typeMetadata: {
     overrides: {
       track: {

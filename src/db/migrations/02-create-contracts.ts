@@ -1,25 +1,25 @@
 import { Knex } from 'knex';
 
-import { ERC721ContractTypeName } from '../../types/ethereum';
+import { NFTContractTypeName } from '../../types/ethereum';
 import { Table } from '../db';
 
 const INITIAL_CONTRACTS = [
   {
     id: '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7',
     startingBlock: '11565020',
-    contractType: ERC721ContractTypeName.zora,
+    contractType: NFTContractTypeName.zora,
   },
   {
     id: '0xf5819e27b9bad9f97c177bf007c1f96f26d91ca6',
     platformId: 'noizd',
     startingBlock: '13470560',
-    contractType: ERC721ContractTypeName.default,
+    contractType: NFTContractTypeName.default,
   },
   {
     id: '0x0bc2a24ce568dad89691116d5b34deb6c203f342',
     platformId: 'catalog',
     startingBlock: '14566825',
-    contractType: ERC721ContractTypeName.default,
+    contractType: NFTContractTypeName.default,
   }
 ]
 

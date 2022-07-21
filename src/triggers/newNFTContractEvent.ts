@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { ContractFilter } from '../clients/ethereum';
-import { ERC721Contract, EthereumContract, FactoryContract, FactoryContractTypes } from '../types/ethereum';
+import { NftFactory, Contract, FactoryContract, FactoryContractTypes } from '../types/ethereum';
 import { Clients } from '../types/processor';
 import { Cursor, Trigger, TriggerOutput } from '../types/trigger';
 
@@ -35,8 +35,8 @@ type ContractsEventsCursor = {
   [contractAddress: string]: string
 };
 
-export const newEthereumEvents: (contracts: EthereumContract[], contractFilters: ContractFilter[], gap?: string) => Trigger<Cursor> =
-  (contracts: EthereumContract[], contractFilters: ContractFilter[], gap: string = process.env.ETHEREUM_BLOCK_QUERY_GAP!) => {
+export const newEthereumEvents: (contracts: Contract[], contractFilters: ContractFilter[], gap?: string) => Trigger<Cursor> =
+  (contracts: Contract[], contractFilters: ContractFilter[], gap: string = process.env.ETHEREUM_BLOCK_QUERY_GAP!) => {
     const triggerFunc = async (clients: Clients, cursorJSON = '{}'): Promise<TriggerOutput> => {
       const cursor: ContractsEventsCursor = JSON.parse(cursorJSON) || {};
       if (contracts.length === 0) {
@@ -84,8 +84,8 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
   };
 
 
-export const newERC721Transfers: (contracts: ERC721Contract[]) => Trigger<Cursor> =
-  (contracts: ERC721Contract[]) => {
+export const newERC721Transfers: (contracts: NftFactory[]) => Trigger<Cursor> =
+  (contracts: NftFactory[]) => {
     const contractFilters = contracts.map(contract => ({
       address: contract.address,
       filter: 'Transfer'
@@ -96,7 +96,11 @@ export const newERC721Transfers: (contracts: ERC721Contract[]) => Trigger<Cursor
 export const newERC721Contract: (factoryContract: FactoryContract) => Trigger<Cursor> =
   (factoryContract: FactoryContract) => {
     const factoryContractTypeName = factoryContract.contractType;
-    const newContractCreatedEvent = FactoryContractTypes[factoryContractTypeName].newContractCreatedEvent;
+    const newContractCreatedEvent = FactoryContractTypes[factoryContractTypeName]?.newContractCreatedEvent;
+
+    if (!newContractCreatedEvent){
+      throw 'no newContractCreatedEvent specified'
+    }
 
     return newEthereumEvents([factoryContract], [{
       address: factoryContract.address,

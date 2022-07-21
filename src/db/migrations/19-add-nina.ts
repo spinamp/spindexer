@@ -1,7 +1,7 @@
 
 import { Knex } from 'knex';
 
-import { FactoryContract, FactoryContractTypeName } from '../../types/ethereum';
+import { FactoryContract, FactoryContractTypeName, NFTStandard } from '../../types/ethereum';
 import { MusicPlatformType } from '../../types/platform';
 import { Table } from '../db';
 import { addFactoryContract, removeFactoryContract, removePlatform } from '../migration-helpers';
@@ -47,7 +47,14 @@ export const up = async (knex: Knex) => {
     table.text('lossyAudioURL').alter();
     table.text('websiteUrl').alter();
     table.string('slug', 1020).alter();
+  })
 
+  await knex.schema.alterTable(Table.erc721Contracts, table => {
+    table.enu('standard', Object.values(NFTStandard)).defaultTo(NFTStandard.ERC721)
+  })
+
+  await knex.schema.alterTable(Table.erc721nfts, table => {
+    table.foreign('contractAddress').references('id').inTable(Table.erc721Contracts).onDelete('CASCADE')
   })
 
   await knex(Table.platforms).insert([NINA_PLATFORM]);
@@ -86,6 +93,13 @@ export const down = async (knex: Knex) => {
     table.string('lossyAudioURL', 3000).alter();
     table.string('websiteUrl',3000).alter();
     table.string('slug', 255).alter();
+  })
 
+  await knex.schema.alterTable(Table.erc721Contracts, table => {
+    table.dropColumn('standard')
+  })
+
+  await knex.schema.alterTable(Table.erc721nfts, table => {
+    table.dropForeign('contractAddress')
   })
 }

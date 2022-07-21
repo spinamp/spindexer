@@ -21,19 +21,18 @@ import { getERC721TokenFieldsProcessor } from './processors/default/getERC721Tok
 import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfs';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
 import { runProcessors } from './runner';
-import { ERC721Contract, FactoryContract, FactoryContractTypeName } from './types/ethereum';
+import { NftFactory, FactoryContract, FactoryContractTypeName } from './types/ethereum';
 import { MusicPlatform } from './types/platform';
 
-
-const PROCESSORS = (erc721Contracts: ERC721Contract[], factoryContracts: FactoryContract[], musicPlatforms: MusicPlatform[]) => {
+const PROCESSORS = (erc721Contracts: NftFactory[], factoryContracts: FactoryContract[], musicPlatforms: MusicPlatform[]) => {
   const erc721ContractsByAddress = _.keyBy(erc721Contracts, 'address');
 
-  const factoryContractProcessors = factoryContracts.map(contract => createERC721ContractFromFactoryProcessor(contract));
+  const erc721FactoryContractProcessors = factoryContracts.map(contract => createERC721ContractFromFactoryProcessor(contract));
   const erc721TransferProcessors = createERC721NFTsFromTransfersProcessor(erc721Contracts);
   const platformTrackProcessors = musicPlatforms.map(musicPlatform => processPlatformTracks(musicPlatform));
 
   return [
-    ...factoryContractProcessors,
+    ...erc721FactoryContractProcessors,
     getERC721ContractFieldsProcessor,
     erc721TransferProcessors,
     stripIgnoredNFTs,
@@ -56,7 +55,7 @@ const PROCESSORS = (erc721Contracts: ERC721Contract[], factoryContracts: Factory
 
 const updateDBLoop = async () => {
   const dbClient = await db.init();
-  const erc721Contracts = await dbClient.getRecords<ERC721Contract>(Table.erc721Contracts);
+  const erc721Contracts = await dbClient.getRecords<NftFactory>(Table.erc721Contracts);
   const factoryContracts = await dbClient.getRecords<FactoryContract>(Table.factoryContracts, [
     [
       'whereNotIn', ['contractType', [FactoryContractTypeName.ninaMintCreator]]

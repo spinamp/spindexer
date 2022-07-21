@@ -12,11 +12,15 @@ const processorFunction = (factoryContract: FactoryContract, name: string) =>
   async ({ newCursor, items: events }: { newCursor: Cursor, items: ethers.Event[] }, clients: Clients) => {
     const factoryContractTypeName = factoryContract.contractType;
     const factoryContractType = FactoryContractTypes[factoryContractTypeName];
-    const eventToERC721Contract = factoryContractType.creationEventToERC721Contract;
-    const newERC721ContractObjects = events.map(e => eventToERC721Contract(e));
-    console.log({ newERC721ContractObjects })
-    await clients.db.insert(Table.erc721Contracts, newERC721ContractObjects);
-    await clients.db.updateProcessor(name, newCursor);
+    const eventToNftFactory = factoryContractType?.creationEventToNftFactory;
+    if (eventToNftFactory){
+      const newERC721ContractObjects = events.map(e => eventToNftFactory(e));
+      console.log({ newERC721ContractObjects })
+      await clients.db.insert(Table.erc721Contracts, newERC721ContractObjects);
+      await clients.db.updateProcessor(name, newCursor);
+    } else {
+      console.log('no eventToNftFactory specified')
+    }
   };
 
 export const createERC721ContractFromFactoryProcessor: (factoryContract: FactoryContract) =>

@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-import { ERC721ContractTypeName } from '../../types/ethereum';
+import { NFTContractTypeName } from '../../types/ethereum';
 import { MusicPlatformType } from '../../types/platform';
 import { addPlatform, removePlatform } from '../migration-helpers';
 
@@ -10,7 +10,7 @@ const CONTRACT = {
   address: '0x2B5426A5B98a3E366230ebA9f95a24f09Ae4a584',
   startingBlock: '14793510',
   platformId: 'mintsongs',
-  contractType: ERC721ContractTypeName.default,
+  contractType: NFTContractTypeName.default,
 };
 
 export const up = async (knex: Knex) => {

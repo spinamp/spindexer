@@ -3,11 +3,11 @@ import _ from 'lodash';
 import { mapAPITrack, mapAPITrackTime, mapAPITrackToArtistID } from '../../clients/noizd';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { ERC721NFT } from '../erc721nft';
+import { NFT } from '../nft';
 import { ProcessedTrack } from '../track';
 
 
-export const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT }): ArtistProfile => {
+export const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): ArtistProfile => {
   let createdAtTime, createdAtEthereumBlockNumber
   if (nft) {
     createdAtTime = nft.createdAtTime
@@ -28,7 +28,7 @@ export const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: ERC72
   };
 };
 
-const mapTrack = (nft: ERC721NFT, apiTrack: any): ProcessedTrack => {
+const mapTrack = (nft: NFT, apiTrack: any): ProcessedTrack => {
   const processedTrack = mapAPITrack(apiTrack);
   if (!nft.metadata) {
     return processedTrack;
@@ -42,14 +42,14 @@ const mapTrack = (nft: ERC721NFT, apiTrack: any): ProcessedTrack => {
   };
 };
 
-const mapNFTtoTrackID = (nft: ERC721NFT): string => {
+const mapNFTtoTrackID = (nft: NFT): string => {
   const [contractAddress, nftId] = nft.id.split('/');
   const externalURL = nft.metadata.external_url;
   const trackId = externalURL.split('/assets/')[1];
   return `ethereum/${formatAddress(contractAddress)}/${trackId}`;
 }
 
-const mapNFTsToTrackIds = async (nfts: ERC721NFT[]): Promise<{ [trackId: string]: ERC721NFT[] }> => {
+const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
 

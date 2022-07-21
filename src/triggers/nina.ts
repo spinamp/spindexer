@@ -3,8 +3,8 @@ import { web3, AnchorProvider, Program, Wallet } from '@project-serum/anchor';
 import { Keypair } from '@solana/web3.js';
 
 import { Table } from '../db/db';
-import { ERC721NFT } from '../types/erc721nft';
 import { FactoryContract } from '../types/ethereum';
+import { NFT } from '../types/nft';
 import { MusicPlatformType } from '../types/platform';
 import { Trigger } from '../types/trigger';
 
@@ -41,7 +41,7 @@ export const newNinaContracts: Trigger<undefined> = async (clients) => {
       )
   ).filter(x => x);
 
-  const existingContracts = (await clients.db.getRecords<ERC721NFT>(Table.erc721nfts, [
+  const existingContracts = (await clients.db.getRecords<NFT>(Table.erc721nfts, [
     [
       'where', ['platformId', MusicPlatformType.nina]
     ]

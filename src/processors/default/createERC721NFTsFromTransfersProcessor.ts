@@ -4,8 +4,8 @@ import _ from 'lodash';
 import { Table } from '../../db/db';
 import { newERC721Transfers } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
-import { ERC721NFT, ERC721Transfer } from '../../types/erc721nft';
-import { ERC721Contract, ETHEREUM_NULL_ADDRESS, NFTContractTypes } from '../../types/ethereum';
+import { NftFactory, ETHEREUM_NULL_ADDRESS, NFTContractTypes } from '../../types/ethereum';
+import { NFT, ERC721Transfer } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';
 
@@ -13,17 +13,22 @@ const NAME = 'createERC721NFTsFromTransfers';
 
 const CHAIN = 'ethereum';
 
-const processorFunction = (contracts: ERC721Contract[]) =>
+const processorFunction = (contracts: NftFactory[]) =>
   async ({ newCursor, items }: { newCursor: Cursor, items: ethers.Event[] }, clients: Clients) => {
     const contractsByAddress = _.keyBy(contracts, 'address');
-    const newNFTs: Partial<ERC721NFT>[] = [];
-    const updates: Partial<ERC721NFT>[] = [];
+    const newNFTs: Partial<NFT>[] = [];
+    const updates: Partial<NFT>[] = [];
     const transfers: Partial<ERC721Transfer>[] = [];
-    items.forEach((item): Partial<ERC721NFT> | undefined => {
+    items.forEach((item): Partial<NFT> | undefined => {
       const address = item.address;
       const contract = contractsByAddress[address];
       const contractTypeName = contract.contractType;
       const contractType = NFTContractTypes[contractTypeName];
+
+      if (!contractType?.buildNFTId){
+        throw 'buildNFTId not specified'
+      }
+
       const tokenId = BigInt((item.args!.tokenId as BigNumber).toString());
       const newMint = item.args!.from === ETHEREUM_NULL_ADDRESS;
       transfers.push({
@@ -56,7 +61,7 @@ const processorFunction = (contracts: ERC721Contract[]) =>
     await clients.db.updateProcessor(NAME, newCursor);
   };
 
-export const createERC721NFTsFromTransfersProcessor: (contracts: ERC721Contract[]) => Processor = (contracts: ERC721Contract[]) => {
+export const createERC721NFTsFromTransfersProcessor: (contracts: NftFactory[]) => Processor = (contracts: NftFactory[]) => {
   return {
     name: NAME,
     trigger: newERC721Transfers(contracts),

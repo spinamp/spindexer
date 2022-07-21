@@ -2,13 +2,13 @@
 import { EthClient, ValidContractCallFunction } from '../../clients/ethereum';
 import { Table } from '../../db/db';
 import { fromDBRecords } from '../../db/orm';
-import { ERC721Contract, ERC721ContractTypeName } from '../../types/ethereum';
+import { NftFactory, NFTStandard } from '../../types/ethereum';
 import { Clients } from '../../types/processor';
 import { Trigger } from '../../types/trigger';
 
 const name = 'getERC721ContractFields';
 
-export const getERC721ContractFields = async (contracts: ERC721Contract[], ethClient: EthClient) => {
+export const getERC721ContractFields = async (contracts: NftFactory[], ethClient: EthClient) => {
   const allContractCalls = contracts.map(contract => {
     return [
       {
@@ -38,7 +38,7 @@ export const getERC721ContractFields = async (contracts: ERC721Contract[], ethCl
   const callResults = await ethClient.call(flatContractCalls);
   const contractUpdates = contracts.map((contract, index) => {
     console.info(`Processing contract with address ${contract.address}`);
-    const contractUpdate: Partial<ERC721Contract> = {
+    const contractUpdate: Partial<NftFactory> = {
       address: contract.address,
     };
     const callIndexes = contractIndexToCalls[index];
@@ -52,14 +52,14 @@ export const getERC721ContractFields = async (contracts: ERC721Contract[], ethCl
   return contractUpdates;
 };
 
-const processorFunction = async (contracts: ERC721Contract[], clients: Clients) => {
+const processorFunction = async (contracts: NftFactory[], clients: Clients) => {
   const contractUpdates = await getERC721ContractFields(contracts, clients.eth);
   await clients.db.update(Table.erc721Contracts, contractUpdates);
 };
 
 export const unprocessedContracts: Trigger<undefined> = async (clients: Clients) => {
   const contracts = (await clients.db.rawSQL(
-    `select * from "${Table.erc721Contracts}" where ("name" is null or "symbol" is null) and "contractType" != '${ERC721ContractTypeName.nina}';`
+    `select * from "${Table.erc721Contracts}" where ("name" is null or "symbol" is null) and "standard" = '${NFTStandard.ERC721}';`
   )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return fromDBRecords(Table.erc721Contracts, contracts);
 };

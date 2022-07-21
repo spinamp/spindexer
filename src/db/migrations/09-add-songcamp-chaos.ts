@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-import { ERC721ContractTypeName } from '../../types/ethereum';
+import { NFTContractTypeName } from '../../types/ethereum';
 import { Table } from '../db';
 
 const CHAOS_PLATFORM = [
@@ -12,7 +12,7 @@ const CHAOS_CONTRACTS = [
     id: '0x8427e46826a520b1264b55f31fcb5ddfdc31e349',
     startingBlock: '10766312',
     platformId: '0x8427e46826a520b1264b55f31fcb5ddfdc31e349',
-    contractType: ERC721ContractTypeName.default,
+    contractType: NFTContractTypeName.default,
   },
 ]
 

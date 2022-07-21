@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-import { ERC721ContractTypeName } from '../../types/ethereum';
+import { NFTContractTypeName } from '../../types/ethereum';
 import { Table } from '../db';
 
 const HEDS_PLATFORM = [
@@ -12,25 +12,25 @@ const HEDS_CONTRACTS = [
     id: '0xde8a0b17d3dc0468adc65309881d9d6a6cd66372',
     startingBlock: '14193219',
     platformId: 'heds',
-    contractType: ERC721ContractTypeName.default,
+    contractType: NFTContractTypeName.default,
   },
   {
     id: '0x5083cf11003f2b25ca7456717e6dc980545002e5',
     platformId: 'heds',
     startingBlock: '14373903',
-    contractType: ERC721ContractTypeName.default,
+    contractType: NFTContractTypeName.default,
   },
   {
     id: '0x567e687c93103010962f9e9cf5730ae8dbfc6d41',
     platformId: 'heds',
     startingBlock: '14548643',
-    contractType: ERC721ContractTypeName.default,
+    contractType: NFTContractTypeName.default,
   },
   {
     id: '0x8045fd700946a00436923f37d08f280ade3b4af6',
     platformId: 'heds',
     startingBlock: '14813870',
-    contractType: ERC721ContractTypeName.default,
+    contractType: NFTContractTypeName.default,
   }
 ]
 
