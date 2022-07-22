@@ -7,6 +7,7 @@ export const errorRetry: Trigger<undefined> = async (clients) => {
   const nftQuery = `select * 
   from "${Table.erc721nftProcessErrors}"
   where "numberOfRetries" < '${NUMBER_OF_RETRIES}'
+  and (${new Date().toISOString()} >= "lastRetry" or "lastRetry" is null)
   limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
 `
   const nfts = (await clients.db.rawSQL(nftQuery))
