@@ -22,3 +22,12 @@ export const getMetadataIPFSHash = (nft: ERC721NFT, erc721ContractsByAddress: { 
   const hash = extractHashFromURL(metadataURL);
   return hash || '';
 }
+
+export type OpenseaTrait = {
+  trait_type: string;
+  value: string;
+}
+
+export const getOpenseaTraitByType = (traits: OpenseaTrait[], traitType: string): (OpenseaTrait | null) => {
+  return traits.find((trait: OpenseaTrait) => trait.trait_type === traitType) || null;
+}
