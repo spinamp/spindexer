@@ -20,6 +20,7 @@ export type ERC721Transfer = Record & {
   to: string
   contractAddress: string
   tokenId: bigint
+  nftId: string;
 };
 
 export const getNFTContractCalls = (nft: ERC721NFT, contractTypeName: ERC721ContractTypeName) => {
