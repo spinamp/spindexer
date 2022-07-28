@@ -6,7 +6,7 @@ import { MusicPlatformType } from '../../types/platform';
 import { addPlatform, removeErc721Contract, removePlatform } from '../migration-helpers';
 
 const GLASSHOUSE_PLATFORM = {
-  id: 'glasshouse',
+  id: '0x719C6d392fc659f4fe9b0576cBC46E18939687a7',
   type: MusicPlatformType['multi-track-multiprint-contract'],
   name: 'Daniel Allan',
 }
