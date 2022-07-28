@@ -6,6 +6,7 @@ import { ERC721Contract } from './ethereum';
 import catalogMappers from './platforms-types/catalog';
 import chaos from './platforms-types/chaos';
 import mintsongsV2 from './platforms-types/mintsongs-v2';
+import multiTrackMultiprintContractMappers from './platforms-types/multi-track-multiprint-contract';
 import noizdMappers from './platforms-types/noizd';
 import singleTrackMultiprintContract from './platforms-types/single-track-multiprint-contract';
 import soundMappers from './platforms-types/sound';
@@ -17,6 +18,7 @@ export enum MusicPlatformType {
   catalog = 'catalog',
   zora = 'zora',
   'single-track-multiprint-contract' = 'single-track-multiprint-contract',
+  'multi-track-multiprint-contract' = 'multi-track-multiprint-contract',
   chaos = 'chaos',
   mintsongsV2 = 'mintsongs-v2'
 }
@@ -61,6 +63,10 @@ export const platformConfigs: MusicPlatformTypeConfigs = {
   },
   'single-track-multiprint-contract': {
     mappers: singleTrackMultiprintContract,
+    clientName: null,
+  },
+  'multi-track-multiprint-contract': {
+    mappers: multiTrackMultiprintContractMappers,
     clientName: null,
   },
   'chaos': {
