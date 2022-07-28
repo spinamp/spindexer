@@ -5,9 +5,8 @@ import slugify from 'slugify';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { ERC721NFT } from '../erc721nft';
+import { ERC721NFT, getTrait } from '../erc721nft';
 import { ERC721Contract } from '../ethereum';
-import { getOpenseaTraitByType } from '../metadata';
 import { MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
@@ -24,7 +23,7 @@ const mapTrack: MapTrack = (
   const track: Partial<ProcessedTrack> = {
     id: mapNFTtoTrackID(nft),
     platformInternalId: mapNFTtoTrackID(nft),
-    title: getOpenseaTraitByType(nft.metadata.attributes, 'Track')?.value,
+    title: getTrait(nft, 'Track'),
     description: nft.metadata.description,
     platformId: contract.platformId,
     lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url),
@@ -62,7 +61,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ER
 };
 
 const mapNFTtoTrackID = (nft: ERC721NFT): string => {
-  const trackName = getOpenseaTraitByType(nft.metadata.attributes, 'Track')?.value;
+  const trackName = getTrait(nft, 'Track');
   return `ethereum/${formatAddress(nft.contractAddress)}/${trackName}`;
 };
 
