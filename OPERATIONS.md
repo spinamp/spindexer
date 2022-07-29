@@ -26,14 +26,7 @@ yarn restore-db
 ## SQL Queries
 
 ```sql
--- Clear all erc721nfts where there was an error getting the object from the metadata url so that they can be tried again:
-select * from erc721nfts where "metadata" is null and "metadataError" is not null;
-
-update erc721nfts SET "metadataError"=null where "metadata" is null and "metadataError" is not null;
-```
-
-```sql
--- Clear all erc721nfts where there was an error processing them into tracks to they can be tried again:
+-- Clear all erc721nfts where there was an error with their metadata or processing them into tracks so they can be tried again:
 select * from "erc721nftProcessErrors";
 
 delete from "erc721nftProcessErrors";

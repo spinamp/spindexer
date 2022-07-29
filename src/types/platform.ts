@@ -6,6 +6,7 @@ import { NFT } from './nft';
 import catalogMappers from './platforms-types/catalog';
 import chaosMappers from './platforms-types/chaos';
 import mintsongsV2Mappers from './platforms-types/mintsongs-v2';
+import multiTrackMultiprintContractMappers from './platforms-types/multi-track-multiprint-contract';
 import ninaMappers from './platforms-types/nina'
 import noizdMappers from './platforms-types/noizd';
 import singleTrackMultiprintContractMappers from './platforms-types/single-track-multiprint-contract';
@@ -18,6 +19,7 @@ export enum MusicPlatformType {
   catalog = 'catalog',
   zora = 'zora',
   'single-track-multiprint-contract' = 'single-track-multiprint-contract',
+  'multi-track-multiprint-contract' = 'multi-track-multiprint-contract',
   chaos = 'chaos',
   mintsongsV2 = 'mintsongs-v2',
   nina = 'nina'
@@ -63,6 +65,10 @@ export const platformConfigs: MusicPlatformTypeConfigs = {
   },
   'single-track-multiprint-contract': {
     mappers: singleTrackMultiprintContractMappers,
+    clientName: null,
+  },
+  'multi-track-multiprint-contract': {
+    mappers: multiTrackMultiprintContractMappers,
     clientName: null,
   },
   'chaos': {

@@ -3,7 +3,6 @@ import { Knex } from 'knex';
 
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/ethereum';
 import { MusicPlatformType } from '../../types/platform';
-import { Table } from '../db';
 import { addPlatform, removeErc721Contract, removePlatform } from '../migration-helpers';
 
 const ROHKI_PLATFORM = {
@@ -36,16 +35,10 @@ const ROHKI_DESPERADO: NftFactory = {
 };
 
 export const up = async (knex: Knex) => {
-  await knex.schema.alterTable(Table.nftFactories, table => {
-    table.jsonb('typeMetadata')
-  })
   await addPlatform(knex, ROHKI_PLATFORM, ROHKI_DESPERADO)
 }
 
 export const down = async (knex: Knex) => {
-  await knex.schema.alterTable(Table.nftFactories, table => {
-    table.dropColumn('typeMetadata')
-  })
   await removeErc721Contract(knex, ROHKI_DESPERADO);
   await removePlatform(knex, ROHKI_PLATFORM, ROHKI_DESPERADO)
 }
