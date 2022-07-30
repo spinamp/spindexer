@@ -93,6 +93,6 @@ export const clearERC721Contract = async(knex: Knex, contract: NftFactoryAddress
 
 
 export const removeNftFactory = async(knex: Knex, contract: NftFactory) => {
-  clearERC721Contract(knex, contract);
+  await clearERC721Contract(knex, contract);
   await knex.raw(`delete from "${Table.nftFactories}" where id ilike '${contract.address}';`);
 }
