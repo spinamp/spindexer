@@ -2,10 +2,10 @@
 import { Knex } from 'knex';
 
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/ethereum';
-import { MusicPlatformType } from '../../types/platform';
-import { addPlatform, removeErc721Contract, removePlatform } from '../migration-helpers';
+import { MusicPlatform, MusicPlatformType } from '../../types/platform';
+import { addNftFactory, addPlatform, removeNftFactory, removePlatform } from '../migration-helpers';
 
-const ROHKI_PLATFORM = {
+const ROHKI_PLATFORM: MusicPlatform = {
   id: 'rohki',
   type: MusicPlatformType['single-track-multiprint-contract'],
   name: 'RŌHKI',
@@ -16,7 +16,7 @@ const ROHKI_DESPERADO: NftFactory = {
   startingBlock: '14779299',
   platformId: ROHKI_PLATFORM.id,
   contractType: NFTContractTypeName.default,
-  standard: NFTStandard.METAPLEX,
+  standard: NFTStandard.ERC721,
   typeMetadata: {
     overrides: {
       track: {
@@ -35,10 +35,11 @@ const ROHKI_DESPERADO: NftFactory = {
 };
 
 export const up = async (knex: Knex) => {
-  await addPlatform(knex, ROHKI_PLATFORM, ROHKI_DESPERADO)
+  await addPlatform(knex, ROHKI_PLATFORM)
+  await addNftFactory(knex, ROHKI_DESPERADO)
 }
 
 export const down = async (knex: Knex) => {
-  await removeErc721Contract(knex, ROHKI_DESPERADO);
-  await removePlatform(knex, ROHKI_PLATFORM, ROHKI_DESPERADO)
+  await removeNftFactory(knex, ROHKI_DESPERADO);
+  await removePlatform(knex, ROHKI_PLATFORM)
 }

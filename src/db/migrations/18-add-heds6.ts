@@ -3,18 +3,18 @@ import { Knex } from 'knex';
 import { NFTContractTypeName, NftFactory, NFTStandard } from '../../types/ethereum';
 import { addNftFactory, removeNftFactory } from '../migration-helpers';
 
-const HEDS_5: NftFactory = {
-  address: '0x8f36eb094f7b960a234a482d4d8ffb8b37f728c6',
-  startingBlock: '14986141',
+const HEDS_6: NftFactory = {
+  address: '0x885236535D5Cf7033BdC5bC1050CaD7fdf4970a6',
+  startingBlock: '15200392',
   platformId: 'heds',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721
 };
 
 export const up = async (knex: Knex) => {
-  await addNftFactory(knex, HEDS_5)
+  await addNftFactory(knex, HEDS_6)
 }
 
 export const down = async (knex: Knex) => {
-  await removeNftFactory(knex, HEDS_5)
+  await removeNftFactory(knex, HEDS_6)
 }

@@ -72,7 +72,7 @@ const createTracks = async (
     if (client && !apiTrack) {
       trackNFTs.forEach(nft => {
         errorNFTs.push({
-          erc721nftId: nft.id,
+          nftId: nft.id,
           processError: `Missing api track`
         });
       })
@@ -88,7 +88,7 @@ const createTracks = async (
     newTracks.push(mappedTrack);
     trackNFTs.forEach(nft => {
       joins.push({
-        erc721nftId: nft.id,
+        nftId: nft.id,
         processedTrackId: trackId
       });
     })
@@ -109,10 +109,10 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
   const platformType = platformConfigs[platform.type];
   if (!platformType) {
     const errorNFTs = nfts.map(nft => ({
-      erc721nftId: nft.id,
+      nftId: nft.id,
       processError: `Missing platform type for ${platform.id}`
     }))
-    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'erc721nftId');
+    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'nftId');
     return;
   }
   let platformClient: TrackAPIClient | null = null;
@@ -121,10 +121,10 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
   }
   if (!platformClient && platformType.clientName !== null) {
     const errorNFTs = nfts.map(nft => ({
-      erc721nftId: nft.id,
+      nftId: nft.id,
       processError: `Missing platform client`
     }))
-    await clients.db.upsert(Table.nftProcessErrors, errorNFTs,'erc721nftId');
+    await clients.db.upsert(Table.nftProcessErrors, errorNFTs,'nftId');
     return;
   }
   const { mapNFTsToTrackIds, mapTrack, mapArtistProfile, selectPrimaryNFTForTrackMapper } = platformType.mappers;
@@ -152,14 +152,14 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
       const trackNFTs = trackMapping[trackId];
       trackNFTs.forEach(nft => {
         joins.push({
-          erc721nftId: nft.id,
+          nftId: nft.id,
           processedTrackId: trackId
         });
       })
     });
   }
   if (errorNFTs.length !== 0) {
-    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'erc721nftId');
+    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'nftId');
   }
   if (oldIds && oldIds.length !== 0) {
     await clients.db.delete(Table.processedTracks, oldIds);

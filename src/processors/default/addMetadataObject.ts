@@ -35,13 +35,13 @@ const processorFunction = (erc721ContractsByAddress: { [key: string]: NftFactory
 
   const results = await rollPromises<NFT, AxiosResponse, AxiosError>(batch, processMetadataResponse);
 
-  const metadataErrors: { metadataError: string, erc721nftId: string }[] = [];
+  const metadataErrors: { metadataError: string, nftId: string }[] = [];
   const nftUpdates = batch.map((nft, index): (Partial<NFT>) => {
     const metadata = results[index].response ? results[index].response!.data : undefined;
     const metadataError = results[index].isError ? results[index].error!.message : undefined;
     if (metadataError){
       metadataErrors.push({
-        erc721nftId: nft.id, 
+        nftId: nft.id, 
         metadataError
       });
     }
@@ -52,7 +52,7 @@ const processorFunction = (erc721ContractsByAddress: { [key: string]: NftFactory
     }
   });
   await clients.db.update(Table.nfts, nftUpdates);
-  await clients.db.upsert(Table.nftProcessErrors,metadataErrors, 'erc721nftId');
+  await clients.db.upsert(Table.nftProcessErrors,metadataErrors, 'nftId');
 
   console.info('Batch done');
 };

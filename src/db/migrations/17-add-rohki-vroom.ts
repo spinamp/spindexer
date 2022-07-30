@@ -2,7 +2,7 @@
 import { Knex } from 'knex';
 
 import { NFTContractTypeName, NftFactory, NFTStandard } from '../../types/ethereum';
-import { addErc721Contract, removeErc721Contract } from '../migration-helpers';
+import { addNftFactory, removeNftFactory } from '../migration-helpers';
 
 const ROHKI_VROOM: NftFactory = {
   address: '0x317394c6dFB5606c2917E1a0DAD4f1B70EDDC921',
@@ -28,9 +28,9 @@ const ROHKI_VROOM: NftFactory = {
 };
 
 export const up = async (knex: Knex) => {
-  await addErc721Contract(knex, ROHKI_VROOM)
+  await addNftFactory(knex, ROHKI_VROOM)
 }
 
 export const down = async (knex: Knex) => {
-  await removeErc721Contract(knex, ROHKI_VROOM);
+  await removeNftFactory(knex, ROHKI_VROOM);
 }

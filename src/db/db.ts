@@ -10,7 +10,7 @@ export enum Table {
   artistProfiles = 'artistProfiles',
   processedTracks = 'processedTracks',
   processors = 'processors',
-  factoryContracts = 'factoryContracts',
+  metaFactories = 'metaFactories',
   nftFactories = 'nftFactories',
   nfts_processedTracks = 'nfts_processedTracks',
   nftProcessErrors = 'nftProcessErrors',

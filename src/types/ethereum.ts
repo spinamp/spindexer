@@ -18,7 +18,7 @@ export enum FactoryContractTypeName {
   ninaMintCreator = 'ninaMintCreator'
 }
 
-export type FactoryContract = Contract & {
+export type MetaFactory = Contract & {
   platformId: string,
   contractType: FactoryContractTypeName,
   gap?: string

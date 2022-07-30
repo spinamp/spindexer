@@ -21,10 +21,10 @@ import { getERC721TokenFieldsProcessor } from './processors/default/getERC721Tok
 import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfs';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
 import { runProcessors } from './runner';
-import { NftFactory, FactoryContract, FactoryContractTypeName } from './types/ethereum';
+import { NftFactory, MetaFactory, FactoryContractTypeName } from './types/ethereum';
 import { MusicPlatform } from './types/platform';
 
-const PROCESSORS = (erc721Contracts: NftFactory[], factoryContracts: FactoryContract[], musicPlatforms: MusicPlatform[]) => {
+const PROCESSORS = (erc721Contracts: NftFactory[], factoryContracts: MetaFactory[], musicPlatforms: MusicPlatform[]) => {
   const erc721ContractsByAddress = _.keyBy(erc721Contracts, 'address');
 
   const erc721FactoryContractProcessors = factoryContracts.map(contract => createERC721ContractFromFactoryProcessor(contract));
@@ -56,8 +56,9 @@ const PROCESSORS = (erc721Contracts: NftFactory[], factoryContracts: FactoryCont
 const updateDBLoop = async () => {
   const dbClient = await db.init();
   const erc721Contracts = await dbClient.getRecords<NftFactory>(Table.nftFactories);
-  const factoryContracts = await dbClient.getRecords<FactoryContract>(Table.factoryContracts, [
+  const factoryContracts = await dbClient.getRecords<MetaFactory>(Table.metaFactories, [
     [
+      // TODO: change this 
       'whereNotIn', ['contractType', [FactoryContractTypeName.ninaMintCreator]]
     ]
   ]);

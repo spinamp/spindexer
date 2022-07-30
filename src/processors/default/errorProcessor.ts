@@ -9,12 +9,12 @@ export const errorProcessor: Processor = {
   trigger: errorRetry,
   processorFunction: async (nftErrors: ERC721NFTProcessError[], clients: Clients) => {
     const nftUpdates: ERC721NFTProcessError[] = nftErrors.map((n) => ({
-      erc721nftId: n.erc721nftId,
+      nftId: n.nftId,
       metadataError: undefined,
       processError: undefined,
       numberOfRetries: n.numberOfRetries + 1
     }));
-    await clients.db.upsert(Table.nftProcessErrors, nftUpdates, 'erc721nftId');
+    await clients.db.upsert(Table.nftProcessErrors, nftUpdates, 'nftId');
   },
   initialCursor: undefined
 };

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { ContractFilter } from '../clients/ethereum';
-import { NftFactory, Contract, FactoryContract, FactoryContractTypes } from '../types/ethereum';
+import { NftFactory, Contract, MetaFactory, FactoryContractTypes } from '../types/ethereum';
 import { Clients } from '../types/processor';
 import { Cursor, Trigger, TriggerOutput } from '../types/trigger';
 
@@ -93,8 +93,8 @@ export const newERC721Transfers: (contracts: NftFactory[]) => Trigger<Cursor> =
     return newEthereumEvents(contracts, contractFilters);
   };
 
-export const newERC721Contract: (factoryContract: FactoryContract) => Trigger<Cursor> =
-  (factoryContract: FactoryContract) => {
+export const newERC721Contract: (factoryContract: MetaFactory) => Trigger<Cursor> =
+  (factoryContract: MetaFactory) => {
     const factoryContractTypeName = factoryContract.contractType;
     const newContractCreatedEvent = FactoryContractTypes[factoryContractTypeName]?.newContractCreatedEvent;
 

@@ -1,4 +1,4 @@
-import { NftFactory, FactoryContract } from '../types/ethereum';
+import { NftFactory, MetaFactory } from '../types/ethereum';
 import { NFT } from '../types/nft';
 import { MusicPlatformType } from '../types/platform';
 import { IdField, Record, RecordUpdate } from '../types/record';
@@ -26,7 +26,7 @@ const toRecordMapper: any = {
       standard: c.standard
     });
   }),
-  [Table.factoryContracts]: (factoryContracts: FactoryContract[]): IdField[] => factoryContracts.map((c: any) => {
+  [Table.metaFactories]: (factoryContracts: MetaFactory[]): IdField[] => factoryContracts.map((c: any) => {
     return ({
       id: c.platformId === MusicPlatformType.nina ? c.address : c.address.toLowerCase(),
       platformId: c.platformId,
@@ -62,7 +62,7 @@ const fromRecordMapper: any = {
       standard: c.standard
     });
   }),
-  [Table.factoryContracts]: (factoryContracts: Record[]): FactoryContract[] => factoryContracts.map((c: any) => {
+  [Table.metaFactories]: (factoryContracts: Record[]): MetaFactory[] => factoryContracts.map((c: any) => {
     return ({
       address: c.id,
       platformId: c.platformId,

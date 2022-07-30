@@ -14,7 +14,7 @@ export const missingCreatedAtTime: (tableName: Table) => Trigger<undefined> = (t
 export const missingMetadataObject: Trigger<undefined> = async (clients) => {
   const nftQuery = `select * from ${Table.nfts} n
     left outer join "${Table.nftProcessErrors}" enpe
-    on n.id = enpe."erc721nftId"
+    on n.id = enpe."nftId"
     where enpe."metadataError" is null
     and n.metadata is null  
   `
@@ -26,7 +26,7 @@ export const missingMetadataObject: Trigger<undefined> = async (clients) => {
 export const missingMetadataIPFSHash: Trigger<undefined> = async (clients) => {
   const nftQuery = `select * from ${Table.nfts} n
   left outer join "${Table.nftProcessErrors}" enpe 
-  on n.id = enpe."erc721nftId" 
+  on n.id = enpe."nftId" 
   where enpe."metadataError" is null
   and n."metadataIPFSHash" is null`;
   const nfts = (await clients.db.rawSQL(nftQuery))
@@ -42,11 +42,11 @@ export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Tr
     // to create a track are not repeated.
     const nftQuery = `select n.* from "${Table.nfts}" as n
       LEFT OUTER JOIN "${Table.nfts_processedTracks}" as j
-      ON n.id = j."erc721nftId"
+      ON n.id = j."nftId"
       LEFT OUTER JOIN "${Table.processedTracks}" as p
       ON j."processedTrackId" = p.id
       LEFT OUTER JOIN "${Table.nftProcessErrors}" as e
-      ON n.id = e."erc721nftId"
+      ON n.id = e."nftId"
       WHERE p.id is NULL AND
       e."processError" is NULL AND
       e."metadataError" is NULL AND

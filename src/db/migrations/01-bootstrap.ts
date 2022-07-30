@@ -1,14 +1,38 @@
 import { Knex } from 'knex';
 
+import { NFTStandard } from '../../types/ethereum';
+import { MusicPlatform, MusicPlatformType } from '../../types/platform';
 import { Table } from '../db';
-
-const MUSIC_PLATFORM_TYPES = ['noizd', 'catalog', 'sound', 'zora'];
 
 const INITIAL_TABLES = [
   {
     name: Table.platforms, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
-      table.enu('type', MUSIC_PLATFORM_TYPES);
+      table.enu('type', Object.values(MusicPlatformType)).notNullable()
+      table.string('name', 1024).notNullable();
+    }
+  },
+  {
+    name: Table.nftFactories, create: (table: Knex.CreateTableBuilder) => {
+      table.string('id').primary();
+      table.string('platformId');
+      table.foreign('platformId').references('id').inTable('platforms').onDelete('cascade');
+      table.string('startingBlock');
+      table.string('contractType');
+      table.jsonb('typeMetadata');
+      table.enu('standard', Object.values(NFTStandard)).defaultTo(NFTStandard.ERC721);
+      table.string('name', 1024);
+      table.string('symbol', 256);
+    }
+  },
+  {
+    name: Table.metaFactories, create: (table: Knex.CreateTableBuilder) => {
+      table.string('id').primary();
+      table.string('platformId');
+      table.foreign('platformId').references('id').inTable('platforms').onDelete('cascade');
+      table.string('startingBlock');
+      table.string('contractType');
+      table.string('gap');
     }
   },
   {
@@ -17,14 +41,13 @@ const INITIAL_TABLES = [
       table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
       table.string('tokenId');
-      table.string('contractAddress');
+      table.string('contractAddress').references('id').inTable(Table.nftFactories).onDelete('cascade');
       table.string('platformId');
       table.foreign('platformId').references('id').inTable('platforms');
       table.string('metadataIPFSHash');
       table.string('tokenURI', 20000);
       table.string('tokenMetadataURI', 20000);
-      table.json('metadata');
-      table.string('metadataError', 3000);
+      table.jsonb('metadata');
       table.string('mimeType');
       table.string('owner');
     }
@@ -47,9 +70,9 @@ const INITIAL_TABLES = [
       table.string('avatarUrl', 3000);
       table.string('websiteUrl', 3000);
       table.string('artistId');
-      table.foreign('artistId').references('id').inTable('artists');
+      table.foreign('artistId').references('id').inTable('artists').onDelete('cascade');
       table.string('platformId');
-      table.foreign('platformId').references('id').inTable('platforms');
+      table.foreign('platformId').references('id').inTable('platforms').onDelete('cascade');
       table.primary(['artistId', 'platformId']);
     }
   },
@@ -58,19 +81,19 @@ const INITIAL_TABLES = [
       table.string('id').primary();
       table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
-      table.string('title');
-      table.string('slug');
+      table.text('title');
+      table.string('slug', 1020);
       table.string('platformInternalId');
       table.string('lossyAudioIPFSHash');
-      table.string('lossyAudioURL', 3000);
-      table.string('description', 10000);
+      table.text('lossyAudioURL');
+      table.text('description');
       table.string('lossyArtworkIPFSHash');
-      table.string('lossyArtworkURL', 3000);
-      table.string('websiteUrl', 3000);
+      table.text('lossyArtworkURL');
+      table.text('websiteUrl');
       table.string('platformId');
-      table.foreign('platformId').references('id').inTable('platforms');
+      table.foreign('platformId').references('id').inTable('platforms').onDelete('cascade');
       table.string('artistId');
-      table.foreign('artistId').references('id').inTable('artists');
+      table.foreign('artistId').references('id').inTable('artists').onDelete('cascade');
     }
   },
   {
@@ -79,13 +102,49 @@ const INITIAL_TABLES = [
       table.string('cursor', 5000000);
     }
   },
+  {
+    name: Table.nfts_processedTracks, create: (table: Knex.CreateTableBuilder) => { 
+      table.string('nftId').references('id').inTable(Table.nfts).onDelete('cascade');
+      table.string('processedTrackId').references('id').inTable(Table.processedTracks).onDelete('cascade');
+      table.primary(['nftId','processedTrackId']);
+    }
+  },
+  {
+    name: Table.nftProcessErrors, create: (table: Knex.CreateTableBuilder) => {
+      table.string('nftId').references('id').inTable(Table.nfts).onDelete('cascade');
+      table.primary(['nftId']);
+      table.string('processError', 3000);
+      table.string('metadataError', 3000),
+      table.integer('numberOfRetries').defaultTo(0)
+    }
+  },
+  {
+    name: Table.ipfsPins, create: (table: Knex.CreateTableBuilder) => {
+      table.string('id').primary(); //ipfs cid
+      table.string('requestId');
+      table.string('status');
+    }
+  },
+  {
+    name: Table.erc721Transfers, create: (table: Knex.CreateTableBuilder) => {
+      table.string('id').primary();
+      table.datetime('createdAtTime', { precision: 3 });
+      table.bigint('createdAtEthereumBlockNumber');
+      table.string('from');
+      table.string('to');
+      table.string('contractAddress');
+      table.string('tokenId');
+      table.string('nftId')
+      table.foreign('nftId').references('id').inTable(Table.nfts).onDelete('cascade');
+    }
+  }
 ];
 
-const INITIAL_PLATFORM_ENUMS = [
-  { id: 'noizd', type: 'noizd' },
-  { id: 'catalog', type: 'catalog' },
-  { id: 'sound', type: 'sound' },
-  { id: 'zora', type: 'zora' },
+const INITIAL_PLATFORM_ENUMS: MusicPlatform[] = [
+  { id: 'noizd', type: MusicPlatformType.noizd, name: 'NOIZD' },
+  { id: 'catalog', type: MusicPlatformType.catalog, name: 'Catalog' },
+  { id: 'sound', type: MusicPlatformType.sound, name: 'Sound.xyz' },
+  { id: 'zora', type: MusicPlatformType.zora, name: 'Zora' },
 ]
 
 export const up = async (knex: Knex) => {
@@ -94,15 +153,21 @@ export const up = async (knex: Knex) => {
     return knex.schema.createTable(table.name, table.create);
   });
   await Promise.all(promises);
-  await knex.raw(`GRANT SELECT ON "platforms" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
-  await knex.raw(`GRANT SELECT ON "erc721nfts" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
-  await knex.raw(`GRANT SELECT ON "artists" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
-  await knex.raw(`GRANT SELECT ON "artistProfiles" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
-  await knex.raw(`GRANT SELECT ON "processedTracks" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "${Table.metaFactories}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "${Table.nftFactories}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "${Table.platforms}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "${Table.nfts}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "${Table.artists}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "${Table.artistProfiles}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "${Table.processedTracks}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "${Table.nfts_processedTracks}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "${Table.ipfsPins}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "${Table.erc721Transfers}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`comment on table "${Table.nftProcessErrors}" is '@omit';`);
   await knex.raw(`comment on table processors is '@omit';`);
   await knex.raw(`comment on table knex_migrations is '@omit';`);
   await knex.raw(`comment on table knex_migrations_lock is '@omit';`);
-  await knex('platforms').insert(INITIAL_PLATFORM_ENUMS);
+  await knex(Table.platforms).insert(INITIAL_PLATFORM_ENUMS);
 };
 
 exports.down = async (knex: Knex) => {

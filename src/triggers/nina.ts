@@ -3,13 +3,13 @@ import { web3, AnchorProvider, Program, Wallet } from '@project-serum/anchor';
 import { Keypair } from '@solana/web3.js';
 
 import { Table } from '../db/db';
-import { FactoryContract } from '../types/ethereum';
+import { MetaFactory } from '../types/ethereum';
 import { NFT } from '../types/nft';
 import { MusicPlatformType } from '../types/platform';
 import { Trigger } from '../types/trigger';
 
 export const newNinaContracts: Trigger<undefined> = async (clients) => {
-  const factory = (await clients.db.getRecords<FactoryContract>(Table.factoryContracts, [
+  const factory = (await clients.db.getRecords<MetaFactory>(Table.metaFactories, [
     [
       'where', ['platformId', MusicPlatformType.nina]
     ]

@@ -6,7 +6,7 @@ export const zoraNFTs: Trigger<undefined> = async (clients) => {
   const nftQuery = `select * 
   from "${Table.nfts}" en 
   left outer join "${Table.nftProcessErrors}" enpe 
-  on en.id = enpe."erc721nftId" 
+  on en.id = enpe."nftId" 
   where en."contractAddress" = '${ZORA_CONTRACT_ADDRESS}'
   and en.metadata is not null
   and enpe."metadataError" is null

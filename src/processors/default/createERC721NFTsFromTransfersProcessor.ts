@@ -56,8 +56,8 @@ const processorFunction = (contracts: NftFactory[]) =>
         owner: item.args!.to
       });
     });
-    await clients.db.insert(Table.erc721nfts, newNFTs.filter(n => !!n));
-    await clients.db.update(Table.erc721nfts, updates);
+    await clients.db.insert(Table.nfts, newNFTs.filter(n => !!n));
+    await clients.db.update(Table.nfts, updates);
     await clients.db.insert(Table.erc721Transfers, transfers);
     await clients.db.updateProcessor(NAME, newCursor);
   };
