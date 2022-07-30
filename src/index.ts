@@ -10,8 +10,8 @@ import { addMetadataObjectProcessor } from './processors/default/addMetadataObje
 import { addTimestampFromMetadata } from './processors/default/addTimestampFromMetadata';
 import { addTimestampToERC721NFTs, addTimestampToERC721Transfers } from './processors/default/addTimestampToERC721NFTs';
 import { categorizeZora } from './processors/default/categorizeZora';
-import { createERC721ContractFromFactoryProcessor } from './processors/default/createERC721ContractFromFactoryProcessor';
 import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
+import { createNftFactoryFromMetaFactoryProcessor } from './processors/default/createNftFactoryFromMetaFactory';
 import { createNinaNfts } from './processors/default/createNinaNftProcesor';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
 import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
@@ -27,12 +27,12 @@ import { MusicPlatform } from './types/platform';
 const PROCESSORS = (erc721Contracts: NftFactory[], factoryContracts: MetaFactory[], musicPlatforms: MusicPlatform[]) => {
   const erc721ContractsByAddress = _.keyBy(erc721Contracts, 'address');
 
-  const erc721FactoryContractProcessors = factoryContracts.map(contract => createERC721ContractFromFactoryProcessor(contract));
+  const metaFactoryProcessors = factoryContracts.map(contract => createNftFactoryFromMetaFactoryProcessor(contract));
   const erc721TransferProcessors = createERC721NFTsFromTransfersProcessor(erc721Contracts);
   const platformTrackProcessors = musicPlatforms.map(musicPlatform => processPlatformTracks(musicPlatform));
 
   return [
-    ...erc721FactoryContractProcessors,
+    ...metaFactoryProcessors,
     getERC721ContractFieldsProcessor,
     erc721TransferProcessors,
     stripIgnoredNFTs,
