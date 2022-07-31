@@ -4,8 +4,9 @@ import _ from 'lodash';
 import { Table } from '../../db/db';
 import { newERC721Transfers } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
-import { NftFactory, ETHEREUM_NULL_ADDRESS, NFTContractTypes } from '../../types/ethereum';
-import { NFT, ERC721Transfer } from '../../types/nft';
+import { ETHEREUM_NULL_ADDRESS } from '../../types/ethereum';
+import { NFT, ERC721Transfer, NftFactory, NFTStandard } from '../../types/nft';
+import { NFTFactoryTypes } from '../../types/nftFactory';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';
 
@@ -23,7 +24,7 @@ const processorFunction = (contracts: NftFactory[]) =>
       const address = item.address;
       const contract = contractsByAddress[address];
       const contractTypeName = contract.contractType;
-      const contractType = NFTContractTypes[contractTypeName];
+      const contractType = NFTFactoryTypes[contractTypeName];
 
       if (!contractType?.buildNFTId){
         throw 'buildNFTId not specified'
@@ -65,7 +66,11 @@ const processorFunction = (contracts: NftFactory[]) =>
 export const createERC721NFTsFromTransfersProcessor: (contracts: NftFactory[]) => Processor = (contracts: NftFactory[]) => {
   return {
     name: NAME,
-    trigger: newERC721Transfers(contracts),
+    trigger: newERC721Transfers(
+      contracts
+        .filter(c => c.standard === NFTStandard.ERC721) //only include ERC721 contracts
+        .map(c => ({ address: c.address, startingBlock: c.startingBlock! })) // map contracts to EthereumContract
+    ),
     processorFunction: processorFunction(contracts),
   }
 };

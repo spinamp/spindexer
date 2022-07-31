@@ -2,8 +2,7 @@
 import { EthClient, ValidContractNFTCallFunction } from '../../clients/ethereum';
 import { Table } from '../../db/db';
 import { unprocessedNFTs } from '../../triggers/missing';
-import { NftFactory } from '../../types/ethereum';
-import { getNFTContractCalls, NFT } from '../../types/nft';
+import { getNFTContractCalls, NFT, NftFactory } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 
 const name = 'getERC721TokenFields';

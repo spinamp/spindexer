@@ -21,14 +21,15 @@ import { getERC721TokenFieldsProcessor } from './processors/default/getERC721Tok
 import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfs';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
 import { runProcessors } from './runner';
-import { NftFactory, MetaFactory, FactoryContractTypeName } from './types/ethereum';
+import { MetaFactory } from './types/metaFactory';
+import { NftFactory, NFTStandard } from './types/nft';
 import { MusicPlatform } from './types/platform';
 
-const PROCESSORS = (erc721Contracts: NftFactory[], factoryContracts: MetaFactory[], musicPlatforms: MusicPlatform[]) => {
-  const erc721ContractsByAddress = _.keyBy(erc721Contracts, 'address');
+const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], musicPlatforms: MusicPlatform[]) => {
+  const nftFactoriesByAddress = _.keyBy(nftFactories, 'address');
 
-  const metaFactoryProcessors = factoryContracts.map(contract => createNftFactoryFromMetaFactoryProcessor(contract));
-  const erc721TransferProcessors = createERC721NFTsFromTransfersProcessor(erc721Contracts);
+  const metaFactoryProcessors = metaFactories.map(contract => createNftFactoryFromMetaFactoryProcessor(contract));
+  const erc721TransferProcessors = createERC721NFTsFromTransfersProcessor(nftFactories);
   const platformTrackProcessors = musicPlatforms.map(musicPlatform => processPlatformTracks(musicPlatform));
 
   return [
@@ -38,9 +39,9 @@ const PROCESSORS = (erc721Contracts: NftFactory[], factoryContracts: MetaFactory
     stripIgnoredNFTs,
     addTimestampToERC721Transfers,
     addTimestampToERC721NFTs,
-    getERC721TokenFieldsProcessor(erc721ContractsByAddress),
-    addMetadataIPFSHashProcessor(erc721ContractsByAddress),
-    addMetadataObjectProcessor(erc721ContractsByAddress),
+    getERC721TokenFieldsProcessor(nftFactoriesByAddress),
+    addMetadataIPFSHashProcessor(nftFactoriesByAddress),
+    addMetadataObjectProcessor(nftFactoriesByAddress),
     stripNonAudio,
     categorizeZora,
     ...platformTrackProcessors,
@@ -55,15 +56,14 @@ const PROCESSORS = (erc721Contracts: NftFactory[], factoryContracts: MetaFactory
 
 const updateDBLoop = async () => {
   const dbClient = await db.init();
-  const erc721Contracts = await dbClient.getRecords<NftFactory>(Table.nftFactories);
-  const factoryContracts = await dbClient.getRecords<MetaFactory>(Table.metaFactories, [
+  const nftFactories = await dbClient.getRecords<NftFactory>(Table.nftFactories);
+  const metaFactories = await dbClient.getRecords<MetaFactory>(Table.metaFactories, [
     [
-      // TODO: change this 
-      'whereNotIn', ['contractType', [FactoryContractTypeName.ninaMintCreator]]
+      'where', ['standard', NFTStandard.ERC721.toString()]
     ]
   ]);
   const musicPlatforms = await dbClient.getRecords<MusicPlatform>(Table.platforms);
-  await runProcessors(PROCESSORS(erc721Contracts, factoryContracts, musicPlatforms), dbClient);
+  await runProcessors(PROCESSORS(nftFactories, metaFactories, musicPlatforms), dbClient);
 };
 
 process.on('SIGINT', () => {

@@ -1,8 +1,7 @@
 import { Table } from '../../db/db';
 import { missingMetadataIPFSHash } from '../../triggers/missing';
-import { NftFactory } from '../../types/ethereum';
 import { getMetadataIPFSHash } from '../../types/metadata';
-import { NFT } from '../../types/nft';
+import { NFT, NftFactory } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 
 const name = 'addMetadataIPFSHash';

@@ -1,7 +1,6 @@
 import { extractHashFromURL } from '../clients/ipfs';
 
-import { NftFactory, NFTContractTypeName } from './ethereum';
-import { NFT } from './nft';
+import { NFT, NFTContractTypeName, NftFactory } from './nft';
 
 export const getMetadataURL = (nft: NFT, contractTypeName?: NFTContractTypeName): (string | null | undefined) => {
   if (contractTypeName === 'zora') {

@@ -1,6 +1,7 @@
 import { Knex } from 'knex';
 
-import { MetaFactory, FactoryContractTypeName } from '../../types/ethereum';
+import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
+import { NFTStandard } from '../../types/nft';
 import { MusicPlatformType } from '../../types/platform';
 import { addMetaFactory, removeMetaFactory } from '../migration-helpers';
 
@@ -9,8 +10,9 @@ const INITIAL_CONTRACTS: MetaFactory[] = [
     address: '0x78e3adc0e811e4f93bd9f1f9389b923c9a3355c2',
     platformId: MusicPlatformType.sound,
     startingBlock: '13725566',
-    contractType: FactoryContractTypeName.soundArtistProfileCreator,
-    gap: '500000'
+    contractType: MetaFactoryTypeName.soundArtistProfileCreator,
+    gap: '500000',
+    standard: NFTStandard.ERC721
   },
 ]
 

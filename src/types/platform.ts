@@ -1,8 +1,7 @@
 import { DBClient } from '../db/db';
 
 import { ArtistProfile } from './artist';
-import { NftFactory } from './ethereum';
-import { NFT } from './nft';
+import { NFT, NftFactory } from './nft';
 import catalogMappers from './platforms-types/catalog';
 import chaosMappers from './platforms-types/chaos';
 import mintsongsV2Mappers from './platforms-types/mintsongs-v2';

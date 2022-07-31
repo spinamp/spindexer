@@ -1,7 +1,10 @@
 import { ValidContractNFTCallFunction } from '../clients/ethereum';
 
-import { NFTContractTypeName, NFTContractTypes, NFTStandard } from './ethereum';
+import { ArtistProfile } from './artist';
+import { Contract } from './contract';
+import { NFTFactoryTypes } from './nftFactory';
 import { Record } from './record';
+import { ProcessedTrack } from './track';
 
 export enum Chain {
   ETHEREUM = 'ethereum',
@@ -29,8 +32,41 @@ export type ERC721Transfer = Record & {
   nftId: string;
 };
 
+export enum NFTContractTypeName {
+  default = 'default',
+  zora = 'zora',
+  nina = 'nina'
+}
+
+export enum NFTStandard {
+  ERC721 = 'erc721',
+  METAPLEX = 'metaplex'
+}
+
+export type TypeMetadata = {
+  overrides: {
+    track?: Partial<ProcessedTrack>,
+    artist?: Partial<ArtistProfile>
+  }
+}
+
+export type NftFactory = Contract & {
+  platformId: string,
+  contractType: NFTContractTypeName,
+  name?: string,
+  symbol?: string,
+  typeMetadata?: TypeMetadata
+  standard: NFTStandard
+}
+
+export type NFTContractType = {
+  contractCalls: ValidContractNFTCallFunction[],
+  contractMetadataField: ValidContractNFTCallFunction,
+  buildNFTId: (contractAddress: string, tokenId: bigint) => string,
+}
+
 export const getNFTContractCalls = (nft: NFT, contractTypeName: NFTContractTypeName) => {
-  const contractType = NFTContractTypes[contractTypeName];
+  const contractType = NFTFactoryTypes[contractTypeName];
   return contractType?.contractCalls.map(call => {
     return {
       contractAddress: nft.contractAddress,

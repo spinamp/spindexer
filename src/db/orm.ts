@@ -1,6 +1,5 @@
-import { NftFactory, MetaFactory, NFTStandard } from '../types/ethereum';
-import { NFT } from '../types/nft';
-import { MusicPlatformType } from '../types/platform';
+import { MetaFactory } from '../types/metaFactory';
+import { NFT, NftFactory, NFTStandard } from '../types/nft';
 import { IdField, Record, RecordUpdate } from '../types/record';
 
 import { Table } from './db';
@@ -26,13 +25,14 @@ const toRecordMapper: any = {
       standard: c.standard
     });
   }),
-  [Table.metaFactories]: (factoryContracts: MetaFactory[]): IdField[] => factoryContracts.map((c: any) => {
+  [Table.metaFactories]: (factoryContracts: MetaFactory[]): IdField[] => factoryContracts.map((c) => {
     return ({
-      id: c.platformId === MusicPlatformType.nina ? c.address : c.address.toLowerCase(), // solana addresses are base58 encoded so are case sensitive
+      id: c.standard === NFTStandard.METAPLEX ? c.address : c.address.toLowerCase(), // solana addresses are base58 encoded so are case sensitive
       platformId: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,
-      gap: c.gap
+      gap: c.gap,
+      standard: c.standard
     });
   }),
 }
@@ -69,6 +69,7 @@ const fromRecordMapper: any = {
       startingBlock: c.startingBlock,
       contractType: c.contractType,
       gap: c.gap,
+      standard: c.standard
     });
   }),
 }

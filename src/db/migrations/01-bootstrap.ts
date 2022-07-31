@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-import { NFTStandard } from '../../types/ethereum';
+import { NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
 import { Table } from '../db';
 
@@ -33,6 +33,7 @@ const INITIAL_TABLES = [
       table.string('startingBlock');
       table.string('contractType');
       table.string('gap');
+      table.enu('standard', Object.values(NFTStandard)).defaultTo(NFTStandard.ERC721);
     }
   },
   {

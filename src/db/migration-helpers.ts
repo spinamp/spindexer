@@ -1,6 +1,7 @@
 import { Knex } from 'knex';
 
-import { MetaFactory, NftFactory } from '../types/ethereum';
+import { MetaFactory } from '../types/metaFactory';
+import { NftFactory } from '../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../types/platform';
 
 import { Table } from './db';

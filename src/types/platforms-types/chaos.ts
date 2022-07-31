@@ -4,8 +4,7 @@ import slugify from 'slugify';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { NftFactory } from '../ethereum';
-import { NFT, getTrait } from '../nft';
+import { NFT, getTrait, NftFactory } from '../nft';
 import { ProcessedTrack } from '../track';
 
 const mapTrack = (

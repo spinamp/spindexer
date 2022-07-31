@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-import { NFTContractTypeName, NftFactory, NFTStandard } from '../../types/ethereum';
+import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { MusicPlatformType } from '../../types/platform';
 import { addNftFactory, removeNftFactory } from '../migration-helpers';
 

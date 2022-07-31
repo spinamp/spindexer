@@ -1,7 +1,7 @@
 
 import { Knex } from 'knex';
 
-import { NFTContractTypeName, NftFactory, NFTStandard } from '../../types/ethereum';
+import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { addNftFactory, removeNftFactory } from '../migration-helpers';
 
 const ROHKI_VROOM: NftFactory = {

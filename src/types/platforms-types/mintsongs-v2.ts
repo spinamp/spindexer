@@ -5,8 +5,7 @@ import { extractHashFromURL } from '../../clients/ipfs';
 import { DBClient } from '../../db/db';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { NftFactory } from '../ethereum';
-import { NFT } from '../nft';
+import { NFT, NftFactory } from '../nft';
 import { ProcessedTrack } from '../track';
 
 const extractArtistIdFromNFT = (nft: NFT) => {

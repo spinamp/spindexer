@@ -2,7 +2,7 @@
 import { EthClient, ValidContractCallFunction } from '../../clients/ethereum';
 import { Table } from '../../db/db';
 import { fromDBRecords } from '../../db/orm';
-import { NftFactory, NFTStandard } from '../../types/ethereum';
+import { NftFactory, NFTStandard } from '../../types/nft';
 import { Clients } from '../../types/processor';
 import { Trigger } from '../../types/trigger';
 

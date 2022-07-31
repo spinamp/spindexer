@@ -2,8 +2,7 @@ import * as MetaplexFoundation from '@metaplex-foundation/js';
 
 import { Table } from '../../db/db';
 import { newNinaContracts } from '../../triggers/nina';
-import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/ethereum';
-import { NFT } from '../../types/nft';
+import { NFT, NFTContractTypeName, NftFactory, NFTStandard } from '../../types/nft';
 import { MusicPlatformType } from '../../types/platform';
 import { Clients, Processor } from '../../types/processor';
 

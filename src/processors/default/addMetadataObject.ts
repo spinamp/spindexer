@@ -3,9 +3,8 @@ import { Axios, AxiosResponse, AxiosError } from 'axios';
 import { IPFSClient } from '../../clients/ipfs';
 import { Table } from '../../db/db';
 import { missingMetadataObject } from '../../triggers/missing';
-import { NftFactory } from '../../types/ethereum';
 import { getMetadataURL } from '../../types/metadata';
-import { NFT } from '../../types/nft';
+import { NFT, NftFactory } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 import { rollPromises } from '../../utils/rollingPromises';
 

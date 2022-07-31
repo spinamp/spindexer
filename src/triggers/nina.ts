@@ -3,7 +3,7 @@ import { web3, AnchorProvider, Program, Wallet } from '@project-serum/anchor';
 import { Keypair } from '@solana/web3.js';
 
 import { Table } from '../db/db';
-import { MetaFactory } from '../types/ethereum';
+import { MetaFactory } from '../types/metaFactory';
 import { NFT } from '../types/nft';
 import { MusicPlatformType } from '../types/platform';
 import { Trigger } from '../types/trigger';

@@ -16,10 +16,10 @@ export const missingMetadataObject: Trigger<undefined> = async (clients) => {
     left outer join "${Table.nftProcessErrors}" enpe
     on n.id = enpe."nftId"
     where enpe."metadataError" is null
-    and n.metadata is null  
+    and n.metadata is null
+    limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
   `
-  const nfts = (await clients.db.rawSQL(nftQuery))
-    .rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+  const nfts = (await clients.db.rawSQL(nftQuery)).rows
   return nfts;
 };
 
@@ -28,9 +28,10 @@ export const missingMetadataIPFSHash: Trigger<undefined> = async (clients) => {
   left outer join "${Table.nftProcessErrors}" enpe 
   on n.id = enpe."nftId" 
   where enpe."metadataError" is null
-  and n."metadataIPFSHash" is null`;
-  const nfts = (await clients.db.rawSQL(nftQuery))
-    .rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+  and n."metadataIPFSHash" is null
+  limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
+  `;
+  const nfts = (await clients.db.rawSQL(nftQuery)).rows
   return nfts;
 };
 
@@ -57,13 +58,16 @@ export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Tr
 
     const nfts = (await clients.db.rawSQL(
       nftQuery
-    )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+    )).rows
     return nfts;
   };
 
 export const unprocessedNFTs: Trigger<undefined> = async (clients) => {
   const nfts = (await clients.db.rawSQL(
-    `select * from ${Table.nfts} where "tokenURI" is null;`
-  )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+    `select * from ${Table.nfts}
+     where "tokenURI" is null
+     limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
+    `
+  )).rows
   return nfts;
 };
