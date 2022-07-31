@@ -56,7 +56,6 @@ export const newNinaContracts: Trigger<undefined> = async (clients) => {
 };
 
 export const missingCreatedAtTimeWithMetadataDate: Trigger<undefined> = async (clients) => {
-
   const nftQuery = `
     select *
     from "${Table.nfts}"
@@ -65,7 +64,6 @@ export const missingCreatedAtTimeWithMetadataDate: Trigger<undefined> = async (c
     limit ${process.env.QUERY_TRIGGER_BATCH_SIZE}
 `;
 
-  const nfts = (await clients.db.rawSQL(nftQuery))
-    .rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+  const nfts = (await clients.db.rawSQL(nftQuery)).rows
   return nfts;
 };

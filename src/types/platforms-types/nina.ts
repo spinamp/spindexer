@@ -56,7 +56,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
 };
 
 const mapNFTtoTrackID = (nft: NFT): string => {
-  return `${nft.id}`
+  return `metaplex/${nft.id}`
 };
 
 const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
