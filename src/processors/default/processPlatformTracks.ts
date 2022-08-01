@@ -5,10 +5,11 @@ import { fromDBRecords } from '../../db/orm';
 import { erc721NFTsWithoutTracks } from '../../triggers/missing';
 import { ArtistProfile, mapArtist } from '../../types/artist';
 import { NFT, NftFactory } from '../../types/nft';
+import { NFTProcessError } from '../../types/nftProcessError';
 import { MusicPlatform, platformConfigs } from '../../types/platform';
 import { Clients, MapTrack, Processor, TrackAPIClient } from '../../types/processor';
 import { Record } from '../../types/record';
-import { ProcessedTrack, mergeProcessedTracks, NFTProcessError, NFTTrackJoin } from '../../types/track';
+import { ProcessedTrack, mergeProcessedTracks, NFTTrackJoin } from '../../types/track';
 
 const name = 'processTracks';
 

@@ -8,11 +8,6 @@ export type SubgraphTrack = {
   id: string
 }
 
-export type NFTProcessError = {
-  nftId: string;
-  processError: string;
-}
-
 export type NFTTrackJoin = {
   nftId: string;
   processedTrackId: string;
