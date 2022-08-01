@@ -117,6 +117,7 @@ const INITIAL_TABLES = [
       table.string('processError', 3000);
       table.string('metadataError', 3000),
       table.integer('numberOfRetries').defaultTo(0)
+      table.dateTime('lastRetry')
     }
   },
   {
