@@ -1,14 +1,14 @@
 import { Table } from '../../db/db';
 import { errorRetry } from '../../triggers/errors';
-import { ERC721NFTProcessError } from '../../types/erc721nftProcessError';
+import { NFTProcessError } from '../../types/nftProcessError';
 import { Clients, Processor } from '../../types/processor';
 
 export const errorProcessor: Processor = {
-  
+
   name: 'errorProcessor',
   trigger: errorRetry,
-  processorFunction: async (nftErrors: ERC721NFTProcessError[], clients: Clients) => {
-    const nftUpdates: ERC721NFTProcessError[] = nftErrors.map((n) => ({
+  processorFunction: async (nftErrors: NFTProcessError[], clients: Clients) => {
+    const nftUpdates: NFTProcessError[] = nftErrors.map((n) => ({
       nftId: n.nftId,
       metadataError: undefined,
       processError: undefined,
