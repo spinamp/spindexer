@@ -43,9 +43,9 @@ export const runProcessors = async (processors: Processor[], dbClient: DBClient)
     }
   }
 
-  const numberOfERC721NFTs = await dbClient.getNumberRecords(Table.nfts);
+  const numberOfNFTss = await dbClient.getNumberRecords(Table.nfts);
   const numberOfProcessedTracks = await dbClient.getNumberRecords(Table.processedTracks);
-  console.info(`DB has ${numberOfERC721NFTs} nfts`);
+  console.info(`DB has ${numberOfNFTss} nfts`);
   console.info(`DB has ${numberOfProcessedTracks} processed tracks`);
   await dbClient.close();
   return false;

@@ -4,7 +4,7 @@ import { NFTProcessError } from '../../types/nftProcessError';
 import { Clients, Processor } from '../../types/processor';
 
 export const errorProcessor: Processor = {
-  
+
   name: 'errorProcessor',
   trigger: errorRetry,
   processorFunction: async (nftErrors: NFTProcessError[], clients: Clients) => {
