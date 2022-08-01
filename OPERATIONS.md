@@ -27,9 +27,8 @@ yarn restore-db
 
 ```sql
 -- Clear all erc721nfts where there was an error with their metadata or processing them into tracks so they can be tried again:
-select * from "erc721nftProcessErrors";
-
-delete from "erc721nftProcessErrors";
+select * from "nftProcessErrors";
+delete from "nftProcessErrors";
 ```
 
 ```sql
@@ -43,6 +42,5 @@ delete from erc721nfts where id like '%0xf5819e27b9bad9f97c177bf007c1f96f26d91ca
 delete from "processedTracks";
 delete from "artistProfiles";
 delete from "artists";
-delete from "erc721nfts";
 delete from processors where id in ('stripIgnoredNFTs','createProcessedTracksFromAPI_noizd');
 ```
