@@ -12,7 +12,8 @@ export const errorProcessor: Processor = {
       nftId: n.nftId,
       metadataError: undefined,
       processError: undefined,
-      numberOfRetries: n.numberOfRetries + 1
+      numberOfRetries: n.numberOfRetries + 1,
+      lastRetry: new Date()
     }));
     await clients.db.upsert(Table.nftProcessErrors, nftUpdates, 'nftId');
   },

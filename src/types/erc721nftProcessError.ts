@@ -3,4 +3,5 @@ export type ERC721NFTProcessError = {
   processError?: string;
   metadataError?: string;
   numberOfRetries: number;
+  lastRetry?: Date;
 }

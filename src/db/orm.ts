@@ -35,6 +35,12 @@ const toRecordMapper: any = {
       standard: c.standard
     });
   }),
+  [Table.erc721nftProcessErrors]: (erc721Contracts: ERC721Contract[]): IdField[] => erc721Contracts.map((c: any) => {
+    return ({
+      ...c,
+      lastRetry: c.lastRetry ? c.lastRetry.toISOString() : null
+    });
+  }),
 }
 
 export const toDBRecords = <RecordType>(tableName: string, records: (RecordType | RecordUpdate<unknown>)[]) => {
@@ -70,6 +76,12 @@ const fromRecordMapper: any = {
       contractType: c.contractType,
       gap: c.gap,
       standard: c.standard
+    });
+  }),
+  [Table.erc721nftProcessErrors]: (erc721Contracts: ERC721Contract[]): IdField[] => erc721Contracts.map((c: any) => {
+    return ({
+      ...c,
+      lastRetry: c.lastRetry ? new Date(c.lastRetry) : null
     });
   }),
 }
