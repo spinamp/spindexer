@@ -44,13 +44,13 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
     addMetadataObjectProcessor(nftFactoriesByAddress),
     stripNonAudio,
     categorizeZora,
+    createNinaNfts,
+    addTimestampFromMetadata,
     ...platformTrackProcessors,
     createProcessedTracksFromAPI('noizd'), //TODO: noizd here is being used both as platformId and MusicPlatformType. Need to bring in the full noizd platform object here and avoid mixing them
     ipfsAudioPinner,
     ipfsArtworkPinner,
     errorProcessor,
-    createNinaNfts,
-    addTimestampFromMetadata,
   ]
 };
 

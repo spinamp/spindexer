@@ -104,7 +104,7 @@ const INITIAL_TABLES = [
     }
   },
   {
-    name: Table.nfts_processedTracks, create: (table: Knex.CreateTableBuilder) => { 
+    name: Table.nfts_processedTracks, create: (table: Knex.CreateTableBuilder) => {
       table.string('nftId').references('id').inTable(Table.nfts).onDelete('cascade');
       table.string('processedTrackId').references('id').inTable(Table.processedTracks).onDelete('cascade');
       table.primary(['nftId','processedTrackId']);
@@ -146,6 +146,7 @@ const INITIAL_PLATFORM_ENUMS: MusicPlatform[] = [
   { id: 'noizd', type: MusicPlatformType.noizd, name: 'NOIZD' },
   { id: 'catalog', type: MusicPlatformType.catalog, name: 'Catalog' },
   { id: 'sound', type: MusicPlatformType.sound, name: 'Sound.xyz' },
+  { id: 'zoraOriginals', type: MusicPlatformType.zora, name: 'Zora' },
   { id: 'zora', type: MusicPlatformType.zora, name: 'Zora' },
 ]
 
