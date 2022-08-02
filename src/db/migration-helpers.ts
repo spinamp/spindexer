@@ -30,10 +30,12 @@ export const removePlatform = async (knex: Knex, platform: MusicPlatform) => {
 
   // await knex.raw(`delete from "${Table.nftFactories}" where "platformId" = '${platform.id}'`);
   // await knex.raw(`delete from "${Table.artistProfiles}" where "platformId" = '${platform.id}'`)
-  await knex.raw(`delete from "${Table.platforms}" where id = '${platform.id}'`)
-  await knex.raw(`ALTER TABLE platforms drop constraint "platforms_type_check"`);
-  const validTypes = Object.values(MusicPlatformType).map(type => `'${type}'::text`).join(', ');
-  await knex.raw(`ALTER TABLE platforms add constraint "platforms_type_check" CHECK (type = ANY (ARRAY[${validTypes}]))`);
+ 
+  // await knex.raw(`delete from "${Table.platforms}" where id = '${platform.id}'`)
+  // await knex.raw(`ALTER TABLE platforms drop constraint "platforms_type_check"`);
+  // const validTypes = Object.values(MusicPlatformType).map(type => `'${type}'::text`).join(', ');
+  // await knex.raw(`ALTER TABLE platforms add constraint "platforms_type_check" CHECK (type = ANY (ARRAY[${validTypes}]))`);
+  throw 'not implemented'
 }
 
 export const addMetaFactory = async(knex: Knex, contract: MetaFactory) => {
@@ -45,14 +47,15 @@ export const addMetaFactory = async(knex: Knex, contract: MetaFactory) => {
 }
 
 export const removeMetaFactory = async(knex: Knex, contract: MetaFactory) => {
-  if (!contract.address || contract.address.length === 0) {
-    throw new Error('Invalid contract address');
-  }
+  throw 'not implemented'
+  // if (!contract.address || contract.address.length === 0) {
+  //   throw new Error('Invalid contract address');
+  // }
 
-  await knex.raw(`delete from "${Table.nfts}" where "platformId" = '${contract.platformId}'`)
-  await knex.raw(`delete from "${Table.nftFactories}" where "platformId" = '${contract.platformId}'`)
+  // await knex.raw(`delete from "${Table.nfts}" where "platformId" = '${contract.platformId}'`)
+  // await knex.raw(`delete from "${Table.nftFactories}" where "platformId" = '${contract.platformId}'`)
 
-  await knex(Table.metaFactories).whereILike('id', contract.address).del()
+  // await knex(Table.metaFactories).whereILike('id', contract.address).del()
 }
 
 export const addNftFactory = async(knex: Knex, contract: NftFactory) => {
@@ -94,6 +97,7 @@ export const clearERC721Contract = async(knex: Knex, contract: NftFactoryAddress
 
 
 export const removeNftFactory = async(knex: Knex, contract: NftFactory) => {
-  await clearERC721Contract(knex, contract);
-  await knex.raw(`delete from "${Table.nftFactories}" where id ilike '${contract.address}';`);
+  throw 'not implemented'
+  // await clearERC721Contract(knex, contract);
+  // await knex.raw(`delete from "${Table.nftFactories}" where id ilike '${contract.address}';`);
 }
