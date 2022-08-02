@@ -57,13 +57,13 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
 const updateDBLoop = async () => {
   const dbClient = await db.init();
   const nftFactories = await dbClient.getRecords<NftFactory>(Table.nftFactories);
-  const metaFactories = await dbClient.getRecords<MetaFactory>(Table.metaFactories, [
+  const erc721MetaFactories = await dbClient.getRecords<MetaFactory>(Table.metaFactories, [
     [
       'where', ['standard', NFTStandard.ERC721.toString()]
     ]
   ]);
   const musicPlatforms = await dbClient.getRecords<MusicPlatform>(Table.platforms);
-  await runProcessors(PROCESSORS(nftFactories, metaFactories, musicPlatforms), dbClient);
+  await runProcessors(PROCESSORS(nftFactories, erc721MetaFactories, musicPlatforms), dbClient);
 };
 
 process.on('SIGINT', () => {
