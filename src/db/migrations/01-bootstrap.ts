@@ -146,7 +146,7 @@ const INITIAL_PLATFORM_ENUMS: MusicPlatform[] = [
   { id: 'noizd', type: MusicPlatformType.noizd, name: 'NOIZD' },
   { id: 'catalog', type: MusicPlatformType.catalog, name: 'Catalog' },
   { id: 'sound', type: MusicPlatformType.sound, name: 'Sound.xyz' },
-  { id: 'zoraOriginals', type: MusicPlatformType.zora, name: 'Zora' },
+  { id: 'zoraOriginal', type: MusicPlatformType.zora, name: 'Zora' },
   { id: 'zora', type: MusicPlatformType.zora, name: 'Zora' },
 ]
 
