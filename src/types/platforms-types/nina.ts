@@ -44,10 +44,12 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
     throw new Error(`NFT missing for mapArtistProfile for nft`)
   }
 
+  const artistId = `nina/${nft.metadata.properties.artist.replace(' ', '-')}`;
+
   return {
     name: nft.metadata.properties.artist,
-    artistId: `nina/${nft.metadata.properties.artist.replace(' ', '-')}`,
-    platformInternalId: nft.platformId,
+    artistId,
+    platformInternalId: artistId,
     platformId: nft.platformId,
     avatarUrl: undefined,
     websiteUrl: `${nft.metadata.external_url}/related`,
