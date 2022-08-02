@@ -50,7 +50,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
     platformInternalId: nft.platformId,
     platformId: nft.platformId,
     avatarUrl: undefined,
-    websiteUrl: nft.metadata.external_url,
+    websiteUrl: `${nft.metadata.external_url}/related`,
     createdAtTime: nft.createdAtTime, 
   }
 };
