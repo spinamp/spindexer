@@ -20,6 +20,8 @@ const processorFunction = (contracts: NftFactory[]) =>
     const newNFTs: Partial<NFT>[] = [];
     const updates: Partial<NFT>[] = [];
     const transfers: Partial<ERC721Transfer>[] = [];
+    const allNfts = await clients.db.getRecords<NFT>(Table.nfts);
+    const allNftContractAddresses = new Set(allNfts.map(nft => nft.contractAddress));
     items.forEach((item): Partial<NFT> | undefined => {
       const address = item.address;
       const contract = contractsByAddress[address];
@@ -32,15 +34,17 @@ const processorFunction = (contracts: NftFactory[]) =>
 
       const tokenId = BigInt((item.args!.tokenId as BigNumber).toString());
       const newMint = item.args!.from === ETHEREUM_NULL_ADDRESS;
-      transfers.push({
-        id: `${CHAIN}/${item.blockNumber}/${item.logIndex}`,
-        contractAddress: formatAddress(contract.address),
-        from: item.args!.from,
-        to: item.args!.to,
-        tokenId,
-        createdAtEthereumBlockNumber: '' + item.blockNumber,
-        nftId: contractType.buildNFTId(contract.address, tokenId), 
-      });
+      if (allNftContractAddresses.has(formatAddress(contract.address))){
+        transfers.push({
+          id: `${CHAIN}/${item.blockNumber}/${item.logIndex}`,
+          contractAddress: formatAddress(contract.address),
+          from: item.args!.from,
+          to: item.args!.to,
+          tokenId,
+          createdAtEthereumBlockNumber: '' + item.blockNumber,
+          nftId: contractType.buildNFTId(contract.address, tokenId), 
+        });
+      }
       if (!newMint) {
         updates.push({
           id: contractType.buildNFTId(contract.address, tokenId),
