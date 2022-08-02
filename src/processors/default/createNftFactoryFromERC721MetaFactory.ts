@@ -25,7 +25,7 @@ const processorFunction = (factoryContract: MetaFactory, name: string) =>
 
   };
 
-export const createNftFactoryFromMetaFactoryProcessor: (factoryContract: MetaFactory) =>
+export const createNftFactoryFromERC721MetaFactoryProcessor: (factoryContract: MetaFactory) =>
 Processor = (factoryContract: MetaFactory) => ({
   name: `${NAME}_${factoryContract.address}`,
   trigger: newERC721Contract(factoryContract),
