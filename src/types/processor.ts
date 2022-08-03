@@ -8,8 +8,7 @@ import { NOIZDClient } from '../clients/noizd';
 import { SoundClient } from '../clients/sound';
 import { DBClient } from '../db/db';
 
-import { NftFactory } from './ethereum';
-import { NFT } from './nft';
+import { NFT, NftFactory } from './nft';
 import { ProcessedTrack } from './track';
 import { Cursor, Trigger } from './trigger';
 

@@ -1,3 +1,5 @@
+*Note: This doc is a bit out of date*
+
 # Overview
 To ingest custom contracts and platforms, we need a mechanism to standardize across all platforms.
 
@@ -220,13 +222,6 @@ async:
  - basically each new master is minted with an nft with json metadata that links to all the layers and stems
  - everything should be doable just from on-chain+ipfs metadata
  - likely need a pinning and audio processing phase to ensure high quality api though
-
-hedstape:
- - nfts have just a single audio file for the full mixtape
- - metadata has links out to other artists but just via artist name
- - def need a pinning and audio processing phase to ensure high quality api
- - their frontend also queries for partial ranges on the audio data based on track timestamps - would likely need similar capability on both ui and api for good ux
- - need to work out how to handle duplicate tracks eg: many heds tracks are minted on catalog too
 
 other todos:
  - Should some contracts require approval for track creation instead of being automated? eg: if mapNFTsToTrackIds can't be 100% reliable

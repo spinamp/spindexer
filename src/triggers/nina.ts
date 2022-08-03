@@ -37,7 +37,7 @@ export const newNinaContracts: Trigger<undefined> = async (clients) => {
     await metaplex.nfts()
       .findAllByMintList(
         releases.map(
-          release => release.account.releaseMint
+          release => release.account.releaseMint as web3.PublicKey
         )
       )
   ).filter(x => x);
@@ -51,7 +51,7 @@ export const newNinaContracts: Trigger<undefined> = async (clients) => {
   const allMintAccounts = new Set(metadataAccounts.map(account => account!.mint.toBase58()));
   const existingMintAccounts = new Set(existingContracts);
 
-  const releasesByMintAddress = _.keyBy(releases, release => release.account.releaseMint.toBase58())
+  const releasesByMintAddress = _.keyBy(releases, release => (release.account.releaseMint as web3.PublicKey).toBase58())
 
   const newMintAccounts = new Set(([...allMintAccounts].filter(mint => !existingMintAccounts.has(mint))));
 

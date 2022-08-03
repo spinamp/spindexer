@@ -1,5 +1,5 @@
 import * as MetaplexFoundation from '@metaplex-foundation/js';
-import { ProgramAccount, IdlTypes, Idl } from '@project-serum/anchor';
+import { web3, ProgramAccount, IdlTypes, Idl } from '@project-serum/anchor';
 import { IdlAccountDef } from '@project-serum/anchor/dist/cjs/idl';
 import { TypeDef } from '@project-serum/anchor/dist/cjs/program/namespace/types';
 
@@ -42,7 +42,7 @@ export const createNinaNfts: Processor = {
       typeMetadata: {
         overrides: {
           artist: {
-            artistId: release.account.authority.toBase58()
+            artistId: (release.account.authority as web3.PublicKey).toBase58()
           }
         }
       }
