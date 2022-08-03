@@ -1,9 +1,11 @@
-# web3-music-pipeline
+# Spindexer
 
-This is a multi-stage processing pipeline that generates a comprehensive web3 music database and:
- - Augments on-chain data with additional info needed (eg: from off-chain sources/ipfs)
- - Transforms data into a more comprehensive, robust schema
- - Saves and keeps alive an updated real time DB
+Spindexer is a web3 indexer built to be fast, scalable, parallelizable, highly functional and primed for future decentralization. It can index from both on-chain and off-chain sources across multiple chains and offchain APIs. It is currently specialized to focus on music nft indexing.
+
+Spindexer runs as multi-stage processing pipeline that generates a comprehensive web3 music database and:
+ - Augments on-chain data with additional info needed (eg: from off-chain, centralized sources, ipfs and arweave)
+ - Transforms data into a more comprehensive, robust and standardized schema
+ - Saves and maintains an updated real time DB and API
 
 ## Requirements to run
  - NodeJS/yarn setup
