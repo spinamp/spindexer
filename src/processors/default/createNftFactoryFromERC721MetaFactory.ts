@@ -6,7 +6,7 @@ import { MetaFactory, MetaFactoryTypes } from '../../types/metaFactory';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';
 
-const NAME = 'createNftFactoryFromMetaFactoryProcessor';
+const NAME = 'createNftFactoryFromERC721MetaFactoryProcessor';
 
 const processorFunction = (factoryContract: MetaFactory, name: string) =>
   async ({ newCursor, items: events }: { newCursor: Cursor, items: ethers.Event[] }, clients: Clients) => {
