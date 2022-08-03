@@ -3,7 +3,7 @@ import { Knex } from 'knex';
 
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
-import { addPlatform, removeNftFactory, removePlatform } from '../migration-helpers';
+import { addNftFactory, addPlatform, removeNftFactory, removePlatform } from '../migration-helpers';
 
 const GLASSHOUSE_PLATFORM: MusicPlatform = {
   id: '0x719C6d392fc659f4fe9b0576cBC46E18939687a7',
@@ -30,6 +30,7 @@ const GLASSHOUSE: NftFactory = {
 
 export const up = async (knex: Knex) => {
   await addPlatform(knex, GLASSHOUSE_PLATFORM)
+  await addNftFactory(knex, GLASSHOUSE)
 }
 
 export const down = async (knex: Knex) => {
