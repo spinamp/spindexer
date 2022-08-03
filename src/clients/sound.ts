@@ -1,7 +1,7 @@
 import { gql, GraphQLClient } from 'graphql-request';
 
 import { formatAddress } from '../types/address';
-import { ERC721NFT } from '../types/erc721nft';
+import { NFT } from '../types/nft';
 
 const soundAPI = new GraphQLClient(
   'https://api.sound.xyz/graphql',
@@ -84,7 +84,7 @@ const init = async () => {
     return allMintedReleases;
   };
 
-  const getNFTTitle = (nft: ERC721NFT) => {
+  const getNFTTitle = (nft: NFT) => {
     if (!nft.metadata) {
       console.error({ nft })
       throw new Error('Missing nft metadata');
@@ -101,13 +101,13 @@ const init = async () => {
     return splitName[0].trim();
   }
 
-  const nftMatchesTrack = (nft: ERC721NFT, apiTrack: any) => {
+  const nftMatchesTrack = (nft: NFT, apiTrack: any) => {
     const sameArtistAsNFT = formatAddress(apiTrack.artist.artistContractAddress) === formatAddress(nft.contractAddress);
     const sameTrackAsNFT = apiTrack.title.trim() === getNFTTitle(nft);
     return sameArtistAsNFT && sameTrackAsNFT;
   }
 
-  const fetchTracksByNFT = async (nfts: ERC721NFT[]) => {
+  const fetchTracksByNFT = async (nfts: NFT[]) => {
     const apiResponse = await getAllMintedReleasesFunction();
     const apiTracks = apiResponse.map(apiTrack => ({
       ...apiTrack,
@@ -115,7 +115,7 @@ const init = async () => {
     }))
 
     const filteredAPITracks = apiTracks.filter(apiTrack => {
-      const matchedNFT = nfts.find((nft: ERC721NFT) => nftMatchesTrack(nft, apiTrack));
+      const matchedNFT = nfts.find((nft: NFT) => nftMatchesTrack(nft, apiTrack));
       return !!matchedNFT;
     });
     filteredAPITracks.forEach(apiTrack => {

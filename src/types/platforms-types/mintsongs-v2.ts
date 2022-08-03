@@ -5,11 +5,10 @@ import { extractHashFromURL } from '../../clients/ipfs';
 import { DBClient } from '../../db/db';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { ERC721NFT } from '../erc721nft';
-import { ERC721Contract } from '../ethereum';
+import { NFT, NftFactory } from '../nft';
 import { ProcessedTrack } from '../track';
 
-const extractArtistIdFromNFT = (nft: ERC721NFT) => {
+const extractArtistIdFromNFT = (nft: NFT) => {
   const artistURL = nft.metadata.external_url;
   const prefix = artistURL.slice(0,28);
   if (prefix !== 'https://www.mintsongs.com/u/') {
@@ -23,9 +22,9 @@ const extractArtistIdFromNFT = (nft: ERC721NFT) => {
 }
 
 const mapTrack = (
-  nft: ERC721NFT,
+  nft: NFT,
   apiTrack: any,
-  contract?: ERC721Contract,
+  contract?: NftFactory,
   trackId?: string
 ): ProcessedTrack => {
   if (!contract) {
@@ -50,7 +49,7 @@ const mapTrack = (
   })
 };
 
-const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ERC721NFT, contract?: ERC721Contract }): ArtistProfile => {
+const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NFT, contract?: NftFactory }): ArtistProfile => {
   if (!nft) {
     throw new Error(`NFT missing for mapArtistProfile for nft`)
   }
@@ -69,18 +68,18 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ER
   }
 };
 
-const mapNFTtoLatestTrackID = (nft: ERC721NFT, dupNFTs: ERC721NFT[]): string => {
+const mapNFTtoLatestTrackID = (nft: NFT, dupNFTs: NFT[]): string => {
   const primaryNFT = selectPrimaryNFTForTrackMapper(dupNFTs);
   return `ethereum/${formatAddress(primaryNFT.contractAddress)}/${primaryNFT.tokenId}`;
 };
 
-const selectPrimaryNFTForTrackMapper = (nfts: ERC721NFT[]) => {
+const selectPrimaryNFTForTrackMapper = (nfts: NFT[]) => {
   const sortedNFTs = _.sortBy(nfts, 'tokenId');
   const lastNFT = sortedNFTs[sortedNFTs.length - 1];
   return lastNFT;
 }
 
-const mapNFTsToTrackIds = async (nfts: ERC721NFT[], dbClient?: DBClient): Promise<{ [trackId: string]: ERC721NFT[] }> => {
+const mapNFTsToTrackIds = async (nfts: NFT[], dbClient?: DBClient): Promise<{ [trackId: string]: NFT[] }> => {
   if (!dbClient) {
     throw new Error('DB Client not provided to mintsongs mapper')
   }

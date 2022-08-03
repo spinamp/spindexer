@@ -8,8 +8,8 @@ import { NOIZDClient } from '../clients/noizd';
 import { SoundClient } from '../clients/sound';
 import { DBClient } from '../db/db';
 
-import { ERC721NFT } from './erc721nft';
-import { ERC721Contract } from './ethereum';
+import { NftFactory } from './ethereum';
+import { NFT } from './nft';
 import { ProcessedTrack } from './track';
 import { Cursor, Trigger } from './trigger';
 
@@ -42,4 +42,4 @@ export type Processor = {
   initialCursor?: Cursor | undefined;
 };
 
-export type MapTrack = (nft: ERC721NFT, apiTrack: any, contract?: ERC721Contract | undefined, trackId?: string) => ProcessedTrack;
+export type MapTrack = (nft: NFT, apiTrack: any, contract?: NftFactory | undefined, trackId?: string) => ProcessedTrack;

@@ -5,15 +5,14 @@ import slugify from 'slugify';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { ERC721NFT, getTrait } from '../erc721nft';
-import { ERC721Contract } from '../ethereum';
+import { NFT, getTrait, NftFactory } from '../nft';
 import { MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
 const mapTrack: MapTrack = (
-  nft: ERC721NFT,
+  nft: NFT,
   apiTrack: any,
-  contract?: ERC721Contract,
+  contract?: NftFactory,
   trackId?: string,
 ): ProcessedTrack => {
   if (!contract) {
@@ -40,7 +39,7 @@ const mapTrack: MapTrack = (
   return track as ProcessedTrack;
 };
 
-const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ERC721NFT, contract?: ERC721Contract }): ArtistProfile => {
+const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NFT, contract?: NftFactory }): ArtistProfile => {
   if (!nft) {
     throw new Error(`NFT missing for mapArtistProfile for nft`)
   }
@@ -60,12 +59,12 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ER
   }
 };
 
-const mapNFTtoTrackID = (nft: ERC721NFT): string => {
+const mapNFTtoTrackID = (nft: NFT): string => {
   const trackName = getTrait(nft, 'Track');
   return `ethereum/${formatAddress(nft.contractAddress)}/${trackName}`;
 };
 
-const mapNFTsToTrackIds = async (nfts: ERC721NFT[]): Promise<{ [trackId: string]: ERC721NFT[] }> => {
+const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
 

@@ -1,14 +1,14 @@
 import { DBClient } from '../db/db';
 
 import { ArtistProfile } from './artist';
-import { ERC721NFT } from './erc721nft';
-import { ERC721Contract } from './ethereum';
+import { NFT, NftFactory } from './nft';
 import catalogMappers from './platforms-types/catalog';
-import chaos from './platforms-types/chaos';
-import mintsongsV2 from './platforms-types/mintsongs-v2';
+import chaosMappers from './platforms-types/chaos';
+import mintsongsV2Mappers from './platforms-types/mintsongs-v2';
 import multiTrackMultiprintContractMappers from './platforms-types/multi-track-multiprint-contract';
+import ninaMappers from './platforms-types/nina'
 import noizdMappers from './platforms-types/noizd';
-import singleTrackMultiprintContract from './platforms-types/single-track-multiprint-contract';
+import singleTrackMultiprintContractMappers from './platforms-types/single-track-multiprint-contract';
 import soundMappers from './platforms-types/sound';
 import { ProcessedTrack } from './track';
 
@@ -20,7 +20,8 @@ export enum MusicPlatformType {
   'single-track-multiprint-contract' = 'single-track-multiprint-contract',
   'multi-track-multiprint-contract' = 'multi-track-multiprint-contract',
   chaos = 'chaos',
-  mintsongsV2 = 'mintsongs-v2'
+  mintsongsV2 = 'mintsongs-v2',
+  nina = 'nina'
 }
 
 export type MusicPlatform = {
@@ -30,10 +31,10 @@ export type MusicPlatform = {
 }
 
 export type PlatformMapper = {
-  mapNFTsToTrackIds: (nfts: ERC721NFT[], dbClient?: DBClient) => Promise<{ [trackId: string]: ERC721NFT[] }>
-  mapTrack: (nft: ERC721NFT, apiTrack: any, contract?: ERC721Contract) => ProcessedTrack
-  mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: ERC721NFT, contract?: ERC721Contract }) => ArtistProfile
-  selectPrimaryNFTForTrackMapper?: (nfts: ERC721NFT[]) => ERC721NFT
+  mapNFTsToTrackIds: (nfts: NFT[], dbClient?: DBClient) => Promise<{ [trackId: string]: NFT[] }>
+  mapTrack: (nft: NFT, apiTrack: any, contract?: NftFactory) => ProcessedTrack
+  mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NFT, contract?: NftFactory }) => ArtistProfile
+  selectPrimaryNFTForTrackMapper?: (nfts: NFT[]) => NFT
 }
 
 export type MusicPlatformTypeConfig = {
@@ -62,7 +63,7 @@ export const platformConfigs: MusicPlatformTypeConfigs = {
 
   },
   'single-track-multiprint-contract': {
-    mappers: singleTrackMultiprintContract,
+    mappers: singleTrackMultiprintContractMappers,
     clientName: null,
   },
   'multi-track-multiprint-contract': {
@@ -70,11 +71,15 @@ export const platformConfigs: MusicPlatformTypeConfigs = {
     clientName: null,
   },
   'chaos': {
-    mappers: chaos,
+    mappers: chaosMappers,
     clientName: null,
   },
   'mintsongs-v2': {
-    mappers: mintsongsV2,
+    mappers: mintsongsV2Mappers,
     clientName: null,
+  },
+  'nina': {
+    mappers: ninaMappers,
+    clientName: null
   }
 }

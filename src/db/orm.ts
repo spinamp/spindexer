@@ -1,5 +1,6 @@
-import { ERC721NFT } from '../types/erc721nft';
-import { ERC721Contract } from '../types/ethereum';
+import { MetaFactory } from '../types/metaFactory';
+import { NFT, NftFactory, NFTStandard } from '../types/nft';
+import { NFTProcessError } from '../types/nftProcessError';
 import { IdField, Record, RecordUpdate } from '../types/record';
 
 import { Table } from './db';
@@ -13,21 +14,36 @@ const toDBRecord = <RecordType>(record: RecordType | RecordUpdate<unknown>) => {
 }
 
 const toRecordMapper: any = {
-  [Table.erc721Contracts]: (erc721Contracts: ERC721Contract[]): IdField[] => erc721Contracts.map((c: any) => {
+  [Table.nftFactories]: (erc721Contracts: NftFactory[]): IdField[] => erc721Contracts.map((c) => {
     return ({
-      id: c.address.toLowerCase(),
+      id: c.standard === NFTStandard.METAPLEX ? c.address : c.address.toLowerCase(), // solana addresses are base58 encoded so are case sensitive
       platformId: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,
       name: c.name,
       symbol: c.symbol,
-      typeMetadata: c.typeMetadata
+      typeMetadata: c.typeMetadata,
+      standard: c.standard
     });
   }),
-  [Table.erc721nftProcessErrors]: (erc721Contracts: ERC721Contract[]): IdField[] => erc721Contracts.map((c: any) => {
+  [Table.metaFactories]: (factoryContracts: MetaFactory[]): IdField[] => factoryContracts.map((c) => {
     return ({
-      ...c,
-      lastRetry: c.lastRetry ? c.lastRetry.toISOString() : null
+      id: c.standard === NFTStandard.METAPLEX ? c.address : c.address.toLowerCase(), // solana addresses are base58 encoded so are case sensitive
+      platformId: c.platformId,
+      startingBlock: c.startingBlock,
+      contractType: c.contractType,
+      gap: c.gap,
+      standard: c.standard
+    });
+  }),
+  [Table.nftProcessErrors]: (nftProcessErrors: NFTProcessError[]): 
+  { nftId: string; metadataError?: string; numberOfRetries?: number; lastRetry?: string; processError?: string }[] => nftProcessErrors.map((c) => {
+    return ({
+      nftId: c.nftId,
+      metadataError: c.metadataError,
+      numberOfRetries: c.numberOfRetries,
+      lastRetry: c.lastRetry ? c.lastRetry.toISOString() : undefined,
+      processError: c.processError
     });
   }),
 }
@@ -41,11 +57,11 @@ export const toDBRecords = <RecordType>(tableName: string, records: (RecordType 
 }
 
 const fromRecordMapper: any = {
-  [Table.erc721nfts]: (nfts: Record[]): ERC721NFT[] => nfts.map((n: any) => {
+  [Table.nfts]: (nfts: Record[]): NFT[] => nfts.map((n: any) => {
     const metadata = typeof n.metadata === 'object' ? n.metadata : JSON.parse(n.metadata);
     return ({ ...n, metadata });
   }),
-  [Table.erc721Contracts]: (erc721Contracts: Record[]): ERC721Contract[] => erc721Contracts.map((c: any) => {
+  [Table.nftFactories]: (erc721Contracts: Record[]): NftFactory[] => erc721Contracts.map((c: any) => {
     return ({
       address: c.id,
       platformId: c.platformId,
@@ -53,19 +69,21 @@ const fromRecordMapper: any = {
       contractType: c.contractType,
       name: c.name,
       symbol: c.symbol,
-      typeMetadata: c.typeMetadata
+      typeMetadata: c.typeMetadata,
+      standard: c.standard
     });
   }),
-  [Table.factoryContracts]: (factoryContracts: Record[]): ERC721Contract[] => factoryContracts.map((c: any) => {
+  [Table.metaFactories]: (factoryContracts: Record[]): MetaFactory[] => factoryContracts.map((c: any) => {
     return ({
       address: c.id,
       platformId: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,
       gap: c.gap,
+      standard: c.standard
     });
   }),
-  [Table.erc721nftProcessErrors]: (erc721Contracts: ERC721Contract[]): IdField[] => erc721Contracts.map((c: any) => {
+  [Table.nftProcessErrors]: (nftFactories: Record[]): NFTProcessError[] => nftFactories.map((c: any) => {
     return ({
       ...c,
       lastRetry: c.lastRetry ? new Date(c.lastRetry) : null

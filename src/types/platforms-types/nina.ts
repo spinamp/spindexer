@@ -1,8 +1,7 @@
+
 import _ from 'lodash';
 import slugify from 'slugify';
 
-import { extractHashFromURL } from '../../clients/ipfs';
-import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT, NftFactory } from '../nft';
 import { MapTrack } from '../processor';
@@ -14,52 +13,54 @@ const mapTrack: MapTrack = (
   contract?: NftFactory,
   trackId?: string,
 ): ProcessedTrack => {
-  if (!contract) {
-    throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
+
+  if (!nft) {
+    throw new Error(`NFT missing for mapArtistProfile for nft`)
   }
 
   const track: Partial<ProcessedTrack> = {
     id: mapNFTtoTrackID(nft),
-    platformInternalId: contract.address,
-    title: contract.name || nft.metadata.name,
+    platformInternalId: nft.id,
+    title: nft.metadata.properties.title.slice(0,1000),
     description: nft.metadata.description,
-    platformId: contract.platformId,
-    lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url),
-    lossyArtworkIPFSHash: extractHashFromURL(nft.metadata.image),
+    platformId: nft.platformId,
+    lossyAudioURL: nft.metadata.animation_url,
+    lossyArtworkURL: nft.metadata.image,
     websiteUrl: nft.metadata.external_url,
-    artistId: contract.platformId,
+    artistId: mapArtistProfile({ nft, contract, apiTrack }).artistId,
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
-    ...contract.typeMetadata?.overrides?.track
   };
 
-  track.slug = slugify(`${track.title} ${nft.createdAtTime.getTime()}`).toLowerCase();
+  track.slug = slugify(`${track.title} ${track.createdAtTime!.getTime()}`).toLowerCase();
 
   return track as ProcessedTrack;
 };
 
 const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NFT, contract?: NftFactory }): ArtistProfile => {
+
   if (!nft) {
     throw new Error(`NFT missing for mapArtistProfile for nft`)
   }
-  if (!contract) {
-    throw new Error(`Contract missing for mapArtistProfile for nft ${nft.id}`)
+
+  if (!contract?.typeMetadata?.overrides.artist?.artistId){
+    throw new Error('Missing artistId override')
   }
+  const artistId = contract.typeMetadata.overrides.artist.artistId;
+
   return {
-    name: contract.platformId, //set in db when contract is created in db
-    artistId: contract.platformId,
-    platformInternalId: contract.platformId,
-    platformId: contract.platformId,
+    name: nft.metadata.properties.artist,
+    artistId,
+    platformInternalId: artistId,
+    platformId: nft.platformId,
     avatarUrl: undefined,
-    websiteUrl: nft.metadata.external_url,
-    createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
-    ...contract.typeMetadata?.overrides?.artist
+    websiteUrl: `${nft.metadata.external_url}/related`,
+    createdAtTime: nft.createdAtTime, 
   }
 };
 
 const mapNFTtoTrackID = (nft: NFT): string => {
-  return `ethereum/${formatAddress(nft.contractAddress)}`;
+  return `solana/${nft.id}`
 };
 
 const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {

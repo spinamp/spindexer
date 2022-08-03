@@ -4,25 +4,26 @@ import { Cursor } from '../types/trigger'
 
 export enum Table {
   platforms = 'platforms',
-  erc721nfts = 'erc721nfts',
+  nfts = 'nfts',
   erc721Transfers = 'erc721Transfers',
   artists = 'artists',
   artistProfiles = 'artistProfiles',
   processedTracks = 'processedTracks',
   processors = 'processors',
-  factoryContracts = 'factoryContracts',
-  erc721Contracts = 'erc721Contracts',
-  erc721nfts_processedTracks = 'erc721nfts_processedTracks',
-  erc721nftProcessErrors = 'erc721nftProcessErrors',
+  metaFactories = 'metaFactories',
+  nftFactories = 'nftFactories',
+  nfts_processedTracks = 'nfts_processedTracks',
+  nftProcessErrors = 'nftProcessErrors',
   ipfsPins = 'ipfsPins',
 }
 
 export type WhereFunc = 'where'
-  | 'whereNull'
-  | 'andWhere'
-  | 'whereJsonPath'
-  | 'whereNotNull'
-  | 'whereIn';
+| 'whereNull'
+| 'andWhere'
+| 'whereJsonPath'
+| 'whereNotNull'
+| 'whereIn'
+| 'whereNotIn';
 
 export type WhereField = 'and';
 
@@ -34,11 +35,15 @@ export type Where = FieldWhere | FuncWhere;
 
 export type Wheres = Where[];
 
+export type QueryOptions = {
+  ignoreConflict?: string;
+}
+
 export type DBClient = {
   getDB: () => Knex;
   getCursor: (processor: string) => Promise<string | undefined>;
   getRecords: <Type>(tableName: Table, wheres?: Wheres) => Promise<Type[]>;
-  insert: <Type>(tableName: Table, rows: Type[]) => Promise<void>;
+  insert: <Type>(tableName: Table, rows: Type[], options?: QueryOptions) => Promise<void>;
   update: <Type>(tableName: Table, rows: Type[]) => Promise<void>;
   upsert: <Type>(tableName: Table, rows: Type[], idField?: string | string[]) => Promise<void>;
   delete: (tableName: Table, ids: string[], idField?: string) => Promise<void>;

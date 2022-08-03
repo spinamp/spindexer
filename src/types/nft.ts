@@ -1,9 +1,17 @@
 import { ValidContractNFTCallFunction } from '../clients/ethereum';
 
-import { ERC721ContractTypeName, NFTContractTypes } from './ethereum';
+import { ArtistProfile } from './artist';
+import { Contract } from './contract';
+import { NFTFactoryTypes } from './nftFactory';
 import { Record } from './record';
+import { ProcessedTrack } from './track';
 
-export type ERC721NFT = Record & {
+export enum Chain {
+  ETHEREUM = 'ethereum',
+  SOLANA = 'solana'
+}
+
+export type NFT = Record & {
   contractAddress: string
   tokenId: bigint
   platformId: string
@@ -13,6 +21,7 @@ export type ERC721NFT = Record & {
   metadata?: any
   mimeType?: string
   owner: string
+  standard: NFTStandard;
 }
 
 export type ERC721Transfer = Record & {
@@ -23,9 +32,42 @@ export type ERC721Transfer = Record & {
   nftId: string;
 };
 
-export const getNFTContractCalls = (nft: ERC721NFT, contractTypeName: ERC721ContractTypeName) => {
-  const contractType = NFTContractTypes[contractTypeName];
-  return contractType.contractCalls.map(call => {
+export enum NFTContractTypeName {
+  default = 'default',
+  zora = 'zora',
+  nina = 'nina'
+}
+
+export enum NFTStandard {
+  ERC721 = 'erc721',
+  METAPLEX = 'metaplex'
+}
+
+export type TypeMetadata = {
+  overrides: {
+    track?: Partial<ProcessedTrack>,
+    artist?: Partial<ArtistProfile>
+  }
+}
+
+export type NftFactory = Contract & {
+  platformId: string,
+  contractType: NFTContractTypeName,
+  name?: string,
+  symbol?: string,
+  typeMetadata?: TypeMetadata
+  standard: NFTStandard
+}
+
+export type NFTContractType = {
+  contractCalls: ValidContractNFTCallFunction[],
+  contractMetadataField: ValidContractNFTCallFunction,
+  buildNFTId: (contractAddress: string, tokenId: bigint) => string,
+}
+
+export const getNFTContractCalls = (nft: NFT, contractTypeName: NFTContractTypeName) => {
+  const contractType = NFTFactoryTypes[contractTypeName];
+  return contractType?.contractCalls.map(call => {
     return {
       contractAddress: nft.contractAddress,
       callFunction: call,
@@ -34,7 +76,7 @@ export const getNFTContractCalls = (nft: ERC721NFT, contractTypeName: ERC721Cont
   });
 };
 
-export const getNFTMetadataField = (nft: ERC721NFT, field: string) => {
+export const getNFTMetadataField = (nft: NFT, field: string) => {
   if (!nft) {
     throw new Error('NFT missing');
   }
@@ -47,7 +89,7 @@ export const getNFTMetadataField = (nft: ERC721NFT, field: string) => {
   return nft.metadata[field];
 }
 
-export const getTrait = (nft: ERC721NFT, type: string) => {
+export const getTrait = (nft: NFT, type: string) => {
   if (!nft.metadata) {
     console.error({ nft })
     throw new Error('Missing nft metadata');

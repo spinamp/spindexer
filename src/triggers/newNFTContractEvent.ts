@@ -1,7 +1,8 @@
 import _ from 'lodash';
 
 import { ContractFilter } from '../clients/ethereum';
-import { ERC721Contract, EthereumContract, FactoryContract, FactoryContractTypes } from '../types/ethereum';
+import { EthereumContract } from '../types/contract';
+import { MetaFactory, MetaFactoryTypes } from '../types/metaFactory';
 import { Clients } from '../types/processor';
 import { Cursor, Trigger, TriggerOutput } from '../types/trigger';
 
@@ -43,14 +44,17 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
         return [];
       }
       contracts.forEach(contract => {
-        if (!cursor[contract.address]) {
+        if (!contract.startingBlock) {
+          throw new Error(`Contract ${contract.address} has no starting block`);
+        }
+
+        if (!cursor[contract.address] && contract.startingBlock) {
           cursor[contract.address] = contract.startingBlock;
         }
       });
       // not all vars are const
       // eslint-disable-next-line prefer-const
       let { rangeStart, rangeEnd, mostStaleContracts } = calculateRange(cursor, gap);
-
       // Check for confirmations
       const latestEthereumBlock = BigInt(await clients.eth.getLatestBlockNumber());
       if (rangeEnd > latestEthereumBlock - NUMBER_OF_CONFIRMATIONS) {
@@ -84,8 +88,8 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
   };
 
 
-export const newERC721Transfers: (contracts: ERC721Contract[]) => Trigger<Cursor> =
-  (contracts: ERC721Contract[]) => {
+export const newERC721Transfers: (contracts: EthereumContract[]) => Trigger<Cursor> =
+  (contracts: EthereumContract[]) => {
     const contractFilters = contracts.map(contract => ({
       address: contract.address,
       filter: 'Transfer'
@@ -93,12 +97,19 @@ export const newERC721Transfers: (contracts: ERC721Contract[]) => Trigger<Cursor
     return newEthereumEvents(contracts, contractFilters);
   };
 
-export const newERC721Contract: (factoryContract: FactoryContract) => Trigger<Cursor> =
-  (factoryContract: FactoryContract) => {
+export const newERC721Contract: (factoryContract: MetaFactory) => Trigger<Cursor> =
+  (factoryContract: MetaFactory) => {
     const factoryContractTypeName = factoryContract.contractType;
-    const newContractCreatedEvent = FactoryContractTypes[factoryContractTypeName].newContractCreatedEvent;
+    const newContractCreatedEvent = MetaFactoryTypes[factoryContractTypeName]?.newContractCreatedEvent;
 
-    return newEthereumEvents([factoryContract], [{
+    if (!newContractCreatedEvent){
+      throw 'no newContractCreatedEvent specified'
+    }
+
+    return newEthereumEvents([{
+      address: factoryContract.address,
+      startingBlock: factoryContract.startingBlock!
+    }], [{
       address: factoryContract.address,
       filter: newContractCreatedEvent
     }], factoryContract.gap ? factoryContract.gap : undefined);

@@ -32,8 +32,8 @@
     "babel-plugin-module-resolver": "^4.1.0",
     "eslint": "^8.16.0",
     "eslint-import-resolver-babel-module": "^5.3.1",
-    "eslint-plugin-unused-imports": "^2.0.0",
     "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
     "nodemon": "^2.0.15",
     "ts-node": "^10.7.0",
     "typechain": "^8.0.0",
@@ -41,6 +41,8 @@
   },
   "dependencies": {
     "@ethersproject/providers": "^5.6.2",
+    "@metaplex-foundation/js": "^0.11.7",
+    "@project-serum/anchor": "^0.25.0",
     "@vscode/sqlite3": "^5.0.8",
     "axios": "^0.26.1",
     "dotenv": "^16.0.0",

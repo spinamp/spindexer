@@ -3,10 +3,10 @@ import slugify from 'slugify';
 
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { ERC721NFT } from '../erc721nft';
+import { NFT } from '../nft';
 import { ProcessedTrack } from '../track';
 
-const mapNFTtoTrackID = (nft: ERC721NFT): string => {
+const mapNFTtoTrackID = (nft: NFT): string => {
   const [contractAddress, nftId] = nft.id.split('/');
   return `ethereum/${formatAddress(contractAddress)}/${nftId}`;
 }
@@ -15,7 +15,7 @@ const mapAPITrackToArtistID = (apiTrack: any): string => {
   return `ethereum/${formatAddress(apiTrack.artist.id)}`;
 };
 
-const mapTrack = (nft: ERC721NFT, apiTrack: any): ProcessedTrack => ({
+const mapTrack = (nft: NFT, apiTrack: any): ProcessedTrack => ({
   id: apiTrack.trackId,
   platformInternalId: apiTrack.id,
   title: apiTrack.title,
@@ -35,7 +35,7 @@ const mapTrack = (nft: ERC721NFT, apiTrack: any): ProcessedTrack => ({
   artistId: mapAPITrackToArtistID(apiTrack),
 });
 
-const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT }): ArtistProfile => {
+const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): ArtistProfile => {
   const artist = apiTrack.artist;
   return {
     name: artist.name,
@@ -51,7 +51,7 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: ERC721NFT })
   }
 };
 
-const mapNFTsToTrackIds = async (nfts: ERC721NFT[]): Promise<{ [trackId: string]: ERC721NFT[] }> => {
+const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
 

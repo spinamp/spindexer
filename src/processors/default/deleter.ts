@@ -23,13 +23,13 @@ const processDelete = async (tableName: Table, processorName: string, ids: strin
 export const stripNonAudio: Processor = {
   name: 'stripNonAudio',
   trigger: nonAudioMetadata,
-  processorFunction: deleteRecords(Table.erc721nfts, 'stripNonAudio'),
+  processorFunction: deleteRecords(Table.nfts, 'stripNonAudio'),
   initialCursor: undefined
 };
 
 export const stripIgnoredNFTs: Processor = {
   name: 'stripIgnoredNFTs',
   trigger: ignoredNFTs,
-  processorFunction: deleteRecordIds(Table.erc721nfts, 'stripIgnoredNFTs'),
+  processorFunction: deleteRecordIds(Table.nfts, 'stripIgnoredNFTs'),
   initialCursor: undefined
 };

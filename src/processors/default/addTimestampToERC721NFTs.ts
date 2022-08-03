@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { Table } from '../../db/db';
-import { missingCreatedAtTime } from '../../triggers/missing';
+import { ethereumMissingCreatedAtTime } from '../../triggers/missing';
 import { Clients } from '../../types/processor';
 import { Record } from '../../types/record';
 
@@ -25,12 +25,12 @@ const processorFunction = (table: Table) => async (items: Record, clients: Clien
 
 export const addTimestampToERC721NFTs = {
   name: 'addTimestampToERC721NFTs',
-  trigger: missingCreatedAtTime(Table.erc721nfts),
-  processorFunction: processorFunction(Table.erc721nfts),
+  trigger: ethereumMissingCreatedAtTime(Table.nfts),
+  processorFunction: processorFunction(Table.nfts),
 };
 
 export const addTimestampToERC721Transfers = {
   name: 'addTimestampToERC721Transfers',
-  trigger: missingCreatedAtTime(Table.erc721Transfers),
+  trigger: ethereumMissingCreatedAtTime(Table.erc721Transfers),
   processorFunction: processorFunction(Table.erc721Transfers),
 };

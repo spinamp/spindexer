@@ -1,14 +1,15 @@
 
 import { Knex } from 'knex';
 
-import { ERC721Contract, ERC721ContractTypeName } from '../../types/ethereum';
-import { addErc721Contract, removeErc721Contract } from '../migration-helpers';
+import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
+import { addNftFactory, removeNftFactory } from '../migration-helpers';
 
-const ROHKI_VROOM: ERC721Contract = {
+const ROHKI_VROOM: NftFactory = {
   address: '0x317394c6dFB5606c2917E1a0DAD4f1B70EDDC921',
   startingBlock: '15112828',
   platformId: 'rohki',
-  contractType: ERC721ContractTypeName.default,
+  contractType: NFTContractTypeName.default,
+  standard: NFTStandard.ERC721,
   typeMetadata: {
     overrides: {
       track: {
@@ -27,9 +28,9 @@ const ROHKI_VROOM: ERC721Contract = {
 };
 
 export const up = async (knex: Knex) => {
-  await addErc721Contract(knex, ROHKI_VROOM)
+  await addNftFactory(knex, ROHKI_VROOM)
 }
 
 export const down = async (knex: Knex) => {
-  await removeErc721Contract(knex, ROHKI_VROOM);
+  await removeNftFactory(knex, ROHKI_VROOM);
 }

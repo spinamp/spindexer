@@ -1,21 +1,21 @@
 import { Table } from '../../db/db';
 import { errorRetry } from '../../triggers/errors';
-import { ERC721NFTProcessError } from '../../types/erc721nftProcessError';
+import { NFTProcessError } from '../../types/nftProcessError';
 import { Clients, Processor } from '../../types/processor';
 
 export const errorProcessor: Processor = {
-  
+
   name: 'errorProcessor',
   trigger: errorRetry,
-  processorFunction: async (nftErrors: ERC721NFTProcessError[], clients: Clients) => {
-    const nftUpdates: ERC721NFTProcessError[] = nftErrors.map((n) => ({
-      erc721nftId: n.erc721nftId,
+  processorFunction: async (nftErrors: NFTProcessError[], clients: Clients) => {
+    const nftUpdates: NFTProcessError[] = nftErrors.map((n) => ({
+      nftId: n.nftId,
       metadataError: undefined,
       processError: undefined,
-      numberOfRetries: n.numberOfRetries + 1,
+      numberOfRetries: (n.numberOfRetries ?? 0) + 1,
       lastRetry: new Date()
     }));
-    await clients.db.upsert(Table.erc721nftProcessErrors, nftUpdates, 'erc721nftId');
+    await clients.db.upsert(Table.nftProcessErrors, nftUpdates, 'nftId');
   },
   initialCursor: undefined
 };

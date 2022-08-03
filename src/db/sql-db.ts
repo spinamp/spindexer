@@ -2,7 +2,7 @@ import knex, { Knex } from 'knex';
 
 import { Cursor } from '../types/trigger';
 
-import { DBClient, Wheres } from './db';
+import { DBClient, QueryOptions, Wheres } from './db';
 import config from './knexfile';
 import { fromDBRecords, toDBRecords } from './orm';
 
@@ -59,13 +59,17 @@ const init = async (): Promise<DBClient> => {
     },
     recordExists: recordExistsFunc(db),
     recordsExist: filterExistRecordsFunc(db),
-    insert: async <RecordType>(tableName: string, records: RecordType[]) => {
+    insert: async <RecordType>(tableName: string, records: RecordType[], options?: QueryOptions) => {
       if (records.length === 0) {
         return;
       }
       console.log(`Inserting into ${tableName} ${records.length} records`);
       const dbRecords = toDBRecords(tableName, records);
-      await db(tableName).insert(dbRecords);
+      if (options?.ignoreConflict){
+        await db(tableName).insert(dbRecords).onConflict(options.ignoreConflict).ignore();
+      } else {
+        await db(tableName).insert(dbRecords);
+      }
     },
     updateProcessor: async (processor: string, lastCursor: Cursor) => {
       console.log(`Updating ${processor} with cursor: ${lastCursor}`);
