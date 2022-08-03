@@ -21,7 +21,7 @@ export const up = async (knex: Knex) => {
   // add comment to add fake fk constraints to view for postgraphile relation generation
   await knex.raw(
     `comment on view "erc721nfts_processedTracks" is
-    E'@foreignKey ("erc721NftId") references erc721nft (id)|@foreignKey ("processedTrackId") references "processedTracks" (id)';
+    E'@foreignKey ("processedTrackId") references "processedTracks" (id)\n@foreignKey ("erc721NftId") references erc721nft (id)';  
     `
   )
 
