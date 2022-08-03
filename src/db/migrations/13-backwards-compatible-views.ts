@@ -13,8 +13,8 @@ export const up = async (knex: Knex) => {
   // backwards compatible view for nfts_processedTracks table
   await knex.raw(
     `create view "erc721nfts_processedTracks" as
-    select npt."nftId" as "erc721NftId", npt."processedTrackId" 
-    from "nfts_processedTracks" npt 
+    select npt."nftId" as "erc721NftId", npt."processedTrackId"
+    from "nfts_processedTracks" npt
     `
   )
 
@@ -24,6 +24,9 @@ export const up = async (knex: Knex) => {
     E'@foreignKey ("erc721NftId") references erc721nft (id)|@foreignKey ("processedTrackId") references "processedTracks" (id)';
     `
   )
+
+  await knex.raw(`GRANT SELECT ON "erc721nfts_processedTracks" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+  await knex.raw(`GRANT SELECT ON "erc721nft" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
 
 }
 
