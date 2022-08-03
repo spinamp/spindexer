@@ -21,7 +21,7 @@ const mapTrack: MapTrack = (
   const track: Partial<ProcessedTrack> = {
     id: mapNFTtoTrackID(nft),
     platformInternalId: nft.id,
-    title: nft.metadata.namesplit(' - ')[1].slice(0, 1000),
+    title: nft.metadata.properties.title,
     description: nft.metadata.description,
     platformId: nft.platformId,
     lossyAudioURL: nft.metadata.animation_url,
