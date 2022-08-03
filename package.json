@@ -1,6 +1,6 @@
 {
-  "name": "web3-music-pipeline",
-  "version": "1.0.0",
+  "name": "spindexer",
+  "version": "0.0.1",
   "description": "",
   "main": "src/index.ts",
   "scripts": {
