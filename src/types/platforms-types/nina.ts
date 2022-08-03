@@ -2,7 +2,6 @@
 import _ from 'lodash';
 import slugify from 'slugify';
 
-
 import { ArtistProfile } from '../artist';
 import { NFT, NftFactory } from '../nft';
 import { MapTrack } from '../processor';
@@ -22,7 +21,7 @@ const mapTrack: MapTrack = (
   const track: Partial<ProcessedTrack> = {
     id: mapNFTtoTrackID(nft),
     platformInternalId: nft.id,
-    title: nft.metadata.name.slice(0, 1000), // TODO: should split string and remove artist from title?
+    title: nft.metadata.namesplit(' - ')[1].slice(0, 1000),
     description: nft.metadata.description,
     platformId: nft.platformId,
     lossyAudioURL: nft.metadata.animation_url,
@@ -44,7 +43,10 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
     throw new Error(`NFT missing for mapArtistProfile for nft`)
   }
 
-  const artistId = `nina/${nft.metadata.properties.artist.replace(' ', '-')}`;
+  if (!contract?.typeMetadata?.overrides.artist?.artistId){
+    throw new Error('Missing artistId override')
+  }
+  const artistId = contract.typeMetadata.overrides.artist.artistId;
 
   return {
     name: nft.metadata.properties.artist,

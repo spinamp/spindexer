@@ -1,6 +1,7 @@
 import * as MetaplexFoundation from '@metaplex-foundation/js';
 import { web3, AnchorProvider, Program, Wallet } from '@project-serum/anchor';
 import { Keypair } from '@solana/web3.js';
+import _ from 'lodash';
 
 import { Table } from '../db/db';
 import { MetaFactory } from '../types/metaFactory';
@@ -47,12 +48,17 @@ export const newNinaContracts: Trigger<undefined> = async (clients) => {
     ]
   ])).map(nft => nft.contractAddress)
 
-  const allReleases = new Set(metadataAccounts.map(account => account!.mint.toBase58()));
-  const existingReleases = new Set(existingContracts);
+  const allMintAccounts = new Set(metadataAccounts.map(account => account!.mint.toBase58()));
+  const existingMintAccounts = new Set(existingContracts);
 
-  const newReleases = new Set(([...allReleases].filter(release => !existingReleases.has(release))));
+  const releasesByMintAddress = _.keyBy(releases, release => release.account.releaseMint.toBase58())
 
-  return metadataAccounts.filter(account => newReleases.has(account!.mint.toBase58()))
+  const newMintAccounts = new Set(([...allMintAccounts].filter(mint => !existingMintAccounts.has(mint))));
+
+  return metadataAccounts.filter(account => newMintAccounts.has(account!.mint.toBase58())).map(account => ({
+    metadataAccount: account,
+    artistAddress: releasesByMintAddress[account!.mint.toBase58()]
+  }))
 };
 
 export const missingCreatedAtTimeWithMetadataDate: Trigger<undefined> = async (clients) => {
