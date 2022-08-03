@@ -24,8 +24,9 @@ Spindexer runs as multi-stage processing pipeline that generates a comprehensive
  - yarn build
  - **Optional:** Bootstrap the DB with a recent backup by running ```yarn restore-db```
  - yarn start
- - This should start up the server. It will seed your database from a recent backup if the database is not yet created, and then catch up the database with the latest data until it is up to date
- - Repeat yarn start to catch up
+ - This should start up the server. It will create the database if it is the first run and has not been restored, and then catch up the database with the latest data until it is up to date
+ - Each time you run the indexer with yarn start, it will catch up to the latest index and end the process
+ - The indexer is intended to be run periodically (eg: once per minute), much like a lambda function
 
 ## Design Goals
 There are a few design goals for the code:
