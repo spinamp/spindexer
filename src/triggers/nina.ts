@@ -57,7 +57,7 @@ export const newNinaContracts: Trigger<undefined> = async (clients) => {
 
   return metadataAccounts.filter(account => newMintAccounts.has(account!.mint.toBase58())).map(account => ({
     metadataAccount: account,
-    artistAddress: releasesByMintAddress[account!.mint.toBase58()]
+    release: releasesByMintAddress[account!.mint.toBase58()]
   }))
 };
 
