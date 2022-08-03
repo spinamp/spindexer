@@ -35,11 +35,15 @@ export type Where = FieldWhere | FuncWhere;
 
 export type Wheres = Where[];
 
+export type QueryOptions = {
+  ignoreConflict?: string;
+}
+
 export type DBClient = {
   getDB: () => Knex;
   getCursor: (processor: string) => Promise<string | undefined>;
   getRecords: <Type>(tableName: Table, wheres?: Wheres) => Promise<Type[]>;
-  insert: <Type>(tableName: Table, rows: Type[]) => Promise<void>;
+  insert: <Type>(tableName: Table, rows: Type[], options?: QueryOptions) => Promise<void>;
   update: <Type>(tableName: Table, rows: Type[]) => Promise<void>;
   upsert: <Type>(tableName: Table, rows: Type[], idField?: string | string[]) => Promise<void>;
   delete: (tableName: Table, ids: string[], idField?: string) => Promise<void>;

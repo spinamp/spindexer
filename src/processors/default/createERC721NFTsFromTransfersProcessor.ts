@@ -21,7 +21,7 @@ const processorFunction = (contracts: NftFactory[]) =>
     const updates: Partial<NFT>[] = [];
     const transfers: Partial<ERC721Transfer>[] = [];
     const allNfts = await clients.db.getRecords<NFT>(Table.nfts);
-    const allNftContractAddresses = new Set(allNfts.map(nft => nft.contractAddress));
+    const allNftIds = new Set(allNfts.map(nft => nft.id));
     items.forEach((item): Partial<NFT> | undefined => {
       const address = item.address;
       const contract = contractsByAddress[address];
@@ -34,7 +34,7 @@ const processorFunction = (contracts: NftFactory[]) =>
 
       const tokenId = BigInt((item.args!.tokenId as BigNumber).toString());
       const newMint = item.args!.from === ETHEREUM_NULL_ADDRESS;
-      if (allNftContractAddresses.has(formatAddress(contract.address))){
+      if (allNftIds.has(contractType.buildNFTId(contract.address, tokenId))){
         transfers.push({
           id: `${CHAIN}/${item.blockNumber}/${item.logIndex}`,
           contractAddress: formatAddress(contract.address),
@@ -61,7 +61,7 @@ const processorFunction = (contracts: NftFactory[]) =>
         owner: item.args!.to
       });
     });
-    await clients.db.insert(Table.nfts, newNFTs.filter(n => !!n));
+    await clients.db.insert(Table.nfts, newNFTs.filter(n => !!n), { ignoreConflict: 'id' });
     await clients.db.update(Table.nfts, updates);
     await clients.db.insert(Table.erc721Transfers, transfers);
     await clients.db.updateProcessor(NAME, newCursor);
