@@ -27,7 +27,12 @@ Spindexer works by:
    - ```DB_SUPERUSER=postgres DB_SUPERUSER_PASSWORD=password yarn bootstrap-db```
  - Ensure the Postgres server forces SSL only.
  - Ensure the SSL certificate for the postgres server is stored at db-ssl-certificate.pem if needed. If you're using AWS RDS, you can copy rds-ssl-certificate.pem to db-ssl-certificate.pem for convenience
- - Setup the ethereum provider, subgraph and ipfs endpoints (We recommend fast, dedicated endpoints for fast indexing that cache indexed content)
+ - Setup the config for each external dependency (We recommend fast, dedicated endpoints for fast indexing that cache indexed content):
+   - Ethereum provider for querying Ethereum
+   - Solana provider for querying Solana
+   - Blocks Subgraph for querying Ethereum block timestamps
+   - IPFS endpoint for accessing IPFS content
+   - IPFS pinning api url for pinning ipfs content to your own node
  - Bootstrap the DB with a recent backup so that you don't have to index from scratch:
    - ```yarn restore-db```
 
@@ -44,7 +49,10 @@ In production, we recommend running the script once a minute to keep it up to da
 watch -n 60 "yarn start >> ./log" 2>&1
 ```
 
-*Note: Sometimes things fail (eg: an offchain API is down). This is fine and expected. Things should continue as expected on the next run of the script. Most NFTs/Tracks/Platforms that cause failure/errors are moved into an error queue and retried a few times after some delay so that they don't block progress for the rest of the indexer.*
+## Operations
+Sometimes things fail (eg: an offchain API is down). This is fine and expected. Things should continue as expected on the next run of the script. Most NFTs/Tracks/Platforms that cause failure/errors are moved into an error queue and retried a few times after some delay so that they don't block progress for the rest of the indexer.
+
+You may also want to disable the ipfs pinning processors by commenting out the ipfsAudioPinner and ipfsArtworkPinner lines from index.ts - They run quite slowly as most pin services have low rate limits.
 
 ## Design Goals
 There are a few design goals for the system:
@@ -57,9 +65,9 @@ There are a few design goals for the system:
  - Allow for decentralization and even some consensus without any co-ordination
 
 ## Contributing
-The repo is still early and not hyper-polished. Contributor guidelines are not ready yet, clear development docs and style/standard expectations are not extremely well documented yet. Interfaces are not well documented yet. Keep this in mind, so if you'd like to contribute:
+The repo is still early and not hyper-polished or perfectly documented. Contributor guidelines are not ready yet, clear development docs and style/standard expectations are not extremely well documented yet. Interfaces are not well documented yet. Keep this in mind, so if you'd like to contribute:
+ - First, reach out on Discord and connect with the team (https://discord.gg/cv6mza8C) so we can help guide you in contributing
  - Read through the [Architecture](./Architecture.md) and [Ingestion](./Ingestion.md) docs which have some more details on the architecture and concepts used in the repo
  - Try set things up yourself, test it out, read the code.
  - Read the code some more, especially getting familiar with the [Processor](./src/types/processor.ts), [Trigger](./src/types/trigger.ts) and [Platform](./src/types/platform.ts) types and how they're used as interfaces :)
  - Check out the Github Project and Github Issues, still being improved
- - Reach out on Discord and connect with the team (https://discord.gg/cv6mza8C)
