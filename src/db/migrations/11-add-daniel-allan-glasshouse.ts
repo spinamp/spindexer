@@ -8,7 +8,7 @@ import { addNftFactory, addPlatform, removeNftFactory, removePlatform } from '..
 const GLASSHOUSE_PLATFORM: MusicPlatform = {
   id: '0x719C6d392fc659f4fe9b0576cBC46E18939687a7',
   type: MusicPlatformType['multi-track-multiprint-contract'],
-  name: 'Daniel Allan',
+  name: 'danielallan.xyz',
 }
 
 const GLASSHOUSE: NftFactory = {
