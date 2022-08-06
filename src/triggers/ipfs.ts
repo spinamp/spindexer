@@ -28,3 +28,16 @@ export const unpinnedTrackContent: (cidField: string, limit?: number) => Trigger
 
     return _.uniq(cids);
   };
+
+export const audioNotOnIpfs: Trigger<undefined> = async (clients: Clients) => {
+  const query = `select t.* from "${Table.processedTracks}" as t
+      where "lossyAudioIPFSHash" is null
+      and "lossyAudioURL" is not null
+      LIMIT ${process.env.QUERY_TRIGGER_BATCH_SIZE!}`
+
+  const tracks = (await clients.db.rawSQL(
+    query
+  )).rows
+
+  return tracks
+};

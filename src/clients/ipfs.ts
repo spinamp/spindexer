@@ -1,6 +1,14 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// const { create, IPFSHTTPClient } = require('ipfs-http-client')
+
+import { IPFS } from 'ipfs-core-types';
+import { create } from 'ipfs-http-client';
+
+
 
 export type IPFSClient = {
   getHTTPURL: (ipfsURL: string) => string;
+  client: IPFS;
 }
 
 export const isIPFSProtocol = (urlString: string) => {
@@ -43,7 +51,8 @@ const init = async () => {
   return {
     getHTTPURL: (ipfsHash: string) => {
       return `${process.env.IPFS_ENDPOINT}${ipfsHash}`;
-    }
+    },
+    client: create()
   }
 }
 

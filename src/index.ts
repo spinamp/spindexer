@@ -19,6 +19,7 @@ import { errorProcessor } from './processors/default/errorProcessor';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
 import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfs';
+import { ipfsAudioUploader } from './processors/default/ipfsMediaUploader';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
 import { runProcessors } from './runner';
 import { MetaFactory } from './types/metaFactory';
@@ -48,6 +49,7 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
     addTimestampFromMetadata,
     ...platformTrackProcessors,
     createProcessedTracksFromAPI('noizd'), //TODO: noizd here is being used both as platformId and MusicPlatformType. Need to bring in the full noizd platform object here and avoid mixing them
+    ipfsAudioUploader,
     ipfsAudioPinner,
     ipfsArtworkPinner,
     errorProcessor,
