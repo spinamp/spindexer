@@ -41,3 +41,16 @@ export const audioNotOnIpfs: Trigger<undefined> = async (clients: Clients) => {
 
   return tracks
 };
+
+export const artworkNotOnIpfs: Trigger<undefined> = async (clients: Clients) => {
+  const query = `select t.* from "${Table.processedTracks}" as t
+      where "lossyArtworkIPFSHash" is null
+      and "lossyArtworkURL" is not null
+      LIMIT ${process.env.QUERY_TRIGGER_BATCH_SIZE!}`
+
+  const tracks = (await clients.db.rawSQL(
+    query
+  )).rows
+
+  return tracks
+};

@@ -47,7 +47,7 @@ const processorFunction = async (cids: string[], clients: Clients) => {
 
   if (newPins.length !== 0) {
     const pinBaseCID = (baseCid: string) => clients.axios.post(
-      ipfsPinEndpoint, { cid: baseCid },
+      ipfsPinEndpoint, { cid: baseCid, origins: [] },
       { timeout: parseInt(process.env.IPFS_PIN_REQUEST_TIMEOUT!), ...pinAuth });
 
     const responses = await rollPromises<string, AxiosResponse, any>(
