@@ -43,18 +43,13 @@ export const extractHashFromURL = (urlString: string) => {
 }
 
 const init = async () => {
-
-  const ETH_INFURA_IPFS_ID = process.env.INFURA_IPFS_ID
-  const ETH_INFURA_IPFS_SECRET = process.env.INFURA_IPFS_SECRET
-
   return {
     getHTTPURL: (ipfsHash: string) => {
       return `${process.env.IPFS_ENDPOINT}${ipfsHash}`;
     },
-    client: create({ url: 'https://ipfs.infura.io:5001/api/v0', headers: {
-      authorization: `Basic ${Buffer.from(
-        `${ETH_INFURA_IPFS_ID}:${ETH_INFURA_IPFS_SECRET}`
-      ).toString('base64')}`
+    client: create({ url: process.env.IPFS_NODE_RPC_URL, headers: {
+      authorization: 
+        Buffer.from(process.env.IPFS_NODE_AUTH_HEADER!).toString('base64')
     } })
   }
 }
