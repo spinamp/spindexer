@@ -13,6 +13,8 @@ const pinAuth = {
 };
 const maxPPM = parseInt(process.env.IPFS_PIN_MAX_PROMISES_PER_MINUTE!);
 
+const IPFS_ORIGINS = process.env.IPFS_NODE_MULTIADDRESS?.split(',');
+
 const processorFunction = async (cids: string[], clients: Clients) => {
   console.log(`Pinning ${cids}`);
 
@@ -47,7 +49,9 @@ const processorFunction = async (cids: string[], clients: Clients) => {
 
   if (newPins.length !== 0) {
     const pinBaseCID = (baseCid: string) => clients.axios.post(
-      ipfsPinEndpoint, { cid: baseCid },
+      ipfsPinEndpoint, { cid: baseCid, 
+        origins: IPFS_ORIGINS
+      },
       { timeout: parseInt(process.env.IPFS_PIN_REQUEST_TIMEOUT!), ...pinAuth });
 
     const responses = await rollPromises<string, AxiosResponse, any>(
