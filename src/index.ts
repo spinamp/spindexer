@@ -18,7 +18,7 @@ import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
 import { errorProcessor } from './processors/default/errorProcessor';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
-import { ipfsAudioUploader, ipfsArtworkUploader } from './processors/default/ipfsMediaUploader';
+import { ipfsArtworkUploader, ipfsAudioUploader } from './processors/default/ipfsMediaUploader';
 import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfsPinner';
 import { processPlatformTracks } from './processors/default/processPlatformTracks';
 import { runProcessors } from './runner';

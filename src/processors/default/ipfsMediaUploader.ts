@@ -1,38 +1,62 @@
 
 import { urlSource } from 'ipfs-http-client';
-import _ from 'lodash'
+import _ from 'lodash';
+
 
 import { Table } from '../../db/db';
 import { artworkNotOnIpfs, audioNotOnIpfs } from '../../triggers/ipfs';
+import { IPFSFile } from '../../types/ipfsFIle';
 import { Clients, Processor } from '../../types/processor';
 import { ProcessedTrack } from '../../types/track';
+import { rollPromises } from '../../utils/rollingPromises';
 
 function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', replaceField: 'lossyAudioIPFSHash' | 'lossyArtworkIPFSHash') {
-  return async (newTriggerItems: any, clients: Clients) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const tracksByFilePath = _.keyBy(newTriggerItems, (track: ProcessedTrack) => new URL(track[sourceField]).pathname.split('/').pop());
-      
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const sources = newTriggerItems.map((track: ProcessedTrack) => {return urlSource(track[sourceField]!)} );
-    const allFiles = await clients.ipfs.client.addAll(sources, {
-      progress: (bytes, path) => console.log(`added ${bytes} bytes of ${path}`),
-      fileImportConcurrency: 10,
-    });
+  return async (tracks: ProcessedTrack[], clients: Clients) => {
+    const updates: ProcessedTrack[] = [];
+    const ipfsFiles: IPFSFile[] = [];
+
+    const existingFiles = await clients.db.getRecords<IPFSFile>(Table.ipfsFiles, [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      ['whereIn', ['url', tracks.map(track => track[sourceField])]]
+    ]);
+    const fileByUrl = _.keyBy(existingFiles, 'url')
     
-    const updatedTracks: ProcessedTrack[] = [];
-    
-    for await (const file of allFiles){
-      const track = tracksByFilePath[file.path];
-    
-      updatedTracks.push({
-        ...track,
-        [replaceField]: file.cid.toString()
-      });
+    const processTrack = async (track: ProcessedTrack) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const url = track[sourceField];
+      try {
+        const source = urlSource(url)
+       
+        const fileForUrl = fileByUrl[url];
+
+        if (!fileForUrl){
+          const file = await clients.ipfs.client.add(source);
+          const cid = file.cid.toString();
+          updates.push({
+            ...track,
+            [replaceField]: cid
+          })
+          ipfsFiles.push({
+            url,
+            cid
+          })
+        } else {
+          updates.push({
+            ...track,
+            [replaceField]: fileForUrl.cid
+          })
+        }
+      } catch (e: any){
+        ipfsFiles.push({ url, error: e.message });
+      }
     }
     
-    await clients.db.update(Table.processedTracks, updatedTracks)
+    await rollPromises<ProcessedTrack, void, void>(tracks, processTrack, 300, 60)
+
+    await clients.db.update(Table.processedTracks, updates)
+    await clients.db.upsert(Table.ipfsFiles, ipfsFiles, 'url');
   }
 } 
 

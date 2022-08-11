@@ -47,10 +47,7 @@ const init = async () => {
     getHTTPURL: (ipfsHash: string) => {
       return `${process.env.IPFS_ENDPOINT}${ipfsHash}`;
     },
-    client: create({ url: process.env.IPFS_NODE_RPC_URL, headers: {
-      authorization: 
-        Buffer.from(process.env.IPFS_NODE_AUTH_HEADER!).toString('base64')
-    } })
+    client: create()
   }
 }
 
