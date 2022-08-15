@@ -33,7 +33,8 @@ function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', rep
         if (!fileForUrl){
           const source = urlSource(url)
           const file = await clients.ipfs.client.add(source, {
-            pin: false
+            pin: false,
+            timeout: parseInt(process.env.IPFS_API_TIMEOUT!)
           });
           const cid = file.cid.toString();
           updates.push({
@@ -55,7 +56,7 @@ function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', rep
       }
     }
     
-    await rollPromises<ProcessedTrack, void, void>(tracks, processTrack, 300, 60)
+    await rollPromises<ProcessedTrack, void, void>(tracks, processTrack, 300, 50)
 
     await clients.db.update(Table.processedTracks, updates)
     await clients.db.upsert(Table.ipfsFiles, ipfsFiles, 'url');
