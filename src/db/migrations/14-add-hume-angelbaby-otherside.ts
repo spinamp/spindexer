@@ -24,6 +24,10 @@ const OTHERSIDE: NftFactory = {
       },
       artist: {
         name: 'angelbaby',
+        artistId: 'angelbaby',
+        platformInternalId: 'angelbaby',
+        avatarUrl: 'https://pbs.twimg.com/profile_images/1547686210016907265/1pyVAGp7_400x400.jpg',
+        websiteUrl: 'https://www.wearehume.com/',
       }
     }
   }
