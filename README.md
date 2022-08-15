@@ -19,7 +19,6 @@ Spindexer works by:
  - Postgres running
  - postgresql-client installed
  - ts-node installed globally
- - ipfs installed
  - git-lfs
 
 ## Setup
