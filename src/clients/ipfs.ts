@@ -47,7 +47,9 @@ const init = async () => {
     getHTTPURL: (ipfsHash: string) => {
       return `${process.env.IPFS_ENDPOINT}${ipfsHash}`;
     },
-    client: create()
+    client: create({
+      url: process.env.IPFS_NODE_HTTP_API
+    })
   }
 }
 
