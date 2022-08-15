@@ -32,7 +32,9 @@ function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', rep
         const fileForUrl = fileByUrl[url];
 
         if (!fileForUrl){
-          const file = await clients.ipfs.client.add(source);
+          const file = await clients.ipfs.client.add(source, {
+            pin: false
+          });
           const cid = file.cid.toString();
           updates.push({
             ...track,
