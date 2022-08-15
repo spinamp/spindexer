@@ -3,7 +3,7 @@ import { Knex } from 'knex';
 
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
-import { addNftFactory, addPlatform, removeNftFactory, removePlatform } from '../migration-helpers';
+import { addPlatform, addNftFactory, removeNftFactory, removePlatform } from '../migration-helpers';
 
 const OTHERSIDE_PLATFORM: MusicPlatform = {
   id: 'otherside',
@@ -17,6 +17,13 @@ const OTHERSIDE: NftFactory = {
   platformId: OTHERSIDE_PLATFORM.id,
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
+  typeMetadata: {
+    overrides: {
+      track: {
+        websiteUrl: 'https://www.wearehume.com/'
+      }
+    }
+  }
 };
 
 export const up = async (knex: Knex) => {
