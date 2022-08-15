@@ -23,7 +23,7 @@ const MINTED: NftFactory = {
         websiteUrl: 'https://www.wearehume.com/'
       },
       artist: {
-        name: 'Angelbaby'
+        name: 'angelbaby'
       }
     }
   }

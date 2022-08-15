@@ -23,7 +23,7 @@ const OTHERSIDE: NftFactory = {
         websiteUrl: 'https://www.wearehume.com/'
       },
       artist: {
-        name: 'Angelbaby',
+        name: 'angelbaby',
       }
     }
   }

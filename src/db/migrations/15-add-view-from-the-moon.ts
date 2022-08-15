@@ -23,7 +23,7 @@ const VIEW_FROM_THE_MOON: NftFactory = {
         websiteUrl: 'https://www.wearehume.com/'
       },
       artist: {
-        name: 'Angelbaby'
+        name: 'angelbaby'
       }
     }
   }
