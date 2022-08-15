@@ -27,11 +27,11 @@ function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', rep
       // @ts-ignore
       const url = track[sourceField];
       try {
-        const source = urlSource(url)
-       
+        
         const fileForUrl = fileByUrl[url];
-
+        
         if (!fileForUrl){
+          const source = urlSource(url)
           const file = await clients.ipfs.client.add(source, {
             pin: false
           });
