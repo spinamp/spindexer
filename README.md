@@ -19,6 +19,7 @@ Spindexer works by:
  - Postgres running
  - postgresql-client installed
  - ts-node installed globally
+ - ipfs installed
 
 ## Setup
  - Copy .env.example to .env and fill it in. Make sure to change the example passwords and keys.
@@ -35,6 +36,10 @@ Spindexer works by:
    - IPFS pinning api url for pinning ipfs content to your own node
  - Bootstrap the DB with a recent backup so that you don't have to index from scratch:
    - ```yarn restore-db```
+ - Ensure the ipfs node is running:
+   - `ipfs daemon`
+ - Add your ipfs node multiaddress to .env. Find this by copying the address with a public ip after running:
+   - `ipfs id` 
 
 ## Running
 The indexer runs via a single node script. This script starts a single node process. The process will create the database if needed on the first run (unless it has been restored from backup), index until it is up to date, and then terminate. Each time the script is run, the index will be caught up to date.
