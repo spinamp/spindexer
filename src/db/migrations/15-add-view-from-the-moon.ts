@@ -23,7 +23,11 @@ const VIEW_FROM_THE_MOON: NftFactory = {
         websiteUrl: 'https://www.wearehume.com/'
       },
       artist: {
-        name: 'angelbaby'
+        name: 'angelbaby',
+        artistId: 'angelbaby',
+        platformInternalId: 'angelbaby',
+        avatarUrl: 'https://pbs.twimg.com/profile_images/1547686210016907265/1pyVAGp7_400x400.jpg',
+        websiteUrl: 'https://www.wearehume.com/',
       }
     }
   }
