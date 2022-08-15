@@ -44,7 +44,7 @@ const INITIAL_TABLES = [
       table.string('tokenId');
       table.string('contractAddress').references('id').inTable(Table.nftFactories).onDelete('cascade');
       table.string('platformId');
-      table.foreign('platformId').references('id').inTable('platforms');
+      table.foreign('platformId').references('id').inTable('platforms').onDelete('cascade');
       table.string('metadataIPFSHash');
       table.string('tokenURI', 20000);
       table.string('tokenMetadataURI', 20000);
