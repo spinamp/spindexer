@@ -21,6 +21,9 @@ const OTHERSIDE: NftFactory = {
     overrides: {
       track: {
         websiteUrl: 'https://www.wearehume.com/'
+      },
+      artist: {
+        name: 'Angelbaby',
       }
     }
   }
