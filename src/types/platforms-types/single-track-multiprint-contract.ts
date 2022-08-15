@@ -27,7 +27,7 @@ const mapTrack: MapTrack = (
     lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url),
     lossyArtworkIPFSHash: extractHashFromURL(nft.metadata.image),
     websiteUrl: nft.metadata.external_url,
-    artistId: contract.platformId,
+    artistId: mapArtistProfile({ apiTrack, contract, nft }).artistId,
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
     ...contract.typeMetadata?.overrides?.track

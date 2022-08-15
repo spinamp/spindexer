@@ -19,7 +19,7 @@ Spindexer works by:
  - Postgres running
  - postgresql-client installed
  - ts-node installed globally
- - ipfs installed
+ - git-lfs
 
 ## Setup
  - Copy .env.example to .env and fill it in. Make sure to change the example passwords and keys.
