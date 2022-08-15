@@ -1,6 +1,5 @@
 
 import { urlSource } from 'ipfs-http-client';
-import _ from 'lodash';
 
 
 import { Table } from '../../db/db';
@@ -10,27 +9,33 @@ import { Clients, Processor } from '../../types/processor';
 import { ProcessedTrack } from '../../types/track';
 import { rollPromises } from '../../utils/rollingPromises';
 
-function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', replaceField: 'lossyAudioIPFSHash' | 'lossyArtworkIPFSHash') {
-  return async (tracks: ProcessedTrack[], clients: Clients) => {
-    const updates: ProcessedTrack[] = [];
-    const ipfsFiles: IPFSFile[] = [];
+type TrackFileJoin = ProcessedTrack & Partial<IPFSFile>;
 
-    const existingFiles = await clients.db.getRecords<IPFSFile>(Table.ipfsFiles, [
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      ['whereIn', ['url', tracks.map(track => track[sourceField])]]
-    ]);
-    const fileByUrl = _.keyBy(existingFiles, 'url')
+function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', replaceField: 'lossyAudioIPFSHash' | 'lossyArtworkIPFSHash') {
+  return async (tracksWithIPFSFiles: TrackFileJoin[], clients: Clients) => {
+    const updates: Partial<ProcessedTrack>[] = [];
+    const ipfsFiles: IPFSFile[] = [];
     
-    const processTrack = async (track: ProcessedTrack) => {
+    const processTrack = async (trackWithFile: TrackFileJoin) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      const url = track[sourceField];
+      const url = trackWithFile[sourceField];
       try {
         
-        const fileForUrl = fileByUrl[url];
+        const fileForUrl: Partial<IPFSFile> = {
+          cid: trackWithFile.cid,
+          url: trackWithFile.url
+        }
+
+        delete trackWithFile['url']
+        delete trackWithFile['error'];
+        delete trackWithFile['cid'];
+
+        const track: ProcessedTrack = {
+          ...trackWithFile
+        }
         
-        if (!fileForUrl){
+        if (!fileForUrl.cid){
           const source = urlSource(url)
           const file = await clients.ipfs.client.add(source, {
             pin: false,
@@ -56,7 +61,7 @@ function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', rep
       }
     }
     
-    await rollPromises<ProcessedTrack, void, void>(tracks, processTrack, 300, 50)
+    await rollPromises<ProcessedTrack, void, void>(tracksWithIPFSFiles, processTrack, 300, 50)
 
     await clients.db.update(Table.processedTracks, updates)
     await clients.db.upsert(Table.ipfsFiles, ipfsFiles, 'url');

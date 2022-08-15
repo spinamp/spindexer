@@ -30,7 +30,7 @@ export const unpinnedTrackContent: (cidField: string, limit?: number) => Trigger
   };
 
 export const audioNotOnIpfs: Trigger<undefined> = async (clients: Clients) => {
-  const query = `select t.* from "${Table.processedTracks}" as t
+  const query = `select * from "${Table.processedTracks}" as t
       left outer join "${Table.ipfsFiles}" i
       on t."lossyAudioURL" = i.url
       where "lossyAudioIPFSHash" is null
@@ -38,15 +38,15 @@ export const audioNotOnIpfs: Trigger<undefined> = async (clients: Clients) => {
       and i.error is null
       LIMIT ${process.env.QUERY_TRIGGER_BATCH_SIZE!}`
 
-  const tracks = (await clients.db.rawSQL(
+  const tracksWithFiles = (await clients.db.rawSQL(
     query
   )).rows
 
-  return tracks
+  return tracksWithFiles
 };
 
 export const artworkNotOnIpfs: Trigger<undefined> = async (clients: Clients) => {
-  const query = `select t.* from "${Table.processedTracks}" as t
+  const query = `select * from "${Table.processedTracks}" as t
       left outer join "${Table.ipfsFiles}" i
       on t."lossyArtworkURL" = i.url
       where "lossyArtworkIPFSHash" is null
@@ -54,9 +54,9 @@ export const artworkNotOnIpfs: Trigger<undefined> = async (clients: Clients) => 
       and i.error is null
       LIMIT ${process.env.QUERY_TRIGGER_BATCH_SIZE!}`
 
-  const tracks = (await clients.db.rawSQL(
+  const tracksWithFiles = (await clients.db.rawSQL(
     query
   )).rows
 
-  return tracks
+  return tracksWithFiles
 };
