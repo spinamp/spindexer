@@ -8,7 +8,7 @@ import { addPlatform, addNftFactory, removeNftFactory, removePlatform } from '..
 const HUME_PLATFORM: MusicPlatform = {
   id: 'hume',
   type: MusicPlatformType['single-track-multiprint-contract'],
-  name: 'HUME',
+  name: 'Hume',
 }
 
 const OTHERSIDE: NftFactory = {
