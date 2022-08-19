@@ -5,7 +5,7 @@ export const ethereumMissingCreatedAtTime: (tableName: Table) => Trigger<undefin
   const nfts = (await clients.db.getRecords(tableName,
     [
       ['whereNull', ['createdAtTime']],
-      ['whereNotNull', ['createdAtEthereumBlockNumber']]
+      ['whereNotNull', ['createdAtEthereumBlockNumber']],
     ]
   )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return nfts;
@@ -17,6 +17,7 @@ export const missingMetadataObject: Trigger<undefined> = async (clients) => {
     on n.id = enpe."nftId"
     where enpe."metadataError" is null
     and n.metadata is null
+    and n.approved = true
     limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
   `
   const nfts = (await clients.db.rawSQL(nftQuery)).rows
@@ -29,6 +30,7 @@ export const missingMetadataIPFSHash: Trigger<undefined> = async (clients) => {
   on n.id = enpe."nftId" 
   where enpe."metadataError" is null
   and n."metadataIPFSHash" is null
+  and n.approved = true
   limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
   `;
   const nfts = (await clients.db.rawSQL(nftQuery)).rows
@@ -41,6 +43,8 @@ export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Tr
     // and returns nfts where there is no corresponding track.
     // It also filters out error tracks so that nfts where we fail
     // to create a track are not repeated.
+    // Additionally we only return results for nfts that have 
+    // been marked as approved.
     const nftQuery = `select n.* from "${Table.nfts}" as n
       LEFT OUTER JOIN "${Table.nfts_processedTracks}" as j
       ON n.id = j."nftId"
@@ -51,7 +55,8 @@ export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Tr
       WHERE p.id is NULL AND
       e."processError" is NULL AND
       e."metadataError" is NULL AND
-      n."platformId"='${platformId}'
+      n."platformId"='${platformId}' AND
+      n.approved = true
       and n."createdAtTime" is NOT NULL
       ORDER BY n."createdAtTime"
       LIMIT ${limit}`
@@ -66,6 +71,7 @@ export const unprocessedNFTs: Trigger<undefined> = async (clients) => {
   const nfts = (await clients.db.rawSQL(
     `select * from ${Table.nfts}
      where "tokenURI" is null
+     and approved = true
      limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
     `
   )).rows

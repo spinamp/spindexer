@@ -18,6 +18,7 @@ const HEDS_CONTRACTS: NftFactory[] = [
     platformId: HEDS_PLATFORM.id,
     contractType: NFTContractTypeName.default,
     standard: NFTStandard.ERC721,
+    approved: false
   },
   {
     address: '0x5083cf11003f2b25ca7456717e6dc980545002e5',
@@ -25,6 +26,8 @@ const HEDS_CONTRACTS: NftFactory[] = [
     startingBlock: '14373903',
     contractType: NFTContractTypeName.default,
     standard: NFTStandard.ERC721,
+    approved: false
+
   },
   {
     address: '0x567e687c93103010962f9e9cf5730ae8dbfc6d41',
@@ -32,6 +35,8 @@ const HEDS_CONTRACTS: NftFactory[] = [
     startingBlock: '14548643',
     contractType: NFTContractTypeName.default,
     standard: NFTStandard.ERC721,
+    approved: false
+
   },
   {
     address: '0x8045fd700946a00436923f37d08f280ade3b4af6',
@@ -39,6 +44,8 @@ const HEDS_CONTRACTS: NftFactory[] = [
     startingBlock: '14813870',
     contractType: NFTContractTypeName.default,
     standard: NFTStandard.ERC721,
+    approved: false
+
   }
 ]
 

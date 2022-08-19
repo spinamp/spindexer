@@ -8,17 +8,17 @@ import { Cursor } from '../../types/trigger';
 
 const NAME = 'createNftFactoryFromERC721MetaFactoryProcessor';
 
-const processorFunction = (factoryContract: MetaFactory, name: string) =>
+const processorFunction = (metaFactory: MetaFactory, name: string) =>
   async ({ newCursor, items: events }: { newCursor: Cursor, items: ethers.Event[] }, clients: Clients) => {
-    const factoryContractTypeName = factoryContract.contractType;
-    const factoryContractType = MetaFactoryTypes[factoryContractTypeName];
-    const eventToNftFactory = factoryContractType?.creationEventToNftFactory;
+    const metaFactoryContractTypeName = metaFactory.contractType;
+    const metaFactoryContractType = MetaFactoryTypes[metaFactoryContractTypeName];
+    const eventToNftFactory = metaFactoryContractType?.creationEventToNftFactory;
 
     if (!eventToNftFactory) {
-      throw `no eventToNftFactory specified for ${factoryContractTypeName}`
+      throw `no eventToNftFactory specified for ${metaFactoryContractTypeName}`
     }
 
-    const newNftFactoryObjects = events.map(e => eventToNftFactory(e));
+    const newNftFactoryObjects = events.map(e => eventToNftFactory(e, metaFactory.approved));
     console.log({ newNftFactoryObjects })
     await clients.db.insert(Table.nftFactories, newNftFactoryObjects);
     await clients.db.updateProcessor(name, newCursor);

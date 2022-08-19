@@ -17,6 +17,7 @@ const MINTED: NftFactory = {
   platformId: HUME_PLATFORM.id,
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
+  approved: false,
   typeMetadata: {
     overrides: {
       track: {

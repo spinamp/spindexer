@@ -9,7 +9,8 @@ const INITIAL_CONTRACTS: NftFactory[] = [
     startingBlock: '11565020',
     contractType: NFTContractTypeName.zora,
     standard: NFTStandard.ERC721,
-    platformId: 'zoraOriginal'
+    platformId: 'zoraOriginal',
+    approved: false
   },
   {
     address: '0xf5819e27b9bad9f97c177bf007c1f96f26d91ca6',
@@ -17,6 +18,7 @@ const INITIAL_CONTRACTS: NftFactory[] = [
     startingBlock: '13470560',
     contractType: NFTContractTypeName.default,
     standard: NFTStandard.ERC721,
+    approved: false
   },
   {
     address: '0x0bc2a24ce568dad89691116d5b34deb6c203f342',
@@ -24,6 +26,7 @@ const INITIAL_CONTRACTS: NftFactory[] = [
     startingBlock: '14566825',
     contractType: NFTContractTypeName.default,
     standard: NFTStandard.ERC721,
+    approved: false
   }
 ]
 

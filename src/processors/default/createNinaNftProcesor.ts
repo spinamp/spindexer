@@ -28,6 +28,7 @@ export const createNinaNfts: Processor = {
         platformId: MusicPlatformType.nina,
         tokenMetadataURI: metadataAccount!.uri,
         tokenURI: metadataAccount!.uri,
+        approved: true // all nina nfts approved by default
       }
       return details
     })
@@ -39,6 +40,7 @@ export const createNinaNfts: Processor = {
       standard: NFTStandard.METAPLEX,
       name: metadataAccount.metadata.name,
       symbol: metadataAccount.metadata.symbol,
+      approved: true, // all nina contracts approved by default
       typeMetadata: {
         overrides: {
           artist: {
