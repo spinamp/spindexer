@@ -3,7 +3,7 @@ import { Knex } from 'knex';
 
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
-import { addNftFactory, addPlatform } from '../migration-helpers';
+import { addNftFactory, addPlatform, removeNftFactory, removePlatform } from '../migration-helpers';
 
 const ANOTHERBLOCK_PLATFORM: MusicPlatform = {
   id: 'anotherblock',
@@ -43,6 +43,6 @@ export const up = async (knex: Knex) => {
 }
 
 export const down = async (knex: Knex) => {
-  // await removePlatform(knex, ANOTHERBLOCK_PLATFORM)
-  // await removeNftFactory(knex, ANOTHERBLOCK);
+  await removePlatform(knex, ANOTHERBLOCK_PLATFORM)
+  await removeNftFactory(knex, ANOTHERBLOCK);
 }
