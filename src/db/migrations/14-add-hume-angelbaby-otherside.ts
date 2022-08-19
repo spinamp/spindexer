@@ -11,7 +11,7 @@ const HUME_PLATFORM: MusicPlatform = {
   name: 'Hume',
 }
 
-const OTHERSIDE: NftFactory = {
+export const OTHERSIDE: NftFactory = {
   address: '0x0301E208Ec282EC38934606EF53dBD5876ED7eB0',
   startingBlock: '14886522',
   platformId: HUME_PLATFORM.id,

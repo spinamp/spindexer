@@ -3,6 +3,24 @@ import { Knex } from 'knex';
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { addNftFactory, removeNftFactory } from '../migration-helpers';
 
+export const NOIZD = {
+  address: '0xf5819e27b9bad9f97c177bf007c1f96f26d91ca6',
+  platformId: 'noizd',
+  startingBlock: '13470560',
+  contractType: NFTContractTypeName.default,
+  standard: NFTStandard.ERC721,
+  approved: false
+}
+
+export const CATALOG = {
+  address: '0x0bc2a24ce568dad89691116d5b34deb6c203f342',
+  platformId: 'catalog',
+  startingBlock: '14566825',
+  contractType: NFTContractTypeName.default,
+  standard: NFTStandard.ERC721,
+  approved: false
+}
+
 const INITIAL_CONTRACTS: NftFactory[] = [
   {
     address: '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7',
@@ -12,22 +30,8 @@ const INITIAL_CONTRACTS: NftFactory[] = [
     platformId: 'zoraOriginal',
     approved: false
   },
-  {
-    address: '0xf5819e27b9bad9f97c177bf007c1f96f26d91ca6',
-    platformId: 'noizd',
-    startingBlock: '13470560',
-    contractType: NFTContractTypeName.default,
-    standard: NFTStandard.ERC721,
-    approved: false
-  },
-  {
-    address: '0x0bc2a24ce568dad89691116d5b34deb6c203f342',
-    platformId: 'catalog',
-    startingBlock: '14566825',
-    contractType: NFTContractTypeName.default,
-    standard: NFTStandard.ERC721,
-    approved: false
-  }
+  NOIZD,
+  CATALOG
 ]
 
 export const up = async (knex: Knex) => {
