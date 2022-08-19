@@ -23,7 +23,8 @@ const ANOTHERBLOCK: NftFactory = {
         websiteUrl: 'https://anotherblock.io/weekend-on-a-tuesday',
         title: 'Weekend on a Tuesday',
         lossyAudioIPFSHash: 'QmYDoCuj8wcSSr5okZXLfc5eFQNDdNy7sBTQWQYts9vrRy', 
-        lossyArtworkURL: 'https://i.scdn.co/image/ab67616d0000b273b26e03e40aab84270dbcd972'
+        lossyArtworkIPFSHash: 'QmTovjG2VAV9DCSVzHqvHe8PFtUoUQ5FUYDBv2qZWHpazC',
+        lossyArtworkURL: 'https://spinamp.mypinata.cloud/ipfs/QmTovjG2VAV9DCSVzHqvHe8PFtUoUQ5FUYDBv2qZWHpazC'
       },
       artist: {
         name: 'r3hab & laidback luke',
