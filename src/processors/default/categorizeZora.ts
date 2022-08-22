@@ -12,7 +12,7 @@ export const categorizeZora: Processor = {
     console.log(`Processing updates for zora nfts with ids: ${nfts.map(n => n.id)}`);
     const nftUpdates = nfts.map((n: NFT) => {
       const platformId = getZoraPlatform(n);
-      const approved = platformId !== MusicPlatformType.zora; // all zora nfts are not approved by default, but catalog is approved
+      const approved = platformId === MusicPlatformType.catalog; // all zora nfts are not approved by default, but catalog is approved
       const update = {
         id: n.id,
         platformId,
