@@ -101,15 +101,3 @@ export const removeNftFactory = async(knex: Knex, contract: NftFactory) => {
   // await clearERC721Contract(knex, contract);
   // await knex.raw(`delete from "${Table.nftFactories}" where id ilike '${contract.address}';`);
 }
-
-export const approveNftFactory = async(knex: Knex, factory: NftFactory) => {
-  return knex(Table.nftFactories)
-    .update({ approved: true })
-    .where('id', factory.address)
-}
-
-export const revokeNftFactoryApproval = async(knex: Knex, factory: NftFactory) => {
-  return knex(Table.nftFactories)
-    .update({ approved: false })
-    .where('id', factory.address)
-}
