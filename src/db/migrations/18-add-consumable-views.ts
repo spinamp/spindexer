@@ -3,7 +3,7 @@ import { Knex } from 'knex';
 
 import { Table } from '../db';
 
-async function getForiegnKeys(knex: Knex): Promise<{
+async function getForeignKeys(knex: Knex): Promise<{
   table_name: string,
   column_name: string,
   foreign_table_name: string,
@@ -47,7 +47,7 @@ export const up = async (knex: Knex) => {
   }
 
   const tables = Object.values(Table);
-  const foreignKeys = await getForiegnKeys(knex)
+  const foreignKeys = await getForeignKeys(knex)
 
   // create views
   for (const table of tables) {
