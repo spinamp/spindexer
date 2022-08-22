@@ -9,7 +9,7 @@ const HEDS_6: NftFactory = {
   platformId: 'heds',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  approved: false
+  approved: true
 };
 
 export const up = async (knex: Knex) => {

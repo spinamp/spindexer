@@ -17,7 +17,7 @@ export const HEDSTAPE_1 = {
   platformId: HEDS_PLATFORM.id,
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  approved: false
+  approved: true
 }
 
 export const HEDSTAPE_2 = {
@@ -26,7 +26,7 @@ export const HEDSTAPE_2 = {
   startingBlock: '14373903',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  approved: false
+  approved: true
 
 }
 
@@ -36,7 +36,7 @@ export const HEDSTAPE_3 = {
   startingBlock: '14548643',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  approved: false
+  approved: true
 
 }
 
@@ -46,7 +46,7 @@ export const HEDSTAPE_4 = {
   startingBlock: '14813870',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  approved: false
+  approved: true
 }
 
 const HEDS_CONTRACTS: NftFactory[] = [

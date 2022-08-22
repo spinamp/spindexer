@@ -10,7 +10,7 @@ const ROHKI_VROOM: NftFactory = {
   platformId: 'rohki',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  approved: false,
+  approved: true,
   typeMetadata: {
     overrides: {
       track: {

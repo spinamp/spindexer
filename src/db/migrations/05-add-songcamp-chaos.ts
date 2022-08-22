@@ -16,7 +16,7 @@ const CHAOS_CONTRACT: NftFactory = {
   platformId: '0x8427e46826a520b1264b55f31fcb5ddfdc31e349',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  approved: false
+  approved: true
 
 }
 
