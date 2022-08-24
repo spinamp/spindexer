@@ -32,7 +32,7 @@ delete from "nftProcessErrors";
 ```
 
 ```sql
--- Clear all ipfs upload erros so they can be tried again:
+-- Clear all ipfs upload errors so they can be tried again:
 delete from "ipfsFiles" where error is not null;
 ```
 
