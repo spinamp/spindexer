@@ -1,0 +1,32 @@
+cd ~
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+sudo apt -y install git-lfs
+git lfs install
+git clone https://github.com/spinamp/spindexer.git
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+nvm install v18.5.0
+nvm alias default v18.5.0
+nvm use v18.5.0
+sudo apt-get -y install wget ca-certificates
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+sudo apt-get update
+sudo apt-get -y install postgresql postgresql-contrib
+cd spindexer/
+npm install -g typescript
+npm install -g ts-node
+npm install --global yarn
+sudo apt install -y build-essential
+yarn
+cp .env.example .env
+cp rds-ssl-certificate.pem db-ssl-certificate.pem
+yarn config set script-shell /bin/bash
+echo "cd spindexer" >> ~/.bashrc
+echo "alias g=\"git\"" >> ~/.bashrc
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.st status
