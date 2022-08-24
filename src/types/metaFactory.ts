@@ -14,7 +14,7 @@ export type MetaFactory = Contract & {
   contractType: MetaFactoryTypeName,
   gap?: string
   standard: NFTStandard; // which type of factories will this metaFactory create
-  approved: boolean;
+  autoApprove: boolean;
 }
 
 export type MetaFactoryType = {
@@ -35,7 +35,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       startingBlock: event.blockNumber,
       contractType: NFTContractTypeName.default,
       standard: NFTStandard.ERC721,
-      approved
+      autoApprove: approved
     })
   }
 }

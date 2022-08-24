@@ -40,7 +40,7 @@ export const createNinaNfts: Processor = {
       standard: NFTStandard.METAPLEX,
       name: metadataAccount.metadata.name,
       symbol: metadataAccount.metadata.symbol,
-      approved: true, // all nina contracts approved by default
+      autoApprove: true, // all nina contracts approved by default
       typeMetadata: {
         overrides: {
           artist: {

@@ -12,7 +12,7 @@ const CONTRACT: NftFactory = {
   platformId: 'mintsongs',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  approved: true
+  autoApprove: true
 
 };
 

@@ -55,7 +55,7 @@ const processorFunction = (contracts: NftFactory[]) =>
         tokenId,
         platformId: contract.platformId,
         owner: item.args!.to,
-        approved: contract.approved
+        approved: contract.autoApprove
       });
     });
     

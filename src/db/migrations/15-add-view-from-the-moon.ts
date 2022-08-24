@@ -17,7 +17,7 @@ export const VIEW_FROM_THE_MOON: NftFactory = {
   platformId: HUME_PLATFORM.id,
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  approved: true,
+  autoApprove: true,
   typeMetadata: {
     overrides: {
       track: {

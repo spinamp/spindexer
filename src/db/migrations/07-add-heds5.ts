@@ -9,7 +9,7 @@ const HEDS_5: NftFactory = {
   platformId: 'heds',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  approved: true
+  autoApprove: true
 
 };
 

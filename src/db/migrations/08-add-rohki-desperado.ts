@@ -17,7 +17,7 @@ const ROHKI_DESPERADO: NftFactory = {
   platformId: ROHKI_PLATFORM.id,
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  approved: true,
+  autoApprove: true,
   typeMetadata: {
     overrides: {
       track: {

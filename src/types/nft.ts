@@ -58,7 +58,7 @@ export type NftFactory = Contract & {
   symbol?: string,
   typeMetadata?: TypeMetadata
   standard: NFTStandard
-  approved: boolean;
+  autoApprove: boolean;
 }
 
 export type NFTContractType = {
