@@ -36,7 +36,7 @@ export const audioNotOnIpfs: Trigger<undefined> = async (clients: Clients) => {
       where "lossyAudioIPFSHash" is null
       and "lossyAudioURL" is not null
       and i.error is null
-      LIMIT ${process.env.QUERY_TRIGGER_BATCH_SIZE!}`
+      LIMIT ${process.env.IPFS_UPLOAD_BATCH_SIZE || process.env.QUERY_TRIGGER_BATCH_SIZE!}`
 
   const tracksWithFiles = (await clients.db.rawSQL(
     query
@@ -52,7 +52,7 @@ export const artworkNotOnIpfs: Trigger<undefined> = async (clients: Clients) => 
       where "lossyArtworkIPFSHash" is null
       and "lossyArtworkURL" is not null
       and i.error is null
-      LIMIT ${process.env.QUERY_TRIGGER_BATCH_SIZE!}`
+      LIMIT ${process.env.IPFS_UPLOAD_BATCH_SIZE || process.env.QUERY_TRIGGER_BATCH_SIZE!}`
 
   const tracksWithFiles = (await clients.db.rawSQL(
     query

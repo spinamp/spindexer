@@ -45,7 +45,7 @@ export async function rollPromises<InputType, OutputType, ErrorType>
             activeRequests--;
           });
           count++;
-          console.log(`Promise ${count} completed...`);
+          console.log(`Promise ${count} initiated...`);
           activeRequests++;
           currentTime = Date.now();
           secondsPassed = (currentTime - startTime) / 1000;

@@ -15,13 +15,13 @@ function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', rep
   return async (tracksWithIPFSFiles: TrackFileJoin[], clients: Clients) => {
     const updates: Partial<ProcessedTrack>[] = [];
     const ipfsFiles: IPFSFile[] = [];
-    
+
     const processTrack = async (trackWithFile: TrackFileJoin) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const url = trackWithFile[sourceField];
       try {
-        
+
         const fileForUrl: Partial<IPFSFile> = {
           cid: trackWithFile.cid,
           url: trackWithFile.url
@@ -34,7 +34,7 @@ function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', rep
         const track: ProcessedTrack = {
           ...trackWithFile
         }
-        
+
         if (!fileForUrl.cid){
           const source = urlSource(url)
           const file = await clients.ipfs.client.add(source, {
@@ -57,16 +57,17 @@ function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', rep
           })
         }
       } catch (e: any){
+        console.log({ url, error: e.message });
         ipfsFiles.push({ url, error: e.message });
       }
     }
-    
+
     await rollPromises<ProcessedTrack, void, void>(tracksWithIPFSFiles, processTrack, 300, 50)
 
     await clients.db.update(Table.processedTracks, updates)
     await clients.db.upsert(Table.ipfsFiles, ipfsFiles, 'url');
   }
-} 
+}
 
 export const ipfsAudioUploader: Processor = ({
   name: 'ipfsAudioUploader',
