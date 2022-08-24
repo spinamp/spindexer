@@ -3,18 +3,18 @@ import { Knex } from 'knex';
 import { Cursor } from '../types/trigger'
 
 export enum Table {
-  platforms = 'platforms',
-  nfts = 'nfts',
-  erc721Transfers = 'erc721Transfers',
-  artists = 'artists',
-  artistProfiles = 'artistProfiles',
-  processedTracks = 'processedTracks',
-  processors = 'processors',
-  metaFactories = 'metaFactories',
-  nftFactories = 'nftFactories',
-  nfts_processedTracks = 'nfts_processedTracks',
-  nftProcessErrors = 'nftProcessErrors',
-  ipfsPins = 'ipfsPins',
+  platforms = 'rawPlatforms',
+  nfts = 'rawNfts',
+  erc721Transfers = 'rawErc721Transfers',
+  artists = 'rawArtists',
+  artistProfiles = 'rawAtistProfiles',
+  processedTracks = 'rawProcessedTracks',
+  processors = 'rawProcessors',
+  metaFactories = 'rawMetaFactories',
+  nftFactories = 'rawNftFactories',
+  nfts_processedTracks = 'rawNfts_processedTracks',
+  nftProcessErrors = 'rawNftProcessErrors',
+  ipfsPins = 'rawIpfsPins',
 }
 
 export type WhereFunc = 'where'

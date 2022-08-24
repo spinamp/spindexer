@@ -2,7 +2,7 @@ import knex, { Knex } from 'knex';
 
 import { Cursor } from '../types/trigger';
 
-import { DBClient, QueryOptions, Wheres } from './db';
+import { DBClient, QueryOptions, Table, Wheres } from './db';
 import config from './knexfile';
 import { fromDBRecords, toDBRecords } from './orm';
 
@@ -54,7 +54,7 @@ const init = async (): Promise<DBClient> => {
   return ({
     getCursor: async (processor: string): Promise<(string | undefined)> => {
       console.log(`Querying for processor cursor for ${processor}`);
-      const cursorResult = await db('processors').where('id', processor).select('cursor');
+      const cursorResult = await db(Table.processors).where('id', processor).select('cursor');
       return cursorResult[0]?.cursor;
     },
     recordExists: recordExistsFunc(db),
@@ -73,13 +73,13 @@ const init = async (): Promise<DBClient> => {
     },
     updateProcessor: async (processor: string, lastCursor: Cursor) => {
       console.log(`Updating ${processor} with cursor: ${lastCursor}`);
-      const processorExists = await recordExistsFunc(db)('processors', processor);
+      const processorExists = await recordExistsFunc(db)(Table.processors, processor);
       if (processorExists) {
-        await db('processors').where('id', processor).update(
+        await db(Table.processors).where('id', processor).update(
           { cursor: lastCursor }
         );
       } else {
-        await db('processors').insert(
+        await db(Table.processors).insert(
           { id: processor, cursor: lastCursor }
         );
       }
