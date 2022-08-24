@@ -31,17 +31,41 @@ async function getForeignKeys(knex: Knex): Promise<{
   return result.rows
 }
 
+enum oldTables {
+  platforms = 'platforms',
+  nfts = 'nfts',
+  erc721Transfers = 'erc721Transfers',
+  artists = 'artists',
+  artistProfiles = 'artistProfiles',
+  processedTracks = 'processedTracks',
+  processors = 'processors',
+  metaFactories = 'metaFactories',
+  nftFactories = 'nftFactories',
+  nfts_processedTracks = 'nfts_processedTracks',
+  nftProcessErrors = 'nftProcessErrors',
+  ipfsPins = 'ipfsPins',
+}
+
 function tableNameToViewName(tableName: string): string {
   return `consumable${tableName[0].toUpperCase() + tableName.substring(1)}`
 }
 
 export const up = async (knex: Knex) => {
 
+  // rename tables with rawPrefix
+  for (const key of Object.keys(oldTables)){
+    const oldName = oldTables[key as oldTables];
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const newName = Table[key as Table];
+    await knex.schema.renameTable(oldName, newName);
+  }
+
   // specify conditions to add to each view
   const conditions: {
     [table in Table]?: string
   } = {
-    processedTracks: `
+    [Table.processedTracks]: `
     "lossyArtworkIPFSHash" is not null 
     and "lossyAudioIPFSHash" is not null`,
   }
@@ -90,5 +114,15 @@ export const up = async (knex: Knex) => {
 export const down = async (knex: Knex) => {
   for (const table of Object.values(Table)){
     await knex.raw(`drop view "${tableNameToViewName(table)}"`);
+  }
+
+  // rename tables without rawPrefix
+  for (const key of Object.keys(oldTables)){
+    const newName = oldTables[key as oldTables];
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const oldName = Table[key as Table];
+  
+    await knex.schema.renameTable(oldName, newName);
   }
 }
