@@ -37,13 +37,13 @@ const toRecordMapper: any = {
     });
   }),
   [Table.nftProcessErrors]: (nftProcessErrors: NFTProcessError[]): 
-  { nftId: string; metadataError?: string; numberOfRetries?: number; lastRetry?: string; processError?: string }[] => nftProcessErrors.map((c) => {
+  { nftId: string; metadataError?: string; numberOfRetries?: number; lastRetry?: string; processError?: string }[] => nftProcessErrors.map((error) => {
     return ({
-      nftId: c.nftId,
-      metadataError: c.metadataError,
-      numberOfRetries: c.numberOfRetries,
-      lastRetry: c.lastRetry ? c.lastRetry.toISOString() : undefined,
-      processError: c.processError
+      nftId: error.nftId,
+      metadataError: error.metadataError,
+      numberOfRetries: error.numberOfRetries,
+      lastRetry: error.lastRetry ? error.lastRetry.toISOString() : undefined,
+      processError: error.processError
     });
   }),
 }
@@ -83,10 +83,10 @@ const fromRecordMapper: any = {
       standard: c.standard
     });
   }),
-  [Table.nftProcessErrors]: (nftFactories: Record[]): NFTProcessError[] => nftFactories.map((c: any) => {
+  [Table.nftProcessErrors]: (errors: Record[]): NFTProcessError[] => errors.map((error: any) => {
     return ({
-      ...c,
-      lastRetry: c.lastRetry ? new Date(c.lastRetry) : null
+      ...error,
+      lastRetry: error.lastRetry ? new Date(error.lastRetry) : null
     });
   }),
 }
