@@ -19,7 +19,7 @@ export const up = async (knex: Knex) => {
   // set all existing entities to approved = true
   await knex(Table.metaFactories).update({ autoApprove: true })
   await knex(Table.nftFactories).update({ autoApprove: true })
-  await knex(Table.nfts).update({ approved: true })
+  await knex(Table.nfts).update({ approved: true }).whereNotIn('platformId', ['zora', 'zoraOriginal'])
 }
 
 export const down = async (knex: Knex) => {
