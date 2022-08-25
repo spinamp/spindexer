@@ -8,6 +8,7 @@ const DATABASE_URL = `postgresql://${process.env.POSTGRES_USERNAME_OPEN}:${proce
 
 const ownerConnectionString = `postgresql://${process.env.POSTGRES_USERNAME}:${process.env.POSTGRES_PASSWORD}@${process.env.POSTGRES_HOST}:5432/${process.env.POSTGRES_DATABASE}${process.env.NODE_ENV === 'production' ? '?ssl=true' : ''}`;
 
+const apiVersionPrefix = process.env.API_VERSION ? `/v${process.env.API_VERSION}` : '';
 http
   .createServer(
     postgraphile(
@@ -23,6 +24,7 @@ http
         disableDefaultMutations: true,
         pgDefaultRole: 'open_access',
         enableCors: true,
+        graphqlRoute: `${apiVersionPrefix}/graphql`
       }
     )
   )
