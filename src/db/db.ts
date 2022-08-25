@@ -15,6 +15,7 @@ export enum Table {
   nfts_processedTracks = 'nfts_processedTracks',
   nftProcessErrors = 'nftProcessErrors',
   ipfsPins = 'ipfsPins',
+  ipfsFiles = 'ipfsFiles'
 }
 
 export type WhereFunc = 'where'
