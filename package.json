@@ -6,6 +6,7 @@
   "scripts": {
     "lint": "npx eslint . --fix",
     "start": "NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem ts-node src/index.ts",
+    "start-logs": "NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem ts-node src/index.ts 2>&1 | tee /tmp/debug",
     "cli": "NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem ts-node src/cli/cli.ts",
     "build": "tsc --skipLibCheck",
     "bootstrap-db": "NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem ts-node db/bootstrap.ts",
@@ -52,6 +53,7 @@
     "ethers": "^5.6.2",
     "graphql": "^16.3.0",
     "graphql-request": "^4.2.0",
+    "ipfs-http-client": "50.1.2",
     "knex": "^1.0.7",
     "knex-dump": "^1.0.11",
     "lodash": "^4.17.21",

@@ -34,6 +34,9 @@ Spindexer works by:
    - Blocks Subgraph for querying Ethereum block timestamps
    - IPFS endpoint for accessing IPFS content
    - IPFS pinning api url for pinning ipfs content to your own node
+   - IPFS RPC endpoint for adding new content to IPFS
+   - IPFS pinning api url for pinning ipfs content to a node
+
  - Bootstrap the DB with a recent backup so that you don't have to index from scratch:
    - ```yarn restore-db```
 

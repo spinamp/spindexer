@@ -32,6 +32,11 @@ delete from "nftProcessErrors";
 ```
 
 ```sql
+-- Clear all ipfs upload errors so they can be tried again:
+delete from "ipfsFiles" where error is not null;
+```
+
+```sql
 -- Clear all noizd nfts:
 delete from processors where id='createNFTsFromERC721Transfers_0xf5819e27b9bad9f97c177bf007c1f96f26d91ca6';
 delete from erc721nfts where id like '%0xf5819e27b9bad9f97c177bf007c1f96f26d91ca6%';
