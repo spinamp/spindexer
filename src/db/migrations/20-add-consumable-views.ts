@@ -53,7 +53,7 @@ function tableNameToViewName(tableName: string): string {
 
 export const up = async (knex: Knex) => {
 
-  // rename tables with rawPrefix
+  // rename tables with raw_ prefix
   for (const key of Object.keys(oldTables)){
     const oldName = oldTables[key as oldTables];
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -62,13 +62,22 @@ export const up = async (knex: Knex) => {
     await knex.schema.renameTable(oldName, newName);
   }
 
-  // specify conditions to add to each view
-  const conditions: {
-    [table in Table]?: string
+  // specify override sql to for creating a view
+  const overrides: {
+    [table in Table]?: string;
   } = {
     [Table.processedTracks]: `
-    "lossyArtworkIPFSHash" is not null 
-    and "lossyAudioIPFSHash" is not null`,
+    select t.* 
+    from "${Table.processedTracks}" t
+    join "${Table.ipfsPins}" p
+    on t."lossyAudioIPFSHash" = p.id 
+    join "${Table.ipfsPins}" p1
+    on t."lossyArtworkIPFSHash" = p1.id 
+    where "lossyArtworkIPFSHash" is not null 
+    and "lossyAudioIPFSHash" is not null
+    and p.status = 'pinned'
+    and p1.status = 'pinned'
+    `
   }
 
   const tables = Object.values(Table);
@@ -77,16 +86,17 @@ export const up = async (knex: Knex) => {
   // create views
   for (const table of tables) {
     const viewName = tableNameToViewName(table);
-    const condition = conditions[table as Table];
+    const override = overrides[table as Table];
 
-    let viewSql = `create view "${viewName}" as 
-      select * from "${table}"
-    `
+    let selectSql = `select * from "${table}"`;
 
-    if (condition) {
-      const where = `where ${condition}`;
-      viewSql = viewSql.concat(where);
+    if (override){
+      selectSql = override;
     }
+
+    const viewSql = `create view "${viewName}" as ${selectSql}`;
+
+    console.log('create view with sql', viewSql)
 
     await knex.raw(viewSql);
   }
@@ -117,7 +127,7 @@ export const down = async (knex: Knex) => {
     await knex.raw(`drop view "${tableNameToViewName(table)}"`);
   }
 
-  // rename tables without rawPrefix
+  // rename tables without raw_ prefix
   for (const key of Object.keys(oldTables)){
     const newName = oldTables[key as oldTables];
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
