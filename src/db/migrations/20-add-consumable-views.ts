@@ -47,8 +47,8 @@ enum oldTables {
 }
 
 function tableNameToViewName(tableName: string): string {
-  // remove raw prefix
-  return tableName.substring(3)
+  // remove raw_ prefix
+  return tableName.substring(4)
 }
 
 export const up = async (knex: Knex) => {
