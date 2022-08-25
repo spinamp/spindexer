@@ -12,29 +12,14 @@ type NftFactoryAddress = {
 }
 
 export const addPlatform = async (knex: Knex, platform: MusicPlatform) => {
-  await knex.raw(`ALTER TABLE platforms drop constraint "platforms_type_check"`);
+  await knex.raw(`ALTER TABLE "${Table.platforms}" drop constraint "platforms_type_check"`);
   const validTypes = Object.values(MusicPlatformType).map(type => `'${type}'::text`).join(', ');
-  await knex.raw(`ALTER TABLE platforms add constraint "platforms_type_check" CHECK (type = ANY (ARRAY[${validTypes}]))`);
+  await knex.raw(`ALTER TABLE "${Table.platforms}" add constraint "platforms_type_check" CHECK (type = ANY (ARRAY[${validTypes}]))`);
 
   await knex(Table.platforms).insert([platform]);
 }
 
 export const removePlatform = async (knex: Knex, platform: MusicPlatform) => {
-  // TODO: fix delete cursor
-  // await knex.raw(`delete from "${Table.nfts}" where "platformId" = '${platform.id}'`)
-  // const result = await knex.raw(`select cursor from processors where id='createERC721NFTsFromTransfers';`);
-  // const parsedCursor = JSON.parse(result.rows[0].cursor);
-  // delete parsedCursor[contract.address.toLowerCase()];
-  // const updatedCursor = JSON.stringify(parsedCursor);
-  // await knex.raw(`update processors set cursor='${updatedCursor}' where id='createERC721NFTsFromTransfers';`);
-
-  // await knex.raw(`delete from "${Table.nftFactories}" where "platformId" = '${platform.id}'`);
-  // await knex.raw(`delete from "${Table.artistProfiles}" where "platformId" = '${platform.id}'`)
- 
-  // await knex.raw(`delete from "${Table.platforms}" where id = '${platform.id}'`)
-  // await knex.raw(`ALTER TABLE platforms drop constraint "platforms_type_check"`);
-  // const validTypes = Object.values(MusicPlatformType).map(type => `'${type}'::text`).join(', ');
-  // await knex.raw(`ALTER TABLE platforms add constraint "platforms_type_check" CHECK (type = ANY (ARRAY[${validTypes}]))`);
   throw 'not implemented'
 }
 
@@ -48,14 +33,6 @@ export const addMetaFactory = async(knex: Knex, contract: MetaFactory) => {
 
 export const removeMetaFactory = async(knex: Knex, contract: MetaFactory) => {
   throw 'not implemented'
-  // if (!contract.address || contract.address.length === 0) {
-  //   throw new Error('Invalid contract address');
-  // }
-
-  // await knex.raw(`delete from "${Table.nfts}" where "platformId" = '${contract.platformId}'`)
-  // await knex.raw(`delete from "${Table.nftFactories}" where "platformId" = '${contract.platformId}'`)
-
-  // await knex(Table.metaFactories).whereILike('id', contract.address).del()
 }
 
 export const addNftFactory = async(knex: Knex, contract: NftFactory) => {
@@ -80,11 +57,11 @@ export const clearERC721Contract = async(knex: Knex, contract: NftFactoryAddress
   if (!contract.address || contract.address.length === 0) {
     throw new Error('Invalid contract address');
   }
-  const result = await knex.raw(`select cursor from processors where id='createERC721NFTsFromTransfers';`);
+  const result = await knex.raw(`select cursor from "${Table.processors}" where id='createERC721NFTsFromTransfers';`);
   const parsedCursor = JSON.parse(result.rows[0].cursor);
   delete parsedCursor[contract.address.toLowerCase()];
   const updatedCursor = JSON.stringify(parsedCursor);
-  await knex.raw(`update processors set cursor='${updatedCursor}' where id='createERC721NFTsFromTransfers';`);
+  await knex.raw(`update "${Table.processors}" set cursor='${updatedCursor}' where id='createERC721NFTsFromTransfers';`);
 
   await clearERC721ContractTracks(knex, contract);
 
@@ -98,6 +75,4 @@ export const clearERC721Contract = async(knex: Knex, contract: NftFactoryAddress
 
 export const removeNftFactory = async(knex: Knex, contract: NftFactory) => {
   throw 'not implemented'
-  // await clearERC721Contract(knex, contract);
-  // await knex.raw(`delete from "${Table.nftFactories}" where id ilike '${contract.address}';`);
 }
