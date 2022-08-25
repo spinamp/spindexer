@@ -6,7 +6,8 @@ import { NftFactory, NFTContractTypeName, NFTStandard } from './nft'
 
 export enum MetaFactoryTypeName {
   soundArtistProfileCreator = 'soundArtistProfileCreator',
-  ninaMintCreator = 'ninaMintCreator'
+  ninaMintCreator = 'ninaMintCreator',
+  zoraDropCreator = 'zoraDropCreator'
 }
 
 export type MetaFactory = Contract & {
@@ -32,6 +33,17 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
     creationEventToNftFactory: (event: any, approved: boolean) => ({
       address: formatAddress(event.args!.artistAddress),
       platformId: 'sound',
+      startingBlock: event.blockNumber,
+      contractType: NFTContractTypeName.default,
+      standard: NFTStandard.ERC721,
+      autoApprove: approved
+    })
+  },
+  zoraDropCreator: {
+    newContractCreatedEvent: 'CreatedDrop',
+    creationEventToNftFactory: (event: any, approved: boolean) => ({
+      address: formatAddress(event.args!.editionContractAddress),
+      platformId: 'zora',
       startingBlock: event.blockNumber,
       contractType: NFTContractTypeName.default,
       standard: NFTStandard.ERC721,
