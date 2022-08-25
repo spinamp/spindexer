@@ -39,7 +39,6 @@ const processorFunction = async (cids: string[], clients: Clients) => {
       accum.push({
         id: cid,
         requestId: pinResponse.requestid,
-        status: pinResponse.status,
       });
     })
     return accum;
@@ -69,7 +68,6 @@ const processorFunction = async (cids: string[], clients: Clients) => {
         pinsToInsert.push({
           id: cid,
           requestId: response.response!.data.requestid,
-          status: response.response!.data.status,
         });
       })
     });

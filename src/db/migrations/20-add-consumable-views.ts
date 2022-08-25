@@ -62,6 +62,11 @@ export const up = async (knex: Knex) => {
     await knex.schema.renameTable(oldName, newName);
   }
 
+  // remove 'status' column of ipfs_pins
+  await knex.schema.alterTable(Table.ipfsPins, table => {
+    table.dropColumn('status')
+  })
+
   // specify override sql to for creating a view
   const overrides: {
     [table in Table]?: string;
@@ -75,8 +80,6 @@ export const up = async (knex: Knex) => {
     on t."lossyArtworkIPFSHash" = p1.id 
     where "lossyArtworkIPFSHash" is not null 
     and "lossyAudioIPFSHash" is not null
-    and p.status = 'pinned'
-    and p1.status = 'pinned'
     `
   }
 
@@ -126,6 +129,10 @@ export const down = async (knex: Knex) => {
   for (const table of Object.values(Table)){
     await knex.raw(`drop view "${tableNameToViewName(table)}"`);
   }
+  
+  await knex.schema.alterTable(Table.ipfsPins, table => {
+    table.string('status')
+  })
 
   // rename tables without raw_ prefix
   for (const key of Object.keys(oldTables)){
