@@ -24,7 +24,8 @@ http
         disableDefaultMutations: true,
         pgDefaultRole: 'open_access',
         enableCors: true,
-        graphqlRoute: `${apiVersionPrefix}/graphql`
+        graphqlRoute: `${apiVersionPrefix}/graphql`,
+        graphiqlRoute: `${apiVersionPrefix}/graphiql`
       }
     )
   )
