@@ -59,16 +59,16 @@ const init = async (): Promise<DBClient> => {
     },
     recordExists: recordExistsFunc(db),
     recordsExist: filterExistRecordsFunc(db),
-    insert: async <RecordType>(tableName: string, records: RecordType[], options?: QueryOptions) => {
+    insert: async <RecordType>(tableName: string, records: RecordType[]) => {
       if (records.length === 0) {
         return;
       }
       console.log(`Inserting into ${tableName} ${records.length} records`);
       const dbRecords = toDBRecords(tableName, records);
       if (options?.ignoreConflict){
-        await db(tableName).insert(dbRecords).onConflict(options.ignoreConflict).ignore();
+        await db.batchInsert(tableName, dbRecords)
       } else {
-        await db(tableName).insert(dbRecords);
+        await db.batchInsert(tableName, dbRecords)
       }
     },
     updateProcessor: async (processor: string, lastCursor: Cursor) => {
