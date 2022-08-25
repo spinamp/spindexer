@@ -47,7 +47,8 @@ enum oldTables {
 }
 
 function tableNameToViewName(tableName: string): string {
-  return `consumable${tableName[0].toUpperCase() + tableName.substring(1)}`
+  // remove raw prefix
+  return tableName.substring(3)
 }
 
 export const up = async (knex: Knex) => {
