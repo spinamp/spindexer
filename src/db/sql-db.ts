@@ -118,7 +118,7 @@ const init = async (): Promise<DBClient> => {
         await db(tableName).whereIn(idField, ids).delete()
       }
     },
-    upsert: async <RecordType>(tableName: string, recordUpserts: RecordType[], idField: string | string[] = 'id') => {
+    upsert: async <RecordType>(tableName: string, recordUpserts: RecordType[], idField: string | string[] = 'id', mergeOptions: string[] | undefined = undefined ) => {
       console.log(`Upserting records`);
       if (recordUpserts?.length > 0) {
         const dbUpserts = toDBRecords(tableName, recordUpserts)
@@ -127,7 +127,7 @@ const init = async (): Promise<DBClient> => {
             await db(tableName)
               .insert(dbUpsert)
               .onConflict(idField as any)
-              .merge()
+              .merge(mergeOptions)
           } catch (error) {
             console.error('Error upsert record:');
             console.dir({ dbUpsert }, { depth: null });
