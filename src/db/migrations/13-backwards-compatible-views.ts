@@ -1,12 +1,14 @@
 
 import { Knex } from 'knex';
 
+import { Table } from '../db';
+
 export const up = async (knex: Knex) => {
 
   // backwards compatible view for nfts table
   await knex.raw(
     `create view erc721nft as
-    select * from nfts
+    select * from "${Table.nfts}"
     `
   )
 
@@ -14,14 +16,14 @@ export const up = async (knex: Knex) => {
   await knex.raw(
     `create view "erc721nfts_processedTracks" as
     select npt."nftId" as "erc721NftId", npt."processedTrackId"
-    from "nfts_processedTracks" npt
+    from "${Table.nfts_processedTracks}" npt
     `
   )
 
   // add comment to add fake fk constraints to view for postgraphile relation generation
   await knex.raw(
     `comment on view "erc721nfts_processedTracks" is
-    E'@foreignKey ("processedTrackId") references "processedTracks" (id)\n@foreignKey ("erc721NftId") references erc721nft (id)';  
+    E'@foreignKey ("processedTrackId") references"${Table.processedTracks}" (id)\n@foreignKey ("erc721NftId") references erc721nft (id)';
     `
   )
 

@@ -170,7 +170,7 @@ export const up = async (knex: Knex) => {
   await knex.raw(`GRANT SELECT ON "${Table.ipfsPins}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`GRANT SELECT ON "${Table.erc721Transfers}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`comment on table "${Table.nftProcessErrors}" is '@omit';`);
-  await knex.raw(`comment on table processors is '@omit';`);
+  await knex.raw(`comment on table "${Table.processors}" is '@omit';`);
   await knex.raw(`comment on table knex_migrations is '@omit';`);
   await knex.raw(`comment on table knex_migrations_lock is '@omit';`);
   await knex(Table.platforms).insert(INITIAL_PLATFORM_ENUMS);
