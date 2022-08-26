@@ -124,6 +124,8 @@ export const up = async (knex: Knex) => {
     const viewName = tableNameToViewName(table);
     await knex.raw(`GRANT SELECT ON "${viewName}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   }
+  await knex.raw(`drop view "erc721nft"`);
+  await knex.raw(`drop view "erc721nfts_processedTracks"`);
 }
 
 export const down = async (knex: Knex) => {
