@@ -10,21 +10,21 @@ async function getForeignKeys(knex: Knex): Promise<{
   foreign_column_name: string
 }[]> {
   const result = await knex.raw(
-    ` 
+    `
     SELECT
-        tc.table_name, 
-        kcu.column_name, 
+        tc.table_name,
+        kcu.column_name,
         ccu.table_name AS foreign_table_name,
-        ccu.column_name AS foreign_column_name 
-    FROM 
-        information_schema.table_constraints AS tc 
+        ccu.column_name AS foreign_column_name
+    FROM
+        information_schema.table_constraints AS tc
         JOIN information_schema.key_column_usage AS kcu
           ON tc.constraint_name = kcu.constraint_name
           AND tc.table_schema = kcu.table_schema
         JOIN information_schema.constraint_column_usage AS ccu
           ON ccu.constraint_name = tc.constraint_name
           AND ccu.table_schema = tc.table_schema
-    WHERE tc.constraint_type = 'FOREIGN KEY';   
+    WHERE tc.constraint_type = 'FOREIGN KEY';
     `
   )
 
@@ -44,6 +44,7 @@ enum oldTables {
   nfts_processedTracks = 'nfts_processedTracks',
   nftProcessErrors = 'nftProcessErrors',
   ipfsPins = 'ipfsPins',
+  ipfsFiles = 'ipfsFiles',
 }
 
 function tableNameToViewName(tableName: string): string {
@@ -72,13 +73,13 @@ export const up = async (knex: Knex) => {
     [table in Table]?: string;
   } = {
     [Table.processedTracks]: `
-    select t.* 
+    select t.*
     from "${Table.processedTracks}" t
     join "${Table.ipfsPins}" p
-    on t."lossyAudioIPFSHash" = p.id 
+    on t."lossyAudioIPFSHash" = p.id
     join "${Table.ipfsPins}" p1
-    on t."lossyArtworkIPFSHash" = p1.id 
-    where "lossyArtworkIPFSHash" is not null 
+    on t."lossyArtworkIPFSHash" = p1.id
+    where "lossyArtworkIPFSHash" is not null
     and "lossyAudioIPFSHash" is not null
     `
   }
@@ -117,7 +118,7 @@ export const up = async (knex: Knex) => {
 
     await knex.raw(commentString)
   }
-  
+
   // add permissions
   for (const table of tables){
     const viewName = tableNameToViewName(table);
@@ -129,7 +130,7 @@ export const down = async (knex: Knex) => {
   for (const table of Object.values(Table)){
     await knex.raw(`drop view "${tableNameToViewName(table)}"`);
   }
-  
+
   await knex.schema.alterTable(Table.ipfsPins, table => {
     table.string('status')
   })
@@ -140,7 +141,7 @@ export const down = async (knex: Knex) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const oldName = Table[key as Table];
-  
+
     await knex.schema.renameTable(oldName, newName);
   }
 }
