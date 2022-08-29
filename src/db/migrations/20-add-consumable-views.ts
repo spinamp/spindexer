@@ -57,6 +57,11 @@ export const up = async (knex: Knex) => {
   // rename tables with raw_ prefix
   for (const key of Object.keys(oldTables)){
     const oldName = oldTables[key as oldTables];
+    // check if old table exists
+    const hasOldTable = await knex.schema.hasTable(oldName);
+    if (!hasOldTable){
+      continue;
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const newName = Table[key as Table];
