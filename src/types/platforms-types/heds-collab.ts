@@ -128,7 +128,8 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
 
 const mapNFTtoTrackID = (nft: NFT): string => {
   const artist = getTrait(nft, 'Artist');
-  return `ethereum/${formatAddress(nft.contractAddress)}/${artist}`;
+  const track = getTrackNameFromArtist(artist);
+  return `ethereum/${formatAddress(nft.contractAddress)}/${track}`;
 };
 
 const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
