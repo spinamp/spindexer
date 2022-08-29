@@ -12,9 +12,10 @@ type NftFactoryAddress = {
 }
 
 export const addPlatform = async (knex: Knex, platform: MusicPlatform) => {
-  await knex.raw(`ALTER TABLE "${Table.platforms}" drop constraint "platforms_type_check"`);
+  const platformTypeCheckConstraintName = `${Table.platforms}_type_check`
+  await knex.raw(`ALTER TABLE "${Table.platforms}" drop constraint "${platformTypeCheckConstraintName}"`);
   const validTypes = Object.values(MusicPlatformType).map(type => `'${type}'::text`).join(', ');
-  await knex.raw(`ALTER TABLE "${Table.platforms}" add constraint "platforms_type_check" CHECK (type = ANY (ARRAY[${validTypes}]))`);
+  await knex.raw(`ALTER TABLE "${Table.platforms}" add constraint "${platformTypeCheckConstraintName}" CHECK (type = ANY (ARRAY[${validTypes}]))`);
 
   await knex(Table.platforms).insert([platform]);
 }
