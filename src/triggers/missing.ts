@@ -12,7 +12,7 @@ export const ethereumMissingCreatedAtTime: (tableName: Table) => Trigger<undefin
 };
 
 export const missingMetadataObject: Trigger<undefined> = async (clients) => {
-  const nftQuery = `select * from ${Table.nfts} n
+  const nftQuery = `select * from "${Table.nfts}" n
     left outer join "${Table.nftProcessErrors}" enpe
     on n.id = enpe."nftId"
     where enpe."metadataError" is null
@@ -25,7 +25,7 @@ export const missingMetadataObject: Trigger<undefined> = async (clients) => {
 };
 
 export const missingMetadataIPFSHash: Trigger<undefined> = async (clients) => {
-  const nftQuery = `select * from ${Table.nfts} n
+  const nftQuery = `select * from "${Table.nfts}" n
   left outer join "${Table.nftProcessErrors}" enpe 
   on n.id = enpe."nftId" 
   where enpe."metadataError" is null
@@ -69,7 +69,7 @@ export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Tr
 
 export const unprocessedNFTs: Trigger<undefined> = async (clients) => {
   const nfts = (await clients.db.rawSQL(
-    `select * from ${Table.nfts}
+    `select * from "${Table.nfts}"
      where "tokenURI" is null
      and approved = true
      limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}

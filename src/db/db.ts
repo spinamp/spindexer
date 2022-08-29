@@ -3,18 +3,19 @@ import { Knex } from 'knex';
 import { Cursor } from '../types/trigger'
 
 export enum Table {
-  platforms = 'platforms',
-  nfts = 'nfts',
-  erc721Transfers = 'erc721Transfers',
-  artists = 'artists',
-  artistProfiles = 'artistProfiles',
-  processedTracks = 'processedTracks',
-  processors = 'processors',
-  metaFactories = 'metaFactories',
-  nftFactories = 'nftFactories',
-  nfts_processedTracks = 'nfts_processedTracks',
-  nftProcessErrors = 'nftProcessErrors',
-  ipfsPins = 'ipfsPins',
+  platforms = 'raw_platforms',
+  nfts = 'raw_nfts',
+  erc721Transfers = 'raw_erc721_transfers',
+  artists = 'raw_artists',
+  artistProfiles = 'raw_artist_profiles',
+  processedTracks = 'raw_processed_tracks',
+  processors = 'raw_processors',
+  metaFactories = 'raw_meta_factories',
+  nftFactories = 'raw_nft_factories',
+  nfts_processedTracks = 'raw_nfts_processed_tracks',
+  nftProcessErrors = 'raw_nft_process_errors',
+  ipfsPins = 'raw_ipfs_pins',
+  ipfsFiles = 'raw_ipfs_files'
 }
 
 export type WhereFunc = 'where'
@@ -45,7 +46,7 @@ export type DBClient = {
   getRecords: <Type>(tableName: Table, wheres?: Wheres) => Promise<Type[]>;
   insert: <Type>(tableName: Table, rows: Type[], options?: QueryOptions) => Promise<void>;
   update: <Type>(tableName: Table, rows: Type[]) => Promise<void>;
-  upsert: <Type>(tableName: Table, rows: Type[], idField?: string | string[]) => Promise<void>;
+  upsert: <Type>(tableName: Table, rows: Type[], idField?: string | string[], mergeOptions?: undefined | string[]) => Promise<void>;
   delete: (tableName: Table, ids: string[], idField?: string) => Promise<void>;
   updateProcessor: (processor: string, lastCursor: Cursor) => Promise<void>;
   getNumberRecords: (tableName: Table) => Promise<any>;
