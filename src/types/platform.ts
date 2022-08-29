@@ -4,6 +4,7 @@ import { ArtistProfile } from './artist';
 import { NFT, NftFactory } from './nft';
 import catalogMappers from './platforms-types/catalog';
 import chaosMappers from './platforms-types/chaos';
+import hedsCollabMappers from './platforms-types/heds-collab';
 import mintsongsV2Mappers from './platforms-types/mintsongs-v2';
 import multiTrackMultiprintContractMappers from './platforms-types/multi-track-multiprint-contract';
 import ninaMappers from './platforms-types/nina'
@@ -21,7 +22,8 @@ export enum MusicPlatformType {
   'multi-track-multiprint-contract' = 'multi-track-multiprint-contract',
   chaos = 'chaos',
   mintsongsV2 = 'mintsongs-v2',
-  nina = 'nina'
+  nina = 'nina',
+  hedsCollab = 'heds-collab'
 }
 
 export type MusicPlatform = {
@@ -80,6 +82,10 @@ export const platformConfigs: MusicPlatformTypeConfigs = {
   },
   'nina': {
     mappers: ninaMappers,
+    clientName: null
+  },
+  'heds-collab': {
+    mappers: hedsCollabMappers,
     clientName: null
   }
 }
