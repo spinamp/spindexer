@@ -62,38 +62,17 @@ const init = async (): Promise<EthClient> => {
         return filter.topics![0];
       });
       const contractAddresses = _.uniq(contractFilters.map(c => c.address));
-
-      // split into ranges of MAX_BLOCK_RANGE  blocks
-      const maxRange = Number(process.env.MAX_BLOCK_RANGE!);
-      const range = Number(toBlock) - Number(fromBlock);
-      const numberOfRanges = Math.ceil(
-        range / Number(maxRange)
-      );
-
-      const ranges = Array(numberOfRanges).fill(0).map((value, index) => {
-        const from = Number(fromBlock) + maxRange * index;
-        const to = Math.min(from + maxRange, Number(toBlock))
-        return {
-          from, 
-          to
-        }
-      })
-
-      const promises = ranges.map(async ({ from, to }) => {
-        return provider.send('eth_getLogs', [{
-          address: contractAddresses,
-          topics: [
-            [ 
-              ...filters
-            ]
-          ],
-          fromBlock: BigNumber.from(from).toHexString(),
-          toBlock: BigNumber.from(to).toHexString(),
-        }]);
-      })
-
-      let events = await Promise.all(promises);
-      events = [].concat(...events);
+      
+      const events = await provider.send('eth_getLogs', [{
+        address: contractAddresses,
+        topics: [
+          [ // topic[0]
+            ...filters
+          ]
+        ],
+        fromBlock: BigNumber.from(fromBlock).toHexString(),
+        toBlock: BigNumber.from(toBlock).toHexString(),
+      }]);
 
       const iface = new ethers.utils.Interface(MetaABI.abi);
       return events.map((event: ethers.Event) => ({
