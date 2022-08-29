@@ -35,16 +35,16 @@ function getTrackNameFromArtist(artist: string): string {
 
 function getAvatarFromArtist(artist: string): string {
   const avatarByArtist: any = {
-    'LOPHIILE FT. TYLER JAY': 'https://firebasestorage.googleapis.com/v0/b/heds-34ac0.appspot.com/o/tapes%2FcollabTAPES%2FGood%20Society%2FImages%2Fartists%2FLophiile.jpg?alt=media&token=538507ad-08d7-499d-a7af-f689377f3349',
-    'CARRTOONS': 'https://firebasestorage.googleapis.com/v0/b/heds-34ac0.appspot.com/o/tapes%2FcollabTAPES%2FGood%20Society%2FImages%2Fartists%2Fcarrtoons.jpg?alt=media&token=e6e5311c-590c-4a6e-b82d-3b3cc2bda207',
-    'ROMDERFUL': 'https://firebasestorage.googleapis.com/v0/b/heds-34ac0.appspot.com/o/tapes%2FcollabTAPES%2FGood%20Society%2FImages%2Fartists%2FROMDERFUL.jpg?alt=media&token=697ee0dc-a8ed-4a81-bc6b-ac31f9db22d0',
-    'AUTUMN KEYS FT AYOTEMI': 'https://firebasestorage.googleapis.com/v0/b/heds-34ac0.appspot.com/o/tapes%2FcollabTAPES%2FGood%20Society%2FImages%2Fartists%2Fautumn%20keys.jpeg?alt=media&token=6cec0f08-839e-4427-b875-178a8ad5c788',
-    'OSHI': 'https://firebasestorage.googleapis.com/v0/b/heds-34ac0.appspot.com/o/tapes%2FcollabTAPES%2FGood%20Society%2FImages%2Fartists%2Foshi.png?alt=media&token=c1282dae-5de3-44cd-91dc-d38c75ee4b07',
-    'DECAP': 'https://firebasestorage.googleapis.com/v0/b/heds-34ac0.appspot.com/o/tapes%2FcollabTAPES%2FGood%20Society%2FImages%2Fartists%2Fdecap.jpg?alt=media&token=0788736c-6b9b-43c2-becd-be72b5578dbf',
-    'CHROMONICCI': `https://firebasestorage.googleapis.com/v0/b/heds-34ac0.appspot.com/o/tapes%2FcollabTAPES%2FGood%20Society%2FImages%2Fartists%2Fchromonicci.jpg?alt=media&token=cd5f28eb-350a-4c7f-a353-bf3894759bc7`,
-    'XANDER': 'https://firebasestorage.googleapis.com/v0/b/heds-34ac0.appspot.com/o/tapes%2FcollabTAPES%2FGood%20Society%2FImages%2Fartists%2Fxander.jpeg?alt=media&token=57173553-96db-49a4-b739-f7284161f48e',
-    'CAPSHUN & CORDEROYBOI': 'https://firebasestorage.googleapis.com/v0/b/heds-34ac0.appspot.com/o/tapes%2FcollabTAPES%2FGood%20Society%2FImages%2Fartists%2Fcapshun-4.jpeg?alt=media&token=37b17134-0b3f-43f6-89d7-456ff5925a92',
-    'PAUL MOND': 'https://firebasestorage.googleapis.com/v0/b/heds-34ac0.appspot.com/o/tapes%2FcollabTAPES%2FGood%20Society%2FImages%2Fartists%2Fpaulmond.jpg?alt=media&token=bdb72778-07a7-43c6-a4aa-580b5fa073b3'
+    'LOPHIILE FT. TYLER JAY': 'https://web3-music-pipeline.mypinata.cloud/ipfs/Qmd67SNvAgfMVU5LgEQnm7HFUT6kZnQ2WXbxvwV2CFFpFd',
+    'CARRTOONS': 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmNjRGN1y3NtFEh5mK4JSc4ZVJBToJ1iSewsQWwQ6Xykcd',
+    'ROMDERFUL': 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmSvqUiYF86eKk3aRks7beuNo8ZPic9ysVJLwFCeQeDKLU',
+    'AUTUMN KEYS FT AYOTEMI': 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmUp18kpqfdNE1NFEqJahGjnTmCWTRuogNzLeKCU3fFGi7',
+    'OSHI': 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmYoALqomeG5U3aivGFt2JNSaDEfHEXtGUcAz6jZnjT7XE',
+    'DECAP': 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmNsndybDyRrRiK7pM7KiHZHZGimuhEiHLhz3LwgvkbDch',
+    'CHROMONICCI': 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmXzsc1FqMzWNtLt57CwGkkZUaa36yk5GZQzZMXnsswtuD',
+    'XANDER': 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmTWmhDVQjd9QxoL1ncMxxBNHTKkqnMZCPRXAmTfMAyoW9',
+    'CAPSHUN & CORDEROYBOI': 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmdXF2TLWhvSjPmQjsccGspyuUoLhwKjuE6xA4ASQehzrN',
+    'PAUL MOND': 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmQ9WnpT5WKJ1Jq5X6YzWkxQj16iUFpRCRKyMjKJaw8pmQ'
   }
 
   const track = avatarByArtist[artist.toUpperCase()];
