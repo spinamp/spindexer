@@ -76,7 +76,8 @@ export const createERC721NFTsFromTransfersProcessor: (contracts: NftFactory[]) =
     trigger: newERC721Transfers(
       contracts
         .filter(c => c.standard === NFTStandard.ERC721) //only include ERC721 contracts
-        .map(c => ({ address: c.address, startingBlock: c.startingBlock! })) // map contracts to EthereumContract
+        .map(c => ({ address: c.address, startingBlock: c.startingBlock! })), // map contracts to EthereumContract
+      process.env.ETHEREUM_BLOCK_QUERY_GAP! // todo: overwrite to 2k?
     ),
     processorFunction: processorFunction(contracts),
   }
