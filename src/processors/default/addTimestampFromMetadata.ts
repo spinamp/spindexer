@@ -6,7 +6,6 @@ import { NFT } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 
 export const addTimestampFromMetadata: Processor = {
-
   name: 'addTimestampFromMetadata',
   trigger: missingCreatedAtTimeWithMetadataDate,
   processorFunction: async (nfts: NFT[], clients: Clients) => {
