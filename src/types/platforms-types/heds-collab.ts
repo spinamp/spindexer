@@ -2,12 +2,13 @@ import _ from 'lodash';
 import slugify from 'slugify';
 
 
-import { extractHashFromURL } from '../../clients/ipfs';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT, getTrait, NftFactory } from '../nft';
 import { MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
+
+import { mapTrack as mapSingleTrack, mapArtistProfile as mapSingleArtistProfile } from './single-track-multiprint-contract'
 
 function getTrackNameFromArtist(artist: string): string {
   const trackByArtist: any = {
@@ -85,21 +86,13 @@ const mapTrack: MapTrack = (
 
   const artist = getTrait(nft, 'Artist');
 
-  const track: Partial<ProcessedTrack> = {
-    id: mapNFTtoTrackID(nft),
-    platformInternalId: mapNFTtoTrackID(nft),
-    title: getTrackNameFromArtist(artist),
-    description: nft.metadata.description,
-    platformId: contract.platformId,
-    lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url),
-    lossyArtworkIPFSHash: extractHashFromURL(nft.metadata.image),
-    websiteUrl: nft.metadata.external_url,
-    artistId: mapArtistProfile({ apiTrack: apiTrack, nft: nft, contract: contract }).artistId,
-    createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
-  };
+  const track: Partial<ProcessedTrack> = mapSingleTrack(nft, apiTrack, contract)
+  track.id = mapNFTtoTrackID(nft);
+  track.platformInternalId = mapNFTtoTrackID(nft);
+  track.title = getTrackNameFromArtist(artist);
+  track.artistId = mapArtistProfile({ apiTrack, nft, contract }).artistId
+  track.slug = slugify(`${track.title} ${new Date(nft.createdAtTime).getTime()}`).toLowerCase();
 
-  track.slug = slugify(`${track.title} ${nft.createdAtTime.getTime()}`).toLowerCase();
 
   return track as ProcessedTrack;
 };
@@ -112,18 +105,17 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
     throw new Error(`Contract missing for mapArtistProfile for nft ${nft.id}`)
   }
 
-  const artist = getTrait(nft, 'Artist');
+  const artistName = getTrait(nft, 'Artist');
 
-  return {
-    name: artist,
-    artistId: getArtistId(artist),
-    platformInternalId: artist,
-    platformId: contract.platformId,
-    avatarUrl: getAvatarFromArtist(artist),
-    websiteUrl: nft.metadata.external_url,
-    createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
-  }
+  const artistProfile = mapSingleArtistProfile({ apiTrack, nft, contract })
+  artistProfile.artistId = getArtistId(artistName);
+  artistProfile.avatarUrl = getAvatarFromArtist(artistName);
+  artistProfile.platformInternalId = artistName;
+  artistProfile.name = artistName;
+
+
+  return artistProfile;
+
 };
 
 const mapNFTtoTrackID = (nft: NFT): string => {
