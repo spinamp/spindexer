@@ -2,6 +2,8 @@ import { Knex } from 'knex';
 
 import { Cursor } from '../types/trigger'
 
+export const defaultTimestampColumn = 'createdAtTime';
+
 export enum Table {
   platforms = 'raw_platforms',
   nfts = 'raw_nfts',
