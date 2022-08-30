@@ -112,7 +112,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
       nftId: nft.id,
       processError: `Missing platform type for ${platform.id}`
     }))
-    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'nftId');
+    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'nftId', ['processError']);
     return;
   }
   let platformClient: TrackAPIClient | null = null;
@@ -124,7 +124,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
       nftId: nft.id,
       processError: `Missing platform client`
     }))
-    await clients.db.upsert(Table.nftProcessErrors, errorNFTs,'nftId');
+    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'nftId', ['processError']);
     return;
   }
   const { mapNFTsToTrackIds, mapTrack, mapArtistProfile, selectPrimaryNFTForTrackMapper } = platformType.mappers;
@@ -159,7 +159,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
     });
   }
   if (errorNFTs.length !== 0) {
-    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'nftId');
+    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'nftId', ['processError']);
   }
   if (oldIds && oldIds.length !== 0) {
     await clients.db.delete(Table.processedTracks, oldIds);

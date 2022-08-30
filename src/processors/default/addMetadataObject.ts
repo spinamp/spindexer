@@ -40,7 +40,7 @@ const processorFunction = (erc721ContractsByAddress: { [key: string]: NftFactory
     const metadataError = results[index].isError ? results[index].error!.message : undefined;
     if (metadataError){
       metadataErrors.push({
-        nftId: nft.id, 
+        nftId: nft.id,
         metadataError
       });
     }
@@ -51,7 +51,7 @@ const processorFunction = (erc721ContractsByAddress: { [key: string]: NftFactory
     }
   });
   await clients.db.update(Table.nfts, nftUpdates);
-  await clients.db.upsert(Table.nftProcessErrors,metadataErrors, 'nftId');
+  await clients.db.upsert(Table.nftProcessErrors, metadataErrors, 'nftId', ['metadataError']);
 
   console.info('Batch done');
 };

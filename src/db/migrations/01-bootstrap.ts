@@ -16,7 +16,7 @@ const INITIAL_TABLES = [
     name: Table.nftFactories, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
       table.string('platformId');
-      table.foreign('platformId').references('id').inTable('platforms').onDelete('cascade');
+      table.foreign('platformId').references('id').inTable(Table.platforms).onDelete('cascade');
       table.string('startingBlock');
       table.string('contractType');
       table.jsonb('typeMetadata');
@@ -30,7 +30,7 @@ const INITIAL_TABLES = [
     name: Table.metaFactories, create: (table: Knex.CreateTableBuilder) => {
       table.string('id').primary();
       table.string('platformId');
-      table.foreign('platformId').references('id').inTable('platforms').onDelete('cascade');
+      table.foreign('platformId').references('id').inTable(Table.platforms).onDelete('cascade');
       table.string('startingBlock');
       table.string('contractType');
       table.string('gap');
@@ -46,7 +46,7 @@ const INITIAL_TABLES = [
       table.string('tokenId');
       table.string('contractAddress').references('id').inTable(Table.nftFactories).onDelete('cascade');
       table.string('platformId');
-      table.foreign('platformId').references('id').inTable('platforms').onDelete('cascade');
+      table.foreign('platformId').references('id').inTable(Table.platforms).onDelete('cascade');
       table.string('metadataIPFSHash');
       table.string('tokenURI', 20000);
       table.string('tokenMetadataURI', 20000);
@@ -74,9 +74,9 @@ const INITIAL_TABLES = [
       table.string('avatarUrl', 3000);
       table.string('websiteUrl', 3000);
       table.string('artistId');
-      table.foreign('artistId').references('id').inTable('artists').onDelete('cascade');
+      table.foreign('artistId').references('id').inTable(Table.artists).onDelete('cascade');
       table.string('platformId');
-      table.foreign('platformId').references('id').inTable('platforms').onDelete('cascade');
+      table.foreign('platformId').references('id').inTable(Table.platforms).onDelete('cascade');
       table.primary(['artistId', 'platformId']);
     }
   },
@@ -95,9 +95,9 @@ const INITIAL_TABLES = [
       table.text('lossyArtworkURL');
       table.text('websiteUrl');
       table.string('platformId');
-      table.foreign('platformId').references('id').inTable('platforms').onDelete('cascade');
+      table.foreign('platformId').references('id').inTable(Table.platforms).onDelete('cascade');
       table.string('artistId');
-      table.foreign('artistId').references('id').inTable('artists').onDelete('cascade');
+      table.foreign('artistId').references('id').inTable(Table.artists).onDelete('cascade');
     }
   },
   {
@@ -170,7 +170,7 @@ export const up = async (knex: Knex) => {
   await knex.raw(`GRANT SELECT ON "${Table.ipfsPins}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`GRANT SELECT ON "${Table.erc721Transfers}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`comment on table "${Table.nftProcessErrors}" is '@omit';`);
-  await knex.raw(`comment on table processors is '@omit';`);
+  await knex.raw(`comment on table "${Table.processors}" is '@omit';`);
   await knex.raw(`comment on table knex_migrations is '@omit';`);
   await knex.raw(`comment on table knex_migrations_lock is '@omit';`);
   await knex(Table.platforms).insert(INITIAL_PLATFORM_ENUMS);
