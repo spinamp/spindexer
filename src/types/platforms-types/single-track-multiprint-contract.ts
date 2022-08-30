@@ -8,7 +8,7 @@ import { NFT, NftFactory } from '../nft';
 import { MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
-const mapTrack: MapTrack = (
+export const mapTrack: MapTrack = (
   nft: NFT,
   apiTrack: any,
   contract?: NftFactory,
@@ -38,7 +38,7 @@ const mapTrack: MapTrack = (
   return track as ProcessedTrack;
 };
 
-const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NFT, contract?: NftFactory }): ArtistProfile => {
+export const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NFT, contract?: NftFactory }): ArtistProfile => {
   if (!nft) {
     throw new Error(`NFT missing for mapArtistProfile for nft`)
   }
