@@ -23,7 +23,8 @@ const toRecordMapper: any = {
       name: c.name,
       symbol: c.symbol,
       typeMetadata: c.typeMetadata,
-      standard: c.standard
+      standard: c.standard,
+      platformIdForPlatformType: c.platformIdForPlatformType
     });
   }),
   [Table.metaFactories]: (factoryContracts: MetaFactory[]): IdField[] => factoryContracts.map((c) => {
@@ -70,7 +71,8 @@ const fromRecordMapper: any = {
       name: c.name,
       symbol: c.symbol,
       typeMetadata: c.typeMetadata,
-      standard: c.standard
+      standard: c.standard,
+      platformIdForPlatformType: c.platformIdForPlatformType
     });
   }),
   [Table.metaFactories]: (factoryContracts: Record[]): MetaFactory[] => factoryContracts.map((c: any) => {
