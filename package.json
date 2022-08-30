@@ -18,7 +18,8 @@
     "drop-db": "read -p \"u sure? ctrl-c to abort \" -n 1 -r; source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -d postgres -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME -c \"drop database web3_music_pipeline;\"",
     "reset-db": "yarn drop-db && yarn restore-db",
     "knex": "source .env && npx knex --knexfile ./db/../src/db/knexfile.ts --connection postgresql://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DATABASE",
-    "migrate-down": "yarn knex migrate:down"
+    "migrate-down": "yarn knex migrate:down",
+    "migrate-latest": "yarn knex migrate:latest"
   },
   "author": "",
   "license": "ISC",

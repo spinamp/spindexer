@@ -10,7 +10,7 @@ const bootstrapDB = async () => {
     ...currentConfig,
     connection: {
       ...currentConfig.connection,
-      database: 'postgres',
+      database: process.env.POSTGRES_DATABASE,
       user: process.env.DB_SUPERUSER,
       password: process.env.DB_SUPERUSER_PASSWORD,
       ssl: process.env.NODE_ENV === 'production'
@@ -20,7 +20,7 @@ const bootstrapDB = async () => {
   await initialDB.raw(`CREATE ROLE ${process.env.POSTGRES_USERNAME} LOGIN PASSWORD '${process.env.POSTGRES_PASSWORD}';`);
   await initialDB.raw(`GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${process.env.POSTGRES_USERNAME};`);
   await initialDB.raw(`GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${process.env.POSTGRES_USERNAME};`);
-  await initialDB.raw(`GRANT ALL PRIVILEGES ON DATABASE postgres TO ${process.env.POSTGRES_USERNAME};`);
+  await initialDB.raw(`GRANT ALL PRIVILEGES ON DATABASE ${process.env.POSTGRES_DATABASE} TO ${process.env.POSTGRES_USERNAME};`);
   await initialDB.raw(`ALTER USER ${process.env.POSTGRES_USERNAME} CREATEDB;`);
   await initialDB.raw(`CREATE ROLE ${process.env.POSTGRES_USERNAME_OPEN} LOGIN PASSWORD '${process.env.POSTGRES_PASSWORD_OPEN}';`);
   await initialDB.destroy();

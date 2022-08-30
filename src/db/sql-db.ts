@@ -8,7 +8,7 @@ import { fromDBRecords, toDBRecords } from './orm';
 
 const loadDB = async () => {
   const currentConfig = config[process.env.NODE_ENV]
-  const initialConfig = { ...currentConfig, connection: { ...currentConfig.connection, database: 'postgres' } };
+  const initialConfig = { ...currentConfig, connection: { ...currentConfig.connection, database: process.env.POSTGRES_DATABASE } };
   const initialDB = knex(initialConfig);
   const { rowCount } = await initialDB.raw(`SELECT 1 FROM pg_database WHERE datname='${process.env.POSTGRES_DATABASE}'`);
   if (rowCount === 0) {
