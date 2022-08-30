@@ -2,7 +2,7 @@ import knex, { Knex } from 'knex';
 
 import { Cursor } from '../types/trigger';
 
-import { DBClient, QueryOptions, Table, Wheres } from './db';
+import { DBClient, QueryOptions, Table, Wheres, defaultTimestampColumn } from './db';
 import config from './knexfile';
 import { fromDBRecords, toDBRecords } from './orm';
 
@@ -123,6 +123,10 @@ const init = async (): Promise<DBClient> => {
       if (recordUpserts?.length > 0) {
         const dbUpserts = toDBRecords(tableName, recordUpserts)
         for (const dbUpsert of dbUpserts) {
+          // exclude the default timestamp column unless explicitly specified in mergeOptions
+          if (mergeOptions === undefined) {
+            mergeOptions = Object.keys(dbUpsert).filter((value) => { return value !== defaultTimestampColumn });
+          }
           try {
             await db(tableName)
               .insert(dbUpsert)
