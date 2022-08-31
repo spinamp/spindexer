@@ -22,16 +22,17 @@ export type EthCall = {
   callInput?: string,
 }
 
-type returnType = ethers.utils.LogDescription & {
+type Events = ethers.utils.LogDescription & {
   logIndex: string,
   blockNumber: string,
   blockHash: string,
   address: string
+  transactionHash: string;
 }
 
 export type EthClient = {
   call: (ethCalls: EthCall[]) => Promise<unknown[]>;
-  getEventsFrom: (fromBlock: string, toBlock: string, contractFilters: ContractFilter[]) => Promise<returnType[]>;
+  getEventsFrom: (fromBlock: string, toBlock: string, contractFilters: ContractFilter[]) => Promise<Events[]>;
   getBlockTimestamps: (blockHashes: string[]) => Promise<number[]>;
   getLatestBlockNumber: () => Promise<number>;
 }
