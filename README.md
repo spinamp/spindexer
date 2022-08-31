@@ -39,6 +39,7 @@ Spindexer works by:
 
  - Bootstrap the DB with a recent backup so that you don't have to index from scratch:
    - ```yarn restore-db```
+   - (You may see a single error related to role "rdsadmin" does not exist - this can be ignored)
 
 ## Running
 The indexer runs via a single node script. This script starts a single node process. The process will create the database if needed on the first run (unless it has been restored from backup), index until it is up to date, and then terminate. Each time the script is run, the index will be caught up to date.
