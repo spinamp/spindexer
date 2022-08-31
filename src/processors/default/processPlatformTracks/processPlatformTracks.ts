@@ -67,7 +67,6 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
         trackMapping,
         existingTrackIds,
       } = await getTrackInputs(nftFactoryType.mappers.mapNFTsToTrackIds, factoryNFTs, clients.db, apiTracksByNFT);
-      console.log('step1');
       const input = {
         nftFactory,
         nftFactoryType,
@@ -94,7 +93,6 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
     const result = await processNFTFactoryTracks({ ...input, apiTrackData });
     allNewTracks = allNewTracks.concat(result.newTracks);
     allJoins = allJoins.concat(result.joins);
-    console.log({ nftFactory: input.nftFactory.address })
     allErrorNFTs = allErrorNFTs.concat(result.errorNFTs);
     allArtistProfiles = allArtistProfiles.concat(result.artistProfiles);
   }
@@ -102,8 +100,6 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
   const artists = allArtistProfiles.map(profile => mapArtist(profile));
 
   const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(allNewTracks, clients.db, true);
-
-  // console.dir({ allJoins }, { depth: null } );
 
   if (allErrorNFTs.length !== 0) {
     await clients.db.upsert(Table.nftProcessErrors, allErrorNFTs, 'nftId', ['processError']);

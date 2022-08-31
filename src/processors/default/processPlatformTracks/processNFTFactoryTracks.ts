@@ -92,7 +92,6 @@ export const getTrackInputs = async (
   ) => {
   const trackMapping = await mapNFTsToTrackIds(nfts, dbClient, apiTracksByNFT);
   const trackIds = Object.keys(trackMapping);
-  console.log({ trackIds, apiTracksByNFT })
   const existingTrackIds = await dbClient.recordsExist(Table.processedTracks, trackIds);
   const newTrackIds = trackIds.filter(id => !existingTrackIds.includes(id));
 
