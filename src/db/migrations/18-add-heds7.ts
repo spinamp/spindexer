@@ -8,7 +8,8 @@ const NFT_FACTORY: NftFactory = {
   startingBlock: '15373455',
   platformId: 'heds',
   contractType: NFTContractTypeName.default,
-  standard: NFTStandard.ERC721
+  standard: NFTStandard.ERC721,
+  autoApprove: true
 };
 
 export const up = async (knex: Knex) => {

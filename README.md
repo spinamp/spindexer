@@ -81,3 +81,4 @@ The repo is still early and not hyper-polished or perfectly documented. Contribu
  - Try set things up yourself, test it out, read the code.
  - Read the code some more, especially getting familiar with the [Processor](./src/types/processor.ts), [Trigger](./src/types/trigger.ts) and [Platform](./src/types/platform.ts) types and how they're used as interfaces :)
  - Check out the Github Project and Github Issues, still being improved
+ - A note on migrations: If your PR includes a schema migration with new or changed fields, make sure it calls the updateViews method to update the corresponding views that are exposed in the API

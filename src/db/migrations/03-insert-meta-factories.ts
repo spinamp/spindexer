@@ -11,7 +11,8 @@ const INITIAL_CONTRACTS: MetaFactory[] = [
     startingBlock: '13725566',
     contractType: MetaFactoryTypeName.soundArtistProfileCreator,
     gap: '500000',
-    standard: NFTStandard.ERC721
+    standard: NFTStandard.ERC721,
+    autoApprove: true
   },
 ]
 

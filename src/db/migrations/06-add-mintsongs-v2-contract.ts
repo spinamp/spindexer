@@ -11,7 +11,9 @@ const CONTRACT: NftFactory = {
   startingBlock: '14793510',
   platformId: 'mintsongs',
   contractType: NFTContractTypeName.default,
-  standard: NFTStandard.ERC721
+  standard: NFTStandard.ERC721,
+  autoApprove: true
+
 };
 
 export const up = async (knex: Knex) => {

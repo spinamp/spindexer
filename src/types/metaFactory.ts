@@ -14,11 +14,12 @@ export type MetaFactory = Contract & {
   contractType: MetaFactoryTypeName,
   gap?: string
   standard: NFTStandard; // which type of factories will this metaFactory create
+  autoApprove: boolean;
 }
 
 export type MetaFactoryType = {
   newContractCreatedEvent: string,
-  creationEventToNftFactory?: (event: ethers.Event) => NftFactory
+  creationEventToNftFactory?: (event: ethers.Event, approved: boolean) => NftFactory
 }
 
 type MetaFactoryTypes = {
@@ -28,12 +29,13 @@ type MetaFactoryTypes = {
 export const MetaFactoryTypes: MetaFactoryTypes = {
   soundArtistProfileCreator: {
     newContractCreatedEvent: 'CreatedArtist',
-    creationEventToNftFactory: (event: any) => ({
+    creationEventToNftFactory: (event: any, approved: boolean) => ({
       address: formatAddress(event.args!.artistAddress),
       platformId: 'sound',
       startingBlock: event.blockNumber,
       contractType: NFTContractTypeName.default,
-      standard: NFTStandard.ERC721
+      standard: NFTStandard.ERC721,
+      autoApprove: approved
     })
   }
 }

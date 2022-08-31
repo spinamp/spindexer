@@ -11,12 +11,13 @@ const HUME_PLATFORM: MusicPlatform = {
   name: 'HUME',
 }
 
-const VIEW_FROM_THE_MOON: NftFactory = {
+export const VIEW_FROM_THE_MOON: NftFactory = {
   address: '0x09d6e0f30cFdf2f62c1179516B1F980c5D96571E',
   startingBlock: '14962984',
   platformId: HUME_PLATFORM.id,
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
+  autoApprove: true,
   typeMetadata: {
     overrides: {
       track: {
