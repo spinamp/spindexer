@@ -23,7 +23,7 @@ const INITIAL_TABLES = [
       table.enu('standard', Object.values(NFTStandard)).defaultTo(NFTStandard.ERC721);
       table.string('name', 1024);
       table.string('symbol', 256);
-      table.string('platformIdForPlatformType').references('id').inTable(Table.platforms).onDelete('cascade').nullable();
+      table.boolean('autoApprove').defaultTo(false)
     }
   },
   {
@@ -35,6 +35,7 @@ const INITIAL_TABLES = [
       table.string('contractType');
       table.string('gap');
       table.enu('standard', Object.values(NFTStandard)).defaultTo(NFTStandard.ERC721);
+      table.boolean('autoApprove').defaultTo(false)
     }
   },
   {
@@ -52,6 +53,7 @@ const INITIAL_TABLES = [
       table.jsonb('metadata');
       table.string('mimeType');
       table.string('owner');
+      table.boolean('approved').defaultTo(false)
     }
   },
   {

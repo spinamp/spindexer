@@ -17,6 +17,7 @@ const GLASSHOUSE: NftFactory = {
   platformId: GLASSHOUSE_PLATFORM.id,
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
+  autoApprove: true,
   typeMetadata: {
     overrides: {
       artist: {

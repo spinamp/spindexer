@@ -11,12 +11,13 @@ const HUME_PLATFORM: MusicPlatform = {
   name: 'HUME',
 }
 
-const MINTED: NftFactory = {
+export const MINTED: NftFactory = {
   address: '0x8056B7750D2A061757a0ECA13eEf78caeDD4a30F',
   startingBlock: '15121180',
   platformId: HUME_PLATFORM.id,
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
+  autoApprove: true,
   typeMetadata: {
     overrides: {
       track: {

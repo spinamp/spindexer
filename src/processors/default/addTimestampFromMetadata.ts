@@ -6,7 +6,6 @@ import { NFT } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 
 export const addTimestampFromMetadata: Processor = {
-  
   name: 'addTimestampFromMetadata',
   trigger: missingCreatedAtTimeWithMetadataDate,
   processorFunction: async (nfts: NFT[], clients: Clients) => {
@@ -18,7 +17,7 @@ export const addTimestampFromMetadata: Processor = {
       }
     })
 
-    await clients.db.upsert<NFT>(Table.nfts, updatedNfts);
+    await clients.db.upsert<NFT>(Table.nfts, updatedNfts, 'id', [ 'createdAtTime' ]);
   },
   initialCursor: undefined
 };

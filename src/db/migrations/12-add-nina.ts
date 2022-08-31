@@ -16,7 +16,8 @@ const NINA: MetaFactory = {
   address: 'ninaN2tm9vUkxoanvGcNApEeWiidLMM2TdBX8HoJuL4',
   platformId: NINA_PLATFORM.id,
   contractType: MetaFactoryTypeName.ninaMintCreator,
-  standard: NFTStandard.METAPLEX
+  standard: NFTStandard.METAPLEX,
+  autoApprove: true
 };
 
 export const up = async (knex: Knex) => {

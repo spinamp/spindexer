@@ -22,6 +22,7 @@ export type NFT = Record & {
   mimeType?: string
   owner: string
   standard: NFTStandard;
+  approved: boolean;
 }
 
 export type ERC721Transfer = Record & {
@@ -56,8 +57,8 @@ export type NftFactory = Contract & {
   name?: string,
   symbol?: string,
   typeMetadata?: TypeMetadata
-  standard: NFTStandard,
-  platformIdForPlatformType?: string; //override platform type from the referenced platform
+  standard: NFTStandard
+  autoApprove: boolean;
 }
 
 export type NFTContractType = {
