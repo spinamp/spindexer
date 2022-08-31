@@ -23,8 +23,7 @@ const toRecordMapper: any = {
       name: c.name,
       symbol: c.symbol,
       typeMetadata: c.typeMetadata,
-      standard: c.standard,
-      platformIdForPlatformType: c.platformIdForPlatformType
+      standard: c.standard
     });
   }),
   [Table.metaFactories]: (factoryContracts: MetaFactory[]): IdField[] => factoryContracts.map((c) => {
@@ -37,7 +36,7 @@ const toRecordMapper: any = {
       standard: c.standard
     });
   }),
-  [Table.nftProcessErrors]: (nftProcessErrors: NFTProcessError[]): 
+  [Table.nftProcessErrors]: (nftProcessErrors: NFTProcessError[]):
   { nftId: string; metadataError?: string; numberOfRetries?: number; lastRetry?: string; processError?: string }[] => nftProcessErrors.map((error) => {
     return ({
       nftId: error.nftId,
@@ -71,8 +70,7 @@ const fromRecordMapper: any = {
       name: c.name,
       symbol: c.symbol,
       typeMetadata: c.typeMetadata,
-      standard: c.standard,
-      platformIdForPlatformType: c.platformIdForPlatformType
+      standard: c.standard
     });
   }),
   [Table.metaFactories]: (factoryContracts: Record[]): MetaFactory[] => factoryContracts.map((c: any) => {

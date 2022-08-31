@@ -23,7 +23,6 @@ const INITIAL_TABLES = [
       table.enu('standard', Object.values(NFTStandard)).defaultTo(NFTStandard.ERC721);
       table.string('name', 1024);
       table.string('symbol', 256);
-      table.string('platformIdForPlatformType').references('id').inTable(Table.platforms).onDelete('cascade').nullable();
     }
   },
   {

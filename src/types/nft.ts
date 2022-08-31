@@ -58,8 +58,7 @@ export type NftFactory = Contract & {
   name?: string,
   symbol?: string,
   typeMetadata?: TypeMetadata
-  standard: NFTStandard,
-  platformIdForPlatformType?: string; //override platform type from the referenced platform
+  standard: NFTStandard
 }
 
 export type NFTContractType = {
