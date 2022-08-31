@@ -29,6 +29,7 @@ const start = async () => {
     await initialDB.raw(`DELETE FROM ${Table.processors} where id='createProcessedTracksFromAPI_${apiPlatform}'`);
   }
   console.log('Done');
+  process.exit(0);
 }
 
 start();
