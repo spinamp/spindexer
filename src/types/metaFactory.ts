@@ -47,7 +47,15 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       startingBlock: event.blockNumber,
       contractType: NFTContractTypeName.default,
       standard: NFTStandard.ERC721,
-      autoApprove: approved
+      autoApprove: approved,
+      typeMetadata: {
+        overrides: {
+          artist: {
+            artistId: event.args!.creator,
+            name: event.args!.creator,
+          }
+        }
+      }
     })
   }
 }

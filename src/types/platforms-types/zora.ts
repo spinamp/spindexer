@@ -1,0 +1,72 @@
+import _ from 'lodash';
+import slugify from 'slugify';
+
+import { extractHashFromURL } from '../../clients/ipfs';
+import { formatAddress } from '../address';
+import { ArtistProfile } from '../artist';
+import { NFT, NftFactory } from '../nft';
+import { MapTrack } from '../processor';
+import { ProcessedTrack } from '../track';
+
+const mapTrack: MapTrack = (
+  nft: NFT,
+  apiTrack: any,
+  contract?: NftFactory,
+  trackId?: string,
+): ProcessedTrack => {
+  if (!contract) {
+    throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
+  }
+
+  const track: Partial<ProcessedTrack> = {
+    id: mapNFTtoTrackID(nft),
+    platformInternalId: contract.address,
+    title: contract.name,
+    description: nft.metadata.description,
+    platformId: contract.platformId,
+    lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url),
+    lossyArtworkIPFSHash: extractHashFromURL(nft.metadata.image),
+    websiteUrl: nft.metadata.external_url || `https://create.zora.co/editions/${contract.address}`,
+    artistId: mapArtistProfile({ apiTrack, contract, nft }).artistId,
+    createdAtTime: nft.createdAtTime,
+    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+  };
+
+  track.slug = slugify(`${track.title} ${nft.createdAtTime.getTime()}`).toLowerCase();
+
+  return track as ProcessedTrack;
+};
+
+const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NFT, contract?: NftFactory }): ArtistProfile => {
+  if (!nft) {
+    throw new Error(`NFT missing for mapArtistProfile for nft`)
+  }
+  if (!contract) {
+    throw new Error(`Contract missing for mapArtistProfile for nft ${nft.id}`)
+  }
+  return {
+    name: contract.platformId, //set in db when contract is created in db
+    artistId: contract.platformId,
+    platformInternalId: contract.platformId,
+    platformId: contract.platformId,
+    avatarUrl: undefined,
+    websiteUrl: nft.metadata.external_url,
+    createdAtTime: nft.createdAtTime,
+    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    ...contract.typeMetadata?.overrides?.artist
+  }
+};
+
+const mapNFTtoTrackID = (nft: NFT): string => {
+  return `ethereum/${formatAddress(nft.contractAddress)}`;
+};
+
+const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
+  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
+}
+
+export default {
+  mapNFTsToTrackIds,
+  mapTrack,
+  mapArtistProfile
+}
