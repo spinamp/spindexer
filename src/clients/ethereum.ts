@@ -61,8 +61,15 @@ async function getLogs(provider: JsonRpcProvider, params: any, fromBlock: string
       end = BigNumber.from(toBlock).toHexString();
     } catch (e: any){
       const errorString = e.toString() as string;
-      const suggestion = errorString.substring(errorString.indexOf('this block range should work: ['), errorString.indexOf(']\\"}}",'));
+      const searchString = 'this block range should work: [';
+      if (!errorString.includes(searchString)){
+        throw `Can't find suggested block range`
+      }
+      const suggestion = errorString.substring(errorString.indexOf(searchString), errorString.indexOf(']\\"}}",'));
       const suggestedRanges = suggestion.substring(suggestion.indexOf('[') + 1).split(', ')
+      if (suggestedRanges.length !== 2){
+        throw `Can't find suggested block range`
+      }
       start = suggestedRanges[0];
       end = suggestedRanges[1];
     }
