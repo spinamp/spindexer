@@ -13,6 +13,8 @@ import singleTrackMultiprintContractMappers from './platforms-types/single-track
 import soundMappers from './platforms-types/sound';
 import { ProcessedTrack } from './track';
 
+export const API_PLATFORMS = ['noizd'];
+
 export enum MusicPlatformType {
   sound = 'sound',
   noizd = 'noizd',
