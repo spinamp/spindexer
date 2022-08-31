@@ -2,6 +2,7 @@ import { Knex } from 'knex';
 
 import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
 import { NFTStandard } from '../../types/nft';
+import { Table } from '../db';
 import { addMetaFactory, removeMetaFactory } from '../migration-helpers';
 
 const ZORA_CREATOR_FACTORY: MetaFactory = 
@@ -17,6 +18,15 @@ const ZORA_CREATOR_FACTORY: MetaFactory =
 
 export const up = async (knex: Knex) => {
   await addMetaFactory(knex, ZORA_CREATOR_FACTORY);
+
+  const hasColumn = await knex.schema.hasColumn(Table.erc721Transfers, 'transactionHash')
+  if (!hasColumn){
+    await knex.schema.alterTable(Table.erc721Transfers, table => {
+      table.string('transactionHash');
+      table.primary(['id', 'from', 'to', 'contractAddress', 'tokenId', 'transactionHash'])
+    })
+  }
+
 };
 
 exports.down = async (knex: Knex) => {
