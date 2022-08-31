@@ -39,7 +39,7 @@ export type Where = FieldWhere | FuncWhere;
 export type Wheres = Where[];
 
 export type QueryOptions = {
-  ignoreConflict?: string;
+  ignoreConflict?: string | string[];
 }
 
 export type DBClient = {
