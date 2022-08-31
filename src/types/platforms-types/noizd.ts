@@ -8,6 +8,9 @@ import { ProcessedTrack } from '../track';
 
 
 export const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): ArtistProfile => {
+  if (!apiTrack) {
+    throw new Error('missing api track');
+  }
   let createdAtTime, createdAtEthereumBlockNumber
   if (nft) {
     createdAtTime = nft.createdAtTime
@@ -29,6 +32,9 @@ export const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }
 };
 
 const mapTrack = (nft: NFT, apiTrack: any): ProcessedTrack => {
+  if (!apiTrack) {
+    throw new Error('missing api track');
+  }
   const processedTrack = mapAPITrack(apiTrack);
   if (!nft.metadata) {
     return processedTrack;
