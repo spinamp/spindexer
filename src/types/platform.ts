@@ -81,5 +81,9 @@ export const platformConfigs: MusicPlatformTypeConfigs = {
   'nina': {
     mappers: ninaMappers,
     clientName: null
+  },
+  zora: {
+    mappers: singleTrackMultiprintContractMappers,
+    clientName: null
   }
 }
