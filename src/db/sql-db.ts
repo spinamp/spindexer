@@ -1,8 +1,9 @@
 import knex, { Knex } from 'knex';
+import _ from 'lodash';
 
 import { Cursor } from '../types/trigger';
 
-import { DBClient, QueryOptions, Table, Wheres, defaultTimestampColumn } from './db';
+import { DBClient, Table, Wheres, defaultTimestampColumn, QueryOptions } from './db';
 import config from './knexfile';
 import { fromDBRecords, toDBRecords } from './orm';
 
@@ -59,17 +60,26 @@ const init = async (): Promise<DBClient> => {
     },
     recordExists: recordExistsFunc(db),
     recordsExist: filterExistRecordsFunc(db),
-    insert: async <RecordType>(tableName: string, records: RecordType[]) => {
+    insert: async <RecordType>(tableName: string, records: RecordType[], options?: QueryOptions) => {
       if (records.length === 0) {
         return;
       }
       console.log(`Inserting into ${tableName} ${records.length} records`);
       const dbRecords = toDBRecords(tableName, records);
-      if (options?.ignoreConflict){
-        await db.batchInsert(tableName, dbRecords)
-      } else {
-        await db.batchInsert(tableName, dbRecords)
-      }
+      await db.transaction(async transaction => {
+        const chunks = _.chunk(dbRecords, 1000);
+
+        await Promise.all(
+          chunks.map(async chunk => {
+            if (options?.ignoreConflict){
+              await transaction.insert(chunk).into(tableName).onConflict(options.ignoreConflict as any).ignore();
+            } else {
+              await transaction.insert(chunk).into(tableName);
+            }
+          })
+        )
+
+      })
     },
     updateProcessor: async (processor: string, lastCursor: Cursor) => {
       console.log(`Updating ${processor} with cursor: ${lastCursor}`);
