@@ -41,6 +41,36 @@ export type ContractFilter = {
   filter: string
 };
 
+async function getLogs(provider: JsonRpcProvider, params: any, fromBlock: string, toBlock: string){
+  const events = [];
+  let start = BigNumber.from(fromBlock).toHexString();
+  let end = BigNumber.from(toBlock).toHexString();
+  let readUntil = '0';
+  while (BigNumber.from(toBlock).gt(readUntil)){
+    try {
+      const eventRange = await provider.send('eth_getLogs', [{
+        ...params,
+        fromBlock: start,
+        toBlock: end
+      }]);
+    
+      events.push(...eventRange)
+      readUntil = end;
+      start = end;
+      end = BigNumber.from(toBlock).toHexString();
+    } catch (e: any){
+      const errorString = e.toString() as string;
+      const suggestion = errorString.substring(errorString.indexOf('this block range should work: ['), errorString.indexOf(']\\"}}",'));
+      const suggestedRanges = suggestion.substring(suggestion.indexOf('[') + 1).split(', ')
+      start = suggestedRanges[0];
+      end = suggestedRanges[1];
+    }
+  }
+
+        
+  return events
+}
+
 const init = async (): Promise<EthClient> => {
   const provider = new JsonRpcProvider({ url: process.env.ETHEREUM_PROVIDER_ENDPOINT!, timeout: 120000 });
   const ethcallProvider = new Provider();
@@ -63,25 +93,28 @@ const init = async (): Promise<EthClient> => {
       });
       const contractAddresses = _.uniq(contractFilters.map(c => c.address));
       
-      const events = await provider.send('eth_getLogs', [{
+      const events = await getLogs(provider, {
         address: contractAddresses,
         topics: [
-          [ // topic[0]
+          [
             ...filters
           ]
-        ],
-        fromBlock: BigNumber.from(fromBlock).toHexString(),
-        toBlock: BigNumber.from(toBlock).toHexString(),
-      }]);
-
+        ] }
+      ,
+      fromBlock,
+      toBlock
+      )
+      
       const iface = new ethers.utils.Interface(MetaABI.abi);
       return events.map((event: ethers.Event) => ({
         ...iface.parseLog(event),
         logIndex: BigNumber.from(event.logIndex).toString(),
         blockNumber: BigNumber.from(event.blockNumber).toString(),
         blockHash: event.blockHash,
-        address: event.address
+        address: event.address,
+        transactionHash: event.transactionHash
       }));
+      
     },
     getLatestBlockNumber: async () => {
       return await provider.getBlockNumber();
