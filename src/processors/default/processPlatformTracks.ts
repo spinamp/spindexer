@@ -170,36 +170,10 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
   await clients.db.insert(Table.nfts_processedTracks, joins);
 };
 
-const processByPlatformType = (platform: MusicPlatform) => async (nfts: NFT[], clients: Clients) => {
-
-  const contracts = await getNFTContracts(nfts, clients.db);
-  const contractByAddress = _.keyBy(contracts, 'address');
-  const nftByPlatform = _.groupBy(nfts, nft => {
-    const contract = contractByAddress[nft.contractAddress];
-    // use ovveride platform
-    if (contract.platformIdForPlatformType){
-      return contract.platformIdForPlatformType
-    }
-    // return related platform by nft.platformId by default
-    return platform.id
-  })
-  const nftPlatforms = Object.keys(nftByPlatform);
-  const platforms = await clients.db.getRecords<MusicPlatform>(Table.platforms, [
-    ['whereIn', ['id', nftPlatforms]]
-  ]);
-  const platformById = _.keyBy(platforms, 'id')
-
-  for (const nftPlatform of nftPlatforms){
-    const processPlatform = await processorFunction(platformById[nftPlatform]);
-    await processPlatform(nftByPlatform[nftPlatform], clients);
-  }
-
-}
-
 export const processPlatformTracks: (platform: MusicPlatform, limit?: number) => Processor =
   (platform: MusicPlatform, limit?: number) => ({
     name,
     trigger: NFTsWithoutTracks(platform.id, limit),
-    processorFunction: processByPlatformType(platform),
+    processorFunction: processorFunction(platform),
     initialCursor: undefined,
   });
