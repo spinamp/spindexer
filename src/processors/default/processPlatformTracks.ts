@@ -6,24 +6,24 @@ import { NFTsWithoutTracks } from '../../triggers/missing';
 import { ArtistProfile, mapArtist } from '../../types/artist';
 import { NFT, NftFactory } from '../../types/nft';
 import { NFTProcessError } from '../../types/nftProcessError';
-import { MusicPlatform, platformConfigs } from '../../types/platform';
+import { MusicPlatform, MusicPlatformTypeConfig, platformConfigs } from '../../types/platform';
 import { Clients, MapTrack, Processor, TrackAPIClient } from '../../types/processor';
 import { Record } from '../../types/record';
 import { ProcessedTrack, mergeProcessedTracks, NFTTrackJoin } from '../../types/track';
 
 const name = 'processTracks';
 
-const getNFTContracts = async (nfts: NFT[], dbClient: DBClient) => {
+const getNFTFactories = async (nfts: NFT[], dbClient: DBClient) => {
   if (nfts.length === 0) {
     throw new Error('Unexpected empty NFT array');
   }
-  const contractAddresses = _.uniq(nfts.map((n: NFT) => n.contractAddress));
-  const contractAddressesString = JSON.stringify(contractAddresses).replace(/\"/g, "'").replace('[', '(').replace(']', ')');
-  const contractQuery = `select * from "${Table.nftFactories}" where id in ${contractAddressesString}`
-  const contracts: NftFactory[] = fromDBRecords(Table.nftFactories, (await dbClient.rawSQL(
-    contractQuery
+  const nftFactoryAddresses = _.uniq(nfts.map((n: NFT) => n.contractAddress));
+  const nftFactoryAddressesString = JSON.stringify(nftFactoryAddresses).replace(/\"/g, "'").replace('[', '(').replace(']', ')');
+  const query = `select * from "${Table.nftFactories}" where id in ${nftFactoryAddressesString}`
+  const nftFactories: NftFactory[] = fromDBRecords(Table.nftFactories, (await dbClient.rawSQL(
+    query
   )).rows);
-  return contracts;
+  return nftFactories;
 }
 
 const getAPITrackData = async (trackIds: string[], client: TrackAPIClient) => {
@@ -39,7 +39,7 @@ const createTracks = async (
   client: TrackAPIClient | null,
   mapTrack: MapTrack,
   mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NFT, contract?: NftFactory | undefined }) => ArtistProfile,
-  contracts: NftFactory[],
+  nftFactory: NftFactory,
   selectPrimaryNFTForTrackMapper?: (nfts: NFT[]) => NFT
 ):
   Promise<{
@@ -79,8 +79,7 @@ const createTracks = async (
       return undefined;
     }
     const primaryNFTForTrack = selectPrimaryNFTForTrackMapper ? selectPrimaryNFTForTrackMapper(trackNFTs) : trackNFTs[0];
-    const contract = contracts.find(c => c.address === primaryNFTForTrack.contractAddress)
-    const mappedTrack = mapTrack(primaryNFTForTrack, apiTrack, contract, trackId);
+    const mappedTrack = mapTrack(primaryNFTForTrack, apiTrack, nftFactory, trackId);
     if (!mappedTrack) {
       return;
     }
@@ -94,7 +93,7 @@ const createTracks = async (
     })
 
     const artistProfile = {
-      ...mapArtistProfile({ apiTrack, nft: trackNFTs[0], contract }),
+      ...mapArtistProfile({ apiTrack, nft: trackNFTs[0], contract: nftFactory }),
     } as ArtistProfile;
     artistProfiles.push(artistProfile);
   });
@@ -104,102 +103,120 @@ const createTracks = async (
   return { newTracks, joins, errorNFTs, artistProfiles: uniqueArtistProfiles };
 }
 
-const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clients: Clients) => {
-  console.log(`Getting ${platform.id} API tracks for ids: ${nfts.map(nft => nft.id)}`);
-  const platformType = platformConfigs[platform.type];
-  if (!platformType) {
-    const errorNFTs = nfts.map(nft => ({
-      nftId: nft.id,
-      processError: `Missing platform type for ${platform.id}`
-    }))
-    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'nftId', ['processError']);
-    return;
-  }
-  let platformClient: TrackAPIClient | null = null;
-  if (platformType.clientName) {
-    platformClient = (clients as any)[platformType.clientName];
-  }
-  if (!platformClient && platformType.clientName !== null) {
-    const errorNFTs = nfts.map(nft => ({
-      nftId: nft.id,
-      processError: `Missing platform client`
-    }))
-    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'nftId', ['processError']);
-    return;
-  }
-  const { mapNFTsToTrackIds, mapTrack, mapArtistProfile, selectPrimaryNFTForTrackMapper } = platformType.mappers;
+const processNFTFactory = async (platform: MusicPlatform,
+  platformType: MusicPlatformTypeConfig, nftFactory: NftFactory, nfts: NFT[],
+  clients: Clients): Promise<{
+  newTracks: ProcessedTrack[],
+  joins: NFTTrackJoin[],
+  errorNFTs: NFTProcessError[],
+  artistProfiles: ArtistProfile[]
+}> => {
+  const platformClient = (clients as any)[platform.id];
 
-  const contracts = await getNFTContracts(nfts, clients.db);
+  const overrideTypeName = nftFactory.typeMetadata?.overrides.type;
+  let type = platformType;
+
+  if (overrideTypeName) {
+    const overrideType = platformConfigs[overrideTypeName];
+    if (!overrideType) {
+      const errorNFTs = nfts.map(nft => ({
+        nftId: nft.id,
+        processError: `Missing override type for nft_factory ${nftFactory.address}`
+      }));
+      return {
+        newTracks: [],
+        joins: [],
+        errorNFTs,
+        artistProfiles: []
+      }
+    } else {
+      type = overrideType;
+    }
+  }
+
+  const { mapNFTsToTrackIds, mapTrack, mapArtistProfile, selectPrimaryNFTForTrackMapper } = type.mappers;
+
   const trackMapping = await mapNFTsToTrackIds(nfts, clients.db);
   const trackIds = Object.keys(trackMapping);
   const existingTrackIds = await clients.db.recordsExist(Table.processedTracks, trackIds);
   const newTrackIds = trackIds.filter(id => !existingTrackIds.includes(id));
-  const { newTracks, joins, errorNFTs, artistProfiles } = await createTracks(
+  const result = await createTracks(
     newTrackIds,
     trackMapping,
     platformClient,
     mapTrack,
     mapArtistProfile,
-    contracts,
+    nftFactory,
     selectPrimaryNFTForTrackMapper
   );
-  const artists = artistProfiles.map(profile => mapArtist(profile));
-
-  const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(newTracks, clients.db, true);
 
   if (existingTrackIds && existingTrackIds.length !== 0) {
     existingTrackIds.map(trackId => {
       const trackNFTs = trackMapping[trackId];
       trackNFTs.forEach(nft => {
-        joins.push({
+        result.joins.push({
           nftId: nft.id,
           processedTrackId: trackId
         });
       })
     });
   }
-  if (errorNFTs.length !== 0) {
+
+  return result;
+
+};
+
+const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clients: Clients) => {
+  console.log(`Getting ${platform.id} API tracks for ids: ${nfts.map(nft => nft.id)}`);
+  const platformType = platformConfigs[platform.type];
+  if (!platformType) {
+    const errorNFTs = nfts.map(nft => ({
+      nftId: nft.id,
+      processError: `Missing platform type for platform ${platform.id}`
+    }))
     await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'nftId', ['processError']);
+    return;
+  }
+
+  const nftsByFactoryId = _.groupBy(nfts, nft => nft.contractAddress);
+
+  const nftFactories = await getNFTFactories(nfts, clients.db);
+
+  let allNewTracks: ProcessedTrack[] = [];
+  let allJoins: NFTTrackJoin[] = [];
+  let allErrorNFTs: NFTProcessError[] = [];
+  let allArtistProfiles: ArtistProfile[] = [];
+
+  for (const nftFactory of nftFactories) {
+    const result = await processNFTFactory(
+      platform, platformType, nftFactory, nftsByFactoryId[nftFactory.address], clients
+    );
+    allNewTracks = allNewTracks.concat(result.newTracks);
+    allJoins = allJoins.concat(result.joins);
+    allErrorNFTs = allErrorNFTs.concat(result.errorNFTs);
+    allArtistProfiles = allArtistProfiles.concat(result.artistProfiles);
+  }
+
+  const artists = allArtistProfiles.map(profile => mapArtist(profile));
+
+  const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(allNewTracks, clients.db, true);
+
+  if (allErrorNFTs.length !== 0) {
+    await clients.db.upsert(Table.nftProcessErrors, allErrorNFTs, 'nftId', ['processError']);
   }
   if (oldIds && oldIds.length !== 0) {
     await clients.db.delete(Table.processedTracks, oldIds);
   }
   await clients.db.upsert(Table.artists, artists);
-  await clients.db.upsert(Table.artistProfiles, (artistProfiles as unknown as Record[]), ['artistId', 'platformId']);
+  await clients.db.upsert(Table.artistProfiles, (allArtistProfiles as unknown as Record[]), ['artistId', 'platformId']);
   await clients.db.upsert(Table.processedTracks, mergedProcessedTracks);
-  await clients.db.insert(Table.nfts_processedTracks, joins);
+  await clients.db.insert(Table.nfts_processedTracks, allJoins);
 };
-
-const processByPlatformType = (platform: MusicPlatform) => async (nfts: NFT[], clients: Clients) => {
-
-  const contracts = await getNFTContracts(nfts, clients.db);
-  const contractByAddress = _.keyBy(contracts, 'address');
-  const nftByPlatform = _.groupBy(nfts, nft => {
-    const contract = contractByAddress[nft.contractAddress];
-    // use ovveride platform
-    if (contract.platformIdForPlatformType){
-      return contract.platformIdForPlatformType
-    }
-    // return related platform by nft.platformId by default
-    return platform.id
-  })
-  const nftPlatforms = Object.keys(nftByPlatform);
-  const platforms = await clients.db.getRecords<MusicPlatform>(Table.platforms, [
-    ['whereIn', ['id', nftPlatforms]]
-  ]);
-  const platformById = _.keyBy(platforms, 'id')
-
-  for (const nftPlatform of nftPlatforms){
-    const processPlatform = await processorFunction(platformById[nftPlatform]);
-    await processPlatform(nftByPlatform[nftPlatform], clients);
-  }
-
-}
 
 export const processPlatformTracks: (platform: MusicPlatform, limit?: number) => Processor =
   (platform: MusicPlatform, limit?: number) => ({
     name,
     trigger: NFTsWithoutTracks(platform.id, limit),
-    processorFunction: processByPlatformType(platform),
+    processorFunction: processorFunction(platform),
     initialCursor: undefined,
   });

@@ -3,6 +3,7 @@ import { ValidContractNFTCallFunction } from '../clients/ethereum';
 import { ArtistProfile } from './artist';
 import { Contract } from './contract';
 import { NFTFactoryTypes } from './nftFactory';
+import { MusicPlatformType } from './platform';
 import { Record } from './record';
 import { ProcessedTrack } from './track';
 
@@ -47,6 +48,7 @@ export type TypeMetadata = {
   overrides: {
     track?: Partial<ProcessedTrack>,
     artist?: Partial<ArtistProfile>
+    type?: MusicPlatformType
   }
 }
 

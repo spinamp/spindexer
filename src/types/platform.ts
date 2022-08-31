@@ -41,7 +41,6 @@ export type PlatformMapper = {
 
 export type MusicPlatformTypeConfig = {
   mappers: PlatformMapper
-  clientName: string | null
   initialTrackCursor?: string
 };
 
@@ -49,43 +48,40 @@ export type MusicPlatformTypeConfigs = {
   [key in MusicPlatformType]?: MusicPlatformTypeConfig
 }
 
+export const platformClients = {
+  sound: 'sound',
+  catalog: 'catalog',
+  noizd: 'noizd',
+}
+
 export const platformConfigs: MusicPlatformTypeConfigs = {
   sound: {
     mappers: soundMappers,
-    clientName: 'sound',
   },
   catalog: {
     mappers: catalogMappers,
-    clientName: 'catalog',
   },
   noizd: {
     mappers: noizdMappers,
-    clientName: 'noizd',
     initialTrackCursor: '2020-04-07T21:11:16.494Z'
 
   },
   'single-track-multiprint-contract': {
     mappers: singleTrackMultiprintContractMappers,
-    clientName: null,
   },
   'multi-track-multiprint-contract': {
     mappers: multiTrackMultiprintContractMappers,
-    clientName: null,
   },
   'chaos': {
     mappers: chaosMappers,
-    clientName: null,
   },
   'mintsongs-v2': {
     mappers: mintsongsV2Mappers,
-    clientName: null,
   },
   'nina': {
     mappers: ninaMappers,
-    clientName: null
   },
   'heds-collab': {
     mappers: hedsCollabMappers,
-    clientName: null
   }
 }
