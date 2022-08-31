@@ -14,11 +14,10 @@
     "connect-db-root": "source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -d postgres -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME",
     "connect-db": "source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -d $POSTGRES_DATABASE -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME",
     "save-db": "source .env && PGPASSWORD=$POSTGRES_PASSWORD pg_dump -F d -f ./db/dump -b -C -d $POSTGRES_DATABASE -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME",
-    "drop-db": "read -p \"u sure? ctrl-c to abort \" -n 1 -r; source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -d postgres -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME -c \"drop database web3_music_pipeline;\"",
+    "drop-db": "read -p \"u sure? ctrl-c to abort \" -n 1 -r; source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -d postgres -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME -c \"drop database $POSTGRES_DATABASE;\"",
     "restore-full-db": "source .env && PGPASSWORD=$POSTGRES_PASSWORD pg_restore ./db/dump  -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME --create --clean --if-exists --verbose --verbose -F d -d postgres",
     "reset-db": "yarn drop-db && yarn restore-full-db",
-    "restore-db-ipfs-pins": "source .env && PGPASSWORD=$POSTGRES_PASSWORD pg_restore ./db/dump  -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME --verbose --verbose -F d -d postgres -t \"ipfsPins\" --data-only",
-    "restore-db-ipfs-files": "source .env && PGPASSWORD=$POSTGRES_PASSWORD pg_restore ./db/dump  -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME --verbose --verbose -F d -d postgres -t \"ipfsFiles\" --data-only",
+    "restore-db-table": "source .env && PGPASSWORD=$POSTGRES_PASSWORD pg_restore ./db/dump  -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME --verbose --verbose -F d -d $POSTGRES_DATABASE --data-only -t",
     "knex": "source .env && npx knex --knexfile ./db/../src/db/knexfile.ts --connection postgresql://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DATABASE",
     "migrate-down": "yarn knex migrate:down"
   },
