@@ -72,7 +72,7 @@ async function getLogs(provider: JsonRpcProvider, params: any, fromBlock: string
 }
 
 const init = async (): Promise<EthClient> => {
-  const provider = new JsonRpcProvider({ url: process.env.ETHEREUM_PROVIDER_ENDPOINT!, timeout: 120000 });
+  const provider = new JsonRpcProvider(process.env.ETHEREUM_PROVIDER_ENDPOINT!);
   const ethcallProvider = new Provider();
   await ethcallProvider.init(provider);
   return {
