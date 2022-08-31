@@ -67,7 +67,7 @@ const init = async (): Promise<DBClient> => {
       console.log(`Inserting into ${tableName} ${records.length} records`);
       const dbRecords = toDBRecords(tableName, records);
       await db.transaction(async transaction => {
-        const chunks = _.chunk(dbRecords, 1000);
+        const chunks = _.chunk(dbRecords, Number.parseInt(process.env.MAX_INSERT_CHUNK_SIZE!));
 
         await Promise.all(
           chunks.map(async chunk => {
