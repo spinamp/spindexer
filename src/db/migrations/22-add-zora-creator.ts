@@ -23,6 +23,7 @@ export const up = async (knex: Knex) => {
   if (!hasColumn){
     await knex.schema.alterTable(Table.erc721Transfers, table => {
       table.string('transactionHash');
+      table.dropPrimary(`${Table.erc721Transfers}_pkey`)
       table.primary(['id', 'from', 'to', 'contractAddress', 'tokenId', 'transactionHash'])
     })
   }
