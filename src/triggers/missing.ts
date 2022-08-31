@@ -37,7 +37,7 @@ export const missingMetadataIPFSHash: Trigger<undefined> = async (clients) => {
   return nfts;
 };
 
-export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Trigger<undefined> =
+export const NFTsWithoutTracks: (platformId: string, limit?: number) => Trigger<undefined> =
   (platformId: string, limit: number = parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)) => async (clients) => {
     // This query joins nfts+tracks through the join table,
     // and returns nfts where there is no corresponding track.
