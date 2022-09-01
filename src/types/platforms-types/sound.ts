@@ -2,7 +2,7 @@ import _ from 'lodash';
 import slugify from 'slugify';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import sound from '../../clients/sound';
+import { DBClient } from '../../db/db';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT, getNFTMetadataField } from '../nft';
@@ -16,6 +16,9 @@ const mapTrack = (
   nft: NFT,
   apiTrack: any
 ): ProcessedTrack => {
+  if (!apiTrack) {
+    throw new Error('missing api track');
+  }
   if (!apiTrack.tracks[0].audio) {
     throw new Error('missing nft metadata audio_url');
   }
@@ -41,6 +44,9 @@ const mapTrack = (
 };
 
 const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): ArtistProfile => {
+  if (!apiTrack) {
+    throw new Error('missing api track');
+  }
   const artist = apiTrack.artist
   return {
     name: artist.name,
@@ -56,10 +62,11 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): Arti
   }
 };
 
-const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
-  const soundClient = await sound.init();
-  const tracksByNFT = await soundClient.fetchTracksByNFT(nfts);
-  return _.groupBy(nfts, nft => tracksByNFT[nft.id]);
+const mapNFTsToTrackIds = async (nfts: NFT[], dbClient?: DBClient, apiTracksByNFT?: any): Promise<{ [trackId: string]: NFT[] }> => {
+  if (!apiTracksByNFT) {
+    throw new Error('Expecting apiTracksByNFT for sound mapper');
+  }
+  return _.groupBy(nfts, nft => apiTracksByNFT[nft.id]);
 }
 
 export default {

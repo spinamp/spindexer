@@ -20,11 +20,11 @@ import { getERC721ContractFieldsProcessor } from './processors/default/getERC721
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
 import { ipfsArtworkUploader, ipfsAudioUploader } from './processors/default/ipfsMediaUploader';
 import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfsPinner';
-import { processPlatformTracks } from './processors/default/processPlatformTracks';
+import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
 import { runProcessors } from './runner';
 import { MetaFactory } from './types/metaFactory';
 import { NftFactory, NFTStandard } from './types/nft';
-import { MusicPlatform } from './types/platform';
+import { API_PLATFORMS, MusicPlatform } from './types/platform';
 
 const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], musicPlatforms: MusicPlatform[]) => {
   const nftFactoriesByAddress = _.keyBy(nftFactories, 'address');
@@ -32,6 +32,9 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
   const metaFactoryProcessors = metaFactories.map(contract => createNftFactoryFromERC721MetaFactoryProcessor(contract));
   const erc721TransferProcessors = createERC721NFTsFromTransfersProcessor(nftFactories);
   const platformTrackProcessors = musicPlatforms.map(musicPlatform => processPlatformTracks(musicPlatform));
+
+  //TODO: noizd here is being used both as platformId and MusicPlatformType. Need to avoid mixing them
+  const apiTrackProcessors = API_PLATFORMS.map(apiPlatform => createProcessedTracksFromAPI(apiPlatform));
 
   return [
     ...metaFactoryProcessors,
@@ -48,7 +51,7 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
     createNinaNfts,
     addTimestampFromMetadata,
     ...platformTrackProcessors,
-    createProcessedTracksFromAPI('noizd'), //TODO: noizd here is being used both as platformId and MusicPlatformType. Need to bring in the full noizd platform object here and avoid mixing them
+    ...apiTrackProcessors,
     ipfsAudioUploader,
     ipfsArtworkUploader,
     ipfsAudioPinner,
