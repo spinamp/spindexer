@@ -19,7 +19,6 @@ const processorFunction = (metaFactory: MetaFactory, name: string) =>
     }
 
     const newNftFactoryObjects = events.map(e => eventToNftFactory(e, metaFactory.autoApprove, metaFactory.autoApprove));
-    console.log({ newNftFactoryObjects })
     await clients.db.insert(Table.nftFactories, newNftFactoryObjects);
     await clients.db.updateProcessor(name, newCursor);
 
