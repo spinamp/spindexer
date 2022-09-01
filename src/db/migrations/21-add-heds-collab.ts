@@ -10,6 +10,7 @@ const HEDS_COLLAB_NFT_FACTORY: NftFactory = {
   platformId: 'heds', // part of existing heds platform
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
+  autoApprove: true,
   typeMetadata: {
     overrides: {
       type: MusicPlatformType['hedsCollab'],
