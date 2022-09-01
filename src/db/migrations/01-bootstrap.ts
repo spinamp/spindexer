@@ -132,7 +132,7 @@ const INITIAL_TABLES = [
   },
   {
     name: Table.erc721Transfers, create: (table: Knex.CreateTableBuilder) => {
-      table.string('id')
+      table.string('id').primary();
       table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
       table.string('from');
@@ -141,7 +141,6 @@ const INITIAL_TABLES = [
       table.string('tokenId');
       table.string('nftId')
       table.string('transactionHash');
-      table.primary(['id', 'from', 'to', 'contractAddress', 'tokenId', 'transactionHash'])
       table.foreign('nftId').references('id').inTable(Table.nfts).onDelete('cascade');
     }
   }

@@ -53,10 +53,10 @@ async function getLogs(provider: JsonRpcProvider, params: any, fromBlock: string
         fromBlock: start,
         toBlock: end
       }]);
-    
+
       events.push(...eventRange)
       readUntil = end;
-      start = end;
+      start = BigNumber.from(end).add(1).toHexString();
       end = BigNumber.from(toBlock).toHexString();
     } catch (e: any){
       const errorString = e.toString() as string;
@@ -67,7 +67,6 @@ async function getLogs(provider: JsonRpcProvider, params: any, fromBlock: string
     }
   }
 
-        
   return events
 }
 
@@ -92,7 +91,7 @@ const init = async (): Promise<EthClient> => {
         return filter.topics![0];
       });
       const contractAddresses = _.uniq(contractFilters.map(c => c.address));
-      
+
       const events = await getLogs(provider, {
         address: contractAddresses,
         topics: [
@@ -104,7 +103,6 @@ const init = async (): Promise<EthClient> => {
       fromBlock,
       toBlock
       )
-      
       const iface = new ethers.utils.Interface(MetaABI.abi);
       return events.map((event: ethers.Event) => ({
         ...iface.parseLog(event),
@@ -114,7 +112,6 @@ const init = async (): Promise<EthClient> => {
         address: event.address,
         transactionHash: event.transactionHash
       }));
-      
     },
     getLatestBlockNumber: async () => {
       return await provider.getBlockNumber();
