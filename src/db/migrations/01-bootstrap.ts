@@ -133,7 +133,7 @@ const INITIAL_TABLES = [
   },
   {
     name: Table.erc721Transfers, create: (table: Knex.CreateTableBuilder) => {
-      table.string('id').primary()
+      table.string('id').primary();
       table.datetime('createdAtTime', { precision: 3 });
       table.bigint('createdAtEthereumBlockNumber');
       table.string('from');

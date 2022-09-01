@@ -20,6 +20,7 @@ const processorFunction = (contracts: NftFactory[]) =>
     const newNFTs: Partial<NFT>[] = [];
     const updates: Partial<NFT>[] = [];
     const transfers: Partial<ERC721Transfer>[] = [];
+
     items.forEach((item): Partial<NFT> | undefined => {
       const address = item.address;
       const contract = contractsByAddress[address];
@@ -58,10 +59,10 @@ const processorFunction = (contracts: NftFactory[]) =>
         approved: contract.autoApprove
       });
     });
-    
+
     await clients.db.insert(Table.nfts, newNFTs.filter(n => !!n), { ignoreConflict: 'id' });
     await clients.db.update(Table.nfts, updates);
-    
+
     const transferNftIds = transfers.map(transfer => transfer.nftId);
     const existingNfts = new Set((await clients.db.getRecords<NFT>(Table.nfts, [ ['whereIn', [ 'id', transferNftIds ]] ])).map(nft => nft.id));
     const transfersForExistingNfts = transfers.filter(transfer => existingNfts.has(transfer.nftId!));
