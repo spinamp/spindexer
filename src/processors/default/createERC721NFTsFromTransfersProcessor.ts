@@ -41,6 +41,7 @@ const processorFunction = (contracts: NftFactory[]) =>
         tokenId,
         createdAtEthereumBlockNumber: '' + item.blockNumber,
         nftId: contractType.buildNFTId(contract.address, tokenId), 
+        transactionHash: item.transactionHash
       });
       if (!newMint) {
         updates.push({

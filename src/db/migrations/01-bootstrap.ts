@@ -141,6 +141,7 @@ const INITIAL_TABLES = [
       table.string('contractAddress');
       table.string('tokenId');
       table.string('nftId')
+      table.string('transactionHash')
       table.foreign('nftId').references('id').inTable(Table.nfts).onDelete('cascade');
     }
   }
