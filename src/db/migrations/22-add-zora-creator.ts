@@ -2,7 +2,6 @@ import { Knex } from 'knex';
 
 import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
 import { NFTStandard } from '../../types/nft';
-import { Table } from '../db';
 import { addMetaFactory, removeMetaFactory } from '../migration-helpers';
 
 const ZORA_CREATOR_FACTORY: MetaFactory =
@@ -17,14 +16,6 @@ const ZORA_CREATOR_FACTORY: MetaFactory =
   }
 
 export const up = async (knex: Knex) => {
-  
-  const hasApproved = await knex.schema.hasColumn(Table.nftFactories, 'approved')
-  if (!hasApproved){
-    await knex.schema.alterTable(Table.nftFactories, table => {
-      table.boolean('approved').defaultTo(false);
-    })
-  }
-
   await addMetaFactory(knex, ZORA_CREATOR_FACTORY);
 };
 
