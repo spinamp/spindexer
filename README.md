@@ -39,6 +39,7 @@ Spindexer works by:
 
  - Bootstrap the DB with a recent backup so that you don't have to index from scratch:
    - ```yarn restore-db```
+   - (You may see a single error related to role "rdsadmin" does not exist - this can be ignored)
 
 ## Running
 The indexer runs via a single node script. This script starts a single node process. The process will create the database if needed on the first run (unless it has been restored from backup), index until it is up to date, and then terminate. Each time the script is run, the index will be caught up to date.
@@ -56,7 +57,19 @@ watch -n 60 "yarn start >> ./log" 2>&1
 ## Operations
 Sometimes things fail (eg: an offchain API is down). This is fine and expected. Things should continue as expected on the next run of the script. Most NFTs/Tracks/Platforms that cause failure/errors are moved into an error queue and retried a few times after some delay so that they don't block progress for the rest of the indexer.
 
-You may also want to disable the ipfs pinning processors by commenting out the ipfsAudioPinner and ipfsArtworkPinner lines from index.ts - They run quite slowly as most pin services have low rate limits.
+When experimenting or testing new PRs that may have breaking changes, you may want to reset the db often or test rebuilding on specific tables.
+There are various commands that help with this:
+
+```
+// This will reset the database to the most recent backup. Useful for testing just the impact of your PR if it is merged and deployed as is.
+yarn reset-db
+
+// This will reset the database to blank, but still insert ipfs files and pins from the backup so that you don't have to reupload and repin files. Useful for testing a full recreate of the database, without the slow upload/pinning steps
+yarn reset-db-minimal
+
+// This will just clear out tables related to track processing, not nft indexing. Useful to test out re-processing all tracks without having to redo nft indexing.
+yarn clear-track-tables
+```
 
 ## Design Goals
 There are a few design goals for the system:
@@ -75,3 +88,4 @@ The repo is still early and not hyper-polished or perfectly documented. Contribu
  - Try set things up yourself, test it out, read the code.
  - Read the code some more, especially getting familiar with the [Processor](./src/types/processor.ts), [Trigger](./src/types/trigger.ts) and [Platform](./src/types/platform.ts) types and how they're used as interfaces :)
  - Check out the Github Project and Github Issues, still being improved
+ - A note on migrations: If your PR includes a schema migration with new or changed fields, make sure it calls the updateViews method to update the corresponding views that are exposed in the API

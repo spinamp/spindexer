@@ -39,7 +39,7 @@ const toRecordMapper: any = {
       autoApprove: c.autoApprove
     });
   }),
-  [Table.nftProcessErrors]: (nftProcessErrors: NFTProcessError[]): 
+  [Table.nftProcessErrors]: (nftProcessErrors: NFTProcessError[]):
   { nftId: string; metadataError?: string; numberOfRetries?: number; lastRetry?: string; processError?: string }[] => nftProcessErrors.map((error) => {
     return ({
       nftId: error.nftId,
