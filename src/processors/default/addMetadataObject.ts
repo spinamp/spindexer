@@ -24,10 +24,17 @@ const getMetadataObject = async (nft: NFT, timeout: number, axios: Axios, ipfs: 
   }
   
   if (metadataURL.startsWith('data:application/json;base64,')){
-    const base64 = metadataURL.substring(metadataURL.indexOf(',') + 1);
-    const data = Buffer.from(base64, 'base64').toString('utf-8')
-    const metadata = JSON.parse(data);
-    return { metadata };
+    try {
+
+      const base64 = metadataURL.substring(metadataURL.indexOf(',') + 1);
+      const data = Buffer.from(base64, 'base64').toString('utf-8')
+      const metadata = JSON.parse(data);
+      return { metadata };
+    } catch (e: any){
+      return {
+        metadataError: e.toString()
+      }
+    }
   }
   
   let queryURL = metadataURL;
