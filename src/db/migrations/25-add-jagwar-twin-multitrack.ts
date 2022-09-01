@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
+import { NftFactory, NFTContractTypeName, NFTStandard, CustomFieldExtractors } from '../../types/nft';
 import { MusicPlatformType } from '../../types/platform';
 import { addNftFactory, removeNftFactory } from '../migration-helpers';
 
@@ -13,13 +13,17 @@ const ALBUM_NFT_FACTORY: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
+  approved: true,
   typeMetadata: {
     overrides: {
       artist: {
         name: 'Jagwar Twin',
         artistId: jagwarTwinAddress,
       },
-      type: MusicPlatformType['multi-track-multiprint-contract']
+      type: MusicPlatformType['multi-track-multiprint-contract'],
+      extractor: {
+        title: CustomFieldExtractors.METADATA_NAME
+      }
     }
   }
 };

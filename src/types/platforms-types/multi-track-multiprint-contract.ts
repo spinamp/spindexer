@@ -5,7 +5,7 @@ import slugify from 'slugify';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { NFT, getTrait, NftFactory } from '../nft';
+import { NFT, getTrait, NftFactory, fieldExtractors } from '../nft';
 import { MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
@@ -24,7 +24,6 @@ const mapTrack: MapTrack = (
   const lossyAudioURL = nft.metadata.animation_url;
   const lossyArtworkURL = nft.metadata.image;
 
-
   if (!lossyAudioIPFSHash && !lossyAudioURL) {
     throw new Error('Failed to extract audio from nft');
   }
@@ -33,11 +32,17 @@ const mapTrack: MapTrack = (
     throw new Error('Failed to extract audio from nft');
   }
 
+  const defaultTitleExtractor = (processNft: NFT) => getTrait(processNft, 'Track');
+  const titleExtractorOverride = contract.typeMetadata?.overrides?.extractor?.title || '';
+  const titleExtractor = titleExtractorOverride ? fieldExtractors[titleExtractorOverride] : defaultTitleExtractor;
+  if (!titleExtractor) {
+    throw new Error('unknown extractor override provided')
+  }
 
   const track: Partial<ProcessedTrack> = {
     id: mapNFTtoTrackID(nft),
     platformInternalId: mapNFTtoTrackID(nft),
-    title: getTrait(nft, 'Track'),
+    title: titleExtractor(nft),
     description: nft.metadata.description,
     platformId: contract.platformId,
     lossyAudioIPFSHash,

@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
+import { NftFactory, NFTContractTypeName, NFTStandard, CustomFieldExtractors } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
 import { addNftFactory, addPlatform, removeNftFactory, removePlatform } from '../migration-helpers';
 
@@ -18,6 +18,7 @@ const THOUGHT_FORMS_NFT_FACTORY: NftFactory = {
   platformId: JAGWAR_TWIN_PLATFORM.id,
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
+  approved: true,
   autoApprove: true,
   typeMetadata: {
     overrides: {
@@ -30,6 +31,9 @@ const THOUGHT_FORMS_NFT_FACTORY: NftFactory = {
         artistId: jagwarTwinAddress,
         avatarUrl: 'https://lh3.googleusercontent.com/OVwmOvucRK6XIwHmRu1tTnRjKD2zDLzPECTFy0Bp5t4LeKgTDiVOZ7KEvAM1AkVOH2QIZuCapgL_EhKg_-26BAsLwsOjLUKmwF-bvSw=s0',
         websiteUrl: 'https://jagwartwin.com/'
+      },
+      extractor: {
+        title: CustomFieldExtractors.METADATA_NAME,
       }
     }
   }
