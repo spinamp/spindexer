@@ -73,6 +73,9 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
         newCursorObject[filter.address] = rangeEnd.toString();
       });
       
+      if (staleContractFilters.length === 0){
+        return []
+      }
       const newEvents = await clients.eth.getEventsFrom(rangeStart.toString(), rangeEnd.toString(), staleContractFilters);
       const newCursor = JSON.stringify(newCursorObject);
       if (newEvents.length === 0 && mostStaleContracts.length !== contracts.length) {
