@@ -30,11 +30,11 @@ const mapTrack = (
     description: apiTrack.description,
     platformId: nft.platformId,
     lossyAudioURL: apiTrack.tracks[0].audio.url || nft.metadata.audio_url,
-    lossyArtworkIPFSHash: extractHashFromURL(getNFTMetadataField(nft, 'image')),
-    lossyAudioIPFSHash: extractHashFromURL(getNFTMetadataField(nft, 'animation_url')),
+    lossyArtworkURL: apiTrack.coverImage.url,
+    lossyAudioIPFSHash: extractHashFromURL(getNFTMetadataField(nft, 'animation_url'))!,
+    lossyArtworkIPFSHash: extractHashFromURL(getNFTMetadataField(nft, 'image'))!,
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
-    lossyArtworkURL: apiTrack.coverImage.url,
     websiteUrl:
       apiTrack.artist.soundHandle && apiTrack.titleSlug
         ? `https://www.sound.xyz/${apiTrack.artist.soundHandle}/${apiTrack.titleSlug}`

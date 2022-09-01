@@ -18,16 +18,30 @@ export const mapTrack: MapTrack = (
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
   }
 
+  const lossyAudioIPFSHash = extractHashFromURL(nft.metadata.animation_url) || undefined;
+  const lossyArtworkIPFSHash = extractHashFromURL(nft.metadata.image) || undefined;
+  const lossyAudioURL = nft.metadata.animation_url;
+  const lossyArtworkURL = nft.metadata.image;
+
+
+  if (!lossyAudioIPFSHash && !lossyAudioURL) {
+    throw new Error('Failed to extract audio from nft');
+  }
+
+  if (!lossyArtworkIPFSHash && !lossyArtworkURL) {
+    throw new Error('Failed to extract audio from nft');
+  }
+
   const track: Partial<ProcessedTrack> = {
     id: mapNFTtoTrackID(nft),
     platformInternalId: contract.address,
     title: contract.name || nft.metadata.name,
     description: nft.metadata.description,
     platformId: contract.platformId,
-    lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url),
-    lossyArtworkIPFSHash: extractHashFromURL(nft.metadata.image),
-    lossyAudioURL: nft.metadata.animation_url,
-    lossyArtworkURL: nft.metadata.image,
+    lossyAudioIPFSHash,
+    lossyArtworkIPFSHash,
+    lossyAudioURL,
+    lossyArtworkURL,
     websiteUrl: nft.metadata.external_url,
     artistId: mapArtistProfile({ apiTrack, contract, nft }).artistId,
     createdAtTime: nft.createdAtTime,
