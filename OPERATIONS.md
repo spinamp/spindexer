@@ -58,7 +58,7 @@ jsonb_set(
   "typeMetadata", '{overrides,artist, "artistId"}',
   format(
     '"ethereum/%s"',
-    "typeMetadata"->'overrides'->'artist'->>'artistId'
+    lower("typeMetadata"->'overrides'->'artist'->>'artistId')
   )::jsonb
 )
 where "platformId"='zora';
