@@ -89,6 +89,5 @@ export const platformConfigs: MusicPlatformTypeConfigs = {
   },
   zora: {
     mappers: zoraMappers,
-    clientName: null
   }
 }

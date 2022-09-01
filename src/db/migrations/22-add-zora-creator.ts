@@ -5,7 +5,7 @@ import { NFTStandard } from '../../types/nft';
 import { Table } from '../db';
 import { addMetaFactory, removeMetaFactory } from '../migration-helpers';
 
-const ZORA_CREATOR_FACTORY: MetaFactory = 
+const ZORA_CREATOR_FACTORY: MetaFactory =
   {
     address: '0xf74b146ce44cc162b601dec3be331784db111dc1',
     platformId: 'zora',
@@ -22,8 +22,6 @@ export const up = async (knex: Knex) => {
   if (!hasTransactionHash){
     await knex.schema.alterTable(Table.erc721Transfers, table => {
       table.string('transactionHash');
-      table.dropPrimary(`${Table.erc721Transfers}_pkey`)
-      table.primary(['id', 'from', 'to', 'contractAddress', 'tokenId', 'transactionHash'])
     })
   }
 
