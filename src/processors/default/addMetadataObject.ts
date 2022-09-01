@@ -58,8 +58,8 @@ const processorFunction = (erc721ContractsByAddress: { [key: string]: NftFactory
 
   const metadataErrors: { metadataError: string, nftId: string }[] = [];
   const nftUpdates = batch.map((nft, index): (Partial<NFT>) => {
-    const metadata = results[index].response!.metadata//results[index].response ? results[index].response!.data : undefined;
-    const metadataError = results[index].response!.metadataError//esults[index].isError ? results[index].error!.message : undefined;
+    const metadata = results[index].response ? results[index].response!.metadata : undefined;
+    const metadataError = results[index].response ? results[index].response!.metadataError : undefined;
     if (metadataError){
       metadataErrors.push({
         nftId: nft.id,

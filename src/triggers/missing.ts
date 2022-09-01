@@ -17,6 +17,8 @@ export const missingMetadataObject: Trigger<undefined> = async (clients) => {
     on n.id = enpe."nftId"
     where enpe."metadataError" is null
     and n.metadata is null
+    and n."tokenURI" is not null
+    and n."tokenURI" != ''
     and n.approved = true
     limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
   `
@@ -56,6 +58,7 @@ export const erc721NFTsWithoutTracks: (platformId: string, limit?: number) => Tr
       e."processError" is NULL AND
       e."metadataError" is NULL AND
       n."platformId"='${platformId}' AND
+      n.metadata is not null AND
       n.approved = true
       and n."createdAtTime" is NOT NULL
       ORDER BY n."createdAtTime"
