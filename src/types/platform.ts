@@ -11,7 +11,6 @@ import ninaMappers from './platforms-types/nina'
 import noizdMappers from './platforms-types/noizd';
 import singleTrackMultiprintContractMappers from './platforms-types/single-track-multiprint-contract';
 import soundMappers from './platforms-types/sound';
-import zoraMappers from './platforms-types/zora';
 import { ProcessedTrack } from './track';
 
 export const API_PLATFORMS = ['noizd'];
@@ -88,6 +87,6 @@ export const platformConfigs: MusicPlatformTypeConfigs = {
     mappers: hedsCollabMappers,
   },
   zora: {
-    mappers: zoraMappers,
+    mappers: singleTrackMultiprintContractMappers,
   }
 }

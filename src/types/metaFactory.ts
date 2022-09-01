@@ -55,6 +55,9 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
           artist: {
             artistId: event.args!.creator,
             name: event.args!.creator,
+          },
+          track: {
+            websiteUrl: `https://create.zora.co/editions/${formatAddress(event.args!.editionContractAddress)}`
           }
         }
       }
