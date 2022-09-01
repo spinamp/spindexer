@@ -1,8 +1,9 @@
 import knex, { Knex } from 'knex';
+import _ from 'lodash';
 
 import { Cursor } from '../types/trigger';
 
-import { DBClient, QueryOptions, Table, Wheres, defaultTimestampColumn } from './db';
+import { DBClient, Table, Wheres, defaultTimestampColumn, QueryOptions } from './db';
 import config from './knexfile';
 import { fromDBRecords, toDBRecords } from './orm';
 
@@ -18,7 +19,7 @@ export const createDB = async (currentConfig: typeof config.development | typeof
 
 const loadDB = async () => {
   const currentConfig = config[process.env.NODE_ENV]
-  createDB(currentConfig);
+  await createDB(currentConfig);
   const db = knex(currentConfig);
   await db.migrate.latest();
   return db;
@@ -69,11 +70,20 @@ const init = async (): Promise<DBClient> => {
       }
       console.log(`Inserting into ${tableName} ${records.length} records`);
       const dbRecords = toDBRecords(tableName, records);
-      if (options?.ignoreConflict){
-        await db(tableName).insert(dbRecords).onConflict(options.ignoreConflict).ignore();
-      } else {
-        await db(tableName).insert(dbRecords);
-      }
+      await db.transaction(async transaction => {
+        const chunks = _.chunk(dbRecords, Number.parseInt(process.env.MAX_INSERT_CHUNK_SIZE!));
+
+        await Promise.all(
+          chunks.map(async chunk => {
+            if (options?.ignoreConflict){
+              await transaction.insert(chunk).into(tableName).onConflict(options.ignoreConflict as any).ignore();
+            } else {
+              await transaction.insert(chunk).into(tableName);
+            }
+          })
+        )
+
+      })
     },
     updateProcessor: async (processor: string, lastCursor: Cursor) => {
       console.log(`Updating ${processor} with cursor: ${lastCursor}`);

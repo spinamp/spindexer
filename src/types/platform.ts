@@ -85,5 +85,8 @@ export const platformConfigs: MusicPlatformTypeConfigs = {
   },
   'heds-collab': {
     mappers: hedsCollabMappers,
+  },
+  zora: {
+    mappers: singleTrackMultiprintContractMappers,
   }
 }

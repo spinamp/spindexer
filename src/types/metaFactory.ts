@@ -6,7 +6,8 @@ import { NftFactory, NFTContractTypeName, NFTStandard } from './nft'
 
 export enum MetaFactoryTypeName {
   soundArtistProfileCreator = 'soundArtistProfileCreator',
-  ninaMintCreator = 'ninaMintCreator'
+  ninaMintCreator = 'ninaMintCreator',
+  zoraDropCreator = 'zoraDropCreator'
 }
 
 export type MetaFactory = Contract & {
@@ -19,7 +20,7 @@ export type MetaFactory = Contract & {
 
 export type MetaFactoryType = {
   newContractCreatedEvent: string,
-  creationEventToNftFactory?: (event: ethers.Event, approved: boolean) => NftFactory
+  creationEventToNftFactory?: (event: ethers.Event, autoApprove: boolean, approved: boolean) => NftFactory
 }
 
 type MetaFactoryTypes = {
@@ -29,13 +30,37 @@ type MetaFactoryTypes = {
 export const MetaFactoryTypes: MetaFactoryTypes = {
   soundArtistProfileCreator: {
     newContractCreatedEvent: 'CreatedArtist',
-    creationEventToNftFactory: (event: any, approved: boolean) => ({
+    creationEventToNftFactory: (event: any, autoApprove: boolean, approved: boolean) => ({
       address: formatAddress(event.args!.artistAddress),
       platformId: 'sound',
       startingBlock: event.blockNumber,
       contractType: NFTContractTypeName.default,
       standard: NFTStandard.ERC721,
-      autoApprove: approved
+      autoApprove,
+      approved
+    })
+  },
+  zoraDropCreator: {
+    newContractCreatedEvent: 'CreatedDrop',
+    creationEventToNftFactory: (event: any, autoApprove: boolean, approved: boolean) => ({
+      address: formatAddress(event.args!.editionContractAddress),
+      platformId: 'zora',
+      startingBlock: event.blockNumber,
+      contractType: NFTContractTypeName.default,
+      standard: NFTStandard.ERC721,
+      autoApprove,
+      approved,
+      typeMetadata: {
+        overrides: {
+          artist: {
+            artistId: event.args!.creator,
+            name: event.args!.creator,
+          },
+          track: {
+            websiteUrl: `https://create.zora.co/editions/${formatAddress(event.args!.editionContractAddress)}`
+          }
+        }
+      }
     })
   }
 }

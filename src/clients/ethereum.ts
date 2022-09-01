@@ -22,9 +22,17 @@ export type EthCall = {
   callInput?: string,
 }
 
+type Events = ethers.utils.LogDescription & {
+  logIndex: string,
+  blockNumber: string,
+  blockHash: string,
+  address: string
+  transactionHash: string;
+}
+
 export type EthClient = {
   call: (ethCalls: EthCall[]) => Promise<unknown[]>;
-  getEventsFrom: (fromBlock: string, toBlock: string, contractFilters: ContractFilter[]) => Promise<ethers.Event[]>;
+  getEventsFrom: (fromBlock: string, toBlock: string, contractFilters: ContractFilter[]) => Promise<Events[]>;
   getBlockTimestamps: (blockHashes: string[]) => Promise<number[]>;
   getLatestBlockNumber: () => Promise<number>;
 }
@@ -34,8 +42,44 @@ export type ContractFilter = {
   filter: string
 };
 
+async function getLogs(provider: JsonRpcProvider, params: any, fromBlock: string, toBlock: string){
+  const events = [];
+  let start = BigNumber.from(fromBlock).toHexString();
+  let end = BigNumber.from(toBlock).toHexString();
+  let readUntil = '0';
+  while (BigNumber.from(toBlock).gt(readUntil)){
+    try {
+      const eventRange = await provider.send('eth_getLogs', [{
+        ...params,
+        fromBlock: start,
+        toBlock: end
+      }]);
+
+      events.push(...eventRange)
+      readUntil = end;
+      start = BigNumber.from(end).add(1).toHexString();
+      end = BigNumber.from(toBlock).toHexString();
+    } catch (e: any){
+      const errorString = e.toString() as string;
+      const searchString = 'this block range should work: [';
+      if (!errorString.includes(searchString)){
+        throw `Can't find suggested block range`
+      }
+      const suggestion = errorString.substring(errorString.indexOf(searchString), errorString.indexOf(']\\"}}",'));
+      const suggestedRanges = suggestion.substring(suggestion.indexOf('[') + 1).split(', ')
+      if (suggestedRanges.length !== 2){
+        throw `Can't find suggested block range`
+      }
+      start = suggestedRanges[0];
+      end = suggestedRanges[1];
+    }
+  }
+
+  return events
+}
+
 const init = async (): Promise<EthClient> => {
-  const provider = new JsonRpcProvider(process.env.ETHEREUM_PROVIDER_ENDPOINT);
+  const provider = new JsonRpcProvider(process.env.ETHEREUM_PROVIDER_ENDPOINT!);
   const ethcallProvider = new Provider();
   await ethcallProvider.init(provider);
   return {
@@ -55,23 +99,26 @@ const init = async (): Promise<EthClient> => {
         return filter.topics![0];
       });
       const contractAddresses = _.uniq(contractFilters.map(c => c.address));
-      const events = await provider.send('eth_getLogs', [{
+
+      const events = await getLogs(provider, {
         address: contractAddresses,
         topics: [
-          [ // topic[0]
+          [
             ...filters
           ]
-        ],
-        fromBlock: BigNumber.from(fromBlock).toHexString(),
-        toBlock: BigNumber.from(toBlock).toHexString(),
-      }]);
+        ] }
+      ,
+      fromBlock,
+      toBlock
+      )
       const iface = new ethers.utils.Interface(MetaABI.abi);
       return events.map((event: ethers.Event) => ({
         ...iface.parseLog(event),
         logIndex: BigNumber.from(event.logIndex).toString(),
         blockNumber: BigNumber.from(event.blockNumber).toString(),
         blockHash: event.blockHash,
-        address: event.address
+        address: event.address,
+        transactionHash: event.transactionHash
       }));
     },
     getLatestBlockNumber: async () => {
