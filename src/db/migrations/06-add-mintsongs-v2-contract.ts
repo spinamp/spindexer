@@ -2,7 +2,7 @@ import { Knex } from 'knex';
 
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
-import { addNftFactory, addPlatform, removeNftFactory, removePlatform } from '../migration-helpers';
+import { addPlatform, addNftFactory, removePlatform, removeNftFactory } from '../migration-helpers';
 
 const PLATFORM: MusicPlatform = { id: 'mintsongs', type: MusicPlatformType.mintsongsV2, name: 'Mintsongs' }
 
@@ -12,7 +12,8 @@ const CONTRACT: NftFactory = {
   platformId: 'mintsongs',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  autoApprove: true
+  autoApprove: true,
+  approved: true
 
 };
 

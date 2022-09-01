@@ -3,7 +3,7 @@ import { Knex } from 'knex';
 
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
-import { addNftFactory, addPlatform, removeNftFactory, removePlatform } from '../migration-helpers';
+import { addPlatform, addNftFactory, removeNftFactory, removePlatform } from '../migration-helpers';
 
 const ROHKI_PLATFORM: MusicPlatform = {
   id: 'rohki',
@@ -18,6 +18,7 @@ const ROHKI_DESPERADO: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
+  approved: true,
   typeMetadata: {
     overrides: {
       track: {
