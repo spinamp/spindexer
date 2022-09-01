@@ -24,6 +24,7 @@ const INITIAL_TABLES = [
       table.string('name', 1024);
       table.string('symbol', 256);
       table.boolean('autoApprove').defaultTo(false)
+      table.boolean('approved').defaultTo(false);
     }
   },
   {

@@ -13,14 +13,13 @@ const ZORA_CREATOR_FACTORY: MetaFactory =
     contractType: MetaFactoryTypeName.zoraDropCreator,
     gap: '500000',
     standard: NFTStandard.ERC721,
-    autoApprove: false
+    autoApprove: false,
   }
 
 export const up = async (knex: Knex) => {
-  await addMetaFactory(knex, ZORA_CREATOR_FACTORY);
-
-  const hasColumn = await knex.schema.hasColumn(Table.erc721Transfers, 'transactionHash')
-  if (!hasColumn){
+  
+  const hasTransactionHash = await knex.schema.hasColumn(Table.erc721Transfers, 'transactionHash')
+  if (!hasTransactionHash){
     await knex.schema.alterTable(Table.erc721Transfers, table => {
       table.string('transactionHash');
       table.dropPrimary(`${Table.erc721Transfers}_pkey`)
@@ -28,6 +27,14 @@ export const up = async (knex: Knex) => {
     })
   }
 
+  const hasApproved = await knex.schema.hasColumn(Table.nftFactories, 'approved')
+  if (!hasApproved){
+    await knex.schema.alterTable(Table.nftFactories, table => {
+      table.boolean('approved').defaultTo(false);
+    })
+  }
+
+  await addMetaFactory(knex, ZORA_CREATOR_FACTORY);
 };
 
 exports.down = async (knex: Knex) => {

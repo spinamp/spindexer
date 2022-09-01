@@ -58,8 +58,9 @@ const processorFunction = async (contracts: NftFactory[], clients: Clients) => {
 };
 
 export const unprocessedContracts: Trigger<undefined> = async (clients: Clients) => {
+  // return results for ERC721 contracts that are approved and have no name or symbol
   const contracts = (await clients.db.rawSQL(
-    `select * from "${Table.nftFactories}" where ("name" is null or "symbol" is null) and "standard" = '${NFTStandard.ERC721}' and "autoApprove" = true;`
+    `select * from "${Table.nftFactories}" where ("name" is null or "symbol" is null) and "standard" = '${NFTStandard.ERC721}' and "approved" = true;`
   )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return fromDBRecords(Table.nftFactories, contracts);
 };
