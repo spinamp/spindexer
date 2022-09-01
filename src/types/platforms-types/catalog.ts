@@ -15,27 +15,35 @@ const mapAPITrackToArtistID = (apiTrack: any): string => {
   return `ethereum/${formatAddress(apiTrack.artist.id)}`;
 };
 
-const mapTrack = (nft: NFT, apiTrack: any): ProcessedTrack => ({
-  id: apiTrack.trackId,
-  platformInternalId: apiTrack.id,
-  title: apiTrack.title,
-  slug: slugify(`${apiTrack.title} ${nft.createdAtTime.getTime()}`).toLowerCase(),
-  description: apiTrack.description,
-  platformId: nft.platformId,
-  lossyAudioIPFSHash: apiTrack.ipfs_hash_lossy_audio,
-  lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${apiTrack.ipfs_hash_lossy_audio}`,
-  createdAtTime: nft.createdAtTime,
-  createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
-  lossyArtworkIPFSHash: apiTrack.ipfs_hash_lossy_artwork,
-  lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${apiTrack.ipfs_hash_lossy_artwork}`,
-  websiteUrl:
+const mapTrack = (nft: NFT, apiTrack: any): ProcessedTrack => {
+  if (!apiTrack) {
+    throw new Error('missing api track');
+  }
+  return {
+    id: apiTrack.trackId,
+    platformInternalId: apiTrack.id,
+    title: apiTrack.title,
+    slug: slugify(`${apiTrack.title} ${nft.createdAtTime.getTime()}`).toLowerCase(),
+    description: apiTrack.description,
+    platformId: nft.platformId,
+    lossyAudioIPFSHash: apiTrack.ipfs_hash_lossy_audio,
+    lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${apiTrack.ipfs_hash_lossy_audio}`,
+    createdAtTime: nft.createdAtTime,
+    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    lossyArtworkIPFSHash: apiTrack.ipfs_hash_lossy_artwork,
+    lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${apiTrack.ipfs_hash_lossy_artwork}`,
+    websiteUrl:
     apiTrack.artist.handle && apiTrack.short_url
       ? `https://beta.catalog.works/${apiTrack.artist.handle}/${apiTrack.short_url}`
       : 'https://beta.catalog.works',
-  artistId: mapAPITrackToArtistID(apiTrack),
-});
+    artistId: mapAPITrackToArtistID(apiTrack),
+  }
+};
 
 const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): ArtistProfile => {
+  if (!apiTrack) {
+    throw new Error('missing api track');
+  }
   const artist = apiTrack.artist;
   return {
     name: artist.name,

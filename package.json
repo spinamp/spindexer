@@ -15,6 +15,7 @@
     "connect-db": "source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -d $POSTGRES_DATABASE -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME",
     "save-db": "rm -rf db/dump/ && source .env && PGPASSWORD=$POSTGRES_PASSWORD pg_dump -F d -f ./db/dump -b -C -d $POSTGRES_DATABASE -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME",
     "drop-db": "read -p \"u sure? ctrl-c to abort \" -n 1 -r; source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -d postgres -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME -c \"drop database $POSTGRES_DATABASE;\"",
+    "clear-track-tables": "read -p \"u sure? ctrl-c to abort \" -n 1 -r; ts-node scripts/clear_track_tables.ts",
     "restore-full-db": "source .env && PGPASSWORD=$POSTGRES_PASSWORD pg_restore ./db/dump  -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME --create --clean --if-exists --verbose --verbose -F d -d postgres",
     "reset-db": "yarn drop-db && yarn restore-full-db",
     "restore-db-table": "source .env && PGPASSWORD=$POSTGRES_PASSWORD pg_restore ./db/dump  -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME --verbose --verbose -F d -d $POSTGRES_DATABASE --data-only -t",
