@@ -49,3 +49,16 @@ delete from raw_artist_profiles;
 delete from raw_artists;
 delete from raw_processors where id in ('stripIgnoredNFTs','createProcessedTracksFromAPI_noizd');
 ```
+
+```sql
+--- Example: Update a bunch of deeply nested entries in records in a table:
+update raw_nft_factories
+set "typeMetadata" =
+jsonb_set(
+  "typeMetadata", '{overrides,artist, "artistId"}',
+  format(
+    '"ethereum/%s"',
+    "typeMetadata"->'overrides'->'artist'->>'artistId'
+  )::jsonb
+)
+where "platformId"='zora';

@@ -53,7 +53,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       typeMetadata: {
         overrides: {
           artist: {
-            artistId: event.args!.creator,
+            artistId: `ethereum/${event.args!.creator}`,
             name: event.args!.creator,
           },
           track: {
