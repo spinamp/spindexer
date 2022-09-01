@@ -19,7 +19,7 @@ export const createDB = async (currentConfig: typeof config.development | typeof
 
 const loadDB = async () => {
   const currentConfig = config[process.env.NODE_ENV]
-  createDB(currentConfig);
+  await createDB(currentConfig);
   const db = knex(currentConfig);
   await db.migrate.latest();
   return db;
