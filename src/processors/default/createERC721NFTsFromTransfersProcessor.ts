@@ -40,7 +40,6 @@ const processorFunction = (contracts: NftFactory[]) =>
         tokenId,
         createdAtEthereumBlockNumber: '' + item.blockNumber,
         nftId: contractType.buildNFTId(contract.address, tokenId), 
-        transactionHash: item.transactionHash
       });
       if (!newMint) {
         updates.push({
@@ -67,9 +66,7 @@ const processorFunction = (contracts: NftFactory[]) =>
     const existingNfts = new Set((await clients.db.getRecords<NFT>(Table.nfts, [ ['whereIn', [ 'id', transferNftIds ]] ])).map(nft => nft.id));
     const transfersForExistingNfts = transfers.filter(transfer => existingNfts.has(transfer.nftId!));
 
-    await clients.db.insert(Table.erc721Transfers, transfersForExistingNfts, {
-      ignoreConflict: ['id', 'from', 'to', 'contractAddress', 'tokenId', 'transactionHash']
-    });
+    await clients.db.insert(Table.erc721Transfers, transfersForExistingNfts);
     await clients.db.updateProcessor(NAME, newCursor);
   };
 

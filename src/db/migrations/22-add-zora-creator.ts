@@ -18,15 +18,6 @@ const ZORA_CREATOR_FACTORY: MetaFactory =
 
 export const up = async (knex: Knex) => {
   
-  const hasTransactionHash = await knex.schema.hasColumn(Table.erc721Transfers, 'transactionHash')
-  if (!hasTransactionHash){
-    await knex.schema.alterTable(Table.erc721Transfers, table => {
-      table.string('transactionHash');
-      table.dropPrimary(`${Table.erc721Transfers}_pkey`)
-      table.primary(['id', 'from', 'to', 'contractAddress', 'tokenId', 'transactionHash'])
-    })
-  }
-
   const hasApproved = await knex.schema.hasColumn(Table.nftFactories, 'approved')
   if (!hasApproved){
     await knex.schema.alterTable(Table.nftFactories, table => {
