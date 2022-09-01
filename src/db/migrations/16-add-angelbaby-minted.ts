@@ -18,6 +18,7 @@ export const MINTED: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
+  approved: true,
   typeMetadata: {
     overrides: {
       track: {

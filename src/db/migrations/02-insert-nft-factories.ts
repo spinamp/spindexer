@@ -9,7 +9,8 @@ export const NOIZD = {
   startingBlock: '13470560',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  autoApprove: true
+  autoApprove: true,
+  approved: true
 }
 
 export const CATALOG = {
@@ -18,7 +19,8 @@ export const CATALOG = {
   startingBlock: '14566825',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  autoApprove: true
+  autoApprove: true,
+  approved: true
 }
 
 const INITIAL_CONTRACTS: NftFactory[] = [
@@ -28,7 +30,8 @@ const INITIAL_CONTRACTS: NftFactory[] = [
     contractType: NFTContractTypeName.zora,
     standard: NFTStandard.ERC721,
     platformId: 'zoraOriginal',
-    autoApprove: true
+    autoApprove: true,
+    approved: true
   },
   NOIZD,
   CATALOG

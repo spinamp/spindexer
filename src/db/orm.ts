@@ -24,7 +24,8 @@ const toRecordMapper: any = {
       symbol: c.symbol,
       typeMetadata: c.typeMetadata,
       standard: c.standard,
-      autoApprove: c.autoApprove
+      autoApprove: c.autoApprove,
+      approved: c.approved
     });
   }),
   [Table.metaFactories]: (factoryContracts: MetaFactory[]): IdField[] => factoryContracts.map((c) => {
@@ -73,7 +74,8 @@ const fromRecordMapper: any = {
       symbol: c.symbol,
       typeMetadata: c.typeMetadata,
       standard: c.standard,
-      autoApprove: c.autoApprove
+      autoApprove: c.autoApprove,
+      approved: c.approved
     });
   }),
   [Table.metaFactories]: (factoryContracts: Record[]): MetaFactory[] => factoryContracts.map((c: any) => {

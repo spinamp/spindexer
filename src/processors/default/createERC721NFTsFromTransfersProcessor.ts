@@ -77,7 +77,7 @@ export const createERC721NFTsFromTransfersProcessor: (contracts: NftFactory[]) =
     name: NAME,
     trigger: newERC721Transfers(
       contracts
-        .filter(c => c.standard === NFTStandard.ERC721) //only include ERC721 contracts
+        .filter(c => c.standard === NFTStandard.ERC721 && c.approved === true) //only include approved ERC721 contracts
         .map(c => ({ address: c.address, startingBlock: c.startingBlock! })), // map contracts to EthereumContract
       process.env.ETHEREUM_BLOCK_QUERY_GAP!
     ),
