@@ -119,6 +119,31 @@
       ],
       "name": "CreatedArtist",
       "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "creator",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "editionContractAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "editionSize",
+          "type": "uint256"
+        }
+      ],
+      "name": "CreatedDrop",
+      "type": "event"
     }
   ]
 }

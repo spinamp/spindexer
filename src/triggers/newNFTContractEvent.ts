@@ -72,7 +72,10 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
       staleContractFilters.forEach(filter => {
         newCursorObject[filter.address] = rangeEnd.toString();
       });
-
+      
+      if (staleContractFilters.length === 0){
+        return []
+      }
       const newEvents = await clients.eth.getEventsFrom(rangeStart.toString(), rangeEnd.toString(), staleContractFilters);
       const newCursor = JSON.stringify(newCursorObject);
       if (newEvents.length === 0 && mostStaleContracts.length !== contracts.length) {
@@ -88,13 +91,13 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
   };
 
 
-export const newERC721Transfers: (contracts: EthereumContract[]) => Trigger<Cursor> =
-  (contracts: EthereumContract[]) => {
+export const newERC721Transfers: (contracts: EthereumContract[], gap?: string) => Trigger<Cursor> =
+  (contracts: EthereumContract[], gap?: string) => {
     const contractFilters = contracts.map(contract => ({
       address: contract.address,
       filter: 'Transfer'
     }));
-    return newEthereumEvents(contracts, contractFilters);
+    return newEthereumEvents(contracts, contractFilters, gap);
   };
 
 export const newERC721Contract: (factoryContract: MetaFactory) => Trigger<Cursor> =

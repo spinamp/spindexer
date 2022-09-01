@@ -4,7 +4,7 @@ import { Knex } from 'knex';
 import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
 import { NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
-import { addMetaFactory, addPlatform, removeMetaFactory, removePlatform } from '../migration-helpers';
+import { addPlatform, addMetaFactory, removeMetaFactory, removePlatform } from '../migration-helpers';
 
 const NINA_PLATFORM: MusicPlatform = {
   id: 'nina',
@@ -17,7 +17,7 @@ const NINA: MetaFactory = {
   platformId: NINA_PLATFORM.id,
   contractType: MetaFactoryTypeName.ninaMintCreator,
   standard: NFTStandard.METAPLEX,
-  autoApprove: true
+  autoApprove: true,
 };
 
 export const up = async (knex: Knex) => {
