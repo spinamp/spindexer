@@ -30,7 +30,7 @@ export const extractHashFromURL = (urlString: string) => {
     if (url.host.includes('.ipfs.')) {
       return url.host.split('.ipfs.')[0];
     }
-    return '';
+    return null;
   } catch {
     if (urlString.startsWith('Qm')) {
       return urlString;
@@ -38,7 +38,7 @@ export const extractHashFromURL = (urlString: string) => {
     if (urlString.startsWith('bafy')) {
       return urlString;
     }
-    return '';
+    return null;
   }
 }
 
