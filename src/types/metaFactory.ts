@@ -53,8 +53,8 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       typeMetadata: {
         overrides: {
           artist: {
-            artistId: event.args!.creator,
-            name: event.args!.creator,
+            artistId: `ethereum/${formatAddress(event.args!.creator)}`,
+            name: formatAddress(event.args!.creator),
           },
           track: {
             websiteUrl: `https://create.zora.co/editions/${formatAddress(event.args!.editionContractAddress)}`
