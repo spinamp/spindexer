@@ -5,7 +5,8 @@ import slugify from 'slugify';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { NFT, getTrait, NftFactory, fieldExtractors } from '../nft';
+import { CustomFieldExtractor, fieldExtractors } from '../fieldExtractor';
+import { NFT, getTrait, NftFactory } from '../nft';
 import { MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
@@ -32,7 +33,8 @@ const mapTrack: MapTrack = (
     throw new Error('Failed to extract audio from nft');
   }
 
-  const defaultTitleExtractor = (processNft: NFT) => getTrait(processNft, 'Track');
+  // TODO: extract function and move to fieldExtractor.ts
+  const defaultTitleExtractor = fieldExtractors[CustomFieldExtractor.ATTRIBUTES_TRAIT_TRACK];
   const titleExtractorOverride = contract.typeMetadata?.overrides?.extractor?.title || '';
   const titleExtractor = titleExtractorOverride ? fieldExtractors[titleExtractorOverride] : defaultTitleExtractor;
   if (!titleExtractor) {

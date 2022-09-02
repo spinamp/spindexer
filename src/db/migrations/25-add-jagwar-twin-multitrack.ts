@@ -1,7 +1,8 @@
 import { Knex } from 'knex';
 
 import { createArtistIdFromEthereumAddress } from '../../types/artist';
-import { NftFactory, NFTContractTypeName, NFTStandard, CustomFieldExtractors } from '../../types/nft';
+import { CustomFieldExtractor } from '../../types/fieldExtractor';
+import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { MusicPlatformType } from '../../types/platform';
 import { addNftFactory, removeNftFactory } from '../migration-helpers';
 
@@ -23,7 +24,7 @@ const ALBUM_NFT_FACTORY: NftFactory = {
       },
       type: MusicPlatformType['multi-track-multiprint-contract'],
       extractor: {
-        title: CustomFieldExtractors.ATTRIBUTES_TRAIT_SONG_TITLE
+        title: CustomFieldExtractor.ATTRIBUTES_TRAIT_SONG_TITLE
       }
     }
   }

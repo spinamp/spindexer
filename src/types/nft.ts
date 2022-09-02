@@ -46,12 +46,6 @@ export enum NFTStandard {
   METAPLEX = 'metaplex'
 }
 
-// TODO: MOVE
-export enum CustomFieldExtractors {
-  METADATA_NAME = 'metadata.name',
-  ATTRIBUTES_TRAIT_SONG_TITLE = 'attributes.trait.song_title'
-}
-
 export type TypeMetadata = {
   overrides: {
     track?: Partial<ProcessedTrack>,
@@ -123,8 +117,3 @@ export const getTrait = (nft: NFT, type: string) => {
   }
   return traitAttribute.value;
 };
-
-export const fieldExtractors: any = {
-  'metadata.name': (nft: NFT) => nft.metadata.name,
-  'attributes.trait.song_title': (nft: NFT) => getTrait(nft, 'Song Title')
-}
