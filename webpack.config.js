@@ -26,6 +26,10 @@ module.exports = env => ({
         test: /\.mjs$/,
         type: 'javascript/auto'
       },
+      {
+        test: /\.wasm$/,
+        type: 'javascript/auto',
+      }
     ],
   },
   resolve: {
@@ -35,6 +39,7 @@ module.exports = env => ({
       child_process: path.resolve(__dirname, 'src/lib/child_process.ts'),
       http2: path.resolve(__dirname, 'src/lib/http2.ts'),
       '@aws-sdk/client-s3': path.resolve(__dirname, 'src/lib/aws.ts'),
+      'mssql/package.json': path.resolve(__dirname, 'src/lib/mssql.ts'),
     }
   },
   output: {

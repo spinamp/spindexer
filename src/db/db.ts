@@ -23,7 +23,6 @@ export enum Table {
 export type WhereFunc = 'where'
 | 'whereNull'
 | 'andWhere'
-| 'whereJsonPath'
 | 'whereNotNull'
 | 'whereIn'
 | 'whereNotIn';

@@ -1,4 +1,11 @@
 export default {
+  sqlite: {
+    client: 'sqlite3',
+    connection: {
+      filename: ':memory:'
+    },
+    useNullAsDefault: true
+  },
   development: {
     client: 'pg',
     connection: {
