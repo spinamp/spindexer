@@ -48,7 +48,8 @@ export enum NFTStandard {
 
 // TODO: MOVE
 export enum CustomFieldExtractors {
-  METADATA_NAME = 'metadata.name'
+  METADATA_NAME = 'metadata.name',
+  ATTRIBUTES_TRAIT_SONG_TITLE = 'attributes.trait.song_title'
 }
 
 export type TypeMetadata = {
@@ -124,5 +125,6 @@ export const getTrait = (nft: NFT, type: string) => {
 };
 
 export const fieldExtractors: any = {
-  'metadata.name': (nft: NFT) => { return nft.metadata.name }
+  'metadata.name': (nft: NFT) => nft.metadata.name,
+  'attributes.trait.song_title': (nft: NFT) => getTrait(nft, 'Song Title')
 }

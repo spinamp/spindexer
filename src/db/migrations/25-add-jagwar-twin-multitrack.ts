@@ -23,7 +23,7 @@ const ALBUM_NFT_FACTORY: NftFactory = {
       },
       type: MusicPlatformType['multi-track-multiprint-contract'],
       extractor: {
-        title: CustomFieldExtractors.METADATA_NAME
+        title: CustomFieldExtractors.ATTRIBUTES_TRAIT_SONG_TITLE
       }
     }
   }
