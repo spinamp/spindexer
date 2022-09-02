@@ -113,7 +113,7 @@ export const getTrait = (nft: NFT, type: string) => {
     return attribute.trait_type.toLowerCase() === type.toLowerCase()
   });
   if (!traitAttribute) {
-    throw new Error('Trait not found');
+    throw new Error('Trait not found: ' + type);
   }
   return traitAttribute.value;
 };

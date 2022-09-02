@@ -84,7 +84,12 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
 };
 
 const mapNFTtoTrackID = (nft: NFT): string => {
-  const trackName = getTrait(nft, 'Track');
+  let trackName: string;
+  try {
+    trackName = getTrait(nft, 'Track');
+  } catch {
+    trackName = 'track-token-' + String(nft.tokenId);
+  }
   return `ethereum/${formatAddress(nft.contractAddress)}/${trackName}`;
 };
 
