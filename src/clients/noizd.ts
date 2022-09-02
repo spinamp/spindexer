@@ -1,9 +1,9 @@
 import axios from 'axios';
-import slugify from 'slugify';
 
 import { formatAddress } from '../types/address';
 import { isGif, isMP4 } from '../types/media';
 import { ProcessedTrack } from '../types/track';
+import { strictSlugify } from '../utils/identifiers';
 
 const noizdAPI = axios.create({
   timeout: 10000,
@@ -59,7 +59,7 @@ export const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrac
     id: mapAPIIDToTrackId(apiTrack.id),
     platformInternalId: apiTrack.id,
     title: apiTrack.title,
-    slug: slugify(`${apiTrack.title} ${mapAPITrackTime(apiTrack).getTime()}`).toLowerCase(),
+    slug: strictSlugify(`${apiTrack.title} ${mapAPITrackTime(apiTrack).getTime()}`),
     description: apiTrack.description,
     platformId: 'noizd',
     lossyAudioURL: apiTrack.metadata ? apiTrack.metadata.audio_url : apiTrack.full.url,

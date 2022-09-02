@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import slugify from 'slugify';
 
+import { strictSlugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT } from '../nft';
@@ -23,7 +23,7 @@ const mapTrack = (nft: NFT, apiTrack: any): ProcessedTrack => {
     id: apiTrack.trackId,
     platformInternalId: apiTrack.id,
     title: apiTrack.title,
-    slug: slugify(`${apiTrack.title} ${nft.createdAtTime.getTime()}`).toLowerCase(),
+    slug: strictSlugify(`${apiTrack.title} ${nft.createdAtTime.getTime()}`),
     description: apiTrack.description,
     platformId: nft.platformId,
     lossyAudioIPFSHash: apiTrack.ipfs_hash_lossy_audio,

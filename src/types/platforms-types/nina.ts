@@ -1,7 +1,6 @@
-
 import _ from 'lodash';
-import slugify from 'slugify';
 
+import { strictSlugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { NFT, NftFactory } from '../nft';
 import { MapTrack } from '../processor';
@@ -32,7 +31,7 @@ const mapTrack: MapTrack = (
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
   };
 
-  track.slug = slugify(`${track.title} ${track.createdAtTime!.getTime()}`).toLowerCase();
+  track.slug = strictSlugify(`${track.title} ${track.createdAtTime!.getTime()}`);
 
   return track as ProcessedTrack;
 };
@@ -55,7 +54,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
     platformId: nft.platformId,
     avatarUrl: undefined,
     websiteUrl: `${nft.metadata.external_url}/related`,
-    createdAtTime: nft.createdAtTime, 
+    createdAtTime: nft.createdAtTime,
   }
 };
 

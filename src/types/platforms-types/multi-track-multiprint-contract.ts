@@ -1,9 +1,8 @@
 import _ from 'lodash';
-import slugify from 'slugify';
-
 
 import { extractHashFromURL } from '../../clients/ipfs';
 import { DBClient } from '../../db/db';
+import { strictSlugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { titleExtractor } from '../fieldExtractor';
@@ -53,7 +52,7 @@ const mapTrack: MapTrack = (
     ...contract.typeMetadata?.overrides?.track
   };
 
-  track.slug = slugify(`${track.title} ${nft.createdAtTime.getTime()}`, { lower: true, strict: true });
+  track.slug = strictSlugify(`${track.title} ${nft.createdAtTime.getTime()}`);
 
   return track as ProcessedTrack;
 };
@@ -79,7 +78,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
 };
 
 const mapNFTtoTrackID = (nft: NFT, extractor: any): string => {
-  const trackName = slugify(extractor(nft), { lower: true, strict: true });
+  const trackName = strictSlugify(extractor(nft));
   return `ethereum/${formatAddress(nft.contractAddress)}/${trackName}`;
 };
 
