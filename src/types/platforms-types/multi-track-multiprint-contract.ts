@@ -3,10 +3,11 @@ import slugify from 'slugify';
 
 
 import { extractHashFromURL } from '../../clients/ipfs';
+import { DBClient } from '../../db/db';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { CustomFieldExtractor, fieldExtractors } from '../fieldExtractor';
-import { NFT, getTrait, NftFactory } from '../nft';
+import { titleExtractor, titleExtractorFunction } from '../fieldExtractor';
+import { NFT, NftFactory } from '../nft';
 import { MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
@@ -33,18 +34,12 @@ const mapTrack: MapTrack = (
     throw new Error('Failed to extract audio from nft');
   }
 
-  // TODO: extract function and move to fieldExtractor.ts
-  const defaultTitleExtractor = fieldExtractors[CustomFieldExtractor.ATTRIBUTES_TRAIT_TRACK];
-  const titleExtractorOverride = contract.typeMetadata?.overrides?.extractor?.title || '';
-  const titleExtractor = titleExtractorOverride ? fieldExtractors[titleExtractorOverride] : defaultTitleExtractor;
-  if (!titleExtractor) {
-    throw new Error('unknown extractor override provided')
-  }
+  const extractor = titleExtractorFunction(contract);
 
   const track: Partial<ProcessedTrack> = {
-    id: mapNFTtoTrackID(nft),
-    platformInternalId: mapNFTtoTrackID(nft),
-    title: titleExtractor(nft),
+    id: mapNFTtoTrackID(nft, extractor),
+    platformInternalId: mapNFTtoTrackID(nft, extractor),
+    title: titleExtractor(nft, contract),
     description: nft.metadata.description,
     platformId: contract.platformId,
     lossyAudioIPFSHash,
@@ -58,7 +53,7 @@ const mapTrack: MapTrack = (
     ...contract.typeMetadata?.overrides?.track
   };
 
-  track.slug = slugify(`${track.title} ${nft.createdAtTime.getTime()}`).toLowerCase();
+  track.slug = slugify(`${track.title} ${nft.createdAtTime.getTime()}`, { lower: true, strict: true });
 
   return track as ProcessedTrack;
 };
@@ -83,18 +78,13 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
   }
 };
 
-const mapNFTtoTrackID = (nft: NFT): string => {
-  let trackName: string;
-  try {
-    trackName = getTrait(nft, 'Track');
-  } catch {
-    trackName = 'track-token-' + String(nft.tokenId);
-  }
+const mapNFTtoTrackID = (nft: NFT, extractor: any): string => {
+  const trackName = slugify(extractor(nft), { lower: true, strict: true });
   return `ethereum/${formatAddress(nft.contractAddress)}/${trackName}`;
 };
 
-const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
-  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
+const mapNFTsToTrackIds = async (nfts: NFT[], dbClient?: DBClient | undefined, extractor?: any): Promise<{ [trackId: string]: NFT[] }> => {
+  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft, extractor));
 }
 
 export default {
