@@ -1,5 +1,6 @@
 import { Knex } from 'knex';
 
+import { createArtistIdFromEthereumAddress } from '../../types/artist';
 import { NftFactory, NFTContractTypeName, NFTStandard, CustomFieldExtractors } from '../../types/nft';
 import { MusicPlatformType } from '../../types/platform';
 import { addNftFactory, removeNftFactory } from '../migration-helpers';
@@ -18,7 +19,7 @@ const ALBUM_NFT_FACTORY: NftFactory = {
     overrides: {
       artist: {
         name: 'Jagwar Twin',
-        artistId: jagwarTwinAddress,
+        artistId: createArtistIdFromEthereumAddress(jagwarTwinAddress),
       },
       type: MusicPlatformType['multi-track-multiprint-contract'],
       extractor: {
