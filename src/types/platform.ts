@@ -1,7 +1,6 @@
 import { DBClient } from '../db/db';
 
 import { ArtistProfile } from './artist';
-import { TitleExtractor } from './fieldExtractor';
 import { NFT, NftFactory } from './nft';
 import catalogMappers from './platforms-types/catalog';
 import chaosMappers from './platforms-types/chaos';
@@ -36,7 +35,7 @@ export type MusicPlatform = {
 }
 
 export type PlatformMapper = {
-  mapNFTsToTrackIds: (nfts: NFT[], dbClient?: DBClient, titleExtractor?: TitleExtractor) => Promise<{ [trackId: string]: NFT[] }>
+  mapNFTsToTrackIds: (nfts: NFT[], dbClient?: DBClient) => Promise<{ [trackId: string]: NFT[] }>
   mapTrack: (nft: NFT, apiTrack: any, contract?: NftFactory) => ProcessedTrack
   mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NFT, contract?: NftFactory }) => ArtistProfile
   selectPrimaryNFTForTrackMapper?: (nfts: NFT[]) => NFT

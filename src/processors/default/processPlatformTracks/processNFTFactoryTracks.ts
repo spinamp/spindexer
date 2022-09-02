@@ -83,15 +83,15 @@ const createTracks = async (
 }
 
 export const getTrackInputs = async (
-  mapNFTsToTrackIds: (nfts: NFT[], dbClient?: DBClient | undefined, extractor?: any, apiTracksByNFT?: any) => Promise<{
+  mapNFTsToTrackIds: (nfts: NFT[], dbClient?: DBClient | undefined, titleExtractor?: any, apiTracksByNFT?: any) => Promise<{
     [trackId: string]: NFT[];
   }>,
   nfts: NFT[],
   dbClient: DBClient,
-  extractor: any,
+  titleExtractor: any,
   apiTracksByNFT: any
   ) => {
-  const trackMapping = await mapNFTsToTrackIds(nfts, dbClient, extractor, apiTracksByNFT);
+  const trackMapping = await mapNFTsToTrackIds(nfts, dbClient, titleExtractor, apiTracksByNFT);
   const trackIds = Object.keys(trackMapping);
   const existingTrackIds = await dbClient.recordsExist(Table.processedTracks, trackIds);
   const newTrackIds = trackIds.filter(id => !existingTrackIds.includes(id));

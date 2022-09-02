@@ -6,7 +6,7 @@ import { extractHashFromURL } from '../../clients/ipfs';
 import { DBClient } from '../../db/db';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { titleExtractor, titleExtractorFunction } from '../fieldExtractor';
+import { titleExtractor } from '../fieldExtractor';
 import { NFT, NftFactory } from '../nft';
 import { MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
@@ -34,12 +34,12 @@ const mapTrack: MapTrack = (
     throw new Error('Failed to extract audio from nft');
   }
 
-  const extractor = titleExtractorFunction(contract);
+  const extractor = titleExtractor(contract);
 
   const track: Partial<ProcessedTrack> = {
     id: mapNFTtoTrackID(nft, extractor),
     platformInternalId: mapNFTtoTrackID(nft, extractor),
-    title: titleExtractor(nft, contract),
+    title: extractor(nft),
     description: nft.metadata.description,
     platformId: contract.platformId,
     lossyAudioIPFSHash,

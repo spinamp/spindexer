@@ -15,16 +15,7 @@ export const titleExtractors: any = {
   'attributes.trait.track': (nft: NFT) => getTrait(nft, 'Track')
 }
 
-export const titleExtractor = (nft: NFT, contract?: NftFactory): string => {
-  const titleExtractorOverride = contract?.typeMetadata?.overrides?.extractor?.title || '';
-  const extractor = titleExtractorOverride ? titleExtractors[titleExtractorOverride] : titleExtractors[CustomTitleExtractor.DEFAULT];
-  if (!extractor) {
-    throw new Error('unknown extractor override provided')
-  }
-  return extractor(nft)
-}
-
-export const titleExtractorFunction = (contract: NftFactory): string => {
+export const titleExtractor = (contract?: NftFactory): TitleExtractor => {
   const titleExtractorOverride = contract?.typeMetadata?.overrides?.extractor?.title || '';
   const extractor = titleExtractorOverride ? titleExtractors[titleExtractorOverride] : titleExtractors[CustomTitleExtractor.DEFAULT];
   if (!extractor) {

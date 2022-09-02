@@ -4,7 +4,7 @@ import { DBClient, Table } from '../../../db/db';
 import { fromDBRecords } from '../../../db/orm';
 import { NFTsWithoutTracks } from '../../../triggers/missing';
 import { ArtistProfile, mapArtist } from '../../../types/artist';
-import { titleExtractorFunction } from '../../../types/fieldExtractor';
+import { titleExtractor } from '../../../types/fieldExtractor';
 import { NFT, NftFactory } from '../../../types/nft';
 import { NFTProcessError } from '../../../types/nftProcessError';
 import { MusicPlatform, MusicPlatformTypeConfig, platformConfigs } from '../../../types/platform';
@@ -63,7 +63,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
     let nftFactoryType: MusicPlatformTypeConfig;
     try {
       nftFactoryType = getNFTFactoryType(nftFactory, platformType);
-      const extractor = titleExtractorFunction(nftFactory);
+      const extractor = titleExtractor(nftFactory);
       const {
         newTrackIds,
         trackMapping,
