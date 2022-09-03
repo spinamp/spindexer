@@ -17,7 +17,9 @@ export enum Table {
   nfts_processedTracks = 'raw_nfts_processed_tracks',
   nftProcessErrors = 'raw_nft_process_errors',
   ipfsPins = 'raw_ipfs_pins',
-  ipfsFiles = 'raw_ipfs_files'
+  ipfsFiles = 'raw_ipfs_files',
+  crdtMessages = 'raw_crdt_messages',
+  processedMessages = 'raw_processed_messages'
 }
 
 export type WhereFunc = 'where'

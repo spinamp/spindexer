@@ -1,14 +1,13 @@
 import 'dotenv/config';
 import './types/env';
 
-import _ from 'lodash';
 
 import { Table } from './db/db';
 import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
 import { addTimestampFromMetadata } from './processors/default/addTimestampFromMetadata';
-import { addTimestampToERC721NFTs, addTimestampToERC721Transfers } from './processors/default/addTimestampToERC721NFTs';
+import { addTimestampToERC721Transfers, addTimestampToERC721NFTs } from './processors/default/addTimestampToERC721NFTs';
 import { categorizeZora } from './processors/default/categorizeZora';
 import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
 import { createNftFactoryFromERC721MetaFactoryProcessor } from './processors/default/createNftFactoryFromERC721MetaFactory';
@@ -18,8 +17,9 @@ import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
 import { errorProcessor } from './processors/default/errorProcessor';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
-import { ipfsArtworkUploader, ipfsAudioUploader } from './processors/default/ipfsMediaUploader';
+import { ipfsAudioUploader, ipfsArtworkUploader } from './processors/default/ipfsMediaUploader';
 import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfsPinner';
+import { crdtMessageProcessor } from './processors/default/messagesProcessor';
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
 import { runProcessors } from './runner';
 import { MetaFactory } from './types/metaFactory';
@@ -38,6 +38,7 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
 
   return [
     ...metaFactoryProcessors,
+    crdtMessageProcessor,
     getERC721ContractFieldsProcessor,
     erc721TransferProcessors,
     stripIgnoredNFTs,
