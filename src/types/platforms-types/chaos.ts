@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { strictSlugify } from '../../utils/identifiers';
+import { slugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT, getTrait, NftFactory } from '../nft';
@@ -20,7 +20,7 @@ const mapTrack = (
     id: mapNFTtoTrackID(nft),
     platformInternalId: song,
     title: song,
-    slug: strictSlugify(`${song} ${nft.createdAtTime.getTime()}`),
+    slug: slugify(`${song} ${nft.createdAtTime.getTime()}`),
     description: nft.metadata.description,
     platformId: contract.platformId,
     lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url)!,

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { strictSlugify } from '../../utils/identifiers';
+import { slugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT, NftFactory } from '../nft';
@@ -49,7 +49,7 @@ export const mapTrack: MapTrack = (
     ...contract.typeMetadata?.overrides?.track
   };
 
-  track.slug = strictSlugify(`${track.title} ${nft.createdAtTime.getTime()}`);
+  track.slug = slugify(`${track.title} ${nft.createdAtTime.getTime()}`);
 
   return track as ProcessedTrack;
 };

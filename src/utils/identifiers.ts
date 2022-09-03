@@ -1,3 +1,3 @@
-import slugify from 'slugify'
+import * as slugifyLibrary from 'slugify'
 
-export const strictSlugify = (input: string) => slugify(input, { lower: true, strict: true })
+export const slugify = (input: string) => slugifyLibrary.default(input, { lower: true, strict: true })

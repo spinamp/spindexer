@@ -1,4 +1,4 @@
-import { strictSlugify } from '../utils/identifiers';
+import { slugify } from '../utils/identifiers';
 
 import { formatAddress } from './address';
 import { Record, TimeField } from './record'
@@ -20,7 +20,7 @@ export type ArtistProfile = TimeField & {
 export const mapArtist = (artistProfile: ArtistProfile): Artist => {
   return {
     name: artistProfile.name,
-    slug: strictSlugify(`${artistProfile.name} ${artistProfile.createdAtTime.getTime()}`),
+    slug: slugify(`${artistProfile.name} ${artistProfile.createdAtTime.getTime()}`),
     id: artistProfile.artistId,
     createdAtTime: artistProfile.createdAtTime,
     createdAtEthereumBlockNumber: artistProfile.createdAtEthereumBlockNumber

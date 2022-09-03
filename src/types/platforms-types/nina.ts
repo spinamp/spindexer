@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { strictSlugify } from '../../utils/identifiers';
+import { slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { NFT, NftFactory } from '../nft';
 import { MapTrack } from '../processor';
@@ -31,7 +31,7 @@ const mapTrack: MapTrack = (
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
   };
 
-  track.slug = strictSlugify(`${track.title} ${track.createdAtTime!.getTime()}`);
+  track.slug = slugify(`${track.title} ${track.createdAtTime!.getTime()}`);
 
   return track as ProcessedTrack;
 };

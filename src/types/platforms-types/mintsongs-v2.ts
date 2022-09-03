@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
 import { DBClient } from '../../db/db';
-import { strictSlugify } from '../../utils/identifiers';
+import { slugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT, NftFactory } from '../nft';
@@ -37,7 +37,7 @@ const mapTrack = (
     id: trackId,
     platformInternalId: nft.metadata.name,
     title: nft.metadata.title,
-    slug: strictSlugify(`${nft.metadata.title} ${nft.createdAtTime.getTime()}`),
+    slug: slugify(`${nft.metadata.title} ${nft.createdAtTime.getTime()}`),
     description: nft.metadata.description,
     platformId: 'mintsongs',
     lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url)!,
