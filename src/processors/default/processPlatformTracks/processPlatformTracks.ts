@@ -109,7 +109,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
   if (oldIds && oldIds.length !== 0) {
     await clients.db.delete(Table.processedTracks, oldIds);
   }
-  await clients.db.upsert(Table.artists, artists);
+  await clients.db.insert(Table.artists, artists, { ignoreConflict: 'id' });
   await clients.db.upsert(Table.artistProfiles, (allArtistProfiles as unknown as Record[]), ['artistId', 'platformId']);
   await clients.db.upsert(Table.processedTracks, mergedProcessedTracks);
   await clients.db.insert(Table.nfts_processedTracks, allJoins);
