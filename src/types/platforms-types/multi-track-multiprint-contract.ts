@@ -77,9 +77,9 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
   }
 };
 
-const mapNFTtoTrackID = (nft: NFT, extractor: any): string => {
-  const trackName = slugify(extractor(nft));
-  return `ethereum/${formatAddress(nft.contractAddress)}/${trackName}`;
+const mapNFTtoTrackID = (nft: NFT, extractor?: TitleExtractor): string => {
+  const trackName = extractor ? extractor(nft) : String(nft.tokenId);
+  return `ethereum/${formatAddress(nft.contractAddress)}/${slugify(trackName)}`;
 };
 
 const mapNFTsToTrackIds = async (nfts: NFT[], dbClient?: DBClient | undefined, apiTracksByNFT?: any, extractor?: TitleExtractor): Promise<{ [trackId: string]: NFT[] }> => {
