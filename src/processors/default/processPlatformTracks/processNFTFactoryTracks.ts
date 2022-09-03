@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import { DBClient, Table } from '../../../db/db';
 import { ArtistProfile } from '../../../types/artist';
+import { TitleExtractor } from '../../../types/fieldExtractor';
 import { NFT, NftFactory } from '../../../types/nft';
 import { NFTProcessError } from '../../../types/nftProcessError';
 import { MusicPlatformTypeConfig, platformConfigs } from '../../../types/platform';
@@ -83,15 +84,15 @@ const createTracks = async (
 }
 
 export const getTrackInputs = async (
-  mapNFTsToTrackIds: (nfts: NFT[], dbClient?: DBClient | undefined, titleExtractor?: any, apiTracksByNFT?: any) => Promise<{
+  mapNFTsToTrackIds: (nfts: NFT[], dbClient?: DBClient | undefined, apiTracksByNFT?: any, titleExtractor?: TitleExtractor) => Promise<{
     [trackId: string]: NFT[];
   }>,
   nfts: NFT[],
   dbClient: DBClient,
-  titleExtractor: any,
-  apiTracksByNFT: any
+  apiTracksByNFT: any,
+  titleExtractor: TitleExtractor
   ) => {
-  const trackMapping = await mapNFTsToTrackIds(nfts, dbClient, titleExtractor, apiTracksByNFT);
+  const trackMapping = await mapNFTsToTrackIds(nfts, dbClient, apiTracksByNFT, titleExtractor);
   const trackIds = Object.keys(trackMapping);
   const existingTrackIds = await dbClient.recordsExist(Table.processedTracks, trackIds);
   const newTrackIds = trackIds.filter(id => !existingTrackIds.includes(id));

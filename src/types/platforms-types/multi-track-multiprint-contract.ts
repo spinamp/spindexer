@@ -5,7 +5,7 @@ import { DBClient } from '../../db/db';
 import { slugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { titleExtractor } from '../fieldExtractor';
+import { TitleExtractor, titleExtractor } from '../fieldExtractor';
 import { NFT, NftFactory } from '../nft';
 import { MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
@@ -82,7 +82,7 @@ const mapNFTtoTrackID = (nft: NFT, extractor: any): string => {
   return `ethereum/${formatAddress(nft.contractAddress)}/${trackName}`;
 };
 
-const mapNFTsToTrackIds = async (nfts: NFT[], dbClient?: DBClient | undefined, extractor?: any): Promise<{ [trackId: string]: NFT[] }> => {
+const mapNFTsToTrackIds = async (nfts: NFT[], dbClient?: DBClient | undefined, apiTracksByNFT?: any, extractor?: TitleExtractor): Promise<{ [trackId: string]: NFT[] }> => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft, extractor));
 }
 

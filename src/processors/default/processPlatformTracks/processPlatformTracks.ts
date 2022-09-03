@@ -68,7 +68,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
         newTrackIds,
         trackMapping,
         existingTrackIds,
-      } = await getTrackInputs(nftFactoryType.mappers.mapNFTsToTrackIds, factoryNFTs, clients.db, extractor, apiTracksByNFT);
+      } = await getTrackInputs(nftFactoryType.mappers.mapNFTsToTrackIds, factoryNFTs, clients.db, apiTracksByNFT, extractor);
       const input = {
         nftFactory,
         nftFactoryType,
