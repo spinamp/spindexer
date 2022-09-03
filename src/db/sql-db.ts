@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { Cursor } from '../types/trigger';
 
-import { DBClient, Table, Wheres, defaultTimestampColumn, QueryOptions } from './db';
+import { DBClient, Table, Wheres, QueryOptions } from './db';
 import config from './knexfile';
 import { fromDBRecords, toDBRecords } from './orm';
 
@@ -138,12 +138,16 @@ const init = async (): Promise<DBClient> => {
         const dbUpserts = toDBRecords(tableName, recordUpserts)
         for (const dbUpsert of dbUpserts) {
           // exclude the default timestamp column unless explicitly specified in mergeOptions
-          if (mergeOptions === undefined) {
-            mergeOptions = Object.keys(dbUpsert).filter((value) => { return value !== defaultTimestampColumn });
-          }
+          // if (mergeOptions === undefined) {
+          //   mergeOptions = Object.keys(dbUpsert).filter((value) => { return value !== defaultTimestampColumn });
+          // }
+
+          // remove undefined properties
+          const properValues = _.omitBy(dbUpsert, _.isUndefined)
+
           try {
             await db(tableName)
-              .insert(dbUpsert)
+              .insert(properValues)
               .onConflict(idField as any)
               .merge(mergeOptions)
           } catch (error) {
