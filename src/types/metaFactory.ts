@@ -31,7 +31,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
   soundArtistProfileCreator: {
     newContractCreatedEvent: 'CreatedArtist',
     creationEventToNftFactory: (event: any, autoApprove: boolean, approved: boolean) => ({
-      address: formatAddress(event.args!.artistAddress),
+      id: formatAddress(event.args!.artistAddress),
       platformId: 'sound',
       startingBlock: event.blockNumber,
       contractType: NFTContractTypeName.default,
@@ -43,7 +43,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
   zoraDropCreator: {
     newContractCreatedEvent: 'CreatedDrop',
     creationEventToNftFactory: (event: any, autoApprove: boolean, approved: boolean) => ({
-      address: formatAddress(event.args!.editionContractAddress),
+      id: formatAddress(event.args!.editionContractAddress),
       platformId: 'zora',
       startingBlock: event.blockNumber,
       contractType: NFTContractTypeName.default,

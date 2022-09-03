@@ -26,7 +26,7 @@ export const removePlatform = async (knex: Knex, platform: MusicPlatform) => {
 }
 
 export const addMetaFactory = async(knex: Knex, contract: MetaFactory) => {
-  if (!contract.address || contract.address.length === 0) {
+  if (!contract.id || contract.id.length === 0) {
     throw new Error('Invalid contract address');
   }
   const dbContracts = toDBRecords(Table.metaFactories, [contract]);
@@ -38,7 +38,7 @@ export const removeMetaFactory = async(knex: Knex, contract: MetaFactory) => {
 }
 
 export const addNftFactory = async(knex: Knex, contract: NftFactory) => {
-  if (!contract.address || contract.address.length === 0) {
+  if (!contract.id || contract.id.length === 0) {
     throw new Error('Invalid contract address');
   }
   const dbContracts = toDBRecords(Table.nftFactories, [contract]);
@@ -108,7 +108,21 @@ async function getForeignKeys(knex: Knex): Promise<{
   return result.rows
 }
 
-function tableNameToViewName(tableName: string): string {
+async function getViews(knex: Knex): Promise<{ view_name: string }[]>{
+  const sql = `SELECT 
+  table_name AS view_name
+FROM 
+  information_schema.views
+WHERE 
+  table_schema = 'public'
+`
+
+  const result = await knex.raw(sql);
+  return result.rows
+
+}
+
+export function tableNameToViewName(tableName: string): string {
   // remove raw_ prefix
   return tableName.substring(4)
 }
@@ -116,42 +130,57 @@ function tableNameToViewName(tableName: string): string {
 export async function updateViews(knex: Knex){
   const tables = Object.values(Table);
   const foreignKeys = await getForeignKeys(knex)
+  const views = await getViews(knex);
+  
+  // drop existing views
+  for (const { view_name } of views){
+    await knex.raw(`drop view ${view_name}`)
+  }
 
   // create views
   for (const table of tables) {
-    const viewName = tableNameToViewName(table);
-    const override = overrides[table as Table];
+    const hasTable = await knex.schema.hasTable(table);
+    if (hasTable){
 
-    let selectSql = `select * from "${table}"`;
+      const viewName = tableNameToViewName(table);
+      const override = overrides[table as Table];
+      
+      let selectSql = `select * from "${table}"`;
 
-    if (override){
-      selectSql = override;
+      if (override){
+        selectSql = override;
+      }
+
+      const viewSql = `create view "${viewName}" as ${selectSql}`;
+
+      await knex.raw(viewSql);
     }
-
-    const viewSql = `create or replace view "${viewName}" as ${selectSql}`;
-
-    console.log('create view with sql', viewSql)
-
-    await knex.raw(viewSql);
   }
 
   // create references
   for (const table of tables) {
-    const viewName = tableNameToViewName(table);
-    const references = foreignKeys.filter(fk => fk.table_name === table)
+    const hasTable = await knex.schema.hasTable(table);
+    if (hasTable){
+
+      const viewName = tableNameToViewName(table);
+      const references = foreignKeys.filter(fk => fk.table_name === table)
   
-    const comments = references.map(ref => {
-      return `@foreignKey ("${ref.column_name}") references "${tableNameToViewName(ref.foreign_table_name!)}" ("${ref.foreign_column_name}")`
-    })
+      const comments = references.map(ref => {
+        return `@foreignKey ("${ref.column_name}") references "${tableNameToViewName(ref.foreign_table_name!)}" ("${ref.foreign_column_name}")`
+      })
   
-    const commentString = `comment on view "${viewName}" is E'${comments.join('\\n')}'`;
-  
-    await knex.raw(commentString)
+      const commentString = `comment on view "${viewName}" is E'${comments.join('\\n')}'`;
+    
+      await knex.raw(commentString)
+    }
   }
   
   // add permissions
   for (const table of tables){
-    const viewName = tableNameToViewName(table);
-    await knex.raw(`GRANT SELECT ON "${viewName}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+    const hasTable = await knex.schema.hasTable(table);
+    if (hasTable){
+      const viewName = tableNameToViewName(table);
+      await knex.raw(`GRANT SELECT ON "${viewName}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+    }
   }
 }

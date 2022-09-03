@@ -26,7 +26,7 @@ const mapTrack = (
     lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url),
     lossyArtworkIPFSHash: extractHashFromURL(nft.metadata.image),
     websiteUrl: 'https://www.chaos.build/',
-    artistId: contract.address,
+    artistId: contract.id,
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
   })
@@ -41,8 +41,8 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
   }
   return {
     name: contract.name!, //set in db when contract is created in db
-    artistId: contract.address,
-    platformInternalId: contract.address,
+    artistId: contract.id,
+    platformInternalId: contract.id,
     platformId: contract.platformId,
     avatarUrl: 'https://lh3.googleusercontent.com/UMytoAeoFW6hGHO3vjIUD28qcKerddfLZP3i2R2g9FS_5IOe7aCSSPosI13VxTFIqw7PgpIOlUSMJrc5jDYf8VbC-4degSMuoXbISw=s0',
     websiteUrl: 'https://www.chaos.build/',
