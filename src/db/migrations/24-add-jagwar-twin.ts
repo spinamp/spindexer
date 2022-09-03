@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 
 import { createArtistIdFromEthereumAddress } from '../../types/artist';
-import { CustomTitleExtractor } from '../../types/fieldExtractor';
+import { TitleExtractorTypes } from '../../types/fieldExtractor';
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
 import { addNftFactory, addPlatform, removeNftFactory, removePlatform } from '../migration-helpers';
@@ -35,7 +35,7 @@ const THOUGHT_FORMS_NFT_FACTORY: NftFactory = {
         websiteUrl: 'https://jagwartwin.com/'
       },
       extractor: {
-        title: CustomTitleExtractor.METADATA_NAME,
+        title: TitleExtractorTypes.METADATA_NAME,
       }
     }
   }
