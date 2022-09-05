@@ -8,7 +8,6 @@ export enum TitleExtractorTypes {
   METADATA_NAME = 'metadata.name',
   ATTRIBUTES_TRAIT_SONG_TITLE = 'attributes.trait.songTitle',
   ATTRIBUTES_TRAIT_TRACK = 'attributes.trait.track',
-  DEFAULT = ATTRIBUTES_TRAIT_TRACK
 }
 
 export type TitleExtractor = (nft: NFT) => string;
@@ -20,11 +19,10 @@ export const titleExtractors: TitleExtractorMapping = {
   'attributes.trait.track': (nft: NFT) => getTrait(nft, 'Track')
 }
 
-export const titleExtractor = (contract?: NftFactory): TitleExtractor => {
-  const titleExtractorOverride = contract?.typeMetadata?.overrides?.extractor?.title || '';
-  const extractor = titleExtractorOverride ? titleExtractors[titleExtractorOverride] : titleExtractors[TitleExtractorTypes.DEFAULT];
-  if (!extractor) {
+export const titleExtractor = (contract: NftFactory): TitleExtractor => {
+  const titleExtractorOverride = contract.typeMetadata?.overrides?.extractor?.title;
+  if (!titleExtractorOverride) {
     throw new Error('unknown extractor override provided')
   }
-  return extractor
+  return titleExtractors[titleExtractorOverride];
 }

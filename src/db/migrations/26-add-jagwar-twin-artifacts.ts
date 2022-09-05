@@ -14,7 +14,7 @@ const ARTIFACTS: NftFactory = {
   platformId: jagwarTwinAddress,
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
-  autoApprove: true,
+  autoApprove: false,
   approved: true,
   typeMetadata: {
     overrides: {
