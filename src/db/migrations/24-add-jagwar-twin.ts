@@ -11,7 +11,7 @@ const jagwarTwinAddress = '0xe80c7fee3d41e311e0351244231919e04e699e56';
 const JAGWAR_TWIN_PLATFORM: MusicPlatform = {
   id: jagwarTwinAddress,
   type: MusicPlatformType['single-track-multiprint-contract'],
-  name: 'Jagwar Twin',
+  name: 'jagwartwin.com',
 }
 
 const THOUGHT_FORMS_NFT_FACTORY: NftFactory = {
@@ -31,7 +31,7 @@ const THOUGHT_FORMS_NFT_FACTORY: NftFactory = {
       artist: {
         name: 'Jagwar Twin',
         artistId: createArtistIdFromEthereumAddress(jagwarTwinAddress),
-        avatarUrl: 'https://lh3.googleusercontent.com/OVwmOvucRK6XIwHmRu1tTnRjKD2zDLzPECTFy0Bp5t4LeKgTDiVOZ7KEvAM1AkVOH2QIZuCapgL_EhKg_-26BAsLwsOjLUKmwF-bvSw=s0',
+        avatarUrl: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmcBb9C69vvJXasxTYFPwpo9WuZv415KkH3wTdoeBMH2hH',
         websiteUrl: 'https://jagwartwin.com/'
       },
       extractor: {
