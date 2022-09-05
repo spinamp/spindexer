@@ -11,7 +11,7 @@ const jagwarTwinAddress = '0xe80c7fee3d41e311e0351244231919e04e699e56';
 const JAGWAR_TWIN_PLATFORM: MusicPlatform = {
   id: jagwarTwinAddress,
   type: MusicPlatformType['single-track-multiprint-contract'],
-  name: 'Jagwar Twin',
+  name: 'jagwartwin.com',
 }
 
 const THOUGHT_FORMS_NFT_FACTORY: NftFactory = {
