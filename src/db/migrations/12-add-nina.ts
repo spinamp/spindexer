@@ -13,7 +13,7 @@ const NINA_PLATFORM: MusicPlatform = {
 }
 
 const NINA: MetaFactory = {
-  address: 'ninaN2tm9vUkxoanvGcNApEeWiidLMM2TdBX8HoJuL4',
+  id: 'ninaN2tm9vUkxoanvGcNApEeWiidLMM2TdBX8HoJuL4',
   platformId: NINA_PLATFORM.id,
   contractType: MetaFactoryTypeName.ninaMintCreator,
   standard: NFTStandard.METAPLEX,

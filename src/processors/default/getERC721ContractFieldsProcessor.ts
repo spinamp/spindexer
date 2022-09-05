@@ -12,11 +12,11 @@ export const getERC721ContractFields = async (contracts: NftFactory[], ethClient
   const allContractCalls = contracts.map(contract => {
     return [
       {
-        contractAddress: contract.address,
+        contractAddress: contract.id,
         callFunction: ValidContractCallFunction.name,
       },
       {
-        contractAddress: contract.address,
+        contractAddress: contract.id,
         callFunction: ValidContractCallFunction.symbol,
       }
     ]
@@ -37,9 +37,9 @@ export const getERC721ContractFields = async (contracts: NftFactory[], ethClient
   });
   const callResults = await ethClient.call(flatContractCalls);
   const contractUpdates = contracts.map((contract, index) => {
-    console.info(`Processing contract with address ${contract.address}`);
+    console.info(`Processing contract with address ${contract.id}`);
     const contractUpdate: Partial<NftFactory> = {
-      address: contract.address,
+      id: contract.id,
     };
     const callIndexes = contractIndexToCalls[index];
     callIndexes.forEach(callIndex => {

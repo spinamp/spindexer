@@ -8,10 +8,6 @@ import { Table } from './db';
 import { toDBRecords } from './orm';
 import { overrides } from './views';
 
-type NftFactoryAddress = {
-  address: string
-}
-
 export const addPlatform = async (knex: Knex, platform: MusicPlatform) => {
   const platformTypeCheckConstraintName = `${Table.platforms}_type_check`
   await knex.raw(`ALTER TABLE "${Table.platforms}" drop constraint "${platformTypeCheckConstraintName}"`);
@@ -45,33 +41,33 @@ export const addNftFactory = async(knex: Knex, contract: NftFactory) => {
   await knex(Table.nftFactories).insert(dbContracts)
 }
 
-export const clearERC721ContractTracks = async(knex: Knex, contract: NftFactoryAddress) => {
+export const clearERC721ContractTracks = async(knex: Knex, contractAddress: string) => {
   await knex(Table.nfts_processedTracks)
-    .whereILike('nftId', `%${contract.address}%`)
+    .whereILike('nftId', `%${contractAddress}%`)
     .del()
 
   await knex(Table.processedTracks)
-    .whereILike('id', `%${contract.address}%`)
+    .whereILike('id', `%${contractAddress}%`)
     .del()
 }
 
-export const clearERC721Contract = async(knex: Knex, contract: NftFactoryAddress) => {
-  if (!contract.address || contract.address.length === 0) {
+export const clearERC721Contract = async(knex: Knex, contractAddress: string) => {
+  if (!contractAddress || contractAddress.length === 0) {
     throw new Error('Invalid contract address');
   }
   const result = await knex.raw(`select cursor from "${Table.processors}" where id='createERC721NFTsFromTransfers';`);
   const parsedCursor = JSON.parse(result.rows[0].cursor);
-  delete parsedCursor[contract.address.toLowerCase()];
+  delete parsedCursor[contractAddress.toLowerCase()];
   const updatedCursor = JSON.stringify(parsedCursor);
   await knex.raw(`update "${Table.processors}" set cursor='${updatedCursor}' where id='createERC721NFTsFromTransfers';`);
 
-  await clearERC721ContractTracks(knex, contract);
+  await clearERC721ContractTracks(knex, contractAddress);
 
   await knex(Table.nftProcessErrors)
-    .whereILike('nftId', `%${contract.address}%`)
+    .whereILike('nftId', `%${contractAddress}%`)
     .del()
-  await knex.raw(`delete from "${Table.erc721Transfers}" where "contractAddress" ilike '${contract.address}';`);
-  await knex.raw(`delete from "${Table.nfts}" where "contractAddress" ilike '${contract.address}'`);
+  await knex.raw(`delete from "${Table.erc721Transfers}" where "contractAddress" ilike '${contractAddress}';`);
+  await knex.raw(`delete from "${Table.nfts}" where "contractAddress" ilike '${contractAddress}'`);
 }
 
 

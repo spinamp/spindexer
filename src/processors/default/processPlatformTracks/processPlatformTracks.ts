@@ -58,7 +58,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
   const inputsforNFTFactoryProcessing: Omit<ProcessNFTFactoryTracksInput, 'apiTrackData'>[] = [];
 
   for (const nftFactory of nftFactories) {
-    const factoryNFTs = nftsByFactoryId[nftFactory.address];
+    const factoryNFTs = nftsByFactoryId[nftFactory.id];
     let nftFactoryType: MusicPlatformTypeConfig;
     try {
       nftFactoryType = getNFTFactoryType(nftFactory, platformType);
@@ -78,7 +78,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
     } catch {
       factoryNFTs.map(nft => allErrorNFTs.push({
         nftId: nft.id,
-        processError: `Missing type for nft_factory ${nftFactory.address}`
+        processError: `Missing type for nft_factory ${nftFactory.id}`
       }));
     }
   }
@@ -107,7 +107,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
   if (oldIds && oldIds.length !== 0) {
     await clients.db.delete(Table.processedTracks, oldIds);
   }
-  await clients.db.upsert(Table.artists, artists);
+  await clients.db.insert(Table.artists, artists, { ignoreConflict: 'id' });
   await clients.db.upsert(Table.artistProfiles, (allArtistProfiles as unknown as Record[]), ['artistId', 'platformId']);
   await clients.db.upsert(Table.processedTracks, mergedProcessedTracks);
   await clients.db.insert(Table.nfts_processedTracks, allJoins);

@@ -1,6 +1,5 @@
-import { extractHashFromURL } from '../clients/ipfs';
 
-import { NFT, NFTContractTypeName, NftFactory } from './nft';
+import { NFT, NFTContractTypeName } from './nft';
 
 export const getMetadataURL = (nft: NFT, contractTypeName?: NFTContractTypeName): (string | null | undefined) => {
   if (contractTypeName === 'zora') {
@@ -8,16 +7,4 @@ export const getMetadataURL = (nft: NFT, contractTypeName?: NFTContractTypeName)
   } else {
     return nft.tokenURI
   }
-}
-
-export const getMetadataIPFSHash = (nft: NFT, erc721ContractsByAddress: { [key: string]: NftFactory }): (string | null | undefined) => {
-  const address = nft.contractAddress;
-  const contract = erc721ContractsByAddress[address];
-  const contractTypeName = contract?.contractType;
-  const metadataURL = getMetadataURL(nft, contractTypeName);
-  if (!metadataURL) {
-    return '';
-  }
-  const hash = extractHashFromURL(metadataURL);
-  return hash || '';
 }

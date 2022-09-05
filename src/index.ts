@@ -27,7 +27,7 @@ import { NftFactory, NFTStandard } from './types/nft';
 import { API_PLATFORMS, MusicPlatform } from './types/platform';
 
 const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], musicPlatforms: MusicPlatform[]) => {
-  const nftFactoriesByAddress = _.keyBy(nftFactories, 'address');
+  const nftFactoriesByAddress = _.keyBy(nftFactories, 'id');
 
   const metaFactoryProcessors = metaFactories.map(contract => createNftFactoryFromERC721MetaFactoryProcessor(contract));
   const erc721TransferProcessors = createERC721NFTsFromTransfersProcessor(nftFactories);

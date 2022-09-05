@@ -353,11 +353,11 @@ export const getTrackAudioCIDs = async (dbClient: DBClient, limit?: number) => {
 };
 
 const clearContract = async(clients: Clients, address: string) => {
-  clearERC721Contract(clients.db.getDB(), { address })
+  clearERC721Contract(clients.db.getDB(), address)
 }
 
 const clearContractTracks = async(clients: Clients, address: string) => {
-  clearERC721ContractTracks(clients.db.getDB(), { address })
+  clearERC721ContractTracks(clients.db.getDB(), address)
 }
 
 const start = async () => {
