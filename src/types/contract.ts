@@ -1,5 +1,5 @@
 export type Contract = {
-  address: string,
+  id: string,
   startingBlock?: string,
 }
 

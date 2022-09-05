@@ -12,7 +12,7 @@ const HUME_PLATFORM: MusicPlatform = {
 }
 
 export const MINTED: NftFactory = {
-  address: '0x8056B7750D2A061757a0ECA13eEf78caeDD4a30F',
+  id: '0x8056B7750D2A061757a0ECA13eEf78caeDD4a30F',
   startingBlock: '15121180',
   platformId: HUME_PLATFORM.id,
   contractType: NFTContractTypeName.default,

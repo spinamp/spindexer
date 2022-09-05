@@ -6,7 +6,7 @@ import { addMetaFactory, removeMetaFactory } from '../migration-helpers';
 
 const ZORA_CREATOR_FACTORY: MetaFactory =
   {
-    address: '0xf74b146ce44cc162b601dec3be331784db111dc1',
+    id: '0xf74b146ce44cc162b601dec3be331784db111dc1',
     platformId: 'zora',
     startingBlock: '14758779',
     contractType: MetaFactoryTypeName.zoraDropCreator,

@@ -34,7 +34,7 @@ export const mapTrack: MapTrack = (
 
   const track: Partial<ProcessedTrack> = {
     id: mapNFTtoTrackID(nft),
-    platformInternalId: contract.address,
+    platformInternalId: contract.id,
     title: contract.name || nft.metadata.name,
     description: nft.metadata.description,
     platformId: contract.platformId,

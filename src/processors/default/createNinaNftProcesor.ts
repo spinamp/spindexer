@@ -34,7 +34,7 @@ export const createNinaNfts: Processor = {
     })
 
     const nftFactories: NftFactory[] = items.map(({ metadataAccount, release }) => ({
-      address: metadataAccount!.mint.toBase58(),
+      id: metadataAccount!.mint.toBase58(),
       contractType: NFTContractTypeName.nina,
       platformId: MusicPlatformType.nina,
       standard: NFTStandard.METAPLEX,

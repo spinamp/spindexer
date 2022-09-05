@@ -12,7 +12,7 @@ const GLASSHOUSE_PLATFORM: MusicPlatform = {
 }
 
 const GLASSHOUSE: NftFactory = {
-  address: '0x719C6d392fc659f4fe9b0576cBC46E18939687a7',
+  id: '0x719C6d392fc659f4fe9b0576cBC46E18939687a7',
   startingBlock: '15151004',
   platformId: GLASSHOUSE_PLATFORM.id,
   contractType: NFTContractTypeName.default,
