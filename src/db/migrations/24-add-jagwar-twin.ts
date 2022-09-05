@@ -31,7 +31,7 @@ const THOUGHT_FORMS_NFT_FACTORY: NftFactory = {
       artist: {
         name: 'Jagwar Twin',
         artistId: createArtistIdFromEthereumAddress(jagwarTwinAddress),
-        avatarUrl: 'https://lh3.googleusercontent.com/OVwmOvucRK6XIwHmRu1tTnRjKD2zDLzPECTFy0Bp5t4LeKgTDiVOZ7KEvAM1AkVOH2QIZuCapgL_EhKg_-26BAsLwsOjLUKmwF-bvSw=s0',
+        avatarUrl: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmcBb9C69vvJXasxTYFPwpo9WuZv415KkH3wTdoeBMH2hH',
         websiteUrl: 'https://jagwartwin.com/'
       },
       extractor: {

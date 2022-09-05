@@ -21,6 +21,8 @@ const ALBUM_NFT_FACTORY: NftFactory = {
       artist: {
         name: 'Jagwar Twin',
         artistId: createArtistIdFromEthereumAddress(jagwarTwinAddress),
+        avatarUrl: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmcBb9C69vvJXasxTYFPwpo9WuZv415KkH3wTdoeBMH2hH',
+        websiteUrl: 'https://jagwartwin.com/'
       },
       type: MusicPlatformType['multi-track-multiprint-contract'],
       extractor: {
