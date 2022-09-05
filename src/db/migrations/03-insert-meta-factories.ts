@@ -6,7 +6,7 @@ import { addMetaFactory, removeMetaFactory } from '../migration-helpers';
 
 const INITIAL_CONTRACTS: MetaFactory[] = [
   {
-    address: '0x78e3adc0e811e4f93bd9f1f9389b923c9a3355c2',
+    id: '0x78e3adc0e811e4f93bd9f1f9389b923c9a3355c2',
     platformId: 'sound',
     startingBlock: '13725566',
     contractType: MetaFactoryTypeName.soundArtistProfileCreator,

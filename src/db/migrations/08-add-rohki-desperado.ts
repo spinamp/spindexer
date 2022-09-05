@@ -12,7 +12,7 @@ const ROHKI_PLATFORM: MusicPlatform = {
 }
 
 const ROHKI_DESPERADO: NftFactory = {
-  address: '0xe8e7Eb47dD7eaFeC80c1EF7f0aE39beE6Dbce469',
+  id: '0xe8e7Eb47dD7eaFeC80c1EF7f0aE39beE6Dbce469',
   startingBlock: '14779299',
   platformId: ROHKI_PLATFORM.id,
   contractType: NFTContractTypeName.default,

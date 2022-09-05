@@ -16,7 +16,7 @@ const CHAIN = 'ethereum';
 
 const processorFunction = (contracts: NftFactory[]) =>
   async ({ newCursor, items }: { newCursor: Cursor, items: ethers.Event[] }, clients: Clients) => {
-    const contractsByAddress = _.keyBy(contracts, 'address');
+    const contractsByAddress = _.keyBy(contracts, 'id');
     const newNFTs: Partial<NFT>[] = [];
     const updates: Partial<NFT>[] = [];
     const transfers: Partial<ERC721Transfer>[] = [];
@@ -35,25 +35,25 @@ const processorFunction = (contracts: NftFactory[]) =>
       const newMint = item.args!.from === ETHEREUM_NULL_ADDRESS;
       transfers.push({
         id: `${CHAIN}/${item.blockNumber}/${item.logIndex}`,
-        contractAddress: formatAddress(contract.address),
+        contractAddress: formatAddress(contract.id),
         from: item.args!.from,
         to: item.args!.to,
         tokenId,
         createdAtEthereumBlockNumber: '' + item.blockNumber,
-        nftId: contractType.buildNFTId(contract.address, tokenId), 
+        nftId: contractType.buildNFTId(contract.id, tokenId), 
         transactionHash: item.transactionHash
       });
       if (!newMint) {
         updates.push({
-          id: contractType.buildNFTId(contract.address, tokenId),
+          id: contractType.buildNFTId(contract.id, tokenId),
           owner: item.args!.to
         })
         return undefined;
       }
       newNFTs.push({
-        id: contractType.buildNFTId(contract.address, tokenId),
+        id: contractType.buildNFTId(contract.id, tokenId),
         createdAtEthereumBlockNumber: '' + item.blockNumber,
-        contractAddress: formatAddress(contract.address),
+        contractAddress: formatAddress(contract.id),
         tokenId,
         platformId: contract.platformId,
         owner: item.args!.to,
@@ -78,7 +78,7 @@ export const createERC721NFTsFromTransfersProcessor: (contracts: NftFactory[]) =
     trigger: newERC721Transfers(
       contracts
         .filter(c => c.standard === NFTStandard.ERC721 && c.approved === true) //only include approved ERC721 contracts
-        .map(c => ({ address: c.address, startingBlock: c.startingBlock! })), // map contracts to EthereumContract
+        .map(c => ({ id: c.id, startingBlock: c.startingBlock! })), // map contracts to EthereumContract
       process.env.ETHEREUM_BLOCK_QUERY_GAP!
     ),
     processorFunction: processorFunction(contracts),

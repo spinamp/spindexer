@@ -12,7 +12,7 @@ const HEDS_PLATFORM: MusicPlatform =
   }
 
 export const HEDSTAPE_1 = {
-  address: '0xde8a0b17d3dc0468adc65309881d9d6a6cd66372',
+  id: '0xde8a0b17d3dc0468adc65309881d9d6a6cd66372',
   startingBlock: '14193219',
   platformId: HEDS_PLATFORM.id,
   contractType: NFTContractTypeName.default,
@@ -23,7 +23,7 @@ export const HEDSTAPE_1 = {
 }
 
 export const HEDSTAPE_2 = {
-  address: '0x5083cf11003f2b25ca7456717e6dc980545002e5',
+  id: '0x5083cf11003f2b25ca7456717e6dc980545002e5',
   platformId: HEDS_PLATFORM.id,
   startingBlock: '14373903',
   contractType: NFTContractTypeName.default,
@@ -35,7 +35,7 @@ export const HEDSTAPE_2 = {
 }
 
 export const HEDSTAPE_3 = {
-  address: '0x567e687c93103010962f9e9cf5730ae8dbfc6d41',
+  id: '0x567e687c93103010962f9e9cf5730ae8dbfc6d41',
   platformId: HEDS_PLATFORM.id,
   startingBlock: '14548643',
   contractType: NFTContractTypeName.default,
@@ -47,7 +47,7 @@ export const HEDSTAPE_3 = {
 }
 
 export const HEDSTAPE_4 = {
-  address: '0x8045fd700946a00436923f37d08f280ade3b4af6',
+  id: '0x8045fd700946a00436923f37d08f280ade3b4af6',
   platformId: HEDS_PLATFORM.id,
   startingBlock: '14813870',
   contractType: NFTContractTypeName.default,

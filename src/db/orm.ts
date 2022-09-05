@@ -16,7 +16,7 @@ const toDBRecord = <RecordType>(record: RecordType | RecordUpdate<unknown>) => {
 const toRecordMapper: any = {
   [Table.nftFactories]: (erc721Contracts: NftFactory[]): IdField[] => erc721Contracts.map((c) => {
     return ({
-      id: c.standard === NFTStandard.METAPLEX ? c.address : c.address.toLowerCase(), // solana addresses are base58 encoded so are case sensitive
+      id: c.standard === NFTStandard.METAPLEX ? c.id : c.id.toLowerCase(), // solana addresses are base58 encoded so are case sensitive
       platformId: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,
@@ -30,7 +30,7 @@ const toRecordMapper: any = {
   }),
   [Table.metaFactories]: (factoryContracts: MetaFactory[]): IdField[] => factoryContracts.map((c) => {
     return ({
-      id: c.standard === NFTStandard.METAPLEX ? c.address : c.address.toLowerCase(), // solana addresses are base58 encoded so are case sensitive
+      id: c.standard === NFTStandard.METAPLEX ? c.id : c.id.toLowerCase(), // solana addresses are base58 encoded so are case sensitive
       platformId: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,
@@ -66,7 +66,7 @@ const fromRecordMapper: any = {
   }),
   [Table.nftFactories]: (erc721Contracts: Record[]): NftFactory[] => erc721Contracts.map((c: any) => {
     return ({
-      address: c.id,
+      id: c.id,
       platformId: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,
@@ -80,7 +80,7 @@ const fromRecordMapper: any = {
   }),
   [Table.metaFactories]: (factoryContracts: Record[]): MetaFactory[] => factoryContracts.map((c: any) => {
     return ({
-      address: c.id,
+      id: c.id,
       platformId: c.platformId,
       startingBlock: c.startingBlock,
       contractType: c.contractType,

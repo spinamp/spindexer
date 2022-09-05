@@ -26,8 +26,8 @@ const processorFunction = (metaFactory: MetaFactory, name: string) =>
 
 export const createNftFactoryFromERC721MetaFactoryProcessor: (factoryContract: MetaFactory) =>
 Processor = (factoryContract: MetaFactory) => ({
-  name: `${NAME}_${factoryContract.address}`,
+  name: `${NAME}_${factoryContract.id}`,
   trigger: newERC721Contract(factoryContract),
-  processorFunction: processorFunction(factoryContract, `${NAME}_${factoryContract.address}`),
-  initialCursor: JSON.stringify({ [factoryContract.address]: factoryContract.startingBlock }),
+  processorFunction: processorFunction(factoryContract, `${NAME}_${factoryContract.id}`),
+  initialCursor: JSON.stringify({ [factoryContract.id]: factoryContract.startingBlock }),
 });
