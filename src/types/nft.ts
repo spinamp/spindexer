@@ -50,7 +50,8 @@ export type TypeMetadata = {
   overrides: {
     track?: Partial<ProcessedTrack>,
     artist?: Partial<ArtistProfile>
-    type?: MusicPlatformType
+    type?: MusicPlatformType,
+    extractor?: Partial<ProcessedTrack> // TODO create a new type that lists fields that are supported
   }
 }
 
