@@ -1,19 +1,34 @@
-import { BigNumber } from 'ethers';
-import _ from 'lodash';
 
 import { Table } from '../db/db';
-import { CrdtMessage } from '../types/message';
-import { Trigger } from '../types/trigger';
+import { CrdtMessage, CrdtOpetation } from '../types/message';
+import { Cursor, Trigger } from '../types/trigger';
 
+export const pendingMempoolMessages: (tables: string) => Trigger<undefined> = 
+  (table) => {
+    return async (clients) => {
+      const sql = `
+      select rm.*, rcs."lastTimestamp"
+      from raw_mempool rm 
+      left outer join ${table} t 
+      on rm."entityId" = t.id
+      left outer join ${Table.crdtState} rcs
+      on rm."table" = rcs."table" 
+      and rm."column" = rcs."column" 
+      and rm."entityId" = rcs."entityId"
+      where rm."table" = '${table}'
+      and ((rm.operation = '${CrdtOpetation.UPDATE}' and t.id is not null) or rm.operation = '${CrdtOpetation.INSERT}')
+      order by rm."table", rm."column", rm."entityId", rm.timestamp
+      `;
 
-export const newMessages: Trigger<undefined> = async (clients) => {
-  // get all unprocessed messages
-  const selectSql = `select m.* from ${Table.crdtMessages} m
-  left outer join ${Table.processedMessages} pm 
-  on m."timestamp" = pm."messageId" 
-  where pm."messageId" is null
-  order by m."timestamp"::numeric 
+      const result = await clients.db.rawSQL(sql);
+      return result.rows;
+    }
+  }
+
+export const newMessages: Trigger<Cursor> = async (clients, cursor: string) => {
+  const selectSql = `select m.* from ${Table.seeds} m
   limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}  
+  offset ${parseInt(cursor)}
   `
   const unprocessedMessages: CrdtMessage[] = (await clients.db.rawSQL(selectSql)).rows;
 
@@ -21,31 +36,7 @@ export const newMessages: Trigger<undefined> = async (clients) => {
     return []
   }
 
-  // group by table, column and id
-  const uniqueTables = _.uniq(unprocessedMessages.map(message => message.table))
-  const uniqueColumns = _.uniq(unprocessedMessages.map(message => message.column))
-  const uniqueIds = _.uniq(unprocessedMessages.map(message => message.entityId))
+  const newCursor = (parseInt(cursor) + unprocessedMessages.length).toString()
 
-  const newestFieldUpdateTimesSql = `
-  select max("messageId"::numeric), "table", "column", "entityId"
-  from raw_processed_messages rpm 
-  where "table" in (${uniqueTables.map(table => `'${table}'`)})
-  and "column" in (${uniqueColumns.map(col => `'${col}'`)})
-  and "entityId" in (${uniqueIds.map(id => `'${id}'`)})
-  group by "table", "column", "entityId"
-  `
-  const newestFieldUpdates = (await clients.db.rawSQL(newestFieldUpdateTimesSql)).rows
-  const lastUpdatedTimeByField = _.keyBy(newestFieldUpdates, update => `${update.table}.${update.column}.${update.entityId}`)
-
-  // filter out older messages
-  const newestMessages = unprocessedMessages.filter(message => {
-    const newestUpdatedTime = lastUpdatedTimeByField[`${message.table}.${message.column}.${message.entityId}`]?.max;
-    if (!newestUpdatedTime){
-      return true
-    }
-
-    return BigNumber.from(message.timestamp).gt(newestUpdatedTime)
-  })
-
-  return newestMessages
+  return { items: unprocessedMessages, newCursor };
 };

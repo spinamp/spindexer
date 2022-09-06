@@ -2,6 +2,8 @@ import 'dotenv/config';
 import './types/env';
 
 
+import _ from 'lodash';
+
 import { Table } from './db/db';
 import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
@@ -17,9 +19,10 @@ import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
 import { errorProcessor } from './processors/default/errorProcessor';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
+import { insertSeedsIntoMempool } from './processors/default/insertSeedsIntoMempool';
 import { ipfsAudioUploader, ipfsArtworkUploader } from './processors/default/ipfsMediaUploader';
 import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfsPinner';
-import { crdtMessageProcessor } from './processors/default/messagesProcessor';
+import { processMempool } from './processors/default/processMempool';
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
 import { runProcessors } from './runner';
 import { MetaFactory } from './types/metaFactory';
@@ -36,9 +39,14 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
   //TODO: noizd here is being used both as platformId and MusicPlatformType. Need to avoid mixing them
   const apiTrackProcessors = API_PLATFORMS.map(apiPlatform => createProcessedTracksFromAPI(apiPlatform));
 
+  const tableMempoolProcessors = Object.values(Table).filter(table => [
+    Table.nftFactories
+  ].includes(table)).map(table => processMempool(table));
+
   return [
+    insertSeedsIntoMempool,
+    ...tableMempoolProcessors,
     ...metaFactoryProcessors,
-    crdtMessageProcessor,
     getERC721ContractFieldsProcessor,
     erc721TransferProcessors,
     stripIgnoredNFTs,
