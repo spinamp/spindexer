@@ -1,5 +1,5 @@
 import { MetaFactory } from '../types/metaFactory';
-import { NFT, NftFactory } from '../types/nft';
+import { NFT, NftFactory, NFTStandard } from '../types/nft';
 import { NFTProcessError } from '../types/nftProcessError';
 import { IdField, Record, RecordUpdate } from '../types/record';
 
