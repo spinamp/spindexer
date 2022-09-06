@@ -9,7 +9,7 @@ import { addNftFactory, removeNftFactory } from '../migration-helpers';
 const jagwarTwinAddress = '0xe80c7fee3d41e311e0351244231919e04e699e56';
 
 const ALBUM_NFT_FACTORY: NftFactory = {
-  address: '0xF85c1f4aC0040e4f2369cFcbAbfccfa2F3E6899E',
+  id: '0xF85c1f4aC0040e4f2369cFcbAbfccfa2F3E6899E',
   startingBlock: '14449704',
   platformId: jagwarTwinAddress,
   contractType: NFTContractTypeName.default,

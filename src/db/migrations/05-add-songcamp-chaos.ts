@@ -11,7 +11,7 @@ const CHAOS_PLATFORM: MusicPlatform = {
 }
 
 const CHAOS_CONTRACT: NftFactory = {
-  address: '0x8427e46826a520b1264b55f31fcb5ddfdc31e349',
+  id: '0x8427e46826a520b1264b55f31fcb5ddfdc31e349',
   startingBlock: '10766312',
   platformId: '0x8427e46826a520b1264b55f31fcb5ddfdc31e349',
   contractType: NFTContractTypeName.default,

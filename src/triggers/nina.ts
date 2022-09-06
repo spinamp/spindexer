@@ -29,7 +29,7 @@ export const newNinaContracts: Trigger<undefined> = async (clients) => {
   const connection = new web3.Connection(endpoint);
   const provider = new AnchorProvider(connection, new Wallet(new Keypair()), {})
   const nina = await Program.at(
-    factory.address,
+    factory.id,
     provider,
   )
 

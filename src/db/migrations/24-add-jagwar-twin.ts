@@ -15,7 +15,7 @@ const JAGWAR_TWIN_PLATFORM: MusicPlatform = {
 }
 
 const THOUGHT_FORMS_NFT_FACTORY: NftFactory = {
-  address: '0x605B0E6b2Ec949235ff5Ac05bD452E22d21c702d',
+  id: '0x605B0E6b2Ec949235ff5Ac05bD452E22d21c702d',
   startingBlock: '14779895',
   platformId: JAGWAR_TWIN_PLATFORM.id,
   contractType: NFTContractTypeName.default,

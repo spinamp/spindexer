@@ -5,7 +5,7 @@ import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { addNftFactory, removeNftFactory } from '../migration-helpers';
 
 const ROHKI_VROOM: NftFactory = {
-  address: '0x317394c6dFB5606c2917E1a0DAD4f1B70EDDC921',
+  id: '0x317394c6dFB5606c2917E1a0DAD4f1B70EDDC921',
   startingBlock: '15112828',
   platformId: 'rohki',
   contractType: NFTContractTypeName.default,

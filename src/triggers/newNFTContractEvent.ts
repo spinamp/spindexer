@@ -45,11 +45,11 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
       }
       contracts.forEach(contract => {
         if (!contract.startingBlock) {
-          throw new Error(`Contract ${contract.address} has no starting block`);
+          throw new Error(`Contract ${contract.id} has no starting block`);
         }
 
-        if (!cursor[contract.address] && contract.startingBlock) {
-          cursor[contract.address] = contract.startingBlock;
+        if (!cursor[contract.id] && contract.startingBlock) {
+          cursor[contract.id] = contract.startingBlock;
         }
       });
       // not all vars are const
@@ -94,7 +94,7 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
 export const newERC721Transfers: (contracts: EthereumContract[], gap?: string) => Trigger<Cursor> =
   (contracts: EthereumContract[], gap?: string) => {
     const contractFilters = contracts.map(contract => ({
-      address: contract.address,
+      address: contract.id,
       filter: 'Transfer'
     }));
     return newEthereumEvents(contracts, contractFilters, gap);
@@ -110,10 +110,10 @@ export const newERC721Contract: (factoryContract: MetaFactory) => Trigger<Cursor
     }
 
     return newEthereumEvents([{
-      address: factoryContract.address,
+      id: factoryContract.id,
       startingBlock: factoryContract.startingBlock!
     }], [{
-      address: factoryContract.address,
+      address: factoryContract.id,
       filter: newContractCreatedEvent
     }], factoryContract.gap ? factoryContract.gap : undefined);
   };

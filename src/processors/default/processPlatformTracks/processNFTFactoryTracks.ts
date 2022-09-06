@@ -109,7 +109,7 @@ export const getNFTFactoryType = (nftFactory: NftFactory, defaultType: MusicPlat
   if (overrideTypeName) {
     const type = platformConfigs[overrideTypeName];
     if (!type) {
-      throw new Error(`Missing type for nft_factory ${nftFactory.address}`)
+      throw new Error(`Missing type for nft_factory ${nftFactory.id}`)
     }
     return type;
   } else {
