@@ -41,4 +41,4 @@ export type Processor = {
   initialCursor?: Cursor | undefined;
 };
 
-export type MapTrack = (nft: NFT, apiTrack: any, nftFactory?: NftFactory | undefined, trackId?: string) => ProcessedTrack;
+export type MapTrack = (nft: NFT, apiTrack: any, contract?: NftFactory, trackId?: string) => ProcessedTrack;

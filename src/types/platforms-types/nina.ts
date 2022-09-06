@@ -7,11 +7,10 @@ import { MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
 const mapTrack: MapTrack = (
-  nft: NFT,
-  apiTrack: any,
-  contract?: NftFactory,
-  trackId?: string,
-): ProcessedTrack => {
+  nft,
+  apiTrack,
+  contract?,
+) => {
 
   if (!nft) {
     throw new Error(`NFT missing for mapArtistProfile for nft`)

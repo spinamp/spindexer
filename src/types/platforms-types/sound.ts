@@ -6,16 +6,16 @@ import { slugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT, getNFTMetadataField } from '../nft';
-import { ProcessedTrack } from '../track';
+import { MapTrack } from '../processor';
 
 const mapAPITrackToArtistID = (apiTrack: any): string => {
   return `ethereum/${formatAddress(apiTrack.artist.user.publicAddress)}`;
 };
 
-const mapTrack = (
-  nft: NFT,
-  apiTrack: any
-): ProcessedTrack => {
+const mapTrack: MapTrack = (
+  nft,
+  apiTrack
+) => {
   if (!apiTrack) {
     throw new Error('missing api track');
   }

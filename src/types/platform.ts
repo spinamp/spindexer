@@ -11,7 +11,7 @@ import ninaMappers from './platforms-types/nina'
 import noizdMappers from './platforms-types/noizd';
 import singleTrackMultiprintContractMappers from './platforms-types/single-track-multiprint-contract';
 import soundMappers from './platforms-types/sound';
-import { ProcessedTrack } from './track';
+import { MapTrack } from './processor';
 
 export const API_PLATFORMS = ['noizd'];
 
@@ -36,7 +36,7 @@ export type MusicPlatform = {
 
 export type PlatformMapper = {
   mapNFTsToTrackIds: (nfts: NFT[], dbClient?: DBClient) => Promise<{ [trackId: string]: NFT[] }>
-  mapTrack: (nft: NFT, apiTrack: any, contract?: NftFactory) => ProcessedTrack
+  mapTrack: MapTrack
   mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NFT, contract?: NftFactory }) => ArtistProfile
   selectPrimaryNFTForTrackMapper?: (nfts: NFT[]) => NFT
 }

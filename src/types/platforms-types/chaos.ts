@@ -5,13 +5,13 @@ import { slugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT, getTrait, NftFactory } from '../nft';
-import { ProcessedTrack } from '../track';
+import { MapTrack } from '../processor';
 
-const mapTrack = (
-  nft: NFT,
-  apiTrack: any,
-  contract?: NftFactory,
-): ProcessedTrack => {
+const mapTrack: MapTrack = (
+  nft,
+  apiTrack,
+  contract?,
+) => {
   if (!contract) {
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
   }

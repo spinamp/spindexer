@@ -6,7 +6,7 @@ import { slugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT, NftFactory } from '../nft';
-import { ProcessedTrack } from '../track';
+import { MapTrack } from '../processor';
 
 const extractArtistIdFromNFT = (nft: NFT) => {
   const artistURL = nft.metadata.external_url;
@@ -21,12 +21,12 @@ const extractArtistIdFromNFT = (nft: NFT) => {
   return `ethereum/${artistAddress}`;
 }
 
-const mapTrack = (
-  nft: NFT,
-  apiTrack: any,
-  contract?: NftFactory,
-  trackId?: string
-): ProcessedTrack => {
+const mapTrack: MapTrack = (
+  nft,
+  apiTrack,
+  contract?,
+  trackId?
+) => {
   if (!contract) {
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
   }

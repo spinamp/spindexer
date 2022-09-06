@@ -4,7 +4,7 @@ import { mapAPITrack, mapAPITrackTime, mapAPITrackToArtistID } from '../../clien
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT } from '../nft';
-import { ProcessedTrack } from '../track';
+import { MapTrack } from '../processor';
 
 
 export const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): ArtistProfile => {
@@ -31,7 +31,7 @@ export const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }
   };
 };
 
-const mapTrack = (nft: NFT, apiTrack: any): ProcessedTrack => {
+const mapTrack: MapTrack = (nft, apiTrack) => {
   if (!apiTrack) {
     throw new Error('missing api track');
   }

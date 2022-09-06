@@ -4,7 +4,7 @@ import { slugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT } from '../nft';
-import { ProcessedTrack } from '../track';
+import { MapTrack } from '../processor';
 
 const mapNFTtoTrackID = (nft: NFT): string => {
   const [contractAddress, nftId] = nft.id.split('/');
@@ -15,7 +15,7 @@ const mapAPITrackToArtistID = (apiTrack: any): string => {
   return `ethereum/${formatAddress(apiTrack.artist.id)}`;
 };
 
-const mapTrack = (nft: NFT, apiTrack: any): ProcessedTrack => {
+const mapTrack: MapTrack = (nft, apiTrack) => {
   if (!apiTrack) {
     throw new Error('missing api track');
   }
