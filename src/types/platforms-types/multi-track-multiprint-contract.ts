@@ -1,13 +1,12 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { DBClient } from '../../db/db';
 import { slugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { TitleExtractor, titleExtractor } from '../fieldExtractor';
 import { NFT, NftFactory } from '../nft';
-import { MapTrack } from '../processor';
+import { MapNFTsToTrackIds, MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
 const mapTrack: MapTrack = (
@@ -81,7 +80,7 @@ const mapNFTtoTrackID = (nft: NFT, extractor?: TitleExtractor): string => {
   return `ethereum/${formatAddress(nft.contractAddress)}/${slugify(trackName)}`;
 };
 
-const mapNFTsToTrackIds = async (nfts: NFT[], dbClient?: DBClient | undefined, apiTracksByNFT?: any, extractor?: TitleExtractor): Promise<{ [trackId: string]: NFT[] }> => {
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts, dbClient?, apiTracksByNFT?, extractor?) => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft, extractor));
 }
 

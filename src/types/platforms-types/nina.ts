@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { NFT, NftFactory } from '../nft';
-import { MapTrack } from '../processor';
+import { MapNFTsToTrackIds, MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
 const mapTrack: MapTrack = (
@@ -61,7 +61,7 @@ const mapNFTtoTrackID = (nft: NFT): string => {
   return `solana/${nft.id}`
 };
 
-const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts) => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
 

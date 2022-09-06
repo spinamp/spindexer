@@ -4,7 +4,7 @@ import { mapAPITrack, mapAPITrackTime, mapAPITrackToArtistID } from '../../clien
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT } from '../nft';
-import { MapTrack } from '../processor';
+import { MapNFTsToTrackIds, MapTrack } from '../processor';
 
 
 export const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): ArtistProfile => {
@@ -55,7 +55,7 @@ const mapNFTtoTrackID = (nft: NFT): string => {
   return `ethereum/${formatAddress(contractAddress)}/${trackId}`;
 }
 
-const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts) => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
 

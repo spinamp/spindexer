@@ -6,7 +6,7 @@ import { TitleExtractor } from '../../../types/fieldExtractor';
 import { NFT, NftFactory } from '../../../types/nft';
 import { NFTProcessError } from '../../../types/nftProcessError';
 import { MusicPlatformTypeConfig, platformConfigs } from '../../../types/platform';
-import { MapTrack, TrackAPIClient } from '../../../types/processor';
+import { MapNFTsToTrackIds, MapTrack, TrackAPIClient } from '../../../types/processor';
 import { ProcessedTrack, NFTTrackJoin } from '../../../types/track';
 
 const name = 'processTracks';
@@ -84,15 +84,13 @@ const createTracks = async (
 }
 
 export const getTrackInputs = async (
-  mapNFTsToTrackIds: (nfts: NFT[], dbClient?: DBClient | undefined, apiTracksByNFT?: any, titleExtractor?: TitleExtractor) => Promise<{
-    [trackId: string]: NFT[];
-  }>,
+  mapNFTsToTrackIds: MapNFTsToTrackIds,
   nfts: NFT[],
   dbClient: DBClient,
   apiTracksByNFT: any,
   titleExtractor: TitleExtractor
   ) => {
-  const trackMapping = await mapNFTsToTrackIds(nfts, dbClient, apiTracksByNFT, titleExtractor);
+  const trackMapping = mapNFTsToTrackIds(nfts, dbClient, apiTracksByNFT, titleExtractor);
   const trackIds = Object.keys(trackMapping);
   const existingTrackIds = await dbClient.recordsExist(Table.processedTracks, trackIds);
   const newTrackIds = trackIds.filter(id => !existingTrackIds.includes(id));

@@ -1,12 +1,11 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { DBClient } from '../../db/db';
 import { slugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT, getNFTMetadataField } from '../nft';
-import { MapTrack } from '../processor';
+import { MapNFTsToTrackIds, MapTrack } from '../processor';
 
 const mapAPITrackToArtistID = (apiTrack: any): string => {
   return `ethereum/${formatAddress(apiTrack.artist.user.publicAddress)}`;
@@ -62,7 +61,7 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): Arti
   }
 };
 
-const mapNFTsToTrackIds = async (nfts: NFT[], dbClient?: DBClient, apiTracksByNFT?: any): Promise<{ [trackId: string]: NFT[] }> => {
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts, dbClient?, apiTracksByNFT?) => {
   if (!apiTracksByNFT) {
     throw new Error('Expecting apiTracksByNFT for sound mapper');
   }

@@ -1,12 +1,11 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { DBClient } from '../../db/db';
 import { slugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT, NftFactory } from '../nft';
-import { MapTrack } from '../processor';
+import { MapNFTsToTrackIds, MapTrack } from '../processor';
 
 const extractArtistIdFromNFT = (nft: NFT) => {
   const artistURL = nft.metadata.external_url;
@@ -79,7 +78,7 @@ const selectPrimaryNFTForTrackMapper = (nfts: NFT[]) => {
   return lastNFT;
 }
 
-const mapNFTsToTrackIds = async (nfts: NFT[], dbClient?: DBClient): Promise<{ [trackId: string]: NFT[] }> => {
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts, dbClient?) => {
   if (!dbClient) {
     throw new Error('DB Client not provided to mintsongs mapper')
   }

@@ -4,7 +4,7 @@ import { slugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
 import { NFT, getTrait, NftFactory } from '../nft';
-import { MapTrack } from '../processor';
+import { MapNFTsToTrackIds, MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
 import { mapTrack as mapSingleTrack, mapArtistProfile as mapSingleArtistProfile } from './single-track-multiprint-contract'
@@ -121,7 +121,7 @@ const mapNFTtoTrackID = (nft: NFT): string => {
   return `ethereum/${formatAddress(nft.contractAddress)}/${track}`;
 };
 
-const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts) => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
 }
 
