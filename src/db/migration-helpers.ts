@@ -104,7 +104,7 @@ async function getForeignKeys(knex: Knex): Promise<{
   return result.rows
 }
 
-function tableNameToViewName(tableName: string): string {
+export function tableNameToViewName(tableName: string): string {
   // remove raw_ prefix
   return tableName.substring(4)
 }
@@ -135,16 +135,16 @@ export async function updateViews(knex: Knex){
   for (const table of tables) {
     const viewName = tableNameToViewName(table);
     const references = foreignKeys.filter(fk => fk.table_name === table)
-  
+
     const comments = references.map(ref => {
       return `@foreignKey ("${ref.column_name}") references "${tableNameToViewName(ref.foreign_table_name!)}" ("${ref.foreign_column_name}")`
     })
-  
+
     const commentString = `comment on view "${viewName}" is E'${comments.join('\\n')}'`;
-  
+
     await knex.raw(commentString)
   }
-  
+
   // add permissions
   for (const table of tables){
     const viewName = tableNameToViewName(table);

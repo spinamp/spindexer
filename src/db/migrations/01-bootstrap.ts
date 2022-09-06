@@ -51,6 +51,7 @@ const INITIAL_TABLES = [
       table.string('metadataIPFSHash');
       table.string('tokenURI', 20000);
       table.string('tokenMetadataURI', 20000);
+      table.jsonb('typeMetadata');
       table.jsonb('metadata');
       table.string('mimeType');
       table.string('owner');
