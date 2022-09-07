@@ -1,7 +1,7 @@
 
 import { Knex } from 'knex';
 
-import { TitleExtractorTypes } from '../../types/fieldExtractor';
+import { IdExtractorTypes, TitleExtractorTypes } from '../../types/fieldExtractor';
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
 import { addPlatform, addNftFactory, removeNftFactory, removePlatform } from '../migration-helpers';
@@ -28,7 +28,8 @@ const GLASSHOUSE: NftFactory = {
         avatarUrl: 'https://storageapi.fleek.co/catalogworks-team-bucket/prod/users/0xbcefc4906b443e4db64e2b00b9af2c39e76c785c/images/profile_picture.jpeg'
       },
       extractor: {
-        title: TitleExtractorTypes.ATTRIBUTES_TRAIT_TRACK
+        title: TitleExtractorTypes.ATTRIBUTES_TRAIT_TRACK,
+        id: IdExtractorTypes.USE_TITLE_EXTRACTOR
       }
     }
   }
