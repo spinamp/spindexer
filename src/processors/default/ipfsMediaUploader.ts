@@ -62,7 +62,7 @@ function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', rep
       }
     }
 
-    await rollPromises<ProcessedTrack, void, void>(tracksWithIPFSFiles, processTrack, 300, 50)
+    await rollPromises<ProcessedTrack, void, void>(tracksWithIPFSFiles, processTrack, 300, 10000)
 
     await clients.db.update(Table.processedTracks, updates)
     await clients.db.upsert(Table.ipfsFiles, ipfsFiles, 'url');
