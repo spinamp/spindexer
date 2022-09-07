@@ -17,7 +17,8 @@ export const processMempool: (table: Table) => Processor =
       const staleMessages: MempoolMessage[] = messages.filter(message => message.operation === CrdtOperation.INSERT);
 
       //  group by table, column, entity so that we can easily categorize fresh and stale messages
-      // messages within each group are ordered by timestamp in the trigger, so it's safe to assume the first message of each group is the freshest
+      // messages within each group are ordered by timestamp in the trigger, so it's safe to assume 
+      // the last message of each group is the freshest
       const groupedMessagesUpdates = _.groupBy(
         messages.filter(message => message.operation === CrdtOperation.UPDATE),
         message => `${message.operation}.${message.table}.${message.column}.${message.entityId}`
