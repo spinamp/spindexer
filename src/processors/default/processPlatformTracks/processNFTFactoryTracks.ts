@@ -2,10 +2,11 @@ import _ from 'lodash';
 
 import { DBClient, Table } from '../../../db/db';
 import { ArtistProfile } from '../../../types/artist';
+import { MapNFTsToTrackIds, MapTrack, NFTtoTrackIdsInput, TrackMapping } from '../../../types/mapping';
 import { NFT, NftFactory } from '../../../types/nft';
 import { NFTProcessError } from '../../../types/nftProcessError';
 import { MusicPlatformTypeConfig, platformConfigs } from '../../../types/platform';
-import { MapTrack, TrackAPIClient } from '../../../types/processor';
+import { TrackAPIClient } from '../../../types/processor';
 import { ProcessedTrack, NFTTrackJoin } from '../../../types/track';
 
 const name = 'processTracks';
@@ -19,7 +20,7 @@ const getAPITrackData = async (trackIds: string[], client: TrackAPIClient) => {
 /* eslint-disable @typescript-eslint/indent */
 const createTracks = async (
   newTrackIds: string[],
-  trackMapping: { [trackId: string]: NFT[] },
+  trackMapping: TrackMapping,
   apiTrackData: any,
   mapTrack: MapTrack,
   mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NFT, contract?: NftFactory | undefined }) => ArtistProfile,
@@ -83,14 +84,14 @@ const createTracks = async (
 }
 
 export const getTrackInputs = async (
-  mapNFTsToTrackIds: (nfts: NFT[], dbClient?: DBClient | undefined, apiTracksByNFT?: any) => Promise<{
-    [trackId: string]: NFT[];
-  }>,
-  nfts: NFT[],
+  mapNFTsToTrackIds: MapNFTsToTrackIds,
+  nftToTrackIdInput: NFTtoTrackIdsInput,
   dbClient: DBClient,
-  apiTracksByNFT: any
   ) => {
-  const trackMapping = await mapNFTsToTrackIds(nfts, dbClient, apiTracksByNFT);
+  if (!dbClient) {
+    throw new Error('No db client provided');
+  }
+  const trackMapping = mapNFTsToTrackIds(nftToTrackIdInput);
   const trackIds = Object.keys(trackMapping);
   const existingTrackIds = await dbClient.recordsExist(Table.processedTracks, trackIds);
   const newTrackIds = trackIds.filter(id => !existingTrackIds.includes(id));
@@ -128,9 +129,7 @@ export const getNFTFactoryType = (nftFactory: NftFactory, defaultType: MusicPlat
 export type ProcessNFTFactoryTracksInput = {
   nftFactory: NftFactory, // The NFT Factory
   nftFactoryType: MusicPlatformTypeConfig, // The default mapper type for this factory in the case there is no override
-  trackMapping: { // A mapping of track ids to nfts for these nfts
-      [trackId: string]: NFT[];
-  },
+  trackMapping: TrackMapping, // A mapping of track ids to nfts for these nfts
   newTrackIds: string[], // The list of track ids that are newly discovered
   existingTrackIds: string[], // The list of track ids that already exist
   apiTrackData: any // Any additional API data for the tracks that is needed for processing

@@ -1,21 +1,19 @@
 import _ from 'lodash';
-import slugify from 'slugify';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { DBClient } from '../../db/db';
-import { formatAddress } from '../address';
+import { ethereumArtistId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
+import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, getNFTMetadataField } from '../nft';
-import { ProcessedTrack } from '../track';
 
 const mapAPITrackToArtistID = (apiTrack: any): string => {
-  return `ethereum/${formatAddress(apiTrack.artist.user.publicAddress)}`;
+  return ethereumArtistId(apiTrack.artist.user.publicAddress);
 };
 
-const mapTrack = (
-  nft: NFT,
-  apiTrack: any
-): ProcessedTrack => {
+const mapTrack: MapTrack = (
+  nft,
+  apiTrack
+) => {
   if (!apiTrack) {
     throw new Error('missing api track');
   }
@@ -26,7 +24,7 @@ const mapTrack = (
     id: apiTrack.trackId,
     platformInternalId: apiTrack.id,
     title: apiTrack.title,
-    slug: slugify(`${apiTrack.title} ${nft.createdAtTime.getTime()}`).toLowerCase(),
+    slug: slugify(`${apiTrack.title} ${nft.createdAtTime.getTime()}`),
     description: apiTrack.description,
     platformId: nft.platformId,
     lossyAudioURL: apiTrack.tracks[0].audio.url || nft.metadata.audio_url,
@@ -62,11 +60,11 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): Arti
   }
 };
 
-const mapNFTsToTrackIds = async (nfts: NFT[], dbClient?: DBClient, apiTracksByNFT?: any): Promise<{ [trackId: string]: NFT[] }> => {
-  if (!apiTracksByNFT) {
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {
+  if (!input.apiTracksByNFT) {
     throw new Error('Expecting apiTracksByNFT for sound mapper');
   }
-  return _.groupBy(nfts, nft => apiTracksByNFT[nft.id]);
+  return _.groupBy(input.nfts, nft => input.apiTracksByNFT[nft.id]);
 }
 
 export default {

@@ -1,17 +1,16 @@
 import _ from 'lodash';
-import slugify from 'slugify';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { formatAddress } from '../address';
+import { ethereumTrackId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
+import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, getTrait, NftFactory } from '../nft';
-import { ProcessedTrack } from '../track';
 
-const mapTrack = (
-  nft: NFT,
-  apiTrack: any,
-  contract?: NftFactory,
-): ProcessedTrack => {
+const mapTrack: MapTrack = (
+  nft,
+  apiTrack,
+  contract?,
+) => {
   if (!contract) {
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
   }
@@ -20,7 +19,7 @@ const mapTrack = (
     id: mapNFTtoTrackID(nft),
     platformInternalId: song,
     title: song,
-    slug: slugify(`${song} ${nft.createdAtTime.getTime()}`).toLowerCase(),
+    slug: slugify(`${song} ${nft.createdAtTime.getTime()}`),
     description: nft.metadata.description,
     platformId: contract.platformId,
     lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url)!,
@@ -55,11 +54,11 @@ const getSong = (nft: NFT) => getTrait(nft, 'Song');
 
 const mapNFTtoTrackID = (nft: NFT): string => {
   const song = getSong(nft);
-  return `ethereum/${formatAddress(nft.contractAddress)}/${song}`;
+  return ethereumTrackId(nft.contractAddress, song);
 };
 
-const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
-  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {
+  return _.groupBy(input.nfts, nft => mapNFTtoTrackID(nft));
 }
 
 export default {

@@ -2,6 +2,7 @@ import { ValidContractNFTCallFunction } from '../clients/ethereum';
 
 import { ArtistProfile } from './artist';
 import { Contract } from './contract';
+import { ExtractorTypes } from './fieldExtractor';
 import { NFTFactoryTypes } from './nftFactory';
 import { MusicPlatformType } from './platform';
 import { Record } from './record';
@@ -51,7 +52,7 @@ export type TypeMetadata = {
     track?: Partial<ProcessedTrack>,
     artist?: Partial<ArtistProfile>
     type?: MusicPlatformType,
-    extractor?: Partial<ProcessedTrack> // TODO create a new type that lists fields that are supported
+    extractor?: ExtractorTypes
   }
 }
 
@@ -113,7 +114,7 @@ export const getTrait = (nft: NFT, type: string) => {
     return attribute.trait_type.toLowerCase() === type.toLowerCase()
   });
   if (!traitAttribute) {
-    throw new Error('Trait not found');
+    throw new Error(`Trait not found: ${type}`);
   }
   return traitAttribute.value;
 };
