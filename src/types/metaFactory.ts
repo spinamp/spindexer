@@ -1,5 +1,7 @@
 import { ethers } from 'ethers'
 
+import { ethereumArtistId } from '../utils/identifiers'
+
 import { formatAddress } from './address'
 import { Contract } from './contract'
 import { NftFactory, NFTContractTypeName, NFTStandard } from './nft'
@@ -53,7 +55,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       typeMetadata: {
         overrides: {
           artist: {
-            artistId: `ethereum/${formatAddress(event.args!.creator)}`,
+            artistId: ethereumArtistId(event.args!.creator),
             name: formatAddress(event.args!.creator),
           },
           track: {

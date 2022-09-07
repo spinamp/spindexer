@@ -1,8 +1,7 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { slugify } from '../../utils/identifiers';
-import { formatAddress } from '../address';
+import { ethereumTrackId, ethereumArtistId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { NFT, NftFactory } from '../nft';
 import { MapNFTsToTrackIds, MapTrack } from '../processor';
@@ -17,7 +16,7 @@ const extractArtistIdFromNFT = (nft: NFT) => {
   if (artistAddress.length !== 42) {
     throw new Error('Unexpected artist address length');
   }
-  return `ethereum/${artistAddress}`;
+  return ethereumArtistId(artistAddress);
 }
 
 const mapTrack: MapTrack = (
@@ -69,7 +68,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
 
 const mapNFTtoLatestTrackID = (nft: NFT, dupNFTs: NFT[]): string => {
   const primaryNFT = selectPrimaryNFTForTrackMapper(dupNFTs);
-  return `ethereum/${formatAddress(primaryNFT.contractAddress)}/${primaryNFT.tokenId}`;
+  return ethereumTrackId(primaryNFT.contractAddress, String(primaryNFT.tokenId));
 };
 
 const selectPrimaryNFTForTrackMapper = (nfts: NFT[]) => {

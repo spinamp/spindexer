@@ -1,14 +1,13 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { slugify } from '../../utils/identifiers';
-import { formatAddress } from '../address';
+import { ethereumArtistId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { NFT, getNFTMetadataField } from '../nft';
 import { MapNFTsToTrackIds, MapTrack } from '../processor';
 
 const mapAPITrackToArtistID = (apiTrack: any): string => {
-  return `ethereum/${formatAddress(apiTrack.artist.user.publicAddress)}`;
+  return ethereumArtistId(apiTrack.artist.user.publicAddress);
 };
 
 const mapTrack: MapTrack = (

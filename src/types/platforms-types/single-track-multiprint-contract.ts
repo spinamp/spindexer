@@ -1,8 +1,7 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { slugify } from '../../utils/identifiers';
-import { formatAddress } from '../address';
+import { ethereumArtistId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { NFT, NftFactory } from '../nft';
 import { MapNFTsToTrackIds, MapTrack } from '../processor';
@@ -74,7 +73,8 @@ export const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, n
 };
 
 const mapNFTtoTrackID = (nft: NFT): string => {
-  return `ethereum/${formatAddress(nft.contractAddress)}`;
+  // TODO: rather use ethereumTrackId and provide appropriate trackId
+  return ethereumArtistId(nft.contractAddress);
 };
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts) => {

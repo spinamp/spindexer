@@ -1,3 +1,5 @@
+import { ethereumTrackId, slugify } from '../utils/identifiers';
+
 import { getTrait, NFT, NftFactory } from './nft';
 
 export type ExtractorTypes = {
@@ -41,4 +43,13 @@ export const idExtractor = (contract: NftFactory): Extractor => {
     return titleExtractor(contract);
   }
   throw new Error('no other id extraction options yet')
+}
+
+export const resolveEthereumTrackIdOverrides = (nft: NFT, contract: NftFactory): string => {
+  const extractor = idExtractor(contract)
+  const trackId = slugify(extractor(nft));
+  if (!trackId) {
+    throw new Error('ID not extracted correctly');
+  }
+  return ethereumTrackId(nft.contractAddress, trackId);
 }

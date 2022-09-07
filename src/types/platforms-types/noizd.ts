@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { mapAPITrack, mapAPITrackTime, mapAPITrackToArtistID } from '../../clients/noizd';
-import { formatAddress } from '../address';
+import { ethereumTrackId } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { NFT } from '../nft';
 import { MapNFTsToTrackIds, MapTrack } from '../processor';
@@ -52,7 +52,7 @@ const mapNFTtoTrackID = (nft: NFT): string => {
   const [contractAddress, nftId] = nft.id.split('/');
   const externalURL = nft.metadata.external_url;
   const trackId = externalURL.split('/assets/')[1];
-  return `ethereum/${formatAddress(contractAddress)}/${trackId}`;
+  return ethereumTrackId(contractAddress, trackId);
 }
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts) => {

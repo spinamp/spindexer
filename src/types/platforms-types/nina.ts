@@ -58,6 +58,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
 };
 
 const mapNFTtoTrackID = (nft: NFT): string => {
+  // TODO: extract solanaTrackId function and provide appropriate trackId
   return `solana/${nft.id}`
 };
 

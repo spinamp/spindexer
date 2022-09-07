@@ -2,14 +2,14 @@ import { utils } from 'ethers';
 import { gql, GraphQLClient } from 'graphql-request';
 import _ from 'lodash';
 
-import { formatAddress } from '../types/address';
+import { ethereumTrackId } from '../utils/identifiers';
 
 const catalogApi = new GraphQLClient(
   'https://catalog-prod.hasura.app/v1/graphql',
 );
 
 const mapAPITrackToTrackID = (apiTrack: any): string => {
-  return `ethereum/${formatAddress(apiTrack.contract_address)}/${apiTrack.nft_id}`;
+  return ethereumTrackId(apiTrack.contract_address, apiTrack.nft_id);
 };
 
 export const mapTrackIdToNFTId = (id: string) => {

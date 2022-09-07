@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { ethereumTrackId, slugify } from '../../utils/identifiers';
+import { slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
-import { titleExtractor } from '../fieldExtractor';
+import { resolveEthereumTrackIdOverrides, titleExtractor } from '../fieldExtractor';
 import { NFT, NftFactory } from '../nft';
 import { MapNFTsToTrackIds, MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
@@ -73,7 +73,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
 };
 
 const mapNFTtoTrackID = (nft: NFT, contract: NftFactory): string => {
-  return ethereumTrackId(nft, contract);
+  return resolveEthereumTrackIdOverrides(nft, contract);
 };
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts, dbClient?, apiTracksByNFT?, contract?) => {
