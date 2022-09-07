@@ -1,6 +1,5 @@
 import { slugify } from '../utils/identifiers';
 
-import { formatAddress } from './address';
 import { Record, TimeField } from './record'
 
 export type Artist = Record & {
@@ -26,7 +25,3 @@ export const mapArtist = (artistProfile: ArtistProfile): Artist => {
     createdAtEthereumBlockNumber: artistProfile.createdAtEthereumBlockNumber
   }
 };
-
-export const createArtistIdFromEthereumAddress = (address: string) => {
-  return `ethereum/${formatAddress(address)}`;
-}
