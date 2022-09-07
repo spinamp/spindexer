@@ -3,8 +3,8 @@ import _ from 'lodash';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { ethereumTrackId, ethereumArtistId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
+import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, NftFactory } from '../nft';
-import { MapNFTsToTrackIds, MapTrack } from '../processor';
 
 const extractArtistIdFromNFT = (nft: NFT) => {
   const artistURL = nft.metadata.external_url;
@@ -77,16 +77,16 @@ const selectPrimaryNFTForTrackMapper = (nfts: NFT[]) => {
   return lastNFT;
 }
 
-const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts, dbClient?) => {
-  if (!dbClient) {
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (nftToTrackIdSource) => {
+  if (!nftToTrackIdSource.dbClient) {
     throw new Error('DB Client not provided to mintsongs mapper')
   }
 
-  const nftsByMetadataName = _.groupBy(nfts, (nft) => {
+  const nftsByMetadataName = _.groupBy(nftToTrackIdSource.nfts, (nft) => {
     return nft.metadata.name;
   });
 
-  const nftsByTrackId = _.groupBy(nfts, (nft) => {
+  const nftsByTrackId = _.groupBy(nftToTrackIdSource.nfts, (nft) => {
     return mapNFTtoLatestTrackID(nft, nftsByMetadataName[nft.metadata.name])
   });
 

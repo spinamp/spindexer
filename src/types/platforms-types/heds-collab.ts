@@ -2,8 +2,8 @@ import _ from 'lodash';
 
 import { ethereumTrackId, ethereumArtistId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
+import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, getTrait, NftFactory } from '../nft';
-import { MapNFTsToTrackIds, MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
 import { mapTrack as mapSingleTrack, mapArtistProfile as mapSingleArtistProfile } from './single-track-multiprint-contract'
@@ -120,8 +120,8 @@ const mapNFTtoTrackID = (nft: NFT): string => {
   return ethereumTrackId(nft.contractAddress, track);
 };
 
-const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts) => {
-  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (nftToTrackIdSource) => {
+  return _.groupBy(nftToTrackIdSource.nfts, nft => mapNFTtoTrackID(nft));
 }
 
 export default {

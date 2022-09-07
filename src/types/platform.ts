@@ -1,6 +1,6 @@
 
-import { ArtistProfile } from './artist';
-import { NFT, NftFactory } from './nft';
+import { MapArtistProfile, MapNFTsToTrackIds, MapTrack } from './mapping';
+import { NFT } from './nft';
 import catalogMappers from './platforms-types/catalog';
 import chaosMappers from './platforms-types/chaos';
 import hedsCollabMappers from './platforms-types/heds-collab';
@@ -10,7 +10,6 @@ import ninaMappers from './platforms-types/nina'
 import noizdMappers from './platforms-types/noizd';
 import singleTrackMultiprintContractMappers from './platforms-types/single-track-multiprint-contract';
 import soundMappers from './platforms-types/sound';
-import { MapNFTsToTrackIds, MapTrack } from './processor';
 
 export const API_PLATFORMS = ['noizd'];
 
@@ -36,7 +35,7 @@ export type MusicPlatform = {
 export type PlatformMapper = {
   mapNFTsToTrackIds: MapNFTsToTrackIds
   mapTrack: MapTrack
-  mapArtistProfile: ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NFT, contract?: NftFactory }) => ArtistProfile
+  mapArtistProfile: MapArtistProfile
   selectPrimaryNFTForTrackMapper?: (nfts: NFT[]) => NFT
 }
 

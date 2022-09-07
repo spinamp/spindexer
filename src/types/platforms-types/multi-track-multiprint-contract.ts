@@ -4,8 +4,8 @@ import { extractHashFromURL } from '../../clients/ipfs';
 import { slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { resolveEthereumTrackIdOverrides, titleExtractor } from '../fieldExtractor';
+import { MapNFTsToTrackIds, MapTrack } from '../mapping';
 import { NFT, NftFactory } from '../nft';
-import { MapNFTsToTrackIds, MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
 const mapTrack: MapTrack = (
@@ -72,15 +72,18 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
   }
 };
 
-const mapNFTtoTrackID = (nft: NFT, contract: NftFactory): string => {
-  return resolveEthereumTrackIdOverrides(nft, contract);
-};
-
-const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts, dbClient?, apiTracksByNFT?, contract?) => {
+const mapNFTtoTrackID = (nft: NFT, contract?: NftFactory): string => {
   if (!contract) {
     throw new Error('No contract provided');
   }
-  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft, contract));
+  return resolveEthereumTrackIdOverrides(nft, contract);
+};
+
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (nftToTrackIdSource) => {
+  if (!nftToTrackIdSource.contract) {
+    throw new Error('No contract provided');
+  }
+  return _.groupBy(nftToTrackIdSource.nfts, nft => mapNFTtoTrackID(nft, nftToTrackIdSource.contract));
 }
 
 export default {

@@ -2,8 +2,8 @@ import _ from 'lodash';
 
 import { slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
+import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, NftFactory } from '../nft';
-import { MapNFTsToTrackIds, MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
 const mapTrack: MapTrack = (
@@ -62,8 +62,8 @@ const mapNFTtoTrackID = (nft: NFT): string => {
   return `solana/${nft.id}`
 };
 
-const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts) => {
-  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (nftToTrackIdSource) => {
+  return _.groupBy(nftToTrackIdSource.nfts, nft => mapNFTtoTrackID(nft));
 }
 
 export default {

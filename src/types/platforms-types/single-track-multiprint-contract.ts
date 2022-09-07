@@ -3,8 +3,8 @@ import _ from 'lodash';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { ethereumArtistId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
+import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, NftFactory } from '../nft';
-import { MapNFTsToTrackIds, MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
 export const mapTrack: MapTrack = (
@@ -77,8 +77,8 @@ const mapNFTtoTrackID = (nft: NFT): string => {
   return ethereumArtistId(nft.contractAddress);
 };
 
-const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts) => {
-  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (nftToTrackIdSource) => {
+  return _.groupBy(nftToTrackIdSource.nfts, nft => mapNFTtoTrackID(nft));
 }
 
 export default {

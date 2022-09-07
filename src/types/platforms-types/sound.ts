@@ -3,8 +3,8 @@ import _ from 'lodash';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { ethereumArtistId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
+import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, getNFTMetadataField } from '../nft';
-import { MapNFTsToTrackIds, MapTrack } from '../processor';
 
 const mapAPITrackToArtistID = (apiTrack: any): string => {
   return ethereumArtistId(apiTrack.artist.user.publicAddress);
@@ -60,11 +60,11 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): Arti
   }
 };
 
-const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts, dbClient?, apiTracksByNFT?) => {
-  if (!apiTracksByNFT) {
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (nftToTrackIdSource) => {
+  if (!nftToTrackIdSource.apiTracksByNFT) {
     throw new Error('Expecting apiTracksByNFT for sound mapper');
   }
-  return _.groupBy(nfts, nft => apiTracksByNFT[nft.id]);
+  return _.groupBy(nftToTrackIdSource.nfts, nft => nftToTrackIdSource.apiTracksByNFT[nft.id]);
 }
 
 export default {
