@@ -3,14 +3,36 @@ import { Table } from '../db/db';
 import { CrdtMessage, CrdtOperation } from '../types/message';
 import { Cursor, Trigger } from '../types/trigger';
 
-export const pendingMempoolMessages: (tables: string) => Trigger<undefined> = 
+export const pendingMempoolInsertMessages: (tables: string) => Trigger<undefined> = 
   (table) => {
     return async (clients) => {
-      // this query joins the message with the table it references
-      // if the message is an update it ignores messages for referenced ids that don't exist
-      // if the message is an insert it will always be included
-      // the crdtState is also joined, so that we can include the last processed timestamp for each message.
-      // the last processed timestamp can be used to determine if pending messages are fresh or stale
+      // join crdtState on insert messages so that
+      // each message can be compared with the last updated time to resolve conflicts
+      const sql = `
+      select rm.*, rcs."lastTimestamp"
+      from raw_mempool rm 
+      left outer join ${Table.crdtState} rcs
+      on rm."table" = rcs."table" 
+      and rm."column" = rcs."column" 
+      and rm."entityId" = rcs."entityId"
+      where rm."table" = '${table}'
+      and rm.operation = '${CrdtOperation.INSERT}'
+      order by rm."table", rm."column", rm."entityId", rm.timestamp
+      limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
+      `;
+
+      const result = await clients.db.rawSQL(sql);
+      return result.rows;
+    }
+  }
+
+export const pendingMempoolUpdateMessages: (tables: string) => Trigger<undefined> = 
+  (table) => {
+    return async (clients) => {
+      // join the message with the table that the message references so
+      // messages can be ignored if the referenced id doesn't exist
+      // additionally join the crdtState, so that we can include the last processed timestamp for each message.
+      // the last processed timestamp can be used in the processor to determine if pending messages are fresh or stale
       const sql = `
       select rm.*, rcs."lastTimestamp"
       from raw_mempool rm 
@@ -21,7 +43,8 @@ export const pendingMempoolMessages: (tables: string) => Trigger<undefined> =
       and rm."column" = rcs."column" 
       and rm."entityId" = rcs."entityId"
       where rm."table" = '${table}'
-      and ((rm.operation = '${CrdtOperation.UPDATE}' and t.id is not null) or rm.operation = '${CrdtOperation.INSERT}')
+      and rm.operation = '${CrdtOperation.UPDATE}'
+      and t.id is not null
       order by rm."table", rm."column", rm."entityId", rm.timestamp
       limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
       `;

@@ -54,7 +54,7 @@ export function getCrdtInsertMessages<T>(table: Table, id: string, data: T ): Cr
     timestamp: new Date(),
     entityId: id,
     table,
-    column: Object.keys(data as any).toString(),
+    column: 'insert',
     value: JSON.stringify(data),
     operation: CrdtOperation.INSERT
   }
