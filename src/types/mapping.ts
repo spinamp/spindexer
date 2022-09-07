@@ -1,4 +1,3 @@
-import { DBClient } from '../db/db';
 
 import { ArtistProfile } from './artist';
 import { NFT, NftFactory } from './nft'

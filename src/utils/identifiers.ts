@@ -10,5 +10,6 @@ export const ethereumArtistId = (address: string): string => {
 }
 
 export const ethereumTrackId = (address: string, trackId: string): string => {
-  return `${ethereumArtistId(address)}/${trackId}`;
+  const suffix = trackId !== '' ? `/${trackId}` : '';
+  return ethereumArtistId(address) + suffix;
 }

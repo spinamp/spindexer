@@ -77,8 +77,7 @@ const selectPrimaryNFTForTrackMapper = (nfts: NFT[]) => {
   return lastNFT;
 }
 
-const mapNFTsToTrackIds: MapNFTsToTrackIds = (nftToTrackIdSource) => {
-
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {
   const nftsByMetadataName = _.groupBy(input.nfts, (nft) => {
     return nft.metadata.name;
   });
