@@ -6,6 +6,11 @@ import { Cursor, Trigger } from '../types/trigger';
 export const pendingMempoolMessages: (tables: string) => Trigger<undefined> = 
   (table) => {
     return async (clients) => {
+      // this query joins the message with the table it references
+      // if the message is an update it ignores messages for referenced ids that don't exist
+      // if the message is an insert it will always be included
+      // the crdtState is also joined, so that we can include the last processed timestamp for each message.
+      // the last processed timestamp can be used to determine if pending messages are fresh or stale
       const sql = `
       select rm.*, rcs."lastTimestamp"
       from raw_mempool rm 
