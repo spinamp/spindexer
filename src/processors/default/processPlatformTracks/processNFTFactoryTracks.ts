@@ -1,8 +1,8 @@
 import _ from 'lodash';
 
-import { DBClient, Table } from '../../../db/db';
+import { Table } from '../../../db/db';
 import { ArtistProfile } from '../../../types/artist';
-import { MapNFTsToTrackIds, MapTrack, NFTstoTrackIdSource, TrackMapping } from '../../../types/mapping';
+import { MapNFTsToTrackIds, MapTrack, NFTtoTrackIdSource, TrackMapping } from '../../../types/mapping';
 import { NFT, NftFactory } from '../../../types/nft';
 import { NFTProcessError } from '../../../types/nftProcessError';
 import { MusicPlatformTypeConfig, platformConfigs } from '../../../types/platform';
@@ -83,18 +83,16 @@ const createTracks = async (
   return { newTracks, joins, errorNFTs, artistProfiles: uniqueArtistProfiles };
 }
 
-// TODO: possibly clean up some more
 export const getTrackInputs = async (
   mapNFTsToTrackIds: MapNFTsToTrackIds,
-  nfts: NFT[],
-  dbClient: DBClient,
-  apiTracksByNFT: any,
-  contract: NftFactory
+  nftToTrackIdSource: NFTtoTrackIdSource,
   ) => {
-  const nftToTrackIdSource: NFTstoTrackIdSource = { nfts, dbClient, apiTracksByNFT, contract }
+  if (!nftToTrackIdSource.dbClient) {
+    throw new Error('No db client provided');
+  }
   const trackMapping = mapNFTsToTrackIds(nftToTrackIdSource);
   const trackIds = Object.keys(trackMapping);
-  const existingTrackIds = await dbClient.recordsExist(Table.processedTracks, trackIds);
+  const existingTrackIds = await nftToTrackIdSource.dbClient.recordsExist(Table.processedTracks, trackIds);
   const newTrackIds = trackIds.filter(id => !existingTrackIds.includes(id));
 
   return {

@@ -8,13 +8,13 @@ export type TrackMapping = {
   [trackId: string]: NFT[]
 }
 
-export type NFTstoTrackIdSource = {
+export type NFTtoTrackIdSource = {
   nfts: NFT[],
   dbClient?: DBClient,
   apiTracksByNFT?: any,
   contract?: NftFactory
 }
 
-export type MapNFTsToTrackIds = (nftToTrackIdSource: NFTstoTrackIdSource) => TrackMapping;
+export type MapNFTsToTrackIds = (nftToTrackIdSource: NFTtoTrackIdSource) => TrackMapping;
 export type MapTrack = (nft: NFT, apiTrack: any, contract?: NftFactory, trackId?: string) => ProcessedTrack;
 export type MapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NFT, contract?: NftFactory }) => ArtistProfile

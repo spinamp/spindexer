@@ -4,6 +4,7 @@ import { DBClient, Table } from '../../../db/db';
 import { fromDBRecords } from '../../../db/orm';
 import { NFTsWithoutTracks } from '../../../triggers/missing';
 import { ArtistProfile, mapArtist } from '../../../types/artist';
+import { NFTtoTrackIdSource } from '../../../types/mapping';
 import { NFT, NftFactory } from '../../../types/nft';
 import { NFTProcessError } from '../../../types/nftProcessError';
 import { MusicPlatform, MusicPlatformTypeConfig, platformConfigs } from '../../../types/platform';
@@ -59,6 +60,13 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
 
   for (const nftFactory of nftFactories) {
     const factoryNFTs = nftsByFactoryId[nftFactory.id];
+    const nftToTrackIdSource: NFTtoTrackIdSource = {
+      nfts: factoryNFTs,
+      dbClient: clients.db,
+      apiTracksByNFT: apiTracksByNFT,
+      contract: nftFactory
+    }
+
     let nftFactoryType: MusicPlatformTypeConfig;
     try {
       nftFactoryType = getNFTFactoryType(nftFactory, platformType);
@@ -66,7 +74,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
         newTrackIds,
         trackMapping,
         existingTrackIds,
-      } = await getTrackInputs(nftFactoryType.mappers.mapNFTsToTrackIds, factoryNFTs, clients.db, apiTracksByNFT, nftFactory);
+      } = await getTrackInputs(nftFactoryType.mappers.mapNFTsToTrackIds, nftToTrackIdSource);
       const input = {
         nftFactory,
         nftFactoryType,
