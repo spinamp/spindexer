@@ -68,7 +68,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
 
 const mapNFTtoLatestTrackID = (nft: NFT, dupNFTs: NFT[]): string => {
   const primaryNFT = selectPrimaryNFTForTrackMapper(dupNFTs);
-  return ethereumTrackId(primaryNFT.contractAddress, String(primaryNFT.tokenId));
+  return ethereumTrackId(primaryNFT.contractAddress, primaryNFT.tokenId.toString());
 };
 
 const selectPrimaryNFTForTrackMapper = (nfts: NFT[]) => {
@@ -78,15 +78,12 @@ const selectPrimaryNFTForTrackMapper = (nfts: NFT[]) => {
 }
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (nftToTrackIdSource) => {
-  if (!nftToTrackIdSource.dbClient) {
-    throw new Error('DB Client not provided to mintsongs mapper')
-  }
 
-  const nftsByMetadataName = _.groupBy(nftToTrackIdSource.nfts, (nft) => {
+  const nftsByMetadataName = _.groupBy(input.nfts, (nft) => {
     return nft.metadata.name;
   });
 
-  const nftsByTrackId = _.groupBy(nftToTrackIdSource.nfts, (nft) => {
+  const nftsByTrackId = _.groupBy(input.nfts, (nft) => {
     return mapNFTtoLatestTrackID(nft, nftsByMetadataName[nft.metadata.name])
   });
 

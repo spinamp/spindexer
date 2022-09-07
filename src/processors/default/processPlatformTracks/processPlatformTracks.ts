@@ -60,9 +60,8 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
 
   for (const nftFactory of nftFactories) {
     const factoryNFTs = nftsByFactoryId[nftFactory.id];
-    const nftToTrackIdSource: NFTtoTrackIdSource = {
+    const nftToTrackIdInput: NFTtoTrackIdInput = {
       nfts: factoryNFTs,
-      dbClient: clients.db,
       apiTracksByNFT: apiTracksByNFT,
       contract: nftFactory
     }
@@ -74,7 +73,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
         newTrackIds,
         trackMapping,
         existingTrackIds,
-      } = await getTrackInputs(nftFactoryType.mappers.mapNFTsToTrackIds, nftToTrackIdSource);
+      } = await getTrackInputs(nftFactoryType.mappers.mapNFTsToTrackIds, nftToTrackIdSource, clients.db);
       const input = {
         nftFactory,
         nftFactoryType,

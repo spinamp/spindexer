@@ -60,11 +60,11 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): Arti
   }
 };
 
-const mapNFTsToTrackIds: MapNFTsToTrackIds = (nftToTrackIdSource) => {
-  if (!nftToTrackIdSource.apiTracksByNFT) {
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {
+  if (!input.apiTracksByNFT) {
     throw new Error('Expecting apiTracksByNFT for sound mapper');
   }
-  return _.groupBy(nftToTrackIdSource.nfts, nft => nftToTrackIdSource.apiTracksByNFT[nft.id]);
+  return _.groupBy(input.nfts, nft => input.apiTracksByNFT[nft.id]);
 }
 
 export default {

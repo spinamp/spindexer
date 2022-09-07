@@ -58,12 +58,11 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
 };
 
 const mapNFTtoTrackID = (nft: NFT): string => {
-  // TODO: extract solanaTrackId function and provide appropriate trackId
   return `solana/${nft.id}`
 };
 
-const mapNFTsToTrackIds: MapNFTsToTrackIds = (nftToTrackIdSource) => {
-  return _.groupBy(nftToTrackIdSource.nfts, nft => mapNFTtoTrackID(nft));
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {
+  return _.groupBy(input.nfts, nft => mapNFTtoTrackID(nft));
 }
 
 export default {

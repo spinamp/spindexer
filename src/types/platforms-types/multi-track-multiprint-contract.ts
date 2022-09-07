@@ -79,11 +79,11 @@ const mapNFTtoTrackID = (nft: NFT, contract?: NftFactory): string => {
   return resolveEthereumTrackIdOverrides(nft, contract);
 };
 
-const mapNFTsToTrackIds: MapNFTsToTrackIds = (nftToTrackIdSource) => {
-  if (!nftToTrackIdSource.contract) {
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {
+  if (!input.contract) {
     throw new Error('No contract provided');
   }
-  return _.groupBy(nftToTrackIdSource.nfts, nft => mapNFTtoTrackID(nft, nftToTrackIdSource.contract));
+  return _.groupBy(input.nfts, nft => mapNFTtoTrackID(nft, input.contract));
 }
 
 export default {

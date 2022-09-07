@@ -57,8 +57,8 @@ const mapNFTtoTrackID = (nft: NFT): string => {
   return ethereumTrackId(nft.contractAddress, song);
 };
 
-const mapNFTsToTrackIds: MapNFTsToTrackIds = (nftToTrackIdSource) => {
-  return _.groupBy(nftToTrackIdSource.nfts, nft => mapNFTtoTrackID(nft));
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {
+  return _.groupBy(input.nfts, nft => mapNFTtoTrackID(nft));
 }
 
 export default {
