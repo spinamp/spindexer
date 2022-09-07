@@ -8,7 +8,6 @@ import { NOIZDClient } from '../clients/noizd';
 import { SoundClient } from '../clients/sound';
 import { DBClient } from '../db/db';
 
-import { Extractor } from './fieldExtractor';
 import { NFT, NftFactory } from './nft';
 import { ProcessedTrack } from './track';
 import { Cursor, Trigger } from './trigger';
@@ -43,4 +42,4 @@ export type Processor = {
 };
 
 export type MapTrack = (nft: NFT, apiTrack: any, contract?: NftFactory, trackId?: string) => ProcessedTrack;
-export type MapNFTsToTrackIds = (nfts: NFT[], dbClient?: DBClient, apiTracksByNFT?: any, extractor?: Extractor) => { [trackId: string]: NFT[] };
+export type MapNFTsToTrackIds = (nfts: NFT[], dbClient?: DBClient, apiTracksByNFT?: any, contract?: NftFactory) => { [trackId: string]: NFT[] };

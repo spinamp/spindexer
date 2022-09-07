@@ -4,7 +4,7 @@ import { extractHashFromURL } from '../../clients/ipfs';
 import { slugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { idExtractor, Extractor, titleExtractor } from '../fieldExtractor';
+import { idExtractor, titleExtractor } from '../fieldExtractor';
 import { NFT, NftFactory } from '../nft';
 import { MapNFTsToTrackIds, MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
@@ -12,7 +12,7 @@ import { ProcessedTrack } from '../track';
 const mapTrack: MapTrack = (
   nft,
   apiTrack,
-  contract?,
+  contract,
 ) => {
   if (!contract) {
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
@@ -32,8 +32,8 @@ const mapTrack: MapTrack = (
   }
 
   const track: Partial<ProcessedTrack> = {
-    id: mapNFTtoTrackID(nft, idExtractor(contract)),
-    platformInternalId: mapNFTtoTrackID(nft, idExtractor(contract)),
+    id: mapNFTtoTrackID(nft, contract),
+    platformInternalId: mapNFTtoTrackID(nft, contract),
     title: titleExtractor(contract)(nft),
     description: nft.metadata.description,
     platformId: contract.platformId,
@@ -73,7 +73,8 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
   }
 };
 
-const mapNFTtoTrackID = (nft: NFT, extractor?: Extractor): string => {
+const mapNFTtoTrackID = (nft: NFT, contract: NftFactory): string => {
+  const extractor = idExtractor(contract);
   if (!extractor) {
     throw new Error('No extractor provided');
   }
@@ -84,8 +85,11 @@ const mapNFTtoTrackID = (nft: NFT, extractor?: Extractor): string => {
   return `ethereum/${formatAddress(nft.contractAddress)}/${id}`;
 };
 
-const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts, dbClient?, apiTracksByNFT?, extractor?) => {
-  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft, extractor));
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts, dbClient?, apiTracksByNFT?, contract?) => {
+  if (!contract) {
+    throw new Error('No contract provided');
+  }
+  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft, contract));
 }
 
 export default {

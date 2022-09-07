@@ -19,9 +19,9 @@ export type Extractor = (nft: NFT) => string;
 export type TitleExtractorMapping = Record<TitleExtractorTypes, Extractor>
 
 export const titleExtractors: TitleExtractorMapping = {
-  'metadata.name': (nft: NFT) => nft.metadata.name,
-  'attributes.trait.songTitle': (nft: NFT) => getTrait(nft, 'Song Title'),
-  'attributes.trait.track': (nft: NFT) => getTrait(nft, 'Track')
+  [TitleExtractorTypes.METADATA_NAME]: (nft: NFT) => nft.metadata.name,
+  [TitleExtractorTypes.ATTRIBUTES_TRAIT_SONG_TITLE]: (nft: NFT) => getTrait(nft, 'Song Title'),
+  [TitleExtractorTypes.ATTRIBUTES_TRAIT_TRACK]: (nft: NFT) => getTrait(nft, 'Track')
 }
 
 export const titleExtractor = (contract: NftFactory): Extractor => {
@@ -32,15 +32,13 @@ export const titleExtractor = (contract: NftFactory): Extractor => {
   return titleExtractors[titleExtractorOverride];
 }
 
-export const idExtractor = (contract: NftFactory): Extractor | undefined => {
+// TODO: make it return a slugified version of the title
+export const idExtractor = (contract: NftFactory): Extractor => {
   const idExtractorOverride = contract.typeMetadata?.overrides?.extractor?.id;
-  if (!idExtractorOverride) {
-    return undefined;
-  }
 
   if (idExtractorOverride === IdExtractorTypes.USE_TITLE_EXTRACTOR) {
     return titleExtractor(contract);
   }
 
-  throw new Error('no other options just yet')
+  throw new Error('no other id extraction options yet')
 }

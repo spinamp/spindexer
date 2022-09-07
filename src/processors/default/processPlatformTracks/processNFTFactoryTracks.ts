@@ -2,7 +2,6 @@ import _ from 'lodash';
 
 import { DBClient, Table } from '../../../db/db';
 import { ArtistProfile } from '../../../types/artist';
-import { Extractor } from '../../../types/fieldExtractor';
 import { NFT, NftFactory } from '../../../types/nft';
 import { NFTProcessError } from '../../../types/nftProcessError';
 import { MusicPlatformTypeConfig, platformConfigs } from '../../../types/platform';
@@ -88,9 +87,9 @@ export const getTrackInputs = async (
   nfts: NFT[],
   dbClient: DBClient,
   apiTracksByNFT: any,
-  extractor?: Extractor
+  contract: NftFactory
   ) => {
-  const trackMapping = mapNFTsToTrackIds(nfts, dbClient, apiTracksByNFT, extractor);
+  const trackMapping = mapNFTsToTrackIds(nfts, dbClient, apiTracksByNFT, contract);
   const trackIds = Object.keys(trackMapping);
   const existingTrackIds = await dbClient.recordsExist(Table.processedTracks, trackIds);
   const newTrackIds = trackIds.filter(id => !existingTrackIds.includes(id));
