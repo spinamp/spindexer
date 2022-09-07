@@ -18,6 +18,7 @@ export const pendingMempoolMessages: (tables: string) => Trigger<undefined> =
       where rm."table" = '${table}'
       and ((rm.operation = '${CrdtOperation.UPDATE}' and t.id is not null) or rm.operation = '${CrdtOperation.INSERT}')
       order by rm."table", rm."column", rm."entityId", rm.timestamp
+      limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
       `;
 
       const result = await clients.db.rawSQL(sql);
