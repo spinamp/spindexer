@@ -32,13 +32,13 @@ export const titleExtractor = (contract: NftFactory): Extractor => {
   return titleExtractors[titleExtractorOverride];
 }
 
-// TODO: make it return a slugified version of the title
 export const idExtractor = (contract: NftFactory): Extractor => {
   const idExtractorOverride = contract.typeMetadata?.overrides?.extractor?.id;
-
+  if (!idExtractorOverride) {
+    throw new Error('unknown extractor override provided')
+  }
   if (idExtractorOverride === IdExtractorTypes.USE_TITLE_EXTRACTOR) {
     return titleExtractor(contract);
   }
-
   throw new Error('no other id extraction options yet')
 }

@@ -1,10 +1,9 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { slugify } from '../../utils/identifiers';
-import { formatAddress } from '../address';
+import { ethereumTrackId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
-import { idExtractor, titleExtractor } from '../fieldExtractor';
+import { titleExtractor } from '../fieldExtractor';
 import { NFT, NftFactory } from '../nft';
 import { MapNFTsToTrackIds, MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
@@ -74,15 +73,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
 };
 
 const mapNFTtoTrackID = (nft: NFT, contract: NftFactory): string => {
-  const extractor = idExtractor(contract);
-  if (!extractor) {
-    throw new Error('No extractor provided');
-  }
-  const id = slugify(extractor(nft));
-  if (!id) {
-    throw new Error('ID not extracted correctly');
-  }
-  return `ethereum/${formatAddress(nft.contractAddress)}/${id}`;
+  return ethereumTrackId(nft, contract);
 };
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts, dbClient?, apiTracksByNFT?, contract?) => {
