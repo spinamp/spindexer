@@ -77,7 +77,7 @@ const mapNFTtoTrackID = (nft: NFT, extractor?: Extractor): string => {
   if (!extractor) {
     throw new Error('No extractor provided');
   }
-  const id = extractor(nft);
+  const id = slugify(extractor(nft));
   if (!id) {
     throw new Error('ID not extracted correctly');
   }
