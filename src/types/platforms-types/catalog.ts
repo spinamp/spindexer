@@ -6,11 +6,6 @@ import { ArtistProfile } from '../artist';
 import { NFT } from '../nft';
 import { MapNFTsToTrackIds, MapTrack } from '../processor';
 
-const mapNFTtoTrackID = (nft: NFT): string => {
-  const [contractAddress, nftId] = nft.id.split('/');
-  return `ethereum/${formatAddress(contractAddress)}/${nftId}`;
-}
-
 const mapAPITrackToArtistID = (apiTrack: any): string => {
   return `ethereum/${formatAddress(apiTrack.artist.id)}`;
 };
@@ -58,6 +53,11 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): Arti
     createdAtEthereumBlockNumber: nft!.createdAtEthereumBlockNumber
   }
 };
+
+const mapNFTtoTrackID = (nft: NFT): string => {
+  const [contractAddress, nftId] = nft.id.split('/');
+  return `ethereum/${formatAddress(contractAddress)}/${nftId}`;
+}
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts) => {
   return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));

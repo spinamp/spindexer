@@ -4,7 +4,7 @@ import { extractHashFromURL } from '../../clients/ipfs';
 import { slugify } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { ArtistProfile } from '../artist';
-import { TitleExtractor, titleExtractor } from '../fieldExtractor';
+import { idExtractor, Extractor, titleExtractor } from '../fieldExtractor';
 import { NFT, NftFactory } from '../nft';
 import { MapNFTsToTrackIds, MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
@@ -31,12 +31,10 @@ const mapTrack: MapTrack = (
     throw new Error('Failed to extract audio from nft');
   }
 
-  const extractor = titleExtractor(contract);
-
   const track: Partial<ProcessedTrack> = {
-    id: mapNFTtoTrackID(nft, extractor),
-    platformInternalId: mapNFTtoTrackID(nft, extractor),
-    title: extractor(nft),
+    id: mapNFTtoTrackID(nft, idExtractor(contract)),
+    platformInternalId: mapNFTtoTrackID(nft, idExtractor(contract)),
+    title: titleExtractor(contract)(nft),
     description: nft.metadata.description,
     platformId: contract.platformId,
     lossyAudioIPFSHash,
@@ -75,9 +73,15 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
   }
 };
 
-const mapNFTtoTrackID = (nft: NFT, extractor?: TitleExtractor): string => {
-  const trackName = extractor ? extractor(nft) : String(nft.tokenId);
-  return `ethereum/${formatAddress(nft.contractAddress)}/${slugify(trackName)}`;
+const mapNFTtoTrackID = (nft: NFT, extractor?: Extractor): string => {
+  if (!extractor) {
+    throw new Error('No extractor provided');
+  }
+  const id = extractor(nft);
+  if (!id) {
+    throw new Error('ID not extracted correctly');
+  }
+  return `ethereum/${formatAddress(nft.contractAddress)}/${id}`;
 };
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (nfts, dbClient?, apiTracksByNFT?, extractor?) => {

@@ -2,6 +2,7 @@ import { getTrait, NFT, NftFactory } from './nft';
 
 export type ExtractorTypes = {
   title?: TitleExtractorTypes
+  id?: IdExtractorTypes
 }
 
 export enum TitleExtractorTypes {
@@ -10,8 +11,12 @@ export enum TitleExtractorTypes {
   ATTRIBUTES_TRAIT_TRACK = 'attributes.trait.track',
 }
 
-export type TitleExtractor = (nft: NFT) => string;
-export type TitleExtractorMapping = Record<TitleExtractorTypes, TitleExtractor>
+export enum IdExtractorTypes {
+  USE_TITLE_EXTRACTOR = 'useTitleExtractor',
+}
+
+export type Extractor = (nft: NFT) => string;
+export type TitleExtractorMapping = Record<TitleExtractorTypes, Extractor>
 
 export const titleExtractors: TitleExtractorMapping = {
   'metadata.name': (nft: NFT) => nft.metadata.name,
@@ -19,10 +24,23 @@ export const titleExtractors: TitleExtractorMapping = {
   'attributes.trait.track': (nft: NFT) => getTrait(nft, 'Track')
 }
 
-export const titleExtractor = (contract: NftFactory): TitleExtractor => {
+export const titleExtractor = (contract: NftFactory): Extractor => {
   const titleExtractorOverride = contract.typeMetadata?.overrides?.extractor?.title;
   if (!titleExtractorOverride) {
     throw new Error('unknown extractor override provided')
   }
   return titleExtractors[titleExtractorOverride];
+}
+
+export const idExtractor = (contract: NftFactory): Extractor | undefined => {
+  const idExtractorOverride = contract.typeMetadata?.overrides?.extractor?.id;
+  if (!idExtractorOverride) {
+    return undefined;
+  }
+
+  if (idExtractorOverride === IdExtractorTypes.USE_TITLE_EXTRACTOR) {
+    return titleExtractor(contract);
+  }
+
+  throw new Error('no other options just yet')
 }
