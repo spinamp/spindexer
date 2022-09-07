@@ -2,7 +2,7 @@
 
 import { Table } from '../db/db';
 
-export enum CrdtOpetation {
+export enum CrdtOperation {
   INSERT = 'insert',
   UPDATE = 'update'
 } 
@@ -13,7 +13,7 @@ export type CrdtMessage = {
   column: string;
   entityId: string;
   value: string;
-  operation: CrdtOpetation
+  operation: CrdtOperation
 }
 
 export type MempoolMessage = CrdtMessage & {
@@ -42,7 +42,7 @@ export function getCrdtUpdateMessages<T>(table: Table, values: Values<T>): CrdtM
     table,
     column: key,
     value: (values as any)[key],
-    operation: CrdtOpetation.UPDATE
+    operation: CrdtOperation.UPDATE
   }))
 
   return messages
@@ -55,6 +55,6 @@ export function getCrdtInsertMessages<T>(table: Table, id: string, data: T ): Cr
     table,
     column: Object.keys(data as any).toString(),
     value: JSON.stringify(data),
-    operation: CrdtOpetation.INSERT
+    operation: CrdtOperation.INSERT
   }
 }

@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-import { CrdtOpetation } from '../../types/message';
+import { CrdtOperation } from '../../types/message';
 import { Table } from '../db';
 import { tableNameToViewName, updateViews } from '../migration-helpers';
 
@@ -11,7 +11,7 @@ export const up = async (knex: Knex) => {
     table.string('column');
     table.string('entityId');
     table.string('value');
-    table.enu('operation', Object.values(CrdtOpetation));
+    table.enu('operation', Object.values(CrdtOperation));
   })
 
   await knex.schema.createTable(Table.crdtState, table => {
@@ -29,7 +29,7 @@ export const up = async (knex: Knex) => {
     table.string('column');
     table.string('entityId');
     table.string('value');
-    table.enu('operation', Object.values(CrdtOpetation));
+    table.enu('operation', Object.values(CrdtOperation));
   })
 
   await updateViews(knex);

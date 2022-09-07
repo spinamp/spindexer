@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import { Table } from '../../db/db';
 import { pendingMempoolMessages } from '../../triggers/messages';
-import { CrdtOpetation, CrdtState, MempoolMessage, PendingMempoolMessage } from '../../types/message';
+import { CrdtOperation, CrdtState, MempoolMessage, PendingMempoolMessage } from '../../types/message';
 import { Clients, Processor } from '../../types/processor';
 
 export const processMempool: (table: Table) => Processor = 
@@ -14,12 +14,12 @@ export const processMempool: (table: Table) => Processor =
     trigger: pendingMempoolMessages(table),
     processorFunction: async (messages: PendingMempoolMessage[] , clients: Clients) => {
       // ignore inserts for now
-      const staleMessages: MempoolMessage[] = messages.filter(message => message.operation === CrdtOpetation.INSERT);
+      const staleMessages: MempoolMessage[] = messages.filter(message => message.operation === CrdtOperation.INSERT);
 
       // messages are ordered by timestamp.
       //  group by table, column, entity so that we can easily categorize fresh and stale messages
       const groupedMessagesUpdates = _.groupBy(
-        messages.filter(message => message.operation === CrdtOpetation.UPDATE),
+        messages.filter(message => message.operation === CrdtOperation.UPDATE),
         message => `${message.operation}.${message.table}.${message.column}.${message.entityId}`
       );
       const entityUpdates: { [id: string]: { [column: string]: string } } = {};

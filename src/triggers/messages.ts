@@ -1,6 +1,6 @@
 
 import { Table } from '../db/db';
-import { CrdtMessage, CrdtOpetation } from '../types/message';
+import { CrdtMessage, CrdtOperation } from '../types/message';
 import { Cursor, Trigger } from '../types/trigger';
 
 export const pendingMempoolMessages: (tables: string) => Trigger<undefined> = 
@@ -16,7 +16,7 @@ export const pendingMempoolMessages: (tables: string) => Trigger<undefined> =
       and rm."column" = rcs."column" 
       and rm."entityId" = rcs."entityId"
       where rm."table" = '${table}'
-      and ((rm.operation = '${CrdtOpetation.UPDATE}' and t.id is not null) or rm.operation = '${CrdtOpetation.INSERT}')
+      and ((rm.operation = '${CrdtOperation.UPDATE}' and t.id is not null) or rm.operation = '${CrdtOperation.INSERT}')
       order by rm."table", rm."column", rm."entityId", rm.timestamp
       `;
 
