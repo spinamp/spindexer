@@ -6,6 +6,7 @@ import { tableNameToViewName, updateViews } from '../migration-helpers';
 
 export const up = async (knex: Knex) => {
   await knex.schema.createTable(Table.seeds, table => {
+    table.increments('id');
     table.dateTime('timestamp');
     table.enu('table', Object.values(Table));
     table.string('column');

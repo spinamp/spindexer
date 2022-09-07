@@ -8,6 +8,7 @@ export enum CrdtOperation {
 } 
 
 export type CrdtMessage = {
+  id?: string;
   timestamp: Date;
   table: Table,
   column: string;

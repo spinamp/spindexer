@@ -27,8 +27,9 @@ export const pendingMempoolMessages: (tables: string) => Trigger<undefined> =
 
 export const newSeedMessages: Trigger<Cursor> = async (clients, cursor: string) => {
   const selectSql = `select m.* from ${Table.seeds} m
-  limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}  
-  offset ${parseInt(cursor)}
+  where id > ${parseInt(cursor)}
+  order by id
+  limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
   `
   const unprocessedMessages: CrdtMessage[] = (await clients.db.rawSQL(selectSql)).rows;
 
@@ -36,7 +37,7 @@ export const newSeedMessages: Trigger<Cursor> = async (clients, cursor: string) 
     return []
   }
 
-  const newCursor = (parseInt(cursor) + unprocessedMessages.length).toString()
+  const newCursor = unprocessedMessages[unprocessedMessages.length - 1].id!
 
   return { items: unprocessedMessages, newCursor };
 };
