@@ -132,22 +132,27 @@ const init = async (): Promise<DBClient> => {
         await db(tableName).whereIn(idField, ids).delete()
       }
     },
-    upsert: async <RecordType>(tableName: string, recordUpserts: RecordType[], idField: string | string[] = 'id', mergeOptions: string[] | undefined = undefined ) => {
+    upsert: async <RecordType>(
+      tableName: string,
+      recordUpserts: RecordType[],
+      idField: string | string[] = 'id',
+      mergeOptions: string[] | undefined = undefined,
+      overrideAll = false
+    ) => {
       console.log(`Upserting records`);
       if (recordUpserts?.length > 0) {
         const dbUpserts = toDBRecords(tableName, recordUpserts)
         for (const dbUpsert of dbUpserts) {
-          // exclude the default timestamp column unless explicitly specified in mergeOptions
-          // if (mergeOptions === undefined) {
-          //   mergeOptions = Object.keys(dbUpsert).filter((value) => { return value !== defaultTimestampColumn });
-          // }
 
-          // remove undefined properties
-          const properValues = _.omitBy(dbUpsert, _.isUndefined)
+          let values = dbUpsert;
+          if (!overrideAll){
+            // remove undefined properties
+            values = _.omitBy(dbUpsert, _.isUndefined)
+          } 
 
           try {
             await db(tableName)
-              .insert(properValues)
+              .insert(values)
               .onConflict(idField as any)
               .merge(mergeOptions)
           } catch (error) {

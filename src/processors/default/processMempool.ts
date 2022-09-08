@@ -3,6 +3,7 @@
 import _ from 'lodash';
 
 import { Table } from '../../db/db';
+import { fromDBRecord } from '../../db/orm';
 import { pendingMempoolInsertMessages, pendingMempoolUpdateMessages } from '../../triggers/messages';
 import { CrdtState, PendingMempoolMessage } from '../../types/message';
 import { Clients, Processor } from '../../types/processor';
@@ -43,8 +44,8 @@ function categorizeMessages(messages: PendingMempoolMessage[]): { results: any, 
   })
     
   const objectUpdates = Object.keys(entityUpdates).map(key => ({
+    ...fromDBRecord(entityUpdates[key]),
     id: key,
-    ...entityUpdates[key]
   }))
 
   return {
@@ -77,10 +78,10 @@ export const processMempoolInserts: (table: Table) => Processor =
       const { crdtUpdates, results } = categorizeMessages(messages);
 
       const insertResults: { id: string, insert: string }[] = results;
-      const rows = Object.values(insertResults).map(result => JSON.parse(result.insert));
+      const rows = Object.values(insertResults).map(result => fromDBRecord(JSON.parse(result.insert)));
 
-      await clients.db.insert(table, rows)
-      await clients.db.insert(Table.crdtState, crdtUpdates)
+      await clients.db.upsert(table, rows, undefined, undefined, true)
+      await clients.db.upsert(Table.crdtState, crdtUpdates, ['table', 'column', 'entityId'])
       await clients.db.delete(Table.mempool, messages.map(message => message.id))
     },
     initialCursor: undefined
