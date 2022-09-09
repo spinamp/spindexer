@@ -14,6 +14,7 @@ Assuming you have nothing more than a URL pointing to a Web3 artist, their track
 
 ## Exploring and Collecting Details
 
+### Finding good sources of information
 First, visit the submitted artist URL. Poke around and get a sense of where you'll find your primary sources of technical information.
 
 Some examples include:
@@ -55,6 +56,26 @@ const EXAMPLE_ALBUM_OR_TRACK_COLLECTION: NftFactory = {
   }
 }
 ```
+
+## Understanding Pre-Existing Processing Strategies
+
+After having collected and considered details about the artist integration, it is important to understand which of the details fit nicely into the existing platform processors in [2].
+
+Also, become familiar with the variety of custom platform processors in `src/types/platform-types.ts` to look for common patterns in dealing with any idiosyncracies.
+
+
+## Estimating Scope of Work
+
+This last part should be much easier to do with all the details and thought from the first few steps (exhausting as they were).
+
+Generally:
+- the more that a "simple integration" overlaps with the existing platform processors in [2], the smaller the scope of work
+- more custom and non-standard the contract, the more likely for the scope to grow
+- when metadata for the NFT is difficult to restructure, non-standard, or entirely custom to incorporate, the greater the scope of work
+
+---
+
+## Appendix: Exploring & Collecting Details Hints + FAQ
 
 [1] Artist/artist-collaboration Address
 
@@ -107,19 +128,3 @@ const EXAMPLE_ALBUM_OR_TRACK_COLLECTION: NftFactory = {
 - An example of NFT metadata can be found on a particular NFT in OpenSea, in its "Details" section usually in a link labelled "TokenId".
 - Inspect the data structure to try to cross-reference it to the way a `ProcessedTrack` is compiled within `MapTrack` for the generalized strategies in section [2].
 - If the structure doesn't fit exactly to the existing mappers, consider implementing and extending the library of field extractors in `fieldExtractor.ts` and using them in the `overrides: { extractors: { ... } }` type metadata.
-
-## Understanding Pre-Existing Processing Strategies
-
-After having collected and considered details about the artist integration, it is important to understand which of the details fit nicely into the existing platform processors in [2].
-
-Also, become familiar with the variety of custom platform processors in `src/types/platform-types.ts` to look for common patterns in dealing with any idiosyncracies.
-
-
-## Estimating Scope of Work
-
-This last part should be much easier to do with all the details and thought from the first few steps (exhausting as they were).
-
-Generally:
-- the more that a "simple integration" overlaps with the existing platform processors in [2], the smaller the scope of work
-- more custom and non-standard the contract, the more likely for the scope to grow
-- when metadata for the NFT is difficult to restructure, non-standard, or entirely custom to incorporate, the greater the scope of work
