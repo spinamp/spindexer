@@ -28,7 +28,7 @@ const OTHERS_DIE: NftFactory = {
       artist: {
         name: 'Mighty33',
         artistId: ethereumArtistId(mighty33Address),
-        avatarUrl: 'https://lh3.googleusercontent.com/IurC9VfibdFS8GtYHbPuEvMfDP_HD2YnLKFVLee9WouwIjtvQwFxBfc-UT6ypNRAAmK73Esfb92OyB3so4rXR3N-6_4iDhDElMzHPJQ=s0',
+        avatarUrl: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmS8dBxzgmNcCL71XYM5WxCkb2MM8rhQdCqAf1as8XXCVo',
         websiteUrl: 'https://geniuscorp.fr/m33'
       },
       type: MusicPlatformType['multi-track-multiprint-contract'],
