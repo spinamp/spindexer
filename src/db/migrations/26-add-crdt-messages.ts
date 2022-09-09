@@ -15,12 +15,19 @@ export const up = async (knex: Knex) => {
     table.enu('operation', Object.values(CrdtOperation));
   })
 
-  await knex.schema.createTable(Table.crdtState, table => {
+  await knex.schema.createTable(Table.crdtUpdateState, table => {
     table.enu('table', Object.values(Table));
     table.string('column');
     table.string('entityId');
     table.dateTime('lastTimestamp');
     table.primary(['table', 'column', 'entityId']);
+  })
+
+  await knex.schema.createTable(Table.crdtInsertState, table => {
+    table.enu('table', Object.values(Table));
+    table.string('entityId');
+    table.dateTime('lastTimestamp');
+    table.primary(['table', 'entityId']);
   })
 
   await knex.schema.createTable(Table.mempool, table => {
@@ -38,10 +45,12 @@ export const up = async (knex: Knex) => {
 
 export const down = async (knex: Knex) => {
   await knex.schema.dropView(tableNameToViewName(Table.seeds));
-  await knex.schema.dropView(tableNameToViewName(Table.crdtState));
+  await knex.schema.dropView(tableNameToViewName(Table.crdtUpdateState));
+  await knex.schema.dropView(tableNameToViewName(Table.crdtInsertState));
   await knex.schema.dropView(tableNameToViewName(Table.mempool));
   await knex.schema.dropTable(Table.seeds);
-  await knex.schema.dropTable(Table.crdtState);
+  await knex.schema.dropTable(Table.crdtUpdateState);
+  await knex.schema.dropTable(Table.crdtInsertState);
   await knex.schema.dropTable(Table.mempool);
 
   await updateViews(knex);

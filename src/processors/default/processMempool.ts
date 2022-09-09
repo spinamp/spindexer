@@ -1,50 +1,50 @@
-
-
 import _ from 'lodash';
 
 import { Table } from '../../db/db';
 import { fromDBRecord } from '../../db/orm';
 import { pendingMempoolInsertMessages, pendingMempoolUpdateMessages } from '../../triggers/messages';
-import { CrdtState, PendingMempoolMessage } from '../../types/message';
+import { PendingMempoolMessage, CrdtInsertMessage, CrdtUpdateMessage, CrdtInsertState, CrdtUpdateState } from '../../types/message';
 import { Clients, Processor } from '../../types/processor';
 
-function categorizeMessages(messages: PendingMempoolMessage[]): { results: any, crdtUpdates: CrdtState[] } {
+function categorizeMessages<MessageType extends CrdtInsertMessage | CrdtUpdateMessage, CrdtStateType extends CrdtInsertState | CrdtUpdateState>
+(
+  messages: PendingMempoolMessage<MessageType>[],
+  messageGrouper: (message: MessageType) => string,
+  mapMessage: (message: MessageType) => { [column: string]: string },
+  mapCrdtState: (message: MessageType) => CrdtStateType,
+):
+  { results: any, crdtUpdates: CrdtStateType[] } {
   const entityUpdates: { [id: string]: any } = {};
-  const crdtUpdates: CrdtState[] = [];
+  const crdtUpdates: CrdtStateType[] = [];
 
   // group by table, column, entity so that we can easily categorize fresh and stale messages.
   // messages within each group are ordered by timestamp in the trigger, so it's safe to assume 
   // the last message of each group is the freshest
   const groupedMessagesUpdates = _.groupBy(
     messages,
-    message => `${message.operation}.${message.table}.${message.column}.${message.entityId}`
+    messageGrouper
   );
 
-  Object.values(groupedMessagesUpdates).forEach(groupMessage => {
+  Object.values(groupedMessagesUpdates).forEach(groupedMessage => {
     // the last message in groupMessage is the freshest
-    const freshestUpdate = groupMessage.at(-1);
+    const freshestUpdate = groupedMessage.at(-1);
     if (!freshestUpdate) return;
 
     // if the freshest message is fresher than the last time from crdtState, we can process it
     // and update the crdt state.
     // otherwise we can discard the message
-    if (freshestUpdate?.lastTimestamp === null || freshestUpdate?.timestamp > freshestUpdate?.lastTimestamp){
+    if (freshestUpdate.lastTimestamp === null || freshestUpdate.timestamp > freshestUpdate.lastTimestamp){
       entityUpdates[freshestUpdate.entityId] = {
         ...entityUpdates[freshestUpdate.entityId],
-        [freshestUpdate.column]: freshestUpdate.value
+        ...mapMessage(freshestUpdate)
       }
 
-      crdtUpdates.push({
-        table: freshestUpdate.table,
-        column: freshestUpdate.column,
-        entityId: freshestUpdate.entityId,
-        lastTimestamp: freshestUpdate.timestamp,
-      })
+      crdtUpdates.push(mapCrdtState(freshestUpdate))
     }
   })
     
   const objectUpdates = Object.keys(entityUpdates).map(key => ({
-    ...fromDBRecord(entityUpdates[key]),
+    ...entityUpdates[key],
     id: key,
   }))
 
@@ -54,16 +54,46 @@ function categorizeMessages(messages: PendingMempoolMessage[]): { results: any, 
   }
 }
 
+
+function categorizeUpdateMessages(messages: PendingMempoolMessage<CrdtUpdateMessage>[]): { results: any, crdtUpdates: CrdtUpdateState[] } {
+  const messageGrouper = (message: PendingMempoolMessage<CrdtUpdateMessage>) => `${message.operation}.${message.table}.${message.column}.${message.entityId}`
+  const mapMessage = (message: PendingMempoolMessage<CrdtUpdateMessage>) => ({ [message.column]: message.value });
+  const mapCrdtState = (message: PendingMempoolMessage<CrdtUpdateMessage>) => ({
+    table: message.table,
+    column: message.column,
+    entityId: message.entityId,
+    lastTimestamp: message.timestamp,
+  })
+
+  return categorizeMessages<PendingMempoolMessage<CrdtUpdateMessage>, CrdtUpdateState>(messages, messageGrouper, mapMessage, mapCrdtState)
+}
+
+function categorizeInsertMessages(messages: PendingMempoolMessage<CrdtInsertMessage>[]): { results: any, crdtUpdates: CrdtInsertState[] } {
+
+  const messageGrouper = (message: PendingMempoolMessage<CrdtInsertMessage>) => `${message.operation}.${message.table}.${message.entityId}`
+  const mapMessage = (message: PendingMempoolMessage<CrdtInsertMessage>) => ({ value: message.value });
+  const mapCrdtState = (message: PendingMempoolMessage<CrdtInsertMessage>) => ({
+    table: message.table,
+    entityId: message.entityId,
+    lastTimestamp: message.timestamp,
+  })
+
+  return categorizeMessages<PendingMempoolMessage<CrdtInsertMessage>, CrdtInsertState>(messages, messageGrouper, mapMessage, mapCrdtState)
+}
+
+
 export const processMempoolUpdates: (table: Table) => Processor = 
   (table) => ({
 
     name: 'processMempoolUpdates',
     trigger: pendingMempoolUpdateMessages(table),
-    processorFunction: async (messages: PendingMempoolMessage[] , clients: Clients) => {
-      const { results, crdtUpdates } = categorizeMessages(messages);
+    processorFunction: async (messages: PendingMempoolMessage<CrdtUpdateMessage>[] , clients: Clients) => {
+      const { results, crdtUpdates } = categorizeUpdateMessages(messages);
 
-      await clients.db.update(table, results);
-      await clients.db.upsert(Table.crdtState, crdtUpdates, ['table', 'column', 'entityId'])
+      const rows = results.map((result: any) => fromDBRecord(result))
+
+      await clients.db.update(table, rows);
+      await clients.db.upsert(Table.crdtUpdateState, crdtUpdates, ['table', 'column', 'entityId'])
       await clients.db.delete(Table.mempool, messages.map(message => message.id))
     },
     initialCursor: undefined
@@ -71,17 +101,16 @@ export const processMempoolUpdates: (table: Table) => Processor =
 
 export const processMempoolInserts: (table: Table) => Processor = 
   (table) => ({
-
     name: 'processMempoolInserts',
     trigger: pendingMempoolInsertMessages(table),
-    processorFunction: async (messages: PendingMempoolMessage[] , clients: Clients) => {
-      const { crdtUpdates, results } = categorizeMessages(messages);
+    processorFunction: async (messages: PendingMempoolMessage<CrdtInsertMessage>[] , clients: Clients) => {
+      const { crdtUpdates, results } = categorizeInsertMessages(messages);
 
-      const insertResults: { id: string, insert: string }[] = results;
-      const rows = Object.values(insertResults).map(result => fromDBRecord(JSON.parse(result.insert)));
+      const insertResults: { id: string, value: any }[] = results;
+      const rows = insertResults.map(result => JSON.parse(result.value));
 
       await clients.db.upsert(table, rows, undefined, undefined, true)
-      await clients.db.upsert(Table.crdtState, crdtUpdates, ['table', 'column', 'entityId'])
+      await clients.db.upsert(Table.crdtInsertState, crdtUpdates, ['table', 'entityId'])
       await clients.db.delete(Table.mempool, messages.map(message => message.id))
     },
     initialCursor: undefined

@@ -11,13 +11,12 @@ export const pendingMempoolInsertMessages: (tables: string) => Trigger<undefined
       const sql = `
       select rm.*, rcs."lastTimestamp"
       from raw_mempool rm 
-      left outer join ${Table.crdtState} rcs
+      left outer join ${Table.crdtInsertState} rcs
       on rm."table" = rcs."table" 
-      and rm."column" = rcs."column" 
       and rm."entityId" = rcs."entityId"
       where rm."table" = '${table}'
       and rm.operation = '${CrdtOperation.INSERT}'
-      order by rm."table", rm."column", rm."entityId", rm.timestamp
+      order by rm."table", rm."entityId", rm.timestamp
       limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
       `;
 
@@ -38,7 +37,7 @@ export const pendingMempoolUpdateMessages: (tables: string) => Trigger<undefined
       from raw_mempool rm 
       left outer join ${table} t 
       on rm."entityId" = t.id
-      left outer join ${Table.crdtState} rcs
+      left outer join ${Table.crdtUpdateState} rcs
       on rm."table" = rcs."table" 
       and rm."column" = rcs."column" 
       and rm."entityId" = rcs."entityId"

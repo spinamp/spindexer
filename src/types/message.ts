@@ -11,33 +11,45 @@ export type CrdtMessage = {
   id?: string;
   timestamp: Date;
   table: Table,
-  column: string;
   entityId: string;
   value: string;
   operation: CrdtOperation
 }
 
-export type MempoolMessage = CrdtMessage & {
+export type CrdtInsertMessage = CrdtMessage & {
+  operation: CrdtOperation.INSERT
+}
+export type CrdtUpdateMessage = CrdtMessage & {
+  column: string;
+  operation: CrdtOperation.UPDATE
+}
+
+export type MempoolMessage<T extends CrdtInsertMessage | CrdtUpdateMessage> = T & {
   id: number;
 }
 
-export type PendingMempoolMessage = MempoolMessage & {
+export type PendingMempoolMessage<T extends CrdtInsertMessage | CrdtUpdateMessage> = MempoolMessage<T> & {
   lastTimestamp: Date;
 }
 
 export type CrdtState = {
   table: Table;
-  column: string;
   entityId: string;
   lastTimestamp: Date;
 }
+
+export type CrdtUpdateState = CrdtState & {
+  column: string;
+}
+
+export type CrdtInsertState = CrdtState;
 
 type Values<T> = {
   id: string;
 } & Partial<T>
 
-export function getCrdtUpdateMessages<T>(table: Table, values: Values<T>): CrdtMessage[]{
-  const messages: CrdtMessage[] = Object.keys(values).filter(key => key !== 'id').map(key => ({
+export function getCrdtUpdateMessages<T>(table: Table, values: Values<T>): CrdtUpdateMessage[]{
+  const messages: CrdtUpdateMessage[] = Object.keys(values).filter(key => key !== 'id').map(key => ({
     timestamp: new Date(),
     entityId: values.id,
     table,
@@ -49,12 +61,11 @@ export function getCrdtUpdateMessages<T>(table: Table, values: Values<T>): CrdtM
   return messages
 }
 
-export function getCrdtInsertMessages<T>(table: Table, id: string, data: T ): CrdtMessage{
+export function getCrdtInsertMessages<T>(table: Table, id: string, data: T ): CrdtInsertMessage{
   return {
     timestamp: new Date(),
     entityId: id,
     table,
-    column: 'insert',
     value: JSON.stringify(data),
     operation: CrdtOperation.INSERT
   }
