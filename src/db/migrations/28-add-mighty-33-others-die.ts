@@ -31,6 +31,9 @@ const OTHERS_DIE: NftFactory = {
         avatarUrl: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmS8dBxzgmNcCL71XYM5WxCkb2MM8rhQdCqAf1as8XXCVo',
         websiteUrl: 'https://geniuscorp.fr/m33'
       },
+      track: {
+        websiteUrl: 'https://geniuscorp.fr/m33'
+      },
       type: MusicPlatformType['multi-track-multiprint-contract'],
       extractor: {
         title: TitleExtractorTypes.METADATA_NAME,
