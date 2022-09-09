@@ -73,6 +73,8 @@ Generally:
 - more custom and non-standard the contract, the more likely for the scope to grow
 - when metadata for the NFT is difficult to restructure, non-standard, or entirely custom to incorporate, the greater the scope of work
 
+It is also important to know what to expect after the integration is complete, so try jot down the number of tracks that are expected to be added to the Spindexer.
+
 ---
 
 ## Appendix: Exploring & Collecting Details Hints + FAQ
