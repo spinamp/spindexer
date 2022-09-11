@@ -10,15 +10,15 @@ import { addNftFactory, addPlatform, removeNftFactory, removePlatform } from '..
 const mighty33Address = '0x8C62dD796e13aD389aD0bfDA44BB231D317Ef6C6';
 
 const MIGHTY_33: MusicPlatform = {
-  id: mighty33Address,
+  id: 'geniuscorp.fr',
   type: MusicPlatformType['multi-track-multiprint-contract'],
-  name: 'Mighty33',
+  name: 'geniuscorp.fr',
 }
 
 const OTHERS_DIE: NftFactory = {
   id: '0x97b9f21b41041e344f5bd71e3e86b69e79dcc0a6',
   startingBlock: '10876005',
-  platformId: mighty33Address,
+  platformId: 'geniuscorp.fr',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
