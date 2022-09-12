@@ -4,14 +4,6 @@ import { CrdtMessage, getCrdtUpdateMessages } from '../../types/message';
 import { NFT, NftFactory } from '../../types/nft';
 import { Table } from '../db';
 
-async function delay(callback: any, timeout: number){
-  return new Promise((res) => {
-    setTimeout(() => {
-      res(callback())
-    }, timeout )
-  })
-}
-
 export const up = async (knex: Knex) => {
 
   // approve zora factories
@@ -25,7 +17,7 @@ export const up = async (knex: Knex) => {
       createdAtEthereumBlockNumber: '8050',
       metadata: {
         test: 'boo'
-      } ,
+      },
       approved: false
     })
   ]
