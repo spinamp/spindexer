@@ -39,7 +39,7 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
   //TODO: noizd here is being used both as platformId and MusicPlatformType. Need to avoid mixing them
   const apiTrackProcessors = API_PLATFORMS.map(apiPlatform => createProcessedTracksFromAPI(apiPlatform));
 
-  const crdtTables = [Table.nftFactories];
+  const crdtTables = [Table.nftFactories, Table.nfts];
 
   const tableInsertsMempoolProcessors = crdtTables.map(table => processMempoolInserts(table));
   const tableUpdatesMempoolProcessors = crdtTables.map(table => processMempoolUpdates(table));

@@ -9,7 +9,7 @@ export const pendingMempoolInsertMessages: (tables: string) => Trigger<undefined
       // join crdtState on insert messages so that
       // each message can be compared with the last updated time to resolve conflicts
       const sql = `
-      select rm.*, rcs."lastTimestamp"
+      select rm.*, rcs."lastTimestamp", rcs.value as "lastValue"
       from raw_mempool rm 
       left outer join ${Table.crdtInsertState} rcs
       on rm."table" = rcs."table" 
@@ -33,7 +33,7 @@ export const pendingMempoolUpdateMessages: (tables: string) => Trigger<undefined
       // additionally join the crdtState, so that we can include the last processed timestamp for each message.
       // the last processed timestamp can be used in the processor to determine if pending messages are fresh or stale
       const sql = `
-      select rm.*, rcs."lastTimestamp"
+      select rm.*, rcs."lastTimestamp", rcs.value as "lastValue"
       from raw_mempool rm 
       left outer join ${table} t 
       on rm."entityId" = t.id

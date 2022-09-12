@@ -30,11 +30,13 @@ export type MempoolMessage<T extends CrdtInsertMessage | CrdtUpdateMessage> = T 
 
 export type PendingMempoolMessage<T extends CrdtInsertMessage | CrdtUpdateMessage> = MempoolMessage<T> & {
   lastTimestamp: Date;
+  lastValue: string;
 }
 
 export type CrdtState = {
   table: Table;
   entityId: string;
+  value: string;
   lastTimestamp: Date;
 }
 

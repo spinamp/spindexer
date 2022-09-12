@@ -1,7 +1,6 @@
 import _ from 'lodash';
 
 import { Table } from '../../db/db';
-import { fromDBRecord } from '../../db/orm';
 import { pendingMempoolInsertMessages, pendingMempoolUpdateMessages } from '../../triggers/messages';
 import { PendingMempoolMessage, CrdtInsertMessage, CrdtUpdateMessage, CrdtInsertState, CrdtUpdateState } from '../../types/message';
 import { Clients, Processor } from '../../types/processor';
@@ -17,7 +16,7 @@ function categorizeMessages<MessageType extends CrdtInsertMessage | CrdtUpdateMe
   const entityUpdates: { [id: string]: any } = {};
   const crdtUpdates: CrdtStateType[] = [];
 
-  // group by table, column, entity so that we can easily categorize fresh and stale messages.
+  // group by entity so that we can easily categorize fresh and stale messages.
   // messages within each group are ordered by timestamp in the trigger, so it's safe to assume 
   // the last message of each group is the freshest
   const groupedMessagesUpdates = _.groupBy(
@@ -30,17 +29,35 @@ function categorizeMessages<MessageType extends CrdtInsertMessage | CrdtUpdateMe
     const freshestUpdate = groupedMessage.at(-1);
     if (!freshestUpdate) return;
 
+    const conflictingMessages = groupedMessage.filter(message => message.timestamp.getTime() === freshestUpdate.timestamp.getTime());
+    const sortedMessages = _.sortBy(conflictingMessages, 'value');
+    const message = sortedMessages[0];
+    
     // if the freshest message is fresher than the last time from crdtState, we can process it
     // and update the crdt state.
     // otherwise we can discard the message
-    if (freshestUpdate.lastTimestamp === null || freshestUpdate.timestamp > freshestUpdate.lastTimestamp){
-      entityUpdates[freshestUpdate.entityId] = {
-        ...entityUpdates[freshestUpdate.entityId],
-        ...mapMessage(freshestUpdate)
+    if (message.lastTimestamp > message.timestamp) return;
+
+    if (message.timestamp.getTime() === message.lastTimestamp?.getTime()){
+      // can discard if the last message is the same as the freshest message
+      if (message.lastValue === message.value){
+        return
       }
 
-      crdtUpdates.push(mapCrdtState(freshestUpdate))
+      const value = _.sortBy([message.value, message.lastValue])[0];
+
+      // can discard if the last message value > freshest message value
+      if (value === message.lastValue){
+        return
+      }
     }
+    
+    entityUpdates[freshestUpdate.entityId] = {
+      ...entityUpdates[message.entityId],
+      ...mapMessage(message)
+    }
+    
+    crdtUpdates.push(mapCrdtState(message))
   })
     
   const objectUpdates = Object.keys(entityUpdates).map(key => ({
@@ -54,7 +71,6 @@ function categorizeMessages<MessageType extends CrdtInsertMessage | CrdtUpdateMe
   }
 }
 
-
 function categorizeUpdateMessages(messages: PendingMempoolMessage<CrdtUpdateMessage>[]): { results: any, crdtUpdates: CrdtUpdateState[] } {
   const messageGrouper = (message: PendingMempoolMessage<CrdtUpdateMessage>) => `${message.operation}.${message.table}.${message.column}.${message.entityId}`
   const mapMessage = (message: PendingMempoolMessage<CrdtUpdateMessage>) => ({ [message.column]: message.value });
@@ -62,6 +78,7 @@ function categorizeUpdateMessages(messages: PendingMempoolMessage<CrdtUpdateMess
     table: message.table,
     column: message.column,
     entityId: message.entityId,
+    value: message.value,
     lastTimestamp: message.timestamp,
   })
 
@@ -75,6 +92,7 @@ function categorizeInsertMessages(messages: PendingMempoolMessage<CrdtInsertMess
   const mapCrdtState = (message: PendingMempoolMessage<CrdtInsertMessage>) => ({
     table: message.table,
     entityId: message.entityId,
+    value: message.value,
     lastTimestamp: message.timestamp,
   })
 
@@ -90,7 +108,7 @@ export const processMempoolUpdates: (table: Table) => Processor =
     processorFunction: async (messages: PendingMempoolMessage<CrdtUpdateMessage>[] , clients: Clients) => {
       const { results, crdtUpdates } = categorizeUpdateMessages(messages);
 
-      const rows = results.map((result: any) => fromDBRecord(result))
+      const rows = results.map((result: any) => (result))
 
       await clients.db.update(table, rows);
       await clients.db.upsert(Table.crdtUpdateState, crdtUpdates, ['table', 'column', 'entityId'])
