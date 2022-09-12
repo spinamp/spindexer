@@ -2,6 +2,7 @@ import { gql, GraphQLClient } from 'graphql-request';
 
 import { formatAddress } from '../types/address';
 import { NFT } from '../types/nft';
+import { ethereumTrackId } from '../utils/identifiers';
 
 const soundAPI = new GraphQLClient(
   'https://api.sound.xyz/graphql',
@@ -17,7 +18,7 @@ const mapAPITrackToTrackID = (apiTrack: any): string => {
   if (!apiTrack.editionId) {
     throw new Error('Missing sound.xyz api track editionId');
   }
-  return `ethereum/${formatAddress(apiTrack.artist.artistContractAddress)}/${apiTrack.editionId}`
+  return ethereumTrackId(apiTrack.artist.artistContractAddress, apiTrack.editionId);
 };
 
 export type SoundClient = {

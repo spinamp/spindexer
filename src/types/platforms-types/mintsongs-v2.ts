@@ -1,12 +1,10 @@
 import _ from 'lodash';
-import slugify from 'slugify';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { DBClient } from '../../db/db';
-import { formatAddress } from '../address';
+import { ethereumTrackId, ethereumArtistId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
+import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, NftFactory } from '../nft';
-import { ProcessedTrack } from '../track';
 
 const extractArtistIdFromNFT = (nft: NFT) => {
   const artistURL = nft.metadata.external_url;
@@ -18,15 +16,15 @@ const extractArtistIdFromNFT = (nft: NFT) => {
   if (artistAddress.length !== 42) {
     throw new Error('Unexpected artist address length');
   }
-  return `ethereum/${artistAddress}`;
+  return ethereumArtistId(artistAddress);
 }
 
-const mapTrack = (
-  nft: NFT,
-  apiTrack: any,
-  contract?: NftFactory,
-  trackId?: string
-): ProcessedTrack => {
+const mapTrack: MapTrack = (
+  nft,
+  apiTrack,
+  contract?,
+  trackId?
+) => {
   if (!contract) {
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
   }
@@ -37,7 +35,7 @@ const mapTrack = (
     id: trackId,
     platformInternalId: nft.metadata.name,
     title: nft.metadata.title,
-    slug: slugify(`${nft.metadata.title} ${nft.createdAtTime.getTime()}`).toLowerCase(),
+    slug: slugify(`${nft.metadata.title} ${nft.createdAtTime.getTime()}`),
     description: nft.metadata.description,
     platformId: 'mintsongs',
     lossyAudioIPFSHash: extractHashFromURL(nft.metadata.animation_url)!,
@@ -70,7 +68,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
 
 const mapNFTtoLatestTrackID = (nft: NFT, dupNFTs: NFT[]): string => {
   const primaryNFT = selectPrimaryNFTForTrackMapper(dupNFTs);
-  return `ethereum/${formatAddress(primaryNFT.contractAddress)}/${primaryNFT.tokenId}`;
+  return ethereumTrackId(primaryNFT.contractAddress, primaryNFT.tokenId.toString());
 };
 
 const selectPrimaryNFTForTrackMapper = (nfts: NFT[]) => {
@@ -79,16 +77,12 @@ const selectPrimaryNFTForTrackMapper = (nfts: NFT[]) => {
   return lastNFT;
 }
 
-const mapNFTsToTrackIds = async (nfts: NFT[], dbClient?: DBClient): Promise<{ [trackId: string]: NFT[] }> => {
-  if (!dbClient) {
-    throw new Error('DB Client not provided to mintsongs mapper')
-  }
-
-  const nftsByMetadataName = _.groupBy(nfts, (nft) => {
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {
+  const nftsByMetadataName = _.groupBy(input.nfts, (nft) => {
     return nft.metadata.name;
   });
 
-  const nftsByTrackId = _.groupBy(nfts, (nft) => {
+  const nftsByTrackId = _.groupBy(input.nfts, (nft) => {
     return mapNFTtoLatestTrackID(nft, nftsByMetadataName[nft.metadata.name])
   });
 

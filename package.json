@@ -20,7 +20,7 @@
     "drop-db": "read -p \"u sure? ctrl-c to abort \" -n 1 -r; source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -d postgres -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME -c \"drop database $POSTGRES_DATABASE;\"",
     "create-db": "source .env && ts-node scripts/create_db.ts",
     "migrate-latest": "source .env && ts-node scripts/migrate_db.ts",
-    "clear-track-tables": "read -p \"u sure? ctrl-c to abort \" -n 1 -r; ts-node scripts/clear_track_tables.ts",
+    "clear-track-tables": "read -p \"u sure? ctrl-c to abort \" -n 1 -r; NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem ts-node scripts/clear_track_tables.ts",
     "restore-full-db": "source .env && PGPASSWORD=$POSTGRES_PASSWORD pg_restore ./db/dump  -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME --create --clean --if-exists --verbose --verbose -F d -d postgres",
     "reset-db": "yarn drop-db && yarn restore-full-db",
     "reset-db-minimal": "yarn drop-db && yarn create-db && yarn migrate-latest && yarn restore-db-table raw_ipfs_pins && yarn restore-db-table raw_ipfs_files",

@@ -1,7 +1,4 @@
-
-import { urlSource } from 'ipfs-http-client';
-
-
+import { urlSource } from '../../clients/ipfs';
 import { Table } from '../../db/db';
 import { artworkNotOnIpfs, audioNotOnIpfs } from '../../triggers/ipfs';
 import { IPFSFile } from '../../types/ipfsFIle';
@@ -62,7 +59,7 @@ function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', rep
       }
     }
 
-    await rollPromises<ProcessedTrack, void, void>(tracksWithIPFSFiles, processTrack, 300, 50)
+    await rollPromises<ProcessedTrack, void, void>(tracksWithIPFSFiles, processTrack, 300, 10000)
 
     await clients.db.update(Table.processedTracks, updates)
     await clients.db.upsert(Table.ipfsFiles, ipfsFiles, 'url');

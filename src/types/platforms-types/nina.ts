@@ -1,18 +1,16 @@
-
 import _ from 'lodash';
-import slugify from 'slugify';
 
+import { slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
+import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, NftFactory } from '../nft';
-import { MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
 const mapTrack: MapTrack = (
-  nft: NFT,
-  apiTrack: any,
-  contract?: NftFactory,
-  trackId?: string,
-): ProcessedTrack => {
+  nft,
+  apiTrack,
+  contract?,
+) => {
 
   if (!nft) {
     throw new Error(`NFT missing for mapArtistProfile for nft`)
@@ -32,7 +30,7 @@ const mapTrack: MapTrack = (
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
   };
 
-  track.slug = slugify(`${track.title} ${track.createdAtTime!.getTime()}`).toLowerCase();
+  track.slug = slugify(`${track.title} ${track.createdAtTime!.getTime()}`);
 
   return track as ProcessedTrack;
 };
@@ -55,7 +53,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
     platformId: nft.platformId,
     avatarUrl: undefined,
     websiteUrl: `${nft.metadata.external_url}/related`,
-    createdAtTime: nft.createdAtTime, 
+    createdAtTime: nft.createdAtTime,
   }
 };
 
@@ -63,8 +61,8 @@ const mapNFTtoTrackID = (nft: NFT): string => {
   return `solana/${nft.id}`
 };
 
-const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
-  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {
+  return _.groupBy(input.nfts, nft => mapNFTtoTrackID(nft));
 }
 
 export default {

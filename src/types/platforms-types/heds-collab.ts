@@ -1,11 +1,9 @@
 import _ from 'lodash';
-import slugify from 'slugify';
 
-
-import { formatAddress } from '../address';
+import { ethereumTrackId, ethereumArtistId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
+import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, getTrait, NftFactory } from '../nft';
-import { MapTrack } from '../processor';
 import { ProcessedTrack } from '../track';
 
 import { mapTrack as mapSingleTrack, mapArtistProfile as mapSingleArtistProfile } from './single-track-multiprint-contract'
@@ -60,8 +58,8 @@ function getAvatarFromArtist(artist: string): string {
 
 function getArtistId(artist: string){
   const idByArtist: any = {
-    'OSHI': 'ethereum/0x4d18f8f2ae19f1e166c97793cceeb70680a2b6d2',
-    'CAPSHUN & CORDEROYBOI': 'ethereum/0xaa86ff6eb0ac77d46de48e955402cc3435c7ab8f',
+    'OSHI': ethereumArtistId('0x4d18f8f2ae19f1e166c97793cceeb70680a2b6d2'),
+    'CAPSHUN & CORDEROYBOI': ethereumArtistId('0xaa86ff6eb0ac77d46de48e955402cc3435c7ab8f'),
   }
 
   const id = idByArtist[artist.toUpperCase()];
@@ -75,11 +73,10 @@ function getArtistId(artist: string){
 }
 
 const mapTrack: MapTrack = (
-  nft: NFT,
-  apiTrack: any,
-  contract?: NftFactory,
-  trackId?: string,
-): ProcessedTrack => {
+  nft,
+  apiTrack,
+  contract?,
+) => {
   if (!contract) {
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
   }
@@ -91,8 +88,7 @@ const mapTrack: MapTrack = (
   track.platformInternalId = mapNFTtoTrackID(nft);
   track.title = getTrackNameFromArtist(artist);
   track.artistId = mapArtistProfile({ apiTrack, nft, contract }).artistId
-  track.slug = slugify(`${track.title} ${new Date(nft.createdAtTime).getTime()}`).toLowerCase();
-
+  track.slug = slugify(`${track.title} ${new Date(nft.createdAtTime).getTime()}`);
 
   return track as ProcessedTrack;
 };
@@ -121,11 +117,11 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
 const mapNFTtoTrackID = (nft: NFT): string => {
   const artist = getTrait(nft, 'Artist');
   const track = getTrackNameFromArtist(artist);
-  return `ethereum/${formatAddress(nft.contractAddress)}/${track}`;
+  return ethereumTrackId(nft.contractAddress, track);
 };
 
-const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
-  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {
+  return _.groupBy(input.nfts, nft => mapNFTtoTrackID(nft));
 }
 
 export default {

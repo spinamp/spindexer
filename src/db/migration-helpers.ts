@@ -76,6 +76,29 @@ export const removeNftFactory = async(knex: Knex, contract: NftFactory) => {
 }
 
 
+async function getPrimaryKeys(knex: Knex): Promise<{
+  table_name: string,
+  column_name: string,
+  foreign_table_name: string,
+  foreign_column_name: string
+}[]> {
+  const result = await knex.raw(
+    `
+    SELECT
+        tc.table_name,
+        kcu.column_name
+    FROM
+        information_schema.table_constraints AS tc
+        JOIN information_schema.key_column_usage AS kcu
+          ON tc.constraint_name = kcu.constraint_name
+          AND tc.table_schema = kcu.table_schema
+    WHERE tc.constraint_type = 'PRIMARY KEY';
+    `
+  )
+
+  return result.rows
+}
+
 async function getForeignKeys(knex: Knex): Promise<{
   table_name: string,
   column_name: string,
@@ -125,7 +148,8 @@ export function tableNameToViewName(tableName: string): string {
 
 export async function updateViews(knex: Knex){
   const tables = Object.values(Table);
-  const foreignKeys = await getForeignKeys(knex)
+  const foreignKeys = await getForeignKeys(knex);
+  const primaryKeys = await getPrimaryKeys(knex);
   const views = await getViews(knex);
   
   // drop existing views
@@ -153,24 +177,28 @@ export async function updateViews(knex: Knex){
     }
   }
 
-  // create references
+  // create references and primaries
   for (const table of tables) {
     const hasTable = await knex.schema.hasTable(table);
     if (hasTable){
-
       const viewName = tableNameToViewName(table);
-      const references = foreignKeys.filter(fk => fk.table_name === table)
-  
-      const comments = references.map(ref => {
-        return `@foreignKey ("${ref.column_name}") references "${tableNameToViewName(ref.foreign_table_name!)}" ("${ref.foreign_column_name}")`
+
+      const foreigns = foreignKeys.filter(fk => fk.table_name === table)
+      const foreignComments = foreigns.map(foreign => {
+        return `@foreignKey ("${foreign.column_name}") references "${tableNameToViewName(foreign.foreign_table_name!)}" ("${foreign.foreign_column_name}")`
       })
-  
+
+      const primaries = primaryKeys.filter(fk => fk.table_name === table).map(primary => `"${primary.column_name}"`);
+      const primaryComment = `@primaryKey ${primaries.join(',')}`;
+
+      const comments = foreignComments.concat(primaryComment);
+
       const commentString = `comment on view "${viewName}" is E'${comments.join('\\n')}'`;
-    
+
       await knex.raw(commentString)
     }
   }
-  
+
   // add permissions
   for (const table of tables){
     const hasTable = await knex.schema.hasTable(table);
@@ -180,3 +208,4 @@ export async function updateViews(knex: Knex){
     }
   }
 }
+

@@ -1,9 +1,8 @@
 import axios from 'axios';
-import slugify from 'slugify';
 
-import { formatAddress } from '../types/address';
 import { isGif, isMP4 } from '../types/media';
 import { ProcessedTrack } from '../types/track';
+import { ethereumTrackId, slugify } from '../utils/identifiers';
 
 const noizdAPI = axios.create({
   timeout: 10000,
@@ -22,7 +21,7 @@ export type NOIZDClient = {
 }
 
 const mapAPIListingToTrackID = (listing: any): string => {
-  return `ethereum/${formatAddress(listing.nft.metadata.contract)}/${listing.id}`;
+  return ethereumTrackId(listing.nft.metadata.contract, listing.id);
 };
 
 const mapAPIIDToTrackId = (apiTrackId: string): string => {
@@ -59,7 +58,7 @@ export const mapAPITrack: (apiTrack: NOIZDAPITrack) => ProcessedTrack = (apiTrac
     id: mapAPIIDToTrackId(apiTrack.id),
     platformInternalId: apiTrack.id,
     title: apiTrack.title,
-    slug: slugify(`${apiTrack.title} ${mapAPITrackTime(apiTrack).getTime()}`).toLowerCase(),
+    slug: slugify(`${apiTrack.title} ${mapAPITrackTime(apiTrack).getTime()}`),
     description: apiTrack.description,
     platformId: 'noizd',
     lossyAudioURL: apiTrack.metadata ? apiTrack.metadata.audio_url : apiTrack.full.url,

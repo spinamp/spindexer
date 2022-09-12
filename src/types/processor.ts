@@ -8,7 +8,6 @@ import { NOIZDClient } from '../clients/noizd';
 import { SoundClient } from '../clients/sound';
 import { DBClient } from '../db/db';
 
-import { NFT, NftFactory } from './nft';
 import { ProcessedTrack } from './track';
 import { Cursor, Trigger } from './trigger';
 
@@ -40,5 +39,3 @@ export type Processor = {
   processorFunction: (newTriggerItems: any, clients: Clients) => Promise<void>;
   initialCursor?: Cursor | undefined;
 };
-
-export type MapTrack = (nft: NFT, apiTrack: any, nftFactory?: NftFactory | undefined, trackId?: string) => ProcessedTrack;

@@ -1,10 +1,10 @@
 import _ from 'lodash';
 
 import { mapAPITrack, mapAPITrackTime, mapAPITrackToArtistID } from '../../clients/noizd';
-import { formatAddress } from '../address';
+import { ethereumTrackId } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
+import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT } from '../nft';
-import { ProcessedTrack } from '../track';
 
 
 export const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): ArtistProfile => {
@@ -31,7 +31,7 @@ export const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }
   };
 };
 
-const mapTrack = (nft: NFT, apiTrack: any): ProcessedTrack => {
+const mapTrack: MapTrack = (nft, apiTrack) => {
   if (!apiTrack) {
     throw new Error('missing api track');
   }
@@ -52,11 +52,11 @@ const mapNFTtoTrackID = (nft: NFT): string => {
   const [contractAddress, nftId] = nft.id.split('/');
   const externalURL = nft.metadata.external_url;
   const trackId = externalURL.split('/assets/')[1];
-  return `ethereum/${formatAddress(contractAddress)}/${trackId}`;
+  return ethereumTrackId(contractAddress, trackId);
 }
 
-const mapNFTsToTrackIds = async (nfts: NFT[]): Promise<{ [trackId: string]: NFT[] }> => {
-  return _.groupBy(nfts, nft => mapNFTtoTrackID(nft));
+const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {
+  return _.groupBy(input.nfts, nft => mapNFTtoTrackID(nft));
 }
 
 export default {
