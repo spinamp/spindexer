@@ -36,7 +36,7 @@ const OTHERS_DIE: NftFactory = {
       },
       type: MusicPlatformType['multi-track-multiprint-contract'],
       extractor: {
-        title: TitleExtractorTypes.METADATA_NAME,
+        title: TitleExtractorTypes.METADATA_NAME_WITHOUT_LEADING_INFO,
         id: IdExtractorTypes.USE_TITLE_EXTRACTOR
       }
     }
