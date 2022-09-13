@@ -49,7 +49,7 @@ const useTokenIdAppendedExternalUrl = (nft: NFT): string => {
 export const websiteUrlExtractor = (contract: NftFactory): Extractor => {
   const websiteUrlExtractorOverride = contract.typeMetadata?.overrides?.extractor?.websiteUrl;
   if (!websiteUrlExtractorOverride) {
-    throw new Error('unknown extractor override provided')
+    return websiteUrlExtractors[WebsiteUrlExtractorTypes.METADATA_EXTERNAL_URL]
   }
   return websiteUrlExtractors[websiteUrlExtractorOverride];
 }

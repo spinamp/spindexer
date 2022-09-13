@@ -24,6 +24,7 @@ const HOLLY_PLUS: NftFactory = {
       artist: {
         name: 'hollyplus',
         websiteUrl: 'https://auction.holly.plus/',
+        avatarUrl: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmQ2AbbqTD5BF4Y12YwtDaosn2k9LGGS6VeXn28bapwHJY',
       },
       type: MusicPlatformType['multi-track-multiprint-contract'],
       extractor: {
