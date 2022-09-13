@@ -92,6 +92,7 @@ function categorizeInsertMessages(messages: PendingMempoolMessage<CrdtInsertMess
   const mapCrdtState = (message: PendingMempoolMessage<CrdtInsertMessage>) => ({
     table: message.table,
     entityId: message.entityId,
+    column: message.column,
     value: message.value,
     lastTimestamp: message.timestamp,
   })
@@ -111,7 +112,7 @@ export const processMempoolUpdates: (table: Table) => Processor =
       const rows = results.map((result: any) => (result))
 
       await clients.db.update(table, rows);
-      await clients.db.upsert(Table.crdtUpdateState, crdtUpdates, ['table', 'column', 'entityId'])
+      await clients.db.upsert(Table.crdtState, crdtUpdates, ['table', 'column', 'entityId'])
       await clients.db.delete(Table.mempool, messages.map(message => message.id))
     },
     initialCursor: undefined
@@ -128,7 +129,7 @@ export const processMempoolInserts: (table: Table) => Processor =
       const rows = insertResults.map(result => JSON.parse(result.value));
 
       await clients.db.upsert(table, rows, undefined, undefined, true)
-      await clients.db.upsert(Table.crdtInsertState, crdtUpdates, ['table', 'entityId'])
+      await clients.db.upsert(Table.crdtState, crdtUpdates, ['table', 'column', 'entityId'])
       await clients.db.delete(Table.mempool, messages.map(message => message.id))
     },
     initialCursor: undefined

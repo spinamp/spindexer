@@ -19,8 +19,7 @@ export enum Table {
   ipfsPins = 'raw_ipfs_pins',
   ipfsFiles = 'raw_ipfs_files',
   seeds = 'raw_seeds',
-  crdtUpdateState = 'raw_crdt_update_state',
-  crdtInsertState = 'raw_crdt_insert_state',
+  crdtState = 'raw_crdt_state',
   mempool = 'raw_mempool'
 }
 

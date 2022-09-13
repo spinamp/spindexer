@@ -12,6 +12,7 @@ export type CrdtMessage = {
   timestamp: Date;
   table: Table,
   entityId: string;
+  column: string;
   value: string;
   operation: CrdtOperation
 }
@@ -20,7 +21,6 @@ export type CrdtInsertMessage = CrdtMessage & {
   operation: CrdtOperation.INSERT
 }
 export type CrdtUpdateMessage = CrdtMessage & {
-  column: string;
   operation: CrdtOperation.UPDATE
 }
 
@@ -63,11 +63,12 @@ export function getCrdtUpdateMessages<T>(table: Table, values: Values<T>): CrdtU
   return messages
 }
 
-export function getCrdtInsertMessages<T>(table: Table, id: string, data: T ): CrdtInsertMessage{
+export function getCrdtInsertMessage<T>(table: Table, id: string, data: T ): CrdtInsertMessage {
   return {
     timestamp: new Date(),
     entityId: id,
     table,
+    column: 'insert',
     value: JSON.stringify(data),
     operation: CrdtOperation.INSERT
   }
