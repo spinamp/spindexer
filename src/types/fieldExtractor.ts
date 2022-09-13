@@ -6,6 +6,7 @@ import { getTrait, NFT, NftFactory } from './nft';
 export type ExtractorTypes = {
   title?: TitleExtractorTypes
   id?: IdExtractorTypes
+  websiteUrl?: WebsiteUrlExtractorTypes
 }
 
 export enum TitleExtractorTypes {
@@ -19,14 +20,38 @@ export enum IdExtractorTypes {
   USE_TITLE_EXTRACTOR = 'useTitleExtractor',
 }
 
+export enum WebsiteUrlExtractorTypes {
+  METADATA_EXTERNAL_URL = 'metadata.externalUrl',
+  USE_TOKEN_ID_APPENDED_EXTERNAL_URL = 'useTokenIdAppendedExternalUrl',
+}
+
 export type Extractor = (nft: NFT) => string;
 export type TitleExtractorMapping = Record<TitleExtractorTypes, Extractor>
+export type WebsiteUrlExtractorMapping = Record<WebsiteUrlExtractorTypes, Extractor>
 
 export const titleExtractors: TitleExtractorMapping = {
   [TitleExtractorTypes.METADATA_NAME]: (nft: NFT) => nft.metadata.name,
   [TitleExtractorTypes.METADATA_NAME_WITHOUT_LEADING_INFO]: (nft: NFT) => dropLeadingInfo(nft.metadata.name),
   [TitleExtractorTypes.ATTRIBUTES_TRAIT_SONG_TITLE]: (nft: NFT) => getTrait(nft, 'Song Title'),
-  [TitleExtractorTypes.ATTRIBUTES_TRAIT_TRACK]: (nft: NFT) => getTrait(nft, 'Track')
+  [TitleExtractorTypes.ATTRIBUTES_TRAIT_TRACK]: (nft: NFT) => getTrait(nft, 'Track'),
+}
+
+export const websiteUrlExtractors: WebsiteUrlExtractorMapping = {
+  [WebsiteUrlExtractorTypes.METADATA_EXTERNAL_URL]: (nft: NFT) => nft.metadata.external_url,
+  [WebsiteUrlExtractorTypes.USE_TOKEN_ID_APPENDED_EXTERNAL_URL]: (nft: NFT) => useTokenIdAppendedExternalUrl(nft),
+}
+
+const useTokenIdAppendedExternalUrl = (nft: NFT): string => {
+  const url = new URL(nft.metadata.external_url);
+  return `${url.origin}/token/${nft.tokenId}`;
+}
+
+export const websiteUrlExtractor = (contract: NftFactory): Extractor => {
+  const websiteUrlExtractorOverride = contract.typeMetadata?.overrides?.extractor?.websiteUrl;
+  if (!websiteUrlExtractorOverride) {
+    throw new Error('unknown extractor override provided')
+  }
+  return websiteUrlExtractors[websiteUrlExtractorOverride];
 }
 
 export const titleExtractor = (contract: NftFactory): Extractor => {
