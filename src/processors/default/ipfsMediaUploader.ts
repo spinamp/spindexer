@@ -1,7 +1,4 @@
-
-import { urlSource } from 'ipfs-http-client';
-
-
+import { urlSource } from '../../clients/ipfs';
 import { Table } from '../../db/db';
 import { artworkNotOnIpfs, audioNotOnIpfs } from '../../triggers/ipfs';
 import { IPFSFile } from '../../types/ipfsFIle';
