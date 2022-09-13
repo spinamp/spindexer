@@ -84,8 +84,9 @@ There are a few design goals for the system:
 ## Contributing
 The repo is still early and not hyper-polished or perfectly documented. Contributor guidelines are not ready yet, clear development docs and style/standard expectations are not extremely well documented yet. Interfaces are not well documented yet. Keep this in mind, so if you'd like to contribute:
  - First, reach out on Discord and connect with the team (https://discord.gg/8YS3peb62f) so we can help guide you in contributing
- - Read through the [Architecture](./Architecture.md) and [Ingestion](./Ingestion.md) docs which have some more details on the architecture and concepts used in the repo
+ - Read through the [Architecture](./docs/architecture.md) and [Ingestion](./docs/ingestion.md) docs which have some more details on the architecture and concepts used in the repo
  - Try set things up yourself, test it out, read the code.
  - Read the code some more, especially getting familiar with the [Processor](./src/types/processor.ts), [Trigger](./src/types/trigger.ts) and [Platform](./src/types/platform.ts) types and how they're used as interfaces :)
  - Check out the Github Project and Github Issues, still being improved
  - A note on migrations: If your PR includes a schema migration with new or changed fields, make sure it calls the updateViews method to update the corresponding views that are exposed in the API
+ - If you'd like to help with adding an artist's custom contract to the Spindexer, check out the [Basic Integration Guide](./docs/basic_integration_guide.md) or reach out to us
