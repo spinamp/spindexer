@@ -1,7 +1,8 @@
 import { Knex } from 'knex';
 
-import { CrdtMessage, getCrdtUpdateMessages } from '../../types/message';
-import { NFT, NftFactory } from '../../types/nft';
+import { ETHEREUM_NULL_ADDRESS } from '../../types/ethereum';
+import { CrdtMessage, getCrdtInsertMessage, getCrdtUpdateMessages } from '../../types/message';
+import { NFT, NFTContractTypeName, NftFactory, NFTStandard } from '../../types/nft';
 import { Table } from '../db';
 
 export const up = async (knex: Knex) => {
@@ -21,6 +22,32 @@ export const up = async (knex: Knex) => {
       approved: false
     })
   ]
+
+  messages.push(
+    getCrdtInsertMessage<NftFactory>(Table.nftFactories, ETHEREUM_NULL_ADDRESS,
+      {
+        id: ETHEREUM_NULL_ADDRESS,
+        approved: false,
+        autoApprove: false,
+        contractType: NFTContractTypeName.default,
+        platformId: 'zora',
+        standard: NFTStandard.ERC721,
+        
+      })
+  )
+
+  messages.push(
+    getCrdtInsertMessage<NftFactory>(Table.nftFactories, '0x0000000000000000000000000000000000000001',
+      {
+        id: '0x0000000000000000000000000000000000000001',
+        approved: false,
+        autoApprove: false,
+        contractType: NFTContractTypeName.default,
+        platformId: 'zora',
+        standard: NFTStandard.ERC721,
+        
+      })
+  )
 
 
   for (const message of messages){
