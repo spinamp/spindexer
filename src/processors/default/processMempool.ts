@@ -46,7 +46,7 @@ function categorizeMessages<MessageType extends CrdtInsertMessage | CrdtUpdateMe
 
       const value = _.sortBy([message.value, message.lastValue])[0];
 
-      // can discard if the last message value > freshest message value
+      // can discard if the last message value > freshest message value, due to the string ordering rule
       if (value === message.lastValue){
         return
       }
