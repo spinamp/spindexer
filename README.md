@@ -58,7 +58,7 @@ watch -n 60 "yarn start >> ./log" 2>&1
 Sometimes things fail (eg: an offchain API is down). This is fine and expected. Things should continue as expected on the next run of the script. Most NFTs/Tracks/Platforms that cause failure/errors are moved into an error queue and retried a few times after some delay so that they don't block progress for the rest of the indexer.
 
 When experimenting or testing new PRs that may have breaking changes, you may want to reset the db often or test rebuilding on specific tables.
-There are various commands that help with this:
+There are various common commands that help with this:
 
 ```
 // This will reset the database to the most recent backup. Useful for testing just the impact of your PR if it is merged and deployed as is.
@@ -70,6 +70,8 @@ yarn reset-db-minimal
 // This will just clear out tables related to track processing, not nft indexing. Useful to test out re-processing all tracks without having to redo nft indexing.
 yarn clear-track-tables
 ```
+
+See [Common Operations](./docs/common_operations.md) for more examples, or simply check out what's available in [package.json](./package.json).
 
 ## Design Goals
 There are a few design goals for the system:
