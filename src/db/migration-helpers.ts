@@ -127,7 +127,7 @@ async function getForeignKeys(knex: Knex): Promise<{
   return result.rows
 }
 
-function tableNameToViewName(tableName: string): string {
+export function tableNameToViewName(tableName: string): string {
   // remove raw_ prefix
   return tableName.substring(4)
 }
