@@ -139,6 +139,15 @@ export async function updateViews(knex: Knex){
 
   // create views
   for (const table of tables) {
+
+    // return early if table doesn't exist
+    const tableExistSql = `SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '${table}')`;
+    const exists = await knex.raw(tableExistSql);
+    if (!exists.rows[0].exists) {
+      console.log(`table ${table} does not exist yet, skipping view creation`);
+      return
+    }
+
     const viewName = tableNameToViewName(table);
     const override = overrides[table as Table];
 
