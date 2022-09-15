@@ -7,7 +7,7 @@ export const pendingMempoolInsertMessages: (tables: string) => Trigger<undefined
   (table) => {
     return async (clients) => {
       // join crdtState on insert messages so that
-      // each message can be compared with the last updated time to resolve conflicts
+      // each message can be compared with the last updated time and value to resolve conflicts
       const sql = `
       select rm.*, rcs."lastTimestamp", rcs.value as "lastValue"
       from raw_mempool rm 
@@ -15,8 +15,7 @@ export const pendingMempoolInsertMessages: (tables: string) => Trigger<undefined
       on rm."table" = rcs."table" 
       and rm."entityId" = rcs."entityId"
       where rm."table" = '${table}'
-      and rm.operation = '${CrdtOperation.INSERT}'
-      and rm.column = 'insert'
+      and rm.operation = '${CrdtOperation.UPSERT}'
       order by rm."table", rm."entityId", rm.timestamp
       limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
       `;
@@ -31,8 +30,9 @@ export const pendingMempoolUpdateMessages: (tables: string) => Trigger<undefined
     return async (clients) => {
       // join the message with the table that the message references so
       // messages can be ignored if the referenced id doesn't exist
-      // additionally join the crdtState, so that we can include the last processed timestamp for each message.
+      // additionally join the crdtState, so that we can include the last processed timestamp and value for each message.
       // the last processed timestamp can be used in the processor to determine if pending messages are fresh or stale
+      // and the values can be used to resolve timestamp conflicts via string sort
       const sql = `
       select rm.*, rcs."lastTimestamp", rcs.value as "lastValue"
       from raw_mempool rm 

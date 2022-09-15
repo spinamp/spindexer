@@ -3,7 +3,7 @@
 import { Table } from '../db/db';
 
 export enum CrdtOperation {
-  INSERT = 'insert',
+  UPSERT = 'upsert',
   UPDATE = 'update'
 } 
 
@@ -17,18 +17,18 @@ export type CrdtMessage = {
   operation: CrdtOperation
 }
 
-export type CrdtInsertMessage = CrdtMessage & {
-  operation: CrdtOperation.INSERT
+export type CrdtUpserttMessage = CrdtMessage & {
+  operation: CrdtOperation.UPSERT
 }
 export type CrdtUpdateMessage = CrdtMessage & {
   operation: CrdtOperation.UPDATE
 }
 
-export type MempoolMessage<T extends CrdtInsertMessage | CrdtUpdateMessage> = T & {
+export type MempoolMessage = CrdtMessage & {
   id: number;
 }
 
-export type PendingMempoolMessage<T extends CrdtInsertMessage | CrdtUpdateMessage> = MempoolMessage<T> & {
+export type PendingMempoolMessage = MempoolMessage & {
   lastTimestamp: Date;
   lastValue: string;
 }
@@ -36,15 +36,10 @@ export type PendingMempoolMessage<T extends CrdtInsertMessage | CrdtUpdateMessag
 export type CrdtState = {
   table: Table;
   entityId: string;
+  column: string;
   value: string;
   lastTimestamp: Date;
 }
-
-export type CrdtUpdateState = CrdtState & {
-  column: string;
-}
-
-export type CrdtInsertState = CrdtState;
 
 type Values<T> = {
   id: string;
@@ -63,13 +58,17 @@ export function getCrdtUpdateMessages<T>(table: Table, values: Values<T>): CrdtU
   return messages
 }
 
-export function getCrdtInsertMessage<T>(table: Table, id: string, data: T ): CrdtInsertMessage {
-  return {
-    timestamp: new Date(),
-    entityId: id,
+export function getCrdtUpsertMessages<T extends object>(table: Table, id: string, data: T ): CrdtUpserttMessage[] {
+  const time = new Date();
+  const messages: CrdtUpserttMessage[] = Object.keys(data).filter(key => key !== 'id').map(key => ({
+    timestamp: time,
     table,
-    column: 'insert',
-    value: JSON.stringify(data),
-    operation: CrdtOperation.INSERT
-  }
+    entityId: id,
+    column: key,
+    value: (data as any)[key],
+    operation: CrdtOperation.UPSERT
+  }));
+
+
+  return messages;
 }
