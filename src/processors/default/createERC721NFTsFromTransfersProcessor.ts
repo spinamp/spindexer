@@ -9,16 +9,15 @@ import { NFT, ERC721Transfer, NftFactory, NFTStandard } from '../../types/nft';
 import { NFTFactoryTypes } from '../../types/nftFactory';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';
+import { ethereumTransferId } from '../../utils/identifiers';
 
 const NAME = 'createERC721NFTsFromTransfers';
-
-const CHAIN = 'ethereum';
 
 const processorFunction = (contracts: NftFactory[]) =>
   async ({ newCursor, items }: { newCursor: Cursor, items: ethers.Event[] }, clients: Clients) => {
     const contractsByAddress = _.keyBy(contracts, 'id');
     const newNFTs: Partial<NFT>[] = [];
-    const updates: Partial<NFT>[] = [];
+    const updatedNFTs: Partial<NFT>[] = [];
     const transfers: Partial<ERC721Transfer>[] = [];
 
     items.forEach((item): Partial<NFT> | undefined => {
@@ -38,7 +37,7 @@ const processorFunction = (contracts: NftFactory[]) =>
       const nftId = contractType.buildNFTId(contractAddress, tokenId);
 
       transfers.push({
-        id: `${CHAIN}/${item.blockNumber}/${item.logIndex}`,
+        id: ethereumTransferId(item.blockNumber, item.logIndex),
         contractAddress: contractAddress,
         from: fromAddress,
         to: toAddress,
@@ -49,7 +48,7 @@ const processorFunction = (contracts: NftFactory[]) =>
       });
 
       if (!newMint(fromAddress)) {
-        updates.push({
+        updatedNFTs.push({
           id: nftId,
           owner: toAddress
         })
@@ -67,7 +66,7 @@ const processorFunction = (contracts: NftFactory[]) =>
     });
 
     await clients.db.insert(Table.nfts, newNFTs.filter(n => !!n), { ignoreConflict: 'id' });
-    await clients.db.update(Table.nfts, updates);
+    await clients.db.update(Table.nfts, updatedNFTs);
 
     const transferNftIds = transfers.map(transfer => transfer.nftId);
     const existingNfts = new Set((await clients.db.getRecords<NFT>(Table.nfts, [ ['whereIn', [ 'id', transferNftIds ]] ])).map(nft => nft.id));
