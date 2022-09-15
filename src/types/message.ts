@@ -11,21 +11,27 @@ export type CrdtMessage = {
   id?: string;
   timestamp: Date;
   table: Table,
-  entityId: string;
-  column: string;
-  value: string;
+  data: {
+    [column: string]: string
+  }
   operation: CrdtOperation
 }
 
-export type CrdtUpserttMessage = CrdtMessage & {
+export type CrdtUpsertMessage = CrdtMessage & {
   operation: CrdtOperation.UPSERT
 }
 export type CrdtUpdateMessage = CrdtMessage & {
   operation: CrdtOperation.UPDATE
 }
 
-export type MempoolMessage = CrdtMessage & {
-  id: number;
+export type MempoolMessage = {
+  id: string;
+  timestamp: Date;
+  table: Table;
+  column: string;
+  entityId: string;
+  value: string;
+  operation: CrdtOperation
 }
 
 export type PendingMempoolMessage = MempoolMessage & {
@@ -41,34 +47,30 @@ export type CrdtState = {
   lastTimestamp: Date;
 }
 
-type Values<T> = {
+type PartialValues<T> = {
   id: string;
 } & Partial<T>
 
-export function getCrdtUpdateMessages<T>(table: Table, values: Values<T>): CrdtUpdateMessage[]{
-  const messages: CrdtUpdateMessage[] = Object.keys(values).filter(key => key !== 'id').map(key => ({
-    timestamp: new Date(),
-    entityId: values.id,
-    table,
-    column: key,
-    value: (values as any)[key],
-    operation: CrdtOperation.UPDATE
-  }))
 
-  return messages
+type Values<T> = {
+  id: string;
+} & T
+
+export function getCrdtUpdateMessage<T>(table: Table, data: PartialValues<T>): CrdtUpdateMessage{
+  return {
+    timestamp: new Date(),
+    table,
+    data,
+    operation: CrdtOperation.UPDATE
+  }
 }
 
-export function getCrdtUpsertMessages<T extends object>(table: Table, id: string, data: T ): CrdtUpserttMessage[] {
+export function getCrdtUpsertMessages<T>(table: Table, id: string, data: Values<T> ): CrdtUpsertMessage {
   const time = new Date();
-  const messages: CrdtUpserttMessage[] = Object.keys(data).filter(key => key !== 'id').map(key => ({
+  return {
     timestamp: time,
     table,
-    entityId: id,
-    column: key,
-    value: (data as any)[key],
+    data: data,
     operation: CrdtOperation.UPSERT
-  }));
-
-
-  return messages;
+  }
 }

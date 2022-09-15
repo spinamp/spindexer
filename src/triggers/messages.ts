@@ -6,19 +6,31 @@ import { Cursor, Trigger } from '../types/trigger';
 export const pendingMempoolInsertMessages: (tables: string) => Trigger<undefined> = 
   (table) => {
     return async (clients) => {
-      // join crdtState on insert messages so that
+      // join crdtState on messages so that
       // each message can be compared with the last updated time and value to resolve conflicts
+      // each message is joined to crdtState via the keys in the data object
       const sql = `
-      select rm.*, rcs."lastTimestamp", rcs.value as "lastValue"
+      select rm.id, 
+      rm."timestamp",
+      rm."table",
+      column_key as "column",
+      rm."data"->>column_key as value,
+      rm."data"->>'id' as "entityId",
+      rm.operation , 
+      rcs."lastTimestamp",
+      rcs.value as "lastValue"
       from raw_mempool rm 
-      left outer join ${Table.crdtState} rcs
+      cross join jsonb_object_keys(rm."data") column_key
+      left outer join raw_crdt_state rcs
       on rm."table" = rcs."table" 
-      and rm."entityId" = rcs."entityId"
+      and column_key = rcs."column"
+      and rm."data"->>'id' = rcs."entityId"
       where rm."table" = '${table}'
       and rm.operation = '${CrdtOperation.UPSERT}'
-      order by rm."table", rm."entityId", rm.timestamp
+      and column_key != 'id'
+      order by rm."table", column_key, rm."data"->>'id', rm.timestamp
       limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
-      `;
+      `
 
       const result = await clients.db.rawSQL(sql);
       return result.rows;
@@ -28,24 +40,36 @@ export const pendingMempoolInsertMessages: (tables: string) => Trigger<undefined
 export const pendingMempoolUpdateMessages: (tables: string) => Trigger<undefined> = 
   (table) => {
     return async (clients) => {
+      // each message has a 'data' field which is an object where the keys reference columns in the target table.
       // join the message with the table that the message references so
-      // messages can be ignored if the referenced id doesn't exist
-      // additionally join the crdtState, so that we can include the last processed timestamp and value for each message.
+      // messages can be ignored if the referenced id doesn't exist.
+      // additionally join the crdtState on the keys of 'data' so that we can include the last processed timestamp and value for each column.
       // the last processed timestamp can be used in the processor to determine if pending messages are fresh or stale
       // and the values can be used to resolve timestamp conflicts via string sort
       const sql = `
-      select rm.*, rcs."lastTimestamp", rcs.value as "lastValue"
+      select 
+      rm.id, 
+      rm."timestamp",
+      rm."table",
+      column_key as "column",
+      rm."data"->>column_key as value,
+      rm."data"->>'id' as "entityId",
+      rm.operation,
+      rcs."lastTimestamp",
+      rcs.value as "lastValue"
       from raw_mempool rm 
-      left outer join ${table} t 
-      on rm."entityId" = t.id
-      left outer join ${Table.crdtState} rcs
-      on rm."table" = rcs."table" 
-      and rm."column" = rcs."column" 
-      and rm."entityId" = rcs."entityId"
+      left outer join ${table} t
+      on rm."data"->>'id' = t.id
+      cross join jsonb_object_keys(rm."data"::jsonb) column_key
+      left outer join raw_crdt_state rcs 
+      on rm."table" = rcs."table"
+      and column_key = rcs."column" 
+      and rm."data"->>'id' = rcs."entityId" 
       where rm."table" = '${table}'
       and rm.operation = '${CrdtOperation.UPDATE}'
       and t.id is not null
-      order by rm."table", rm."column", rm."entityId", rm.timestamp
+      and column_key != 'id'
+      order by rm."table", rm."data"->>'id', rm."timestamp"
       limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
       `;
 

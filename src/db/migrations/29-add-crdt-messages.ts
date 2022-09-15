@@ -9,9 +9,7 @@ export const up = async (knex: Knex) => {
     table.increments('id').primary();
     table.dateTime('timestamp');
     table.enu('table', Object.values(Table));
-    table.string('column');
-    table.string('entityId');
-    table.string('value');
+    table.jsonb('data');
     table.enu('operation', Object.values(CrdtOperation));
   })
 
@@ -28,9 +26,7 @@ export const up = async (knex: Knex) => {
     table.increments('id')
     table.dateTime('timestamp')
     table.enu('table', Object.values(Table));
-    table.string('column');
-    table.string('entityId');
-    table.string('value');
+    table.jsonb('data')
     table.enu('operation', Object.values(CrdtOperation));
   })
 

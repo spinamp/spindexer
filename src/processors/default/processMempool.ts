@@ -13,6 +13,9 @@ function categorizeMessages
   const entityUpdates: { [id: string]: any } = {};
   const crdtUpdates: CrdtState[] = [];
 
+  // NOTE: messages can be partially processed. If a column in a message is stale, it will be ignored but the rest of the message
+  // will still be processed. 
+
   // group by entity so that we can easily categorize fresh and stale messages.
   // messages within each group are ordered by timestamp in the trigger, so it's safe to assume 
   // the last message of each group is the freshest
@@ -62,7 +65,7 @@ function categorizeMessages
       lastTimestamp: message.timestamp,
     })
   })
-    
+  
   const objectUpdates = Object.keys(entityUpdates).map(key => ({
     ...entityUpdates[key],
     id: key,
