@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { Table } from '../../db/db';
 import { newERC721Transfers } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
-import { ETHEREUM_NULL_ADDRESS } from '../../types/ethereum';
+import { newMint } from '../../types/ethereum';
 import { NFT, ERC721Transfer, NftFactory, NFTStandard } from '../../types/nft';
 import { NFTFactoryTypes } from '../../types/nftFactory';
 import { Clients, Processor } from '../../types/processor';
@@ -31,32 +31,37 @@ const processorFunction = (contracts: NftFactory[]) =>
         throw 'buildNFTId not specified'
       }
 
+      const contractAddress = formatAddress(contract.id);
+      const fromAddress = formatAddress(item.args!.from);
+      const toAddress = formatAddress(item.args!.to);
       const tokenId = BigInt((item.args!.tokenId as BigNumber).toString());
-      const newMint = item.args!.from === ETHEREUM_NULL_ADDRESS;
+      const nftId = contractType.buildNFTId(contractAddress, tokenId);
+
       transfers.push({
         id: `${CHAIN}/${item.blockNumber}/${item.logIndex}`,
-        contractAddress: formatAddress(contract.id),
-        from: item.args!.from,
-        to: item.args!.to,
+        contractAddress: contractAddress,
+        from: fromAddress,
+        to: toAddress,
         tokenId,
         createdAtEthereumBlockNumber: '' + item.blockNumber,
-        nftId: contractType.buildNFTId(contract.id, tokenId), 
+        nftId: nftId,
         transactionHash: item.transactionHash
       });
-      if (!newMint) {
+
+      if (!newMint(fromAddress)) {
         updates.push({
-          id: contractType.buildNFTId(contract.id, tokenId),
-          owner: item.args!.to
+          id: nftId,
+          owner: toAddress
         })
         return undefined;
       }
       newNFTs.push({
-        id: contractType.buildNFTId(contract.id, tokenId),
+        id: nftId,
         createdAtEthereumBlockNumber: '' + item.blockNumber,
-        contractAddress: formatAddress(contract.id),
+        contractAddress: contractAddress,
         tokenId,
         platformId: contract.platformId,
-        owner: item.args!.to,
+        owner: toAddress,
         approved: contract.autoApprove
       });
     });
