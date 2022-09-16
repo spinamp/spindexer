@@ -7,6 +7,7 @@ import { formatAddress } from '../../types/address';
 import { newMint } from '../../types/ethereum';
 import { NFT, ERC721Transfer, NftFactory, NFTStandard } from '../../types/nft';
 import { NFTFactoryTypes } from '../../types/nftFactory';
+import { consolidate, Collector, NFTsCollectors } from '../../types/nftsCollectors';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';
 import { ethereumTransferId } from '../../utils/identifiers';
@@ -19,6 +20,7 @@ const processorFunction = (contracts: NftFactory[]) =>
     const newNFTs: Partial<NFT>[] = [];
     const updatedNFTs: Partial<NFT>[] = [];
     const transfers: Partial<ERC721Transfer>[] = [];
+    const updatedNftsCollectors: NFTsCollectors[] = [];
 
     items.forEach((item): Partial<NFT> | undefined => {
       const address = item.address;
@@ -52,6 +54,8 @@ const processorFunction = (contracts: NftFactory[]) =>
           id: nftId,
           owner: toAddress
         })
+        updatedNftsCollectors.push({ nftId: nftId, collectorId: fromAddress, amount: -1 })
+        updatedNftsCollectors.push({ nftId: nftId, collectorId: toAddress, amount: 1 })
         return undefined;
       }
       newNFTs.push({
@@ -63,8 +67,25 @@ const processorFunction = (contracts: NftFactory[]) =>
         owner: toAddress,
         approved: contract.autoApprove
       });
+      updatedNftsCollectors.push({ nftId: nftId, collectorId: toAddress, amount: 1 })
     });
 
+    // update Collectors table
+    const allCollectors = updatedNftsCollectors.map<Collector>(({ collectorId }) => { return { id: collectorId } } );
+    await clients.db.insert(Table.collectors, _.uniqBy(allCollectors, 'id'), { ignoreConflict: 'id' })
+
+    // fetch any existing NftCollectors
+    const idPairs = _.uniq(updatedNftsCollectors.map( (e) => [e.nftId, e.collectorId] ))
+    const existingNftsCollectors = await clients.db.getRecords<NFTsCollectors>(Table.nftsCollectors,
+      [ ['whereIn', [ ['nftId', 'collectorId'], idPairs ] ] ]
+    );
+
+    // update all NFTsCollectors with most up to date amounts
+    const fullNftsCollectors = updatedNftsCollectors.concat(existingNftsCollectors)
+    const consolidatedNftsCollectors = consolidate(fullNftsCollectors)
+    await clients.db.insert(Table.nftsCollectors, consolidatedNftsCollectors, { ignoreConflict: ['nftId', 'collectorId'] });
+
+    // update NFTs table
     await clients.db.insert(Table.nfts, newNFTs.filter(n => !!n), { ignoreConflict: 'id' });
     await clients.db.update(Table.nfts, updatedNFTs);
 
@@ -72,6 +93,7 @@ const processorFunction = (contracts: NftFactory[]) =>
     const existingNfts = new Set((await clients.db.getRecords<NFT>(Table.nfts, [ ['whereIn', [ 'id', transferNftIds ]] ])).map(nft => nft.id));
     const transfersForExistingNfts = transfers.filter(transfer => existingNfts.has(transfer.nftId!));
 
+    // update ERC721Transfers table
     await clients.db.insert(Table.erc721Transfers, transfersForExistingNfts);
     await clients.db.updateProcessor(NAME, newCursor);
   };

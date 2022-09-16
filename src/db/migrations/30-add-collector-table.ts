@@ -11,10 +11,11 @@ export const up = async (knex: Knex) => {
   } )
 
   await knex.schema.createTable(Table.nftsCollectors, table => {
-    table.string('nftId').references('id').inTable(Table.nfts).onDelete('cascade');
+    table.string('nftId') //.references('id').inTable(Table.nfts).onDelete('cascade'); // cannot enforce this because we might not have the nft yet due to order of processing
     table.string('collectorId').references('id').inTable(Table.collectors).onDelete('cascade');
     table.integer('amount').defaultTo(1);
     table.primary(['nftId','collectorId']);
+    table.unique(['nftId','collectorId']);
   } )
 
   await knex.raw(`
@@ -39,9 +40,10 @@ export const up = async (knex: Knex) => {
 
 export const down = async (knex: Knex) => {
   await knex.schema.alterTable(Table.nftsCollectors, table => {
-    table.dropForeign('nftid');
+    // table.dropForeign('nftid');
     table.dropForeign('collectorid');
     table.dropPrimary('raw_nfts_collectors_pkey');
+    table.dropUnique(['nftId','collectorId']);
   });
 
   await knex.schema.alterTable(Table.collectors, table => {
