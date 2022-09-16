@@ -19,17 +19,19 @@ export const pendingMempoolInsertMessages: (tables: string) => Trigger<undefined
       rm.operation , 
       rcs."lastTimestamp",
       rcs.value as "lastValue"
-      from raw_mempool rm 
+      from (
+        select * from ${Table.mempool} 
+        where "table" = '${table}'
+        and operation = '${CrdtOperation.UPSERT}'
+        limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
+      ) as rm 
       cross join jsonb_object_keys(rm."data") column_key
-      left outer join raw_crdt_state rcs
+      left outer join ${Table.crdtState} rcs
       on rm."table" = rcs."table" 
       and column_key = rcs."column"
       and rm."data"->>'id' = rcs."entityId"
-      where rm."table" = '${table}'
-      and rm.operation = '${CrdtOperation.UPSERT}'
-      and column_key != 'id'
+      where column_key != 'id'
       order by rm."table", column_key, rm."data"->>'id', rm.timestamp
-      limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
       `
 
       const result = await clients.db.rawSQL(sql);
@@ -57,20 +59,23 @@ export const pendingMempoolUpdateMessages: (tables: string) => Trigger<undefined
       rm.operation,
       rcs."lastTimestamp",
       rcs.value as "lastValue"
-      from raw_mempool rm 
+      from (
+        select *
+        from ${Table.mempool}
+        where "table" = '${table}'
+        and operation = '${CrdtOperation.UPDATE}'
+        limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
+      ) as rm
       left outer join ${table} t
       on rm."data"->>'id' = t.id
-      cross join jsonb_object_keys(rm."data"::jsonb) column_key
-      left outer join raw_crdt_state rcs 
+      cross join jsonb_object_keys(rm."data") column_key
+      left outer join ${Table.crdtState} rcs 
       on rm."table" = rcs."table"
       and column_key = rcs."column" 
       and rm."data"->>'id' = rcs."entityId" 
-      where rm."table" = '${table}'
-      and rm.operation = '${CrdtOperation.UPDATE}'
-      and t.id is not null
+      where t.id is not null
       and column_key != 'id'
       order by rm."table", rm."data"->>'id', rm."timestamp"
-      limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
       `;
 
       const result = await clients.db.rawSQL(sql);
