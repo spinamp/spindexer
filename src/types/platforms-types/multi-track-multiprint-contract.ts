@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
-import { resolveEthereumTrackIdOverrides, titleExtractor } from '../fieldExtractor';
+import { resolveEthereumTrackIdOverrides, titleExtractor, websiteUrlExtractor } from '../fieldExtractor';
 import { MapNFTsToTrackIds, MapTrack } from '../mapping';
 import { NFT, NftFactory } from '../nft';
 import { ProcessedTrack } from '../track';
@@ -40,7 +40,7 @@ const mapTrack: MapTrack = (
     lossyArtworkIPFSHash,
     lossyAudioURL,
     lossyArtworkURL,
-    websiteUrl: nft.metadata.external_url,
+    websiteUrl: websiteUrlExtractor(contract)(nft),
     artistId: mapArtistProfile({ apiTrack: apiTrack, nft: nft, contract: contract }).artistId,
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
