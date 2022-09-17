@@ -34,6 +34,7 @@ export type EthClient = {
   call: (ethCalls: EthCall[]) => Promise<unknown[]>;
   getEventsFrom: (fromBlock: string, toBlock: string, contractFilters: ContractFilter[]) => Promise<Events[]>;
   getBlockTimestamps: (blockHashes: string[]) => Promise<number[]>;
+  getBlockTimestampsByBlockNumber: (blockNumbers: number[]) => Promise<{ [blockNumber: number]: number }>;
   getLatestBlockNumber: () => Promise<number>;
 }
 
@@ -132,6 +133,19 @@ const init = async (): Promise<EthClient> => {
         throw new Error('Failed to get all block timestamps');
       }
       return results.map(result => result.response!.timestamp);
+    },
+    getBlockTimestampsByBlockNumber: async (blockNumbers: number[]) => {
+      const getBlock = provider.getBlock.bind(provider);
+      const results = await rollPromises(blockNumbers, getBlock);
+      const failedBlocks = results.filter(result => result.isError);
+      if (failedBlocks.length !== 0) {
+        throw new Error('Failed to get all block timestamps');
+      }
+
+      return results.reduce((prev, result) => 
+        ({ ...prev, [result.response!.number]: result.response!.timestamp }),
+      {}
+      );
     }
   }
 }
