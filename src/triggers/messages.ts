@@ -60,20 +60,20 @@ export const pendingMempoolUpdateMessages: (tables: string) => Trigger<undefined
       rcs."lastTimestamp",
       rcs.value as "lastValue"
       from (
-        select *
-        from ${Table.mempool}
+        select rm.*
+        from ${Table.mempool} rm
+        left outer join ${table} t
+        on rm."data"->>'id' = t.id
         where "table" = '${table}'
         and operation = '${CrdtOperation.UPDATE}'
+        and t.id is not null
         limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
       ) as rm
-      left outer join ${table} t
-      on rm."data"->>'id' = t.id
       cross join jsonb_object_keys(rm."data") column_key
       left outer join ${Table.crdtState} rcs 
       on rm."table" = rcs."table"
       and column_key = rcs."column" 
       and rm."data"->>'id' = rcs."entityId" 
-      where t.id is not null
       and column_key != 'id'
       order by rm."table", rm."data"->>'id', rm."timestamp"
       `;
