@@ -17,7 +17,7 @@ const MIGHTY_33: MusicPlatform = {
 
 const OTHERS_DIE: NftFactory = {
   id: '0x97b9f21b41041e344f5bd71e3e86b69e79dcc0a6',
-  startingBlock: '10876005',
+  startingBlock: '10876004',
   platformId: 'geniuscorp.fr',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
