@@ -22,20 +22,6 @@ export const up = async (knex: Knex) => {
     table.boolean('burned').defaultTo(false);
   });
 
-  await knex.raw(`
-    INSERT INTO ${Table.collectors} (id)
-    SELECT DISTINCT owner
-    FROM ${Table.nfts}
-    WHERE owner IS NOT null;
-  `)
-
-  await knex.raw(`
-    INSERT INTO ${Table.nftsCollectors} ("nftId", "collectorId")
-    SELECT DISTINCT id, owner
-    FROM ${Table.nfts}
-    WHERE owner IS NOT null;
-  `)
-
   await knex.raw(`GRANT SELECT ON "${Table.collectors}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`GRANT SELECT ON "${Table.nftsCollectors}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
 
