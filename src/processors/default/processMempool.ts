@@ -13,8 +13,7 @@ function categorizeMessages
   const entityUpdates: { [id: string]: any } = {};
   const crdtUpdates: CrdtState[] = [];
 
-  // NOTE: messages can be partially processed. If a column in a message is stale, it will be ignored but the rest of the message
-  // will still be processed. 
+  // NOTE: messages with stale columns are still processed. If a message contains a stale update, that update will not be applied, but the message is still considered processed
 
   // group by entity so that we can easily categorize fresh and stale messages.
   // messages within each group are ordered by timestamp in the trigger, so it's safe to assume 
