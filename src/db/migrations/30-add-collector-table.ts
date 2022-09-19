@@ -11,12 +11,16 @@ export const up = async (knex: Knex) => {
   } )
 
   await knex.schema.createTable(Table.nftsCollectors, table => {
-    table.string('nftId') //.references('id').inTable(Table.nfts).onDelete('cascade'); // cannot enforce this because we might not have the nft yet due to order of processing
+    table.string('nftId').references('id').inTable(Table.nfts).onDelete('cascade');
     table.string('collectorId').references('id').inTable(Table.collectors).onDelete('cascade');
     table.integer('amount').defaultTo(1);
     table.primary(['nftId','collectorId']);
     table.unique(['nftId','collectorId']);
   } )
+
+  await knex.schema.alterTable(Table.nfts, table => {
+    table.boolean('burned').defaultTo(false);
+  });
 
   await knex.raw(`
     INSERT INTO ${Table.collectors} (id)
@@ -40,7 +44,7 @@ export const up = async (knex: Knex) => {
 
 export const down = async (knex: Knex) => {
   await knex.schema.alterTable(Table.nftsCollectors, table => {
-    // table.dropForeign('nftid');
+    table.dropForeign('nftid');
     table.dropForeign('collectorid');
     table.dropPrimary('raw_nfts_collectors_pkey');
     table.dropUnique(['nftId','collectorId']);
@@ -52,6 +56,12 @@ export const down = async (knex: Knex) => {
 
   await knex.schema.dropViewIfExists(tableNameToViewName(Table.collectors));
   await knex.schema.dropViewIfExists(tableNameToViewName(Table.nftsCollectors));
+  await knex.schema.dropViewIfExists(tableNameToViewName(Table.nfts));
   await knex.schema.dropTable(Table.collectors);
   await knex.schema.dropTable(Table.nftsCollectors);
+  await knex.schema.alterTable(Table.nfts, table => {
+    table.dropColumn('burned');
+  });
+
+  await updateViews(knex);
 }

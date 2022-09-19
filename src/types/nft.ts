@@ -25,6 +25,7 @@ export type NFT = Record & {
   owner: string
   standard: NFTStandard;
   approved: boolean;
+  burned: boolean;
 }
 
 export type ERC721Transfer = Record & {

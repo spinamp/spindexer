@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { Table } from '../../db/db';
 import { newERC721Transfers } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
-import { newMint } from '../../types/ethereum';
+import { burned, newMint } from '../../types/ethereum';
 import { NFT, ERC721Transfer, NftFactory, NFTStandard } from '../../types/nft';
 import { NFTFactoryTypes } from '../../types/nftFactory';
 import { consolidate, Collector, NFTsCollectors, NFTsCollectorsChanges } from '../../types/nftsCollectors';
@@ -22,7 +22,7 @@ const processorFunction = (contracts: NftFactory[]) =>
     const transfers: Partial<ERC721Transfer>[] = [];
     const nftsCollectorsChanges: NFTsCollectorsChanges[] = [];
 
-    items.forEach((item): Partial<NFT> | undefined => {
+    items.forEach((item): void => {
       const address = item.address;
       const contract = contractsByAddress[address];
       const contractTypeName = contract.contractType;
@@ -32,9 +32,9 @@ const processorFunction = (contracts: NftFactory[]) =>
         throw 'buildNFTId not specified'
       }
 
-      const contractAddress = formatAddress(contract.id);
-      const fromAddress = formatAddress(item.args!.from);
       const toAddress = formatAddress(item.args!.to);
+      const fromAddress = formatAddress(item.args!.from);
+      const contractAddress = formatAddress(contract.id);
       const tokenId = BigInt((item.args!.tokenId as BigNumber).toString());
       const nftId = contractType.buildNFTId(contractAddress, tokenId);
 
@@ -52,22 +52,25 @@ const processorFunction = (contracts: NftFactory[]) =>
       if (!newMint(fromAddress)) {
         updatedNFTs.push({
           id: nftId,
-          owner: toAddress
+          owner: toAddress,
+          burned: burned(toAddress)
         })
         nftsCollectorsChanges.push({ nftId: nftId, collectorId: fromAddress, amount: -1 })
+        if (!burned(toAddress)) {
+          nftsCollectorsChanges.push({ nftId: nftId, collectorId: toAddress, amount: 1 })
+        }
+      } else {
+        newNFTs.push({
+          id: nftId,
+          createdAtEthereumBlockNumber: '' + item.blockNumber,
+          contractAddress: contractAddress,
+          tokenId,
+          platformId: contract.platformId,
+          owner: toAddress,
+          approved: contract.autoApprove
+        });
         nftsCollectorsChanges.push({ nftId: nftId, collectorId: toAddress, amount: 1 })
-        return undefined;
       }
-      newNFTs.push({
-        id: nftId,
-        createdAtEthereumBlockNumber: '' + item.blockNumber,
-        contractAddress: contractAddress,
-        tokenId,
-        platformId: contract.platformId,
-        owner: toAddress,
-        approved: contract.autoApprove
-      });
-      nftsCollectorsChanges.push({ nftId: nftId, collectorId: toAddress, amount: 1 })
     });
 
     const allCollectors = nftsCollectorsChanges.map<Collector>(({ collectorId }) => { return { id: collectorId } } );
@@ -80,7 +83,7 @@ const processorFunction = (contracts: NftFactory[]) =>
     const updatedNftsCollectors = consolidate(allNftsCollectorsChanges)
 
     await clients.db.insert(Table.nfts, newNFTs.filter(n => !!n), { ignoreConflict: 'id' });
-    await clients.db.update(Table.nfts, updatedNFTs);
+    await clients.db.upsert(Table.nfts, updatedNFTs);
     await clients.db.insert(Table.collectors, _.uniqBy(allCollectors, 'id'), { ignoreConflict: 'id' })
     await clients.db.insert(Table.nftsCollectors, updatedNftsCollectors, { ignoreConflict: ['nftId', 'collectorId'] });
 
