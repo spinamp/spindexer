@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
-import { resolveEthereumTrackIdOverrides, titleExtractor, websiteUrlExtractor } from '../fieldExtractor';
+import { audioUrlExtractor, resolveEthereumTrackIdOverrides, titleExtractor, websiteUrlExtractor } from '../fieldExtractor';
 import { MapNFTsToTrackIds, MapTrack } from '../mapping';
 import { NFT, NftFactory } from '../nft';
 import { ProcessedTrack } from '../track';
@@ -17,10 +17,10 @@ const mapTrack: MapTrack = (
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
   }
 
-  const lossyAudioIPFSHash = extractHashFromURL(nft.metadata.animation_url) || undefined;
-  const lossyArtworkIPFSHash = extractHashFromURL(nft.metadata.image) || undefined;
-  const lossyAudioURL = nft.metadata.animation_url;
+  const lossyAudioURL = audioUrlExtractor(contract)(nft);
   const lossyArtworkURL = nft.metadata.image;
+  const lossyAudioIPFSHash = extractHashFromURL(lossyAudioURL) || undefined;
+  const lossyArtworkIPFSHash = extractHashFromURL(lossyArtworkURL) || undefined;
 
   if (!lossyAudioIPFSHash && !lossyAudioURL) {
     throw new Error('Failed to extract audio from nft');

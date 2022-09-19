@@ -22,10 +22,9 @@ const getMetadataObject = async (nft: NFT, timeout: number, axios: Axios, ipfs: 
   if (!metadataURL) {
     return Promise.reject({ message: `Metadata metadataURL missing` });
   }
-  
+
   if (metadataURL.startsWith('data:application/json;base64,')){
     try {
-
       const base64 = metadataURL.substring(metadataURL.indexOf(',') + 1);
       const data = Buffer.from(base64, 'base64').toString('utf-8')
       const metadata = JSON.parse(data);
@@ -36,7 +35,7 @@ const getMetadataObject = async (nft: NFT, timeout: number, axios: Axios, ipfs: 
       }
     }
   }
-  
+
   let queryURL = metadataURL;
   if (nft.metadataIPFSHash) {
     queryURL = ipfs.getHTTPURL(nft.metadataIPFSHash);

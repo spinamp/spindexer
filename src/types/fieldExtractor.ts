@@ -4,8 +4,9 @@ import { dropLeadingInfo } from '../utils/sanitizers';
 import { getTrait, NFT, NftFactory } from './nft';
 
 export type ExtractorTypes = {
-  title?: TitleExtractorTypes
   id?: IdExtractorTypes
+  title?: TitleExtractorTypes
+  audioUrl?: AudioUrlExtractorTypes
   websiteUrl?: WebsiteUrlExtractorTypes
 }
 
@@ -20,6 +21,11 @@ export enum IdExtractorTypes {
   USE_TITLE_EXTRACTOR = 'useTitleExtractor',
 }
 
+export enum AudioUrlExtractorTypes {
+  METADATA_ANIMATION_URL = 'metadata.animation_url',
+  ATTRIBUTES_TRAIT_AUDIO = 'attributes.trait.audio',
+}
+
 export enum WebsiteUrlExtractorTypes {
   METADATA_EXTERNAL_URL = 'metadata.externalUrl',
   USE_TOKEN_ID_APPENDED_EXTERNAL_URL = 'useTokenIdAppendedExternalUrl',
@@ -27,6 +33,7 @@ export enum WebsiteUrlExtractorTypes {
 
 export type Extractor = (nft: NFT) => string;
 export type TitleExtractorMapping = Record<TitleExtractorTypes, Extractor>
+export type AudioUrlExtractorMapping = Record<AudioUrlExtractorTypes, Extractor>
 export type WebsiteUrlExtractorMapping = Record<WebsiteUrlExtractorTypes, Extractor>
 
 export const titleExtractors: TitleExtractorMapping = {
@@ -35,6 +42,12 @@ export const titleExtractors: TitleExtractorMapping = {
   [TitleExtractorTypes.ATTRIBUTES_TRAIT_SONG_TITLE]: (nft: NFT) => getTrait(nft, 'Song Title'),
   [TitleExtractorTypes.ATTRIBUTES_TRAIT_TRACK]: (nft: NFT) => getTrait(nft, 'Track'),
 }
+
+export const audioUrlExtractors: AudioUrlExtractorMapping = {
+  [AudioUrlExtractorTypes.METADATA_ANIMATION_URL]: (nft: NFT) => nft.metadata.animation_url,
+  [AudioUrlExtractorTypes.ATTRIBUTES_TRAIT_AUDIO]: (nft: NFT) => getTrait(nft, 'Audio'),
+}
+
 
 export const websiteUrlExtractors: WebsiteUrlExtractorMapping = {
   [WebsiteUrlExtractorTypes.METADATA_EXTERNAL_URL]: (nft: NFT) => nft.metadata.external_url,
@@ -52,6 +65,14 @@ export const websiteUrlExtractor = (contract: NftFactory): Extractor => {
     return websiteUrlExtractors[WebsiteUrlExtractorTypes.METADATA_EXTERNAL_URL]
   }
   return websiteUrlExtractors[websiteUrlExtractorOverride];
+}
+
+export const audioUrlExtractor = (contract: NftFactory): Extractor => {
+  const audioUrlExtractorOverride = contract.typeMetadata?.overrides?.extractor?.audioUrl;
+  if (!audioUrlExtractorOverride) {
+    return audioUrlExtractors[AudioUrlExtractorTypes.METADATA_ANIMATION_URL]
+  }
+  return audioUrlExtractors[audioUrlExtractorOverride];
 }
 
 export const titleExtractor = (contract: NftFactory): Extractor => {
