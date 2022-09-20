@@ -27,7 +27,7 @@ const EXAMPLE_PLATFORM: MusicPlatform = {
 const EXAMPLE_ALBUM_OR_TRACK_COLLECTION: NftFactory = {
 {
   id: '0x141...',                            // album/collection/track address              [4]
-  startingBlock: '15151004',                 // earliest block number                       [5]
+  startingBlock: '15151004',                 // block number before contract inception      [5]
   platformId: EXAMPLE_PLATFORM.id,           // new/existing platform id                    [6]
   standard: NFTStandard.ERC721,              // contract type (relates to the chain)        [7]
   contractType: NFTContractTypeName.default, // other contract variation (custom or forked) [8]
