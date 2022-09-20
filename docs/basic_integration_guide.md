@@ -41,7 +41,7 @@ const EXAMPLE_PLATFORM: MusicPlatform = {
 const EXAMPLE_ALBUM_OR_TRACK_COLLECTION: NftFactory = {
 {
   id: '0x141...',                            // album/collection/track address              [4]
-  startingBlock: '15151004',                 // earliest block number                       [5]
+  startingBlock: '15151004',                 // block number before contract inception      [5]
   platformId: EXAMPLE_PLATFORM.id,           // new/existing platform id                    [6]
   standard: NFTStandard.ERC721,              // contract type (relates to the chain)        [7]
   contractType: NFTContractTypeName.default, // other contract variation (custom or forked) [8]
@@ -100,10 +100,10 @@ It is also important to know what to expect after the integration is complete, s
 
 - For an album or a collection, this is usually found via an Etherscan/Solscan link on the page via OpenSea.
 
-[5] Earliest block number
+[5] Block number before contract inception
 
-- Looking at the collection through Etherscan/Solscan, check the list of transactions to find the earliest transaction block.
-- Etherscan/Solscan shows the last 25 transactions by default so make sure to expand the full list to find the earliest block!
+- Looking at the collection through Etherscan/Solscan, click through to the "at txn" for the "Contract Creator" to find the contract's starting
+block. Subtract 1 from this block number and you've got your block number before contract inception.
 
 [6] New/existing platform id
 
