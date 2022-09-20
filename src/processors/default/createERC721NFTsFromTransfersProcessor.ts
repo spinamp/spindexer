@@ -83,9 +83,9 @@ const processorFunction = (contracts: NftFactory[]) =>
     const updatedNftsCollectors = consolidate(allNftsCollectorsChanges)
 
     await clients.db.insert(Table.nfts, newNFTs.filter(n => !!n), { ignoreConflict: 'id' });
-    await clients.db.upsert(Table.nfts, updatedNFTs);
-    await clients.db.insert(Table.collectors, _.uniqBy(allCollectors, 'id'), { ignoreConflict: 'id' })
-    await clients.db.insert(Table.nftsCollectors, updatedNftsCollectors, { ignoreConflict: ['nftId', 'collectorId'] });
+    await clients.db.update(Table.nfts, updatedNFTs);
+    await clients.db.upsert(Table.collectors, _.uniqBy(allCollectors, 'id'))
+    await clients.db.upsert(Table.nftsCollectors, updatedNftsCollectors, ['nftId', 'collectorId']);
 
     const transferNftIds = transfers.map(transfer => transfer.nftId);
     const existingNfts = new Set((await clients.db.getRecords<NFT>(Table.nfts, [ ['whereIn', [ 'id', transferNftIds ]] ])).map(nft => nft.id));
