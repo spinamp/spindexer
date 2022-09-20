@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
-import { audioUrlExtractor, resolveEthereumTrackIdOverrides, titleExtractor, websiteUrlExtractor } from '../fieldExtractor';
+import { audioUrlExtractor, resolveArtistIdOverrides, resolveArtistNameOverrides, resolveEthereumTrackIdOverrides, titleExtractor, websiteUrlExtractor } from '../fieldExtractor';
 import { MapNFTsToTrackIds, MapTrack } from '../mapping';
 import { NFT, NftFactory } from '../nft';
 import { ProcessedTrack } from '../track';
@@ -59,9 +59,10 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
   if (!contract) {
     throw new Error(`Contract missing for mapArtistProfile for nft ${nft.id}`)
   }
+
   return {
-    name: contract.platformId,
-    artistId: contract.platformId,
+    name: resolveArtistNameOverrides(nft, contract),
+    artistId: resolveArtistIdOverrides(nft, contract),
     platformInternalId: contract.platformId,
     platformId: contract.platformId,
     avatarUrl: undefined,
