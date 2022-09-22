@@ -154,7 +154,7 @@ export async function updateViews(knex: Knex){
   
   // drop existing views
   for (const { view_name } of views){
-    await knex.raw(`drop view ${view_name}`)
+    await knex.schema.dropViewIfExists(view_name);
   }
 
   // create views
