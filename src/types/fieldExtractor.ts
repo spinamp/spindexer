@@ -40,6 +40,7 @@ export enum ArtistNameExtractorTypes {
 
 export enum ArtistIdExtractorTypes {
   USE_PLATFORM_AND_ARTIST_NAME = 'usePlatformAndArtistName',
+  USE_PLATFORM_ID = 'usePlatformId',
 }
 
 export type Extractor = (nft: NFT) => string;
@@ -137,8 +138,13 @@ export const resolveArtistNameOverrides = (nft: NFT, contract: NftFactory): stri
 
 export const resolveArtistIdOverrides = (nft: NFT, contract: NftFactory): string => {
   const artistIdExtractorOverride = contract.typeMetadata?.overrides?.extractor?.artistId;
-  if (!artistIdExtractorOverride || (artistIdExtractorOverride !== ArtistIdExtractorTypes.USE_PLATFORM_AND_ARTIST_NAME)) {
-    return contract.platformId;
+  if (artistIdExtractorOverride) {
+    if (artistIdExtractorOverride === ArtistIdExtractorTypes.USE_PLATFORM_ID) {
+      return contract.platformId;
+    }
+    else if (artistIdExtractorOverride === ArtistIdExtractorTypes.USE_PLATFORM_AND_ARTIST_NAME) {
+      return `${contract.platformId}/${slugify(resolveArtistNameOverrides(nft, contract))}`;
+    }
   }
-  return `${contract.platformId}/${slugify(resolveArtistNameOverrides(nft, contract))}`;
+  throw new Error('unknown extractor override provided')
 }
