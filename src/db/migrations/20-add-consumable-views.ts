@@ -44,9 +44,6 @@ export const up = async (knex: Knex) => {
   })
 
   await updateViews(knex);
-
-  await knex.raw(`drop view "erc721nft"`);
-  await knex.raw(`drop view "erc721nfts_processedTracks"`);
 }
 
 export const down = async (knex: Knex) => {
