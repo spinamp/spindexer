@@ -8,9 +8,11 @@ export enum Table {
   artists = 'raw_artists',
   artistProfiles = 'raw_artist_profiles',
   collectors = 'raw_collectors',
+  crdtState = 'raw_crdt_state',
   erc721Transfers = 'raw_erc721_transfers',
   ipfsPins = 'raw_ipfs_pins',
   ipfsFiles = 'raw_ipfs_files',
+  mempool = 'raw_mempool',
   metaFactories = 'raw_meta_factories',
   nfts = 'raw_nfts',
   nfts_processedTracks = 'raw_nfts_processed_tracks',
@@ -20,6 +22,7 @@ export enum Table {
   platforms = 'raw_platforms',
   processedTracks = 'raw_processed_tracks',
   processors = 'raw_processors',
+  seeds = 'raw_seeds',
 }
 
 export type WhereFunc = 'where'
@@ -50,7 +53,7 @@ export type DBClient = {
   getRecords: <Type>(tableName: Table, wheres?: Wheres) => Promise<Type[]>;
   insert: <Type>(tableName: Table, rows: Type[], options?: QueryOptions) => Promise<void>;
   update: <Type>(tableName: Table, rows: Type[]) => Promise<void>;
-  upsert: <Type>(tableName: Table, rows: Type[], idField?: string | string[], mergeOptions?: undefined | string[]) => Promise<void>;
+  upsert: <Type>(tableName: Table, rows: Type[], idField?: string | string[], mergeOptions?: undefined | string[], overrideAll?: boolean) => Promise<void>;
   delete: (tableName: Table, ids: string[], idField?: string) => Promise<void>;
   updateProcessor: (processor: string, lastCursor: Cursor) => Promise<void>;
   getNumberRecords: (tableName: Table) => Promise<any>;

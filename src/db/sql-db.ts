@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { Cursor } from '../types/trigger';
 
-import { DBClient, Table, Wheres, defaultTimestampColumn, QueryOptions } from './db';
+import { DBClient, Table, Wheres, QueryOptions } from './db';
 import config from './knexfile';
 import { fromDBRecords, toDBRecords } from './orm';
 
@@ -132,18 +132,27 @@ const init = async (): Promise<DBClient> => {
         await db(tableName).whereIn(idField, ids).delete()
       }
     },
-    upsert: async <RecordType>(tableName: string, recordUpserts: RecordType[], idField: string | string[] = 'id', mergeOptions: string[] | undefined = undefined ) => {
+    upsert: async <RecordType>(
+      tableName: string,
+      recordUpserts: RecordType[],
+      idField: string | string[] = 'id',
+      mergeOptions: string[] | undefined = undefined,
+      overrideAll = false
+    ) => {
       console.log(`Upserting records`);
       if (recordUpserts?.length > 0) {
         const dbUpserts = toDBRecords(tableName, recordUpserts)
         for (const dbUpsert of dbUpserts) {
-          // exclude the default timestamp column unless explicitly specified in mergeOptions
-          if (mergeOptions === undefined) {
-            mergeOptions = Object.keys(dbUpsert).filter((value) => { return value !== defaultTimestampColumn });
-          }
+
+          let values = dbUpsert;
+          if (!overrideAll){
+            // remove undefined properties
+            values = _.omitBy(dbUpsert, _.isUndefined)
+          } 
+
           try {
             await db(tableName)
-              .insert(dbUpsert)
+              .insert(values)
               .onConflict(idField as any)
               .merge(mergeOptions)
           } catch (error) {
