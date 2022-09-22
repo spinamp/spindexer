@@ -127,7 +127,21 @@ async function getForeignKeys(knex: Knex): Promise<{
   return result.rows
 }
 
-function tableNameToViewName(tableName: string): string {
+async function getViews(knex: Knex): Promise<{ view_name: string }[]>{
+  const sql = `SELECT 
+  table_name AS view_name
+FROM 
+  information_schema.views
+WHERE 
+  table_schema = 'public'
+`
+
+  const result = await knex.raw(sql);
+  return result.rows
+
+}
+
+export function tableNameToViewName(tableName: string): string {
   // remove raw_ prefix
   return tableName.substring(4)
 }
@@ -136,47 +150,62 @@ export async function updateViews(knex: Knex){
   const tables = Object.values(Table);
   const foreignKeys = await getForeignKeys(knex);
   const primaryKeys = await getPrimaryKeys(knex);
+  const views = await getViews(knex);
+  
+  // drop existing views
+  for (const { view_name } of views){
+    await knex.raw(`drop view ${view_name}`)
+  }
 
   // create views
   for (const table of tables) {
-    const viewName = tableNameToViewName(table);
-    const override = overrides[table as Table];
+    const hasTable = await knex.schema.hasTable(table);
+    if (hasTable){
 
-    let selectSql = `select * from "${table}"`;
+      const viewName = tableNameToViewName(table);
+      const override = overrides[table as Table];
+      
+      let selectSql = `select * from "${table}"`;
 
-    if (override){
-      selectSql = override;
+      if (override){
+        selectSql = override;
+      }
+
+      const viewSql = `create view "${viewName}" as ${selectSql}`;
+
+      await knex.raw(viewSql);
     }
-
-    const viewSql = `create or replace view "${viewName}" as ${selectSql}`;
-
-    console.log('create view with sql', viewSql)
-
-    await knex.raw(viewSql);
   }
 
   // create references and primaries
   for (const table of tables) {
-    const viewName = tableNameToViewName(table);
+    const hasTable = await knex.schema.hasTable(table);
+    if (hasTable){
+      const viewName = tableNameToViewName(table);
 
-    const foreigns = foreignKeys.filter(fk => fk.table_name === table)
-    const foreignComments = foreigns.map(foreign => {
-      return `@foreignKey ("${foreign.column_name}") references "${tableNameToViewName(foreign.foreign_table_name!)}" ("${foreign.foreign_column_name}")`
-    })
+      const foreigns = foreignKeys.filter(fk => fk.table_name === table)
+      const foreignComments = foreigns.map(foreign => {
+        return `@foreignKey ("${foreign.column_name}") references "${tableNameToViewName(foreign.foreign_table_name!)}" ("${foreign.foreign_column_name}")`
+      })
 
-    const primaries = primaryKeys.filter(fk => fk.table_name === table).map(primary => `"${primary.column_name}"`);
-    const primaryComment = `@primaryKey ${primaries.join(',')}`;
+      const primaries = primaryKeys.filter(fk => fk.table_name === table).map(primary => `"${primary.column_name}"`);
+      const primaryComment = `@primaryKey ${primaries.join(',')}`;
 
-    const comments = foreignComments.concat(primaryComment);
+      const comments = foreignComments.concat(primaryComment);
 
-    const commentString = `comment on view "${viewName}" is E'${comments.join('\\n')}'`;
+      const commentString = `comment on view "${viewName}" is E'${comments.join('\\n')}'`;
 
-    await knex.raw(commentString)
+      await knex.raw(commentString)
+    }
   }
 
   // add permissions
   for (const table of tables){
-    const viewName = tableNameToViewName(table);
-    await knex.raw(`GRANT SELECT ON "${viewName}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+    const hasTable = await knex.schema.hasTable(table);
+    if (hasTable){
+      const viewName = tableNameToViewName(table);
+      await knex.raw(`GRANT SELECT ON "${viewName}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
+    }
   }
 }
+

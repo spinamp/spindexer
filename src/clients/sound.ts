@@ -57,32 +57,32 @@ const init = async () => {
               description
               editionId
               coverImage {
-              id
-              url
+                id
+                url
               }
               artist {
-              id
-              name
-              soundHandle
-              artistContractAddress
-              user {
-                  publicAddress
-                  avatar {
-                  url
-                  }
-              }
+                id
+                name
+                soundHandle
+                artistContractAddress
+                user {
+                    publicAddress
+                    avatar {
+                      url
+                    }
+                }
               }
               tracks {
-              id
-              title
-              trackNumber
-              duration
+                id
+                title
+                trackNumber
+                duration
               }
           }
       }
       `,
     );
-    return allMintedReleases;
+    return allMintedReleases.filter((release: any) => !!release.editionId);
   };
 
   const getNFTTitle = (nft: NFT) => {
