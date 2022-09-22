@@ -18,6 +18,7 @@ export enum TitleExtractorTypes {
 
 export enum IdExtractorTypes {
   USE_TITLE_EXTRACTOR = 'useTitleExtractor',
+  CONTRACT_ADDRESS = 'contractAddress'
 }
 
 export enum WebsiteUrlExtractorTypes {
@@ -26,8 +27,14 @@ export enum WebsiteUrlExtractorTypes {
 }
 
 export type Extractor = (nft: NFT) => string;
+export type IdExtractorMapping = Record<Partial<IdExtractorTypes>, Extractor>
 export type TitleExtractorMapping = Record<TitleExtractorTypes, Extractor>
 export type WebsiteUrlExtractorMapping = Record<WebsiteUrlExtractorTypes, Extractor>
+
+export const idExtractors: IdExtractorMapping = {
+  [IdExtractorTypes.USE_TITLE_EXTRACTOR]: (nft: NFT) => { throw new Error('Unexpected code path - title extractor should already be applied') },
+  [IdExtractorTypes.CONTRACT_ADDRESS]: (nft: NFT) => nft.contractAddress,
+}
 
 export const titleExtractors: TitleExtractorMapping = {
   [TitleExtractorTypes.METADATA_NAME]: (nft: NFT) => nft.metadata.name,
@@ -70,7 +77,11 @@ export const idExtractor = (contract: NftFactory): Extractor => {
   if (idExtractorOverride === IdExtractorTypes.USE_TITLE_EXTRACTOR) {
     return titleExtractor(contract);
   }
-  throw new Error('no other id extraction options yet')
+  const extractor = idExtractors[idExtractorOverride];
+  if (!extractor) {
+    throw new Error('no other id extraction options yet')
+  }
+  return extractor;
 }
 
 export const resolveEthereumTrackIdOverrides = (nft: NFT, contract: NftFactory): string => {
