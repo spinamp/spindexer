@@ -8,7 +8,7 @@ const INITIAL_CONTRACTS: MetaFactory[] = [
   {
     id: '0x78e3adc0e811e4f93bd9f1f9389b923c9a3355c2',
     platformId: 'sound',
-    startingBlock: '13725566',
+    startingBlock: '13725565',
     contractType: MetaFactoryTypeName.soundArtistProfileCreator,
     gap: '500000',
     standard: NFTStandard.ERC721,

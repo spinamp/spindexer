@@ -11,7 +11,7 @@ Messages are the mechanism for mutating data within spinamp.
 
 There are currently 2 supported types of messages.
 
-Inserts: For inserting full new records into any table
+Upserts: For upserting multiple columns on a record into any table, potentially creating a new record
 Updates: For updating specific columns on specific records in any table
 
 Both CRDT types have been implemented to be used as a simple, generic way to update data in the database, to serve current use cases without special custom logic.
@@ -24,26 +24,29 @@ Messages consist of:
  -  timestamp: to provide ordering
  -  table: the table to be changed
  -  entityId: the id of the record to be changed
- -  value: the new value to be changed
- -  column: the column to be changed (only for update crdts)
+ -  values: the new values to be changed (as a json object with keys corresponding to columns)
+ -  operation: upsert or update
 
 # CRDT Message Processing Logic
 
-Update messages will update only a single column on a single record when processed, and will be applied if no newer value for that column is known.
+Update messages will only be processed if the record they are expecting to update already exists.
+Upsert messages will be processed even if the record does not exist.
 
-Insert messages will upsert and overwrite all columns of a single record, and will also only be applied if no newer value for that record is known.
+During processing, the processer updates each specified column on a single record, only if no newer value for that column is known. If a newer value for that column is known, that column will not be updated.
 
-In both types, if there is a clashing timestamp, the string sort of the value of clashing messages is used to determine their order.
+If there is a clashing timestamp on a column, the string sort of the value of clashing messages is used to determine their order.
 
 Deletes are not supported - in the future a 'tombstone' system may be added that can mark records as deleted, but this is not included in the initial requirements so left out for now.
 
-There is a dedicated crdtInsertState and crdtUpdateState table that keeps track of the latest known timestamp on insert and update messages that have been processed.
+There is a dedicated crdtState table that keeps track of the latest known timestamp on every column on every record that has been processed.
 
 # Message Discovery and Processing Flow
 
 Messages are currently only discovered using a single mechanism, the backup seed, described below.
 
-When a new message is discovered, it is inserted into the mempool table, intended to hold messages until they're processed. Messaged are picked up by their respective processor, depending on their type, any updates are applied and then they're removed from the mempool. (They're still backed up as part of the seed)
+When a new message is discovered, it is inserted into the mempool table, intended to hold messages until they're processed. Messaged are picked up by their respective processor, depending on their type, any updates are applied and then they're deleted from the mempool. Messages that are not yet ready for processing (eg: updates on nonexistent records) will stay in the mempool until ready.
+
+The backup seed table remains persistent as an ongoing backup - messages are never deleted from it.
 
 # Message Backup
 

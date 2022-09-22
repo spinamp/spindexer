@@ -4,24 +4,25 @@ import _ from 'lodash';
 import { Table } from '../../db/db';
 import { newERC721Transfers } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
-import { ETHEREUM_NULL_ADDRESS } from '../../types/ethereum';
+import { burned, newMint } from '../../types/ethereum';
 import { NFT, ERC721Transfer, NftFactory, NFTStandard } from '../../types/nft';
 import { NFTFactoryTypes } from '../../types/nftFactory';
+import { consolidate, Collector, NFTsCollectors, NFTsCollectorsChanges } from '../../types/nftsCollectors';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';
+import { ethereumTransferId } from '../../utils/identifiers';
 
 const NAME = 'createERC721NFTsFromTransfers';
-
-const CHAIN = 'ethereum';
 
 const processorFunction = (contracts: NftFactory[]) =>
   async ({ newCursor, items }: { newCursor: Cursor, items: ethers.Event[] }, clients: Clients) => {
     const contractsByAddress = _.keyBy(contracts, 'id');
     const newNFTs: Partial<NFT>[] = [];
-    const updates: Partial<NFT>[] = [];
+    const updatedNFTs: Partial<NFT>[] = [];
     const transfers: Partial<ERC721Transfer>[] = [];
+    const nftsCollectorsChanges: NFTsCollectorsChanges[] = [];
 
-    items.forEach((item): Partial<NFT> | undefined => {
+    items.forEach((item): void => {
       const address = item.address;
       const contract = contractsByAddress[address];
       const contractTypeName = contract.contractType;
@@ -31,38 +32,60 @@ const processorFunction = (contracts: NftFactory[]) =>
         throw 'buildNFTId not specified'
       }
 
+      const toAddress = formatAddress(item.args!.to);
+      const fromAddress = formatAddress(item.args!.from);
+      const contractAddress = formatAddress(contract.id);
       const tokenId = BigInt((item.args!.tokenId as BigNumber).toString());
-      const newMint = item.args!.from === ETHEREUM_NULL_ADDRESS;
+      const nftId = contractType.buildNFTId(contractAddress, tokenId);
+
       transfers.push({
-        id: `${CHAIN}/${item.blockNumber}/${item.logIndex}`,
-        contractAddress: formatAddress(contract.id),
-        from: item.args!.from,
-        to: item.args!.to,
+        id: ethereumTransferId(item.blockNumber, item.logIndex),
+        contractAddress: contractAddress,
+        from: fromAddress,
+        to: toAddress,
         tokenId,
         createdAtEthereumBlockNumber: '' + item.blockNumber,
-        nftId: contractType.buildNFTId(contract.id, tokenId), 
+        nftId: nftId,
         transactionHash: item.transactionHash
       });
-      if (!newMint) {
-        updates.push({
-          id: contractType.buildNFTId(contract.id, tokenId),
-          owner: item.args!.to
+
+      if (!newMint(fromAddress)) {
+        updatedNFTs.push({
+          id: nftId,
+          owner: toAddress,
+          burned: burned(toAddress)
         })
-        return undefined;
+        nftsCollectorsChanges.push({ nftId: nftId, collectorId: fromAddress, amount: -1 })
+        if (!burned(toAddress)) {
+          nftsCollectorsChanges.push({ nftId: nftId, collectorId: toAddress, amount: 1 })
+        }
+      } else {
+        newNFTs.push({
+          id: nftId,
+          createdAtEthereumBlockNumber: '' + item.blockNumber,
+          contractAddress: contractAddress,
+          tokenId,
+          platformId: contract.platformId,
+          owner: toAddress,
+          approved: contract.autoApprove
+        });
+        nftsCollectorsChanges.push({ nftId: nftId, collectorId: toAddress, amount: 1 })
       }
-      newNFTs.push({
-        id: contractType.buildNFTId(contract.id, tokenId),
-        createdAtEthereumBlockNumber: '' + item.blockNumber,
-        contractAddress: formatAddress(contract.id),
-        tokenId,
-        platformId: contract.platformId,
-        owner: item.args!.to,
-        approved: contract.autoApprove
-      });
     });
 
+    const allCollectors = nftsCollectorsChanges.map<Collector>(({ collectorId }) => { return { id: collectorId } } );
+    const idPairs = _.uniq(nftsCollectorsChanges.map( (e) => [e.nftId, e.collectorId] ))
+    const existingNftsCollectors = await clients.db.getRecords<NFTsCollectors>(Table.nftsCollectors,
+      [ ['whereIn', [ ['nftId', 'collectorId'], idPairs ] ] ]
+    );
+
+    const allNftsCollectorsChanges = nftsCollectorsChanges.concat(existingNftsCollectors)
+    const updatedNftsCollectors = consolidate(allNftsCollectorsChanges)
+
     await clients.db.insert(Table.nfts, newNFTs.filter(n => !!n), { ignoreConflict: 'id' });
-    await clients.db.update(Table.nfts, updates);
+    await clients.db.update(Table.nfts, updatedNFTs);
+    await clients.db.upsert(Table.collectors, _.uniqBy(allCollectors, 'id'))
+    await clients.db.upsert(Table.nftsCollectors, updatedNftsCollectors, ['nftId', 'collectorId']);
 
     const transferNftIds = transfers.map(transfer => transfer.nftId);
     const existingNfts = new Set((await clients.db.getRecords<NFT>(Table.nfts, [ ['whereIn', [ 'id', transferNftIds ]] ])).map(nft => nft.id));

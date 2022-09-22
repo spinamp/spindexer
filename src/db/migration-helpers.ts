@@ -128,11 +128,11 @@ async function getForeignKeys(knex: Knex): Promise<{
 }
 
 async function getViews(knex: Knex): Promise<{ view_name: string }[]>{
-  const sql = `SELECT 
+  const sql = `SELECT
   table_name AS view_name
-FROM 
+FROM
   information_schema.views
-WHERE 
+WHERE
   table_schema = 'public'
 `
 
@@ -151,7 +151,7 @@ export async function updateViews(knex: Knex){
   const foreignKeys = await getForeignKeys(knex);
   const primaryKeys = await getPrimaryKeys(knex);
   const views = await getViews(knex);
-  
+
   // drop existing views
   for (const { view_name } of views){
     await knex.schema.dropViewIfExists(view_name);
@@ -164,7 +164,7 @@ export async function updateViews(knex: Knex){
 
       const viewName = tableNameToViewName(table);
       const override = overrides[table as Table];
-      
+
       let selectSql = `select * from "${table}"`;
 
       if (override){

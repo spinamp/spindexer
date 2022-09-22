@@ -13,7 +13,7 @@ const HOLLY_PLUS_PLATFORM: MusicPlatform = {
 
 const HOLLY_PLUS: NftFactory = {
   id: '0x6688Ee4E6e17a9cF88A13Da833b011E64C2B4203',
-  startingBlock: '13001584',
+  startingBlock: '13001583',
   platformId: 'hollyplus',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,

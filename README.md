@@ -24,6 +24,8 @@ Spindexer works by:
 ## Setup
  - Copy .env.example to .env and fill it in. Make sure to change the example passwords and keys.
  - Set up a postgres server with admin username/password
+ - Configure yarn's script-shell so your .env loads correctly
+   - ```yarn config set script-shell /bin/bash```
  - Bootstrap the DB for the pipeline. This will create db users for the pipeline:
    - ```DB_SUPERUSER=postgres DB_SUPERUSER_PASSWORD=password yarn bootstrap-db```
  - Ensure the Postgres server forces SSL only.

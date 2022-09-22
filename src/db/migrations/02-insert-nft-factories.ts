@@ -26,7 +26,7 @@ export const CATALOG = {
 const INITIAL_CONTRACTS: NftFactory[] = [
   {
     id: '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7',
-    startingBlock: '11565020',
+    startingBlock: '11565019',
     contractType: NFTContractTypeName.zora,
     standard: NFTStandard.ERC721,
     platformId: 'zoraOriginal',

@@ -8,7 +8,7 @@ const PLATFORM: MusicPlatform = { id: 'mintsongs', type: MusicPlatformType.mints
 
 const CONTRACT: NftFactory = {
   id: '0x2B5426A5B98a3E366230ebA9f95a24f09Ae4a584',
-  startingBlock: '14793510',
+  startingBlock: '14793509',
   platformId: 'mintsongs',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,

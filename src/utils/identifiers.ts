@@ -13,3 +13,7 @@ export const ethereumTrackId = (address: string, trackId: string): string => {
   const suffix = trackId !== '' ? `/${trackId}` : '';
   return ethereumArtistId(address) + suffix;
 }
+
+export const ethereumTransferId = (blockNumber: string | number, logIndex: string | number): string => {
+  return `${Chain.ETHEREUM}/${blockNumber}/${logIndex}`;
+}
