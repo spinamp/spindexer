@@ -75,17 +75,25 @@ const processorFunction = (contracts: NftFactory[]) =>
 
     const allCollectors = nftsCollectorsChanges.map<Collector>(({ collectorId }) => { return { id: collectorId } } );
     const idPairs = _.uniq(nftsCollectorsChanges.map( (e) => [e.nftId, e.collectorId] ))
-    const existingNftsCollectors = await clients.db.getRecords<NFTsCollectors>(Table.nftsCollectors,
-      [ ['whereIn', [ ['nftId', 'collectorId'], idPairs ] ] ]
-    );
+    const idPairChunks = _.chunk(idPairs, 500);
+    const existingNftsCollectors: NFTsCollectors[] = [];
+    for (let i = 0; i < idPairChunks.length; i++) {
+      const records = await clients.db.getRecords<NFTsCollectors>(Table.nftsCollectors,
+        [ ['whereIn', [ ['nftId', 'collectorId'], idPairChunks[i] ] ] ]
+      );
+      existingNftsCollectors.push(...records);
+    }
 
     const allNftsCollectorsChanges = nftsCollectorsChanges.concat(existingNftsCollectors)
     const updatedNftsCollectors = consolidate(allNftsCollectorsChanges)
+    const updatedNftsCollectorsChunks = _.chunk(updatedNftsCollectors, 500);
 
     await clients.db.insert(Table.nfts, newNFTs.filter(n => !!n), { ignoreConflict: 'id' });
     await clients.db.update(Table.nfts, updatedNFTs);
     await clients.db.upsert(Table.collectors, _.uniqBy(allCollectors, 'id'))
-    await clients.db.upsert(Table.nftsCollectors, updatedNftsCollectors, ['nftId', 'collectorId']);
+    for (let i = 0; i < updatedNftsCollectorsChunks.length; i++) {
+      await clients.db.upsert(Table.nftsCollectors, updatedNftsCollectorsChunks[i], ['nftId', 'collectorId']);
+    }
 
     const transferNftIds = transfers.map(transfer => transfer.nftId);
     const existingNfts = new Set((await clients.db.getRecords<NFT>(Table.nfts, [ ['whereIn', [ 'id', transferNftIds ]] ])).map(nft => nft.id));

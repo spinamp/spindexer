@@ -15,7 +15,6 @@ import { createERC721NFTsFromTransfersProcessor } from './processors/default/cre
 import { createNftFactoryFromERC721MetaFactoryProcessor } from './processors/default/createNftFactoryFromERC721MetaFactory';
 import { createNinaNfts } from './processors/default/createNinaNftProcesor';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
-import { stripIgnoredNFTs, stripNonAudio } from './processors/default/deleter';
 import { errorProcessor } from './processors/default/errorProcessor';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
@@ -51,13 +50,13 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
     ...metaFactoryProcessors,
     getERC721ContractFieldsProcessor,
     erc721TransferProcessors,
-    stripIgnoredNFTs,
+    // stripIgnoredNFTs,
     addTimestampToERC721Transfers,
     addTimestampToERC721NFTs,
     getERC721TokenFieldsProcessor(nftFactoriesByAddress),
     addMetadataIPFSHashProcessor(nftFactoriesByAddress),
     addMetadataObjectProcessor(nftFactoriesByAddress),
-    stripNonAudio,
+    // stripNonAudio,
     categorizeZora,
     createNinaNfts,
     addTimestampFromMetadata,
