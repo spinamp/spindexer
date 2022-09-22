@@ -17,7 +17,10 @@ export enum Table {
   nfts_processedTracks = 'raw_nfts_processed_tracks',
   nftProcessErrors = 'raw_nft_process_errors',
   ipfsPins = 'raw_ipfs_pins',
-  ipfsFiles = 'raw_ipfs_files'
+  ipfsFiles = 'raw_ipfs_files',
+  seeds = 'raw_seeds',
+  crdtState = 'raw_crdt_state',
+  mempool = 'raw_mempool'
 }
 
 export type WhereFunc = 'where'
@@ -48,7 +51,7 @@ export type DBClient = {
   getRecords: <Type>(tableName: Table, wheres?: Wheres) => Promise<Type[]>;
   insert: <Type>(tableName: Table, rows: Type[], options?: QueryOptions) => Promise<void>;
   update: <Type>(tableName: Table, rows: Type[]) => Promise<void>;
-  upsert: <Type>(tableName: Table, rows: Type[], idField?: string | string[], mergeOptions?: undefined | string[]) => Promise<void>;
+  upsert: <Type>(tableName: Table, rows: Type[], idField?: string | string[], mergeOptions?: undefined | string[], overrideAll?: boolean) => Promise<void>;
   delete: (tableName: Table, ids: string[], idField?: string) => Promise<void>;
   updateProcessor: (processor: string, lastCursor: Cursor) => Promise<void>;
   getNumberRecords: (tableName: Table) => Promise<any>;
