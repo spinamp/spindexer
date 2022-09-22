@@ -5,22 +5,24 @@ import { Cursor } from '../types/trigger'
 export const defaultTimestampColumn = 'createdAtTime';
 
 export enum Table {
-  platforms = 'raw_platforms',
-  nfts = 'raw_nfts',
-  erc721Transfers = 'raw_erc721_transfers',
   artists = 'raw_artists',
   artistProfiles = 'raw_artist_profiles',
-  processedTracks = 'raw_processed_tracks',
-  processors = 'raw_processors',
-  metaFactories = 'raw_meta_factories',
-  nftFactories = 'raw_nft_factories',
-  nfts_processedTracks = 'raw_nfts_processed_tracks',
-  nftProcessErrors = 'raw_nft_process_errors',
+  collectors = 'raw_collectors',
+  crdtState = 'raw_crdt_state',
+  erc721Transfers = 'raw_erc721_transfers',
   ipfsPins = 'raw_ipfs_pins',
   ipfsFiles = 'raw_ipfs_files',
+  mempool = 'raw_mempool',
+  metaFactories = 'raw_meta_factories',
+  nfts = 'raw_nfts',
+  nfts_processedTracks = 'raw_nfts_processed_tracks',
+  nftsCollectors = 'raw_nfts_collectors',
+  nftFactories = 'raw_nft_factories',
+  nftProcessErrors = 'raw_nft_process_errors',
+  platforms = 'raw_platforms',
+  processedTracks = 'raw_processed_tracks',
+  processors = 'raw_processors',
   seeds = 'raw_seeds',
-  crdtState = 'raw_crdt_state',
-  mempool = 'raw_mempool'
 }
 
 export type WhereFunc = 'where'
