@@ -2,6 +2,15 @@
 
 Here are some useful commands while operating things:
 
+## Node Bootstrap
+There is a script we have for bootstrapping a new Spindexer node. We recommend running on a fresh Ubuntu setup with at least 20GB disk space and 4GB RAM.
+
+```
+curl -o- https://raw.githubusercontent.com/spinamp/spindexer/main/instance_install_script | bash
+```
+
+From there, just modify your .env file to configure it as needed, and you're good to go!
+
 ## DB Management
 
 Save the database backup:
