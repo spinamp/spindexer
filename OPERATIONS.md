@@ -9,6 +9,8 @@ There is a script we have for bootstrapping a new Spindexer node. We recommend r
 curl -o- https://raw.githubusercontent.com/spinamp/spindexer/main/instance_install_script | bash
 ```
 
+From there, just modify your .env file to configure it as needed, and you're good to go!
+
 ## DB Management
 
 Save the database backup:
