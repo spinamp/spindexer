@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-import { ArtistIdExtractorTypes, ArtistNameExtractorTypes, AudioUrlExtractorTypes, IdExtractorTypes, TitleExtractorTypes } from '../../types/fieldExtractor';
+import { ArtistIdExtractorTypes, ArtistNameExtractorTypes, ArtworkUrlExtractorTypes, AudioUrlExtractorTypes, IdExtractorTypes, TitleExtractorTypes } from '../../types/fieldExtractor';
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
 import { addNftFactory, addPlatform, removeNftFactory, removePlatform } from '../migration-helpers';
@@ -23,16 +23,18 @@ const SEASONS_1: NftFactory = {
     overrides: {
       artist: {
         websiteUrl: 'https://relics.xyz',
-        avatarUrl: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmS6WbpHrMYsu6Tmts61FfqiEwmrzJRrPrnN9o5qGDzME4',
+        avatarUrl: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmSRN9HKXiziZzvkWrPG92UUHYiDKSZhfrFKf42EkniZVt',
       },
       track: {
         websiteUrl: 'https://relics.xyz',
       },
+      artworkURL: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmSRN9HKXiziZzvkWrPG92UUHYiDKSZhfrFKf42EkniZVt',
       type: MusicPlatformType['multi-track-multiprint-contract'],
       extractor: {
         id: IdExtractorTypes.USE_TITLE_EXTRACTOR,
         title: TitleExtractorTypes.METADATA_NAME_WITHOUT_TRAILING_INFO,
         audioUrl: AudioUrlExtractorTypes.ATTRIBUTES_TRAIT_AUDIO,
+        artworkUrl: ArtworkUrlExtractorTypes.USE_ARTWORK_URL_OVERRIDE,
         artistName: ArtistNameExtractorTypes.ATTRIBUTES_TRAIT_MUSICIAN,
         artistId: ArtistIdExtractorTypes.USE_PLATFORM_AND_ARTIST_NAME,
       }

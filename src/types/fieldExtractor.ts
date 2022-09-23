@@ -7,6 +7,7 @@ export type ExtractorTypes = {
   id?: IdExtractorTypes
   title?: TitleExtractorTypes
   audioUrl?: AudioUrlExtractorTypes
+  artworkUrl?: ArtworkUrlExtractorTypes
   websiteUrl?: WebsiteUrlExtractorTypes
   artistName?: ArtistNameExtractorTypes,
   artistId?: ArtistIdExtractorTypes,
@@ -29,6 +30,11 @@ export enum AudioUrlExtractorTypes {
   ATTRIBUTES_TRAIT_AUDIO = 'attributes.trait.audio',
 }
 
+export enum ArtworkUrlExtractorTypes {
+  METADATA_IMAGE = 'metadata.image',
+  USE_ARTWORK_URL_OVERRIDE = 'useArtworkUrlOverride',
+}
+
 export enum WebsiteUrlExtractorTypes {
   METADATA_EXTERNAL_URL = 'metadata.externalUrl',
   USE_TOKEN_ID_APPENDED_EXTERNAL_URL = 'useTokenIdAppendedExternalUrl',
@@ -46,6 +52,7 @@ export enum ArtistIdExtractorTypes {
 export type Extractor = (nft: NFT) => string;
 export type TitleExtractorMapping = Record<TitleExtractorTypes, Extractor>
 export type AudioUrlExtractorMapping = Record<AudioUrlExtractorTypes, Extractor>
+export type ArtworkUrlExtractorMapping = Record<ArtworkUrlExtractorTypes, Extractor>
 export type WebsiteUrlExtractorMapping = Record<WebsiteUrlExtractorTypes, Extractor>
 export type ArtistNameExtractorMapping = Record<ArtistNameExtractorTypes, Extractor>
 
@@ -126,6 +133,19 @@ export const resolveEthereumTrackIdOverrides = (nft: NFT, contract: NftFactory):
     throw new Error('ID not extracted correctly');
   }
   return ethereumTrackId(nft.contractAddress, trackId);
+}
+
+export const resolveArtworkUrlOverrides = (nft: NFT, contract: NftFactory): string => {
+  const override = contract.typeMetadata?.overrides?.extractor?.artworkUrl;
+
+  if (override === ArtworkUrlExtractorTypes.USE_ARTWORK_URL_OVERRIDE) {
+    const url = contract.typeMetadata?.overrides?.artworkURL;
+    if (!url) {
+      throw new Error('artwork url override not provided');
+    }
+    return url;
+  }
+  return nft.metadata.image
 }
 
 export const resolveArtistNameOverrides = (nft: NFT, contract: NftFactory): string => {
