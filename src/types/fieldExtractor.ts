@@ -146,5 +146,10 @@ export const resolveArtistIdOverrides = (nft: NFT, contract: NftFactory): string
       return `${contract.platformId}/${slugify(resolveArtistNameOverrides(nft, contract))}`;
     }
   }
-  throw new Error('unknown extractor override provided')
+
+  const artistIdOverride = contract.typeMetadata?.overrides?.artist?.artistId;
+  if (!artistIdOverride) {
+    throw new Error('must directly provided an artist ID override, or an artist ID extractor override');
+  }
+  return artistIdOverride;
 }

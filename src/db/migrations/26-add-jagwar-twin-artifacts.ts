@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-import { ArtistIdExtractorTypes, IdExtractorTypes, TitleExtractorTypes } from '../../types/fieldExtractor';
+import { IdExtractorTypes, TitleExtractorTypes } from '../../types/fieldExtractor';
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { MusicPlatformType } from '../../types/platform';
 import { ethereumArtistId } from '../../utils/identifiers';
@@ -28,7 +28,6 @@ const ARTIFACTS: NftFactory = {
       extractor: {
         title: TitleExtractorTypes.METADATA_NAME,
         id: IdExtractorTypes.USE_TITLE_EXTRACTOR,
-        artistId: ArtistIdExtractorTypes.USE_PLATFORM_ID,
       }
     }
   }
