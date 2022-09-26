@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
-import { audioUrlExtractor, resolveArtistIdOverrides, resolveArtistNameOverrides, resolveArtworkUrlOverrides, resolveEthereumTrackIdOverrides, titleExtractor, websiteUrlExtractor } from '../fieldExtractor';
+import { resolveArtistId, resolveArtistName, resolveArtworkUrl, resolveAudioUrl, resolveEthereumTrackId, resolveTitle, resolveWebsiteUrl } from '../fieldExtractor';
 import { MapNFTsToTrackIds, MapTrack } from '../mapping';
 import { NFT, NftFactory } from '../nft';
 import { ProcessedTrack } from '../track';
@@ -17,8 +17,8 @@ const mapTrack: MapTrack = (
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
   }
 
-  const lossyAudioURL = audioUrlExtractor(contract)(nft);
-  const lossyArtworkURL = resolveArtworkUrlOverrides(nft, contract);
+  const lossyAudioURL = resolveAudioUrl(nft, contract);
+  const lossyArtworkURL = resolveArtworkUrl(nft, contract);
   const lossyAudioIPFSHash = extractHashFromURL(lossyAudioURL) || undefined;
   const lossyArtworkIPFSHash = extractHashFromURL(lossyArtworkURL) || undefined;
 
@@ -33,14 +33,14 @@ const mapTrack: MapTrack = (
   const track: Partial<ProcessedTrack> = {
     id: mapNFTtoTrackID(nft, contract),
     platformInternalId: mapNFTtoTrackID(nft, contract),
-    title: titleExtractor(contract)(nft),
+    title: resolveTitle(nft, contract),
     description: nft.metadata.description,
     platformId: contract.platformId,
     lossyAudioIPFSHash,
     lossyArtworkIPFSHash,
     lossyAudioURL,
     lossyArtworkURL,
-    websiteUrl: websiteUrlExtractor(contract)(nft),
+    websiteUrl: resolveWebsiteUrl(nft, contract),
     artistId: mapArtistProfile({ apiTrack: apiTrack, nft: nft, contract: contract }).artistId,
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
@@ -61,8 +61,8 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
   }
 
   return {
-    name: resolveArtistNameOverrides(nft, contract),
-    artistId: resolveArtistIdOverrides(nft, contract),
+    name: resolveArtistName(nft, contract),
+    artistId: resolveArtistId(nft, contract),
     platformInternalId: contract.platformId,
     platformId: contract.platformId,
     avatarUrl: undefined,
@@ -77,7 +77,7 @@ const mapNFTtoTrackID = (nft: NFT, contract?: NftFactory): string => {
   if (!contract) {
     throw new Error('No contract provided');
   }
-  return resolveEthereumTrackIdOverrides(nft, contract);
+  return resolveEthereumTrackId(nft, contract);
 };
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {
