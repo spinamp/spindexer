@@ -27,8 +27,8 @@ const SEASONS_1: NftFactory = {
       },
       track: {
         websiteUrl: 'https://relics.xyz',
+        lossyArtworkURL: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmSRN9HKXiziZzvkWrPG92UUHYiDKSZhfrFKf42EkniZVt',
       },
-      artworkURL: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmSRN9HKXiziZzvkWrPG92UUHYiDKSZhfrFKf42EkniZVt',
       type: MusicPlatformType['multi-track-multiprint-contract'],
       extractor: {
         id: IdExtractorTypes.USE_TITLE_EXTRACTOR,

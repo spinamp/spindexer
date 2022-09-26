@@ -139,9 +139,10 @@ export const resolveArtworkUrlOverrides = (nft: NFT, contract: NftFactory): stri
   const override = contract.typeMetadata?.overrides?.extractor?.artworkUrl;
 
   if (override === ArtworkUrlExtractorTypes.USE_ARTWORK_URL_OVERRIDE) {
-    const url = contract.typeMetadata?.overrides?.artworkURL;
+    const track = contract.typeMetadata?.overrides?.track;
+    const url = (track as any).lossyArtworkURL;
     if (!url) {
-      throw new Error('artwork url override not provided');
+      throw new Error('track lossy artwork url override not provided');
     }
     return url;
   }

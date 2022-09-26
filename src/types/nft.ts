@@ -54,7 +54,6 @@ export type TypeMetadata = {
     artist?: Partial<ArtistProfile>
     type?: MusicPlatformType
     extractor?: ExtractorTypes
-    artworkURL?: string
   }
 }
 
