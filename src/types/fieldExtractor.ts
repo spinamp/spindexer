@@ -1,4 +1,4 @@
-import { ethereumTrackId, slugify } from '../utils/identifiers';
+import { ethereumArtistId, ethereumTrackId, slugify } from '../utils/identifiers';
 import { dropLeadingInfo, dropTrailingInfo } from '../utils/sanitizers';
 
 import { getTrait, NFT, NftFactory } from './nft';
@@ -42,11 +42,13 @@ export enum WebsiteUrlExtractorTypes {
 
 export enum ArtistNameExtractorTypes {
   ATTRIBUTES_TRAIT_MUSICIAN = 'attributes.trait.musician',
+  USE_ARTIST_NAME_OVERRIDE = 'useArtistNameOverride',
 }
 
 export enum ArtistIdExtractorTypes {
   USE_PLATFORM_AND_ARTIST_NAME = 'usePlatformAndArtistName',
   USE_PLATFORM_ID = 'usePlatformId',
+  USE_ARTIST_ID_OVERRIDE = 'useArtistIdOverride',
 }
 
 export type Extractor = (nft: NFT) => string;
@@ -54,7 +56,6 @@ export type TitleExtractorMapping = Record<TitleExtractorTypes, Extractor>
 export type AudioUrlExtractorMapping = Record<AudioUrlExtractorTypes, Extractor>
 export type ArtworkUrlExtractorMapping = Record<ArtworkUrlExtractorTypes, Extractor>
 export type WebsiteUrlExtractorMapping = Record<WebsiteUrlExtractorTypes, Extractor>
-export type ArtistNameExtractorMapping = Record<ArtistNameExtractorTypes, Extractor>
 
 export const titleExtractors: TitleExtractorMapping = {
   [TitleExtractorTypes.METADATA_NAME]: (nft: NFT) => nft.metadata.name,
@@ -74,21 +75,9 @@ export const websiteUrlExtractors: WebsiteUrlExtractorMapping = {
   [WebsiteUrlExtractorTypes.USE_TOKEN_ID_APPENDED_EXTERNAL_URL]: (nft: NFT) => useTokenIdAppendedExternalUrl(nft),
 }
 
-export const artistNameExtractors: ArtistNameExtractorMapping = {
-  [ArtistNameExtractorTypes.ATTRIBUTES_TRAIT_MUSICIAN]: (nft: NFT) => getTrait(nft, 'Musician'),
-}
-
 const useTokenIdAppendedExternalUrl = (nft: NFT): string => {
   const url = new URL(nft.metadata.external_url);
   return `${url.origin}/token/${nft.tokenId}`;
-}
-
-export const artistNameExtractor = (contract: NftFactory): Extractor => {
-  const artistNameExtractorOverride = contract.typeMetadata?.overrides?.extractor?.artistName;
-  if (!artistNameExtractorOverride) {
-    throw new Error('unknown extractor override provided')
-  }
-  return artistNameExtractors[artistNameExtractorOverride];
 }
 
 export const websiteUrlExtractor = (contract: NftFactory): Extractor => {
@@ -151,10 +140,18 @@ export const resolveArtworkUrlOverrides = (nft: NFT, contract: NftFactory): stri
 
 export const resolveArtistNameOverrides = (nft: NFT, contract: NftFactory): string => {
   const artistNameExtractorOverride = contract.typeMetadata?.overrides?.extractor?.artistName;
-  if (!artistNameExtractorOverride || (artistNameExtractorOverride !== ArtistNameExtractorTypes.ATTRIBUTES_TRAIT_MUSICIAN)) {
-    return contract.platformId;
+
+  if (artistNameExtractorOverride === ArtistNameExtractorTypes.ATTRIBUTES_TRAIT_MUSICIAN) {
+    return getTrait(nft, 'Musician');
+  } else if (artistNameExtractorOverride === ArtistNameExtractorTypes.USE_ARTIST_NAME_OVERRIDE) {
+    const artistNameOverride = contract.typeMetadata?.overrides?.artist?.name;
+    if (!artistNameOverride) {
+      throw new Error('must directly provided an artist name override, or an artist name extractor override');
+    }
+    return artistNameOverride;
   }
-  return artistNameExtractor(contract)(nft);
+
+  throw new Error('must specify artist name extractor');
 }
 
 export const resolveArtistIdOverrides = (nft: NFT, contract: NftFactory): string => {
@@ -166,11 +163,13 @@ export const resolveArtistIdOverrides = (nft: NFT, contract: NftFactory): string
     else if (artistIdExtractorOverride === ArtistIdExtractorTypes.USE_PLATFORM_AND_ARTIST_NAME) {
       return `${contract.platformId}/${slugify(resolveArtistNameOverrides(nft, contract))}`;
     }
+    else if (artistIdExtractorOverride === ArtistIdExtractorTypes.USE_ARTIST_ID_OVERRIDE) {
+      const artistIdOverride = contract.typeMetadata?.overrides?.artist?.artistId;
+      if (!artistIdOverride) {
+        throw new Error('must directly provided an artist ID override, or an artist ID extractor override');
+      }
+    }
   }
 
-  const artistIdOverride = contract.typeMetadata?.overrides?.artist?.artistId;
-  if (!artistIdOverride) {
-    throw new Error('must directly provided an artist ID override, or an artist ID extractor override');
-  }
-  return artistIdOverride;
+  return ethereumArtistId(contract.id);
 }
