@@ -170,6 +170,7 @@ export const resolveArtistId: Resolver = (nft, contract) => {
       if (!artistIdOverride) {
         throw new Error('must directly provided an artist ID override, or an artist ID extractor override');
       }
+      return artistIdOverride;
     }
   }
 
