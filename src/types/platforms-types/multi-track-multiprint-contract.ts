@@ -22,6 +22,11 @@ const mapTrack: MapTrack = (
   const lossyAudioIPFSHash = extractHashFromURL(lossyAudioURL) || undefined;
   const lossyArtworkIPFSHash = extractHashFromURL(lossyArtworkURL) || undefined;
 
+  const id = mapNFTtoTrackID(nft, contract);
+  if (!id) {
+    throw new Error(`Attempted to map track with null id for nft ${nft.id}`)
+  }
+
   if (!lossyAudioIPFSHash && !lossyAudioURL) {
     throw new Error('Failed to extract audio from nft');
   }
@@ -31,8 +36,8 @@ const mapTrack: MapTrack = (
   }
 
   const track: Partial<ProcessedTrack> = {
-    id: mapNFTtoTrackID(nft, contract),
-    platformInternalId: mapNFTtoTrackID(nft, contract),
+    id,
+    platformInternalId: id,
     title: resolveTitle(nft, contract),
     description: nft.metadata.description,
     platformId: contract.platformId,
@@ -73,7 +78,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
   }
 };
 
-const mapNFTtoTrackID = (nft: NFT, contract?: NftFactory): string => {
+const mapNFTtoTrackID = (nft: NFT, contract?: NftFactory): string | null => {
   if (!contract) {
     throw new Error('No contract provided');
   }
