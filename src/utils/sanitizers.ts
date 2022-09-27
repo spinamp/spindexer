@@ -7,7 +7,7 @@ export const cleanURL = (urlString: string) => {
   try {
     const url = new URL(urlString);
     if (url.protocol === 'ar:') {
-      return `${process.env.ARWEAVE_GATEWAY}${urlString.replace(/^ar:\/\//, '')}`;
+      return `${process.env.ARWEAVE_GATEWAY_URL}${urlString.replace(/^ar:\/\//, '')}`;
     }
     return urlString.replace('arweave.rocks', 'arweave.net');
   } catch {
