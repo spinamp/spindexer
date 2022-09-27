@@ -12,13 +12,15 @@ export type ExtractorTypes = {
   title?: TitleExtractorTypes
   audioUrl?: AudioUrlExtractorTypes
   artworkUrl?: ArtworkUrlExtractorTypes
+  avatarUrl?: AvatarUrlExtractorTypes
   websiteUrl?: WebsiteUrlExtractorTypes
-  artistName?: ArtistNameExtractorTypes,
-  artistId?: ArtistIdExtractorTypes,
+  artistName?: ArtistNameExtractorTypes
+  artistId?: ArtistIdExtractorTypes
 }
 
 export enum TitleExtractorTypes {
   METADATA_NAME = 'metadata.name',
+  METADATA_TITLE = 'metadata.title',
   METADATA_NAME_WITHOUT_LEADING_INFO = 'metadataNameWithoutLeadingInfo',
   METADATA_NAME_WITHOUT_TRAILING_INFO = 'metadataNameWithoutTrailingInfo',
   ATTRIBUTES_TRAIT_SONG_TITLE = 'attributes.trait.songTitle',
@@ -40,14 +42,20 @@ export enum ArtworkUrlExtractorTypes {
   USE_ARTWORK_URL_OVERRIDE = 'useArtworkUrlOverride',
 }
 
+export enum AvatarUrlExtractorTypes {
+  METADATA_IMAGE = 'metadata.image',
+}
+
 export enum WebsiteUrlExtractorTypes {
   METADATA_EXTERNAL_URL = 'metadata.externalUrl',
   USE_TOKEN_ID_APPENDED_EXTERNAL_URL = 'useTokenIdAppendedExternalUrl',
+  EXTERNAL_URL_WITH_ONLY_FIRST_SEGMENT = 'externalUrlWithOnlyFirstSegment',
 }
 
 export enum ArtistNameExtractorTypes {
   ATTRIBUTES_TRAIT_MUSICIAN = 'attributes.trait.musician',
   USE_ARTIST_NAME_OVERRIDE = 'useArtistNameOverride',
+  METADATA_ARTIST = 'metadataArtist',
 }
 
 export enum ArtistIdExtractorTypes {
@@ -56,19 +64,20 @@ export enum ArtistIdExtractorTypes {
   USE_ARTIST_ID_OVERRIDE = 'useArtistIdOverride',
 }
 
-
 type IdExtractorMapping = Record<Partial<IdExtractorTypes>, Extractor>
 type TitleExtractorMapping = Record<TitleExtractorTypes, Extractor>
 type AudioUrlExtractorMapping = Record<AudioUrlExtractorTypes, Extractor>
 type WebsiteUrlExtractorMapping = Record<WebsiteUrlExtractorTypes, Extractor>
+type AvatarUrlExtractorMapping = Record<AvatarUrlExtractorTypes, Extractor>
 
-export const idExtractors: IdExtractorMapping = {
+const idExtractors: IdExtractorMapping = {
   [IdExtractorTypes.USE_TITLE_EXTRACTOR]: (nft: NFT) => { throw new Error('Unexpected code path - title extractor should already be applied') },
   [IdExtractorTypes.CONTRACT_ADDRESS]: (nft: NFT) => nft.contractAddress,
 }
 
 const titleExtractors: TitleExtractorMapping = {
   [TitleExtractorTypes.METADATA_NAME]: (nft: NFT) => nft.metadata.name,
+  [TitleExtractorTypes.METADATA_TITLE]: (nft: NFT) => nft.metadata.title,
   [TitleExtractorTypes.METADATA_NAME_WITHOUT_LEADING_INFO]: (nft: NFT) => dropLeadingInfo(nft.metadata.name),
   [TitleExtractorTypes.METADATA_NAME_WITHOUT_TRAILING_INFO]: (nft: NFT) => dropTrailingInfo(nft.metadata.name),
   [TitleExtractorTypes.ATTRIBUTES_TRAIT_SONG_TITLE]: (nft: NFT) => getTrait(nft, 'Song Title'),
@@ -83,8 +92,17 @@ const audioUrlExtractors: AudioUrlExtractorMapping = {
 const websiteUrlExtractors: WebsiteUrlExtractorMapping = {
   [WebsiteUrlExtractorTypes.METADATA_EXTERNAL_URL]: (nft: NFT) => nft.metadata.external_url,
   [WebsiteUrlExtractorTypes.USE_TOKEN_ID_APPENDED_EXTERNAL_URL]: (nft: NFT) => useTokenIdAppendedExternalUrl(nft),
+  [WebsiteUrlExtractorTypes.EXTERNAL_URL_WITH_ONLY_FIRST_SEGMENT]: (nft: NFT) => externalURLWithOnlyFirstSegment(nft),
 }
 
+const avatarUrlExtractors: AvatarUrlExtractorMapping = {
+  [AvatarUrlExtractorTypes.METADATA_IMAGE]: (nft: NFT) => cleanURL(nft.metadata.image || ''),
+}
+
+const externalURLWithOnlyFirstSegment: Extractor = (nft) => {
+  const url = new URL(nft.metadata.external_url);
+  return `${url.origin}/${url.pathname.split('/')[1]}`;
+}
 const useTokenIdAppendedExternalUrl: Extractor = (nft) => {
   const url = new URL(nft.metadata.external_url);
   return `${url.origin}/token/${nft.tokenId}`;
@@ -138,6 +156,11 @@ export const resolveEthereumTrackId: Resolver = (nft, contract) => {
   return ethereumTrackId(nft.contractAddress, trackId);
 }
 
+export const resolveAvatarUrl: Resolver = (nft) => {
+  const defaultExtractor = avatarUrlExtractors[AvatarUrlExtractorTypes.METADATA_IMAGE];
+  return defaultExtractor(nft);
+}
+
 export const resolveArtworkUrl: Resolver = (nft, contract) => {
   const override = contract.typeMetadata?.overrides?.extractor?.artworkUrl;
 
@@ -163,6 +186,8 @@ export const resolveArtistName: Resolver = (nft, contract) => {
       throw new Error('must directly provided an artist name override, or an artist name extractor override');
     }
     return artistNameOverride;
+  } else if (artistNameExtractorOverride === ArtistNameExtractorTypes.METADATA_ARTIST) {
+    return nft.metadata.artist;
   }
 
   throw new Error('must specify artist name extractor');

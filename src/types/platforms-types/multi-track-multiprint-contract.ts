@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
-import { resolveArtistId, resolveArtistName, resolveArtworkUrl, resolveAudioUrl, resolveEthereumTrackId, resolveTitle, resolveWebsiteUrl } from '../fieldExtractor';
+import { resolveArtistId, resolveArtistName, resolveArtworkUrl, resolveAudioUrl, resolveAvatarUrl, resolveEthereumTrackId, resolveTitle, resolveWebsiteUrl } from '../fieldExtractor';
 import { MapNFTsToTrackIds, MapTrack } from '../mapping';
 import { NFT, NftFactory } from '../nft';
 import { ProcessedTrack } from '../track';
@@ -70,7 +70,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
     artistId: resolveArtistId(nft, contract),
     platformInternalId: contract.platformId,
     platformId: contract.platformId,
-    avatarUrl: undefined,
+    avatarUrl: resolveAvatarUrl(nft,contract),
     websiteUrl: nft.metadata.external_url,
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,

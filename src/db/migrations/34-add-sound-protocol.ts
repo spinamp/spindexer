@@ -18,10 +18,8 @@ const SOUND_PROTOCOL_FACTORY: MetaFactory =
 
 
 export const up = async (knex: Knex) => {
-
   const message: CrdtMessage = getCrdtUpsertMessage<MetaFactory>(Table.metaFactories, SOUND_PROTOCOL_FACTORY);
   await knex(Table.seeds).insert(message);
-
 }
 
 export const down = async (knex: Knex) => {
