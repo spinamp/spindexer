@@ -96,6 +96,9 @@ const init = async () => {
       console.error({ nft })
       throw new Error('Missing nft metadata');
     }
+    if (nft.metadata.title){
+      return nft.metadata.title;
+    }
     if (!nft.metadata.name) {
       console.error({ nft })
       throw new Error('Missing name');
