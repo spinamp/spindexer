@@ -92,6 +92,8 @@ export const getTrackInputs = async (
     throw new Error('No db client provided');
   }
   const trackMapping = mapNFTsToTrackIds(nftToTrackIdInput);
+  const nftsWithoutTracks = trackMapping['null'];
+  delete trackMapping['null'];
   const trackIds = Object.keys(trackMapping);
   const existingTrackIds = await dbClient.recordsExist(Table.processedTracks, trackIds);
   const newTrackIds = trackIds.filter(id => !existingTrackIds.includes(id));
@@ -100,6 +102,7 @@ export const getTrackInputs = async (
     newTrackIds,
     trackMapping,
     existingTrackIds,
+    nftsWithoutTracks,
   }
 }
 
