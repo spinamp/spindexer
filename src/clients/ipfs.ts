@@ -38,6 +38,9 @@ export const extractHashFromURL = (urlString: string) => {
     }
     return null;
   } catch {
+    if (urlString === undefined) {
+      return null
+    }
     if (urlString.startsWith('Qm')) {
       return urlString;
     }

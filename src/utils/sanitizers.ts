@@ -14,3 +14,8 @@ export const cleanURL = (urlString: string) => {
     return urlString.replace('arweave.rocks', 'arweave.net');
   }
 };
+
+export const dropTrailingInfo = (str: string) => {
+  // remove everything after the ' #' characters
+  return str.replace(/\s+#\S+$/g, '');
+}

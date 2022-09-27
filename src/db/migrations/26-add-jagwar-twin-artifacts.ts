@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-import { IdExtractorTypes, TitleExtractorTypes } from '../../types/fieldExtractor';
+import { ArtistIdExtractorTypes, ArtistNameExtractorTypes, IdExtractorTypes, TitleExtractorTypes } from '../../types/fieldExtractor';
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { MusicPlatformType } from '../../types/platform';
 import { ethereumArtistId } from '../../utils/identifiers';
@@ -27,7 +27,9 @@ const ARTIFACTS: NftFactory = {
       type: MusicPlatformType['multi-track-multiprint-contract'],
       extractor: {
         title: TitleExtractorTypes.METADATA_NAME,
-        id: IdExtractorTypes.USE_TITLE_EXTRACTOR
+        id: IdExtractorTypes.USE_TITLE_EXTRACTOR,
+        artistId: ArtistIdExtractorTypes.USE_ARTIST_ID_OVERRIDE,
+        artistName: ArtistNameExtractorTypes.USE_ARTIST_NAME_OVERRIDE,
       }
     }
   }

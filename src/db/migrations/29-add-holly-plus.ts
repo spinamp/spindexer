@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-import { IdExtractorTypes, TitleExtractorTypes, WebsiteUrlExtractorTypes } from '../../types/fieldExtractor';
+import { ArtistNameExtractorTypes, IdExtractorTypes, TitleExtractorTypes, WebsiteUrlExtractorTypes } from '../../types/fieldExtractor';
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
 import { addNftFactory, addPlatform, removeNftFactory, removePlatform } from '../migration-helpers';
@@ -31,6 +31,7 @@ const HOLLY_PLUS: NftFactory = {
         title: TitleExtractorTypes.METADATA_NAME,
         id: IdExtractorTypes.USE_TITLE_EXTRACTOR,
         websiteUrl: WebsiteUrlExtractorTypes.USE_TOKEN_ID_APPENDED_EXTERNAL_URL,
+        artistName: ArtistNameExtractorTypes.USE_ARTIST_NAME_OVERRIDE,
       }
     }
   }

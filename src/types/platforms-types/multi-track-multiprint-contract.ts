@@ -2,9 +2,8 @@ import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
 import { slugify } from '../../utils/identifiers';
-import { cleanURL } from '../../utils/sanitizers';
 import { ArtistProfile } from '../artist';
-import { resolveEthereumTrackIdOverrides, titleExtractor, websiteUrlExtractor } from '../fieldExtractor';
+import { resolveArtistId, resolveArtistName, resolveArtworkUrl, resolveAudioUrl, resolveEthereumTrackId, resolveTitle, resolveWebsiteUrl } from '../fieldExtractor';
 import { MapNFTsToTrackIds, MapTrack } from '../mapping';
 import { NFT, NftFactory } from '../nft';
 import { ProcessedTrack } from '../track';
@@ -18,10 +17,15 @@ const mapTrack: MapTrack = (
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
   }
 
-  const lossyAudioIPFSHash = extractHashFromURL(nft.metadata.animation_url) || undefined;
-  const lossyArtworkIPFSHash = extractHashFromURL(nft.metadata.image) || undefined;
-  const lossyAudioURL = cleanURL(nft.metadata.animation_url);
-  const lossyArtworkURL = cleanURL(nft.metadata.image);
+  const lossyAudioURL = resolveAudioUrl(nft, contract);
+  const lossyArtworkURL = resolveArtworkUrl(nft, contract);
+  const lossyAudioIPFSHash = extractHashFromURL(lossyAudioURL) || undefined;
+  const lossyArtworkIPFSHash = extractHashFromURL(lossyArtworkURL) || undefined;
+
+  const id = mapNFTtoTrackID(nft, contract);
+  if (!id) {
+    throw new Error(`Attempted to map track with null id for nft ${nft.id}`)
+  }
 
   if (!lossyAudioIPFSHash && !lossyAudioURL) {
     throw new Error('Failed to extract audio from nft');
@@ -32,16 +36,16 @@ const mapTrack: MapTrack = (
   }
 
   const track: Partial<ProcessedTrack> = {
-    id: mapNFTtoTrackID(nft, contract),
-    platformInternalId: mapNFTtoTrackID(nft, contract),
-    title: titleExtractor(contract)(nft),
+    id,
+    platformInternalId: id,
+    title: resolveTitle(nft, contract),
     description: nft.metadata.description,
     platformId: contract.platformId,
     lossyAudioIPFSHash,
     lossyArtworkIPFSHash,
     lossyAudioURL,
     lossyArtworkURL,
-    websiteUrl: websiteUrlExtractor(contract)(nft),
+    websiteUrl: resolveWebsiteUrl(nft, contract),
     artistId: mapArtistProfile({ apiTrack: apiTrack, nft: nft, contract: contract }).artistId,
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
@@ -60,9 +64,10 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
   if (!contract) {
     throw new Error(`Contract missing for mapArtistProfile for nft ${nft.id}`)
   }
+
   return {
-    name: contract.platformId,
-    artistId: contract.platformId,
+    name: resolveArtistName(nft, contract),
+    artistId: resolveArtistId(nft, contract),
     platformInternalId: contract.platformId,
     platformId: contract.platformId,
     avatarUrl: undefined,
@@ -73,18 +78,24 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
   }
 };
 
-const mapNFTtoTrackID = (nft: NFT, contract?: NftFactory): string => {
+const mapNFTtoTrackID = (nft: NFT, contract?: NftFactory): string | null => {
   if (!contract) {
     throw new Error('No contract provided');
   }
-  return resolveEthereumTrackIdOverrides(nft, contract);
+  return resolveEthereumTrackId(nft, contract);
 };
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {
   if (!input.contract) {
     throw new Error('No contract provided');
   }
-  return _.groupBy(input.nfts, nft => mapNFTtoTrackID(nft, input.contract));
+  return _.groupBy(input.nfts, nft => {
+    try {
+      return mapNFTtoTrackID(nft, input.contract);
+    } catch (e) {
+      return 'null';
+    }
+  });
 }
 
 export default {
