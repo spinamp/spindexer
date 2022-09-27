@@ -38,6 +38,7 @@ Spindexer works by:
    - IPFS pinning api url for pinning ipfs content to your own node
    - IPFS RPC endpoint for adding new content to IPFS
    - IPFS pinning api url for pinning ipfs content to a node
+   - Sound.xyz API key for querying sound.xyz metadata
 
  - Bootstrap the DB with a recent backup so that you don't have to index from scratch:
    - ```yarn restore-db```
