@@ -50,9 +50,9 @@ export enum NFTStandard {
 
 export type TypeMetadata = {
   overrides: {
-    track?: Partial<ProcessedTrack>,
+    track?: Partial<ProcessedTrack>
     artist?: Partial<ArtistProfile>
-    type?: MusicPlatformType,
+    type?: MusicPlatformType
     extractor?: ExtractorTypes
   }
 }
