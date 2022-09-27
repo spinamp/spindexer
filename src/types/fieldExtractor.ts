@@ -29,7 +29,7 @@ export enum TitleExtractorTypes {
 
 export enum IdExtractorTypes {
   USE_TITLE_EXTRACTOR = 'useTitleExtractor',
-  CONTRACT_ADDRESS = 'contractAddress'
+  TRACK_NUMBER = 'trackNumber'
 }
 
 export enum AudioUrlExtractorTypes {
@@ -72,7 +72,12 @@ type AvatarUrlExtractorMapping = Record<AvatarUrlExtractorTypes, Extractor>
 
 const idExtractors: IdExtractorMapping = {
   [IdExtractorTypes.USE_TITLE_EXTRACTOR]: (nft: NFT) => { throw new Error('Unexpected code path - title extractor should already be applied') },
-  [IdExtractorTypes.CONTRACT_ADDRESS]: (nft: NFT) => nft.contractAddress,
+  [IdExtractorTypes.TRACK_NUMBER]: (nft: NFT) => {
+    if (!nft.metadata.trackNumber) {
+      throw new Error(`nft ${nft.id} missing track number`);
+    }
+    return `${nft.metadata.trackNumber}`
+  },
 }
 
 const titleExtractors: TitleExtractorMapping = {

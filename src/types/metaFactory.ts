@@ -85,7 +85,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
             artistId: ethereumArtistId(event.args!.deployer),
           },
           extractor: {
-            id: IdExtractorTypes.CONTRACT_ADDRESS,
+            id: IdExtractorTypes.TRACK_NUMBER,
             title: TitleExtractorTypes.METADATA_TITLE,
             artistName: ArtistNameExtractorTypes.METADATA_ARTIST,
             avatarUrl: AvatarUrlExtractorTypes.METADATA_IMAGE,
