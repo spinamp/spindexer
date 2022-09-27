@@ -5,9 +5,10 @@ export const dropLeadingInfo = (str: string) => {
 
 export const cleanURL = (urlString: string) => {
   try {
+    console.log('clean url', urlString);
     const url = new URL(urlString);
     if (url.protocol === 'ar:') {
-      return `${process.env.ARWEAVE_GATEWAY}${url.pathname.replace(/^\/\//, '')}`;
+      return `${process.env.ARWEAVE_GATEWAY_URL}${urlString.replace(/^ar:\/\//, '')}`;
     }
     return urlString.replace('arweave.rocks', 'arweave.net');
   } catch {

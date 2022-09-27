@@ -96,6 +96,9 @@ const init = async () => {
       console.error({ nft })
       throw new Error('Missing nft metadata');
     }
+    if (nft.metadata.title){
+      return nft.metadata.title;
+    }
     if (!nft.metadata.name) {
       console.error({ nft })
       throw new Error('Missing name');
@@ -108,9 +111,11 @@ const init = async () => {
     return splitName[0].trim();
   }
 
+
   const nftMatchesTrack = (nft: NFT, apiTrack: any) => {
     const sameArtistAsNFT = formatAddress(apiTrack.artist.artistContractAddress) === formatAddress(nft.contractAddress);
     const sameTrackAsNFT = apiTrack.title.trim() === getNFTTitle(nft);
+
     return sameArtistAsNFT && sameTrackAsNFT;
   }
 
@@ -121,10 +126,12 @@ const init = async () => {
       trackId: mapAPITrackToTrackID(apiTrack),
     }))
 
+    
     const filteredAPITracks = apiTracks.filter(apiTrack => {
       const matchedNFT = nfts.find((nft: NFT) => nftMatchesTrack(nft, apiTrack));
       return !!matchedNFT;
     });
+
     filteredAPITracks.forEach(apiTrack => {
       if (apiTrack.tracks.length > 1) {
         return { isError: true, error: new Error('Sound release with multiple tracks not yet implemented') };
@@ -144,6 +151,7 @@ const init = async () => {
       const nftTrack = audioAPITracks.find(track => nftMatchesTrack(nft, track));
       if (!nftTrack || !nftTrack.trackId) {
         console.dir({ nftTrack, nft })
+
         throw new Error('No track found for NFT')
       }
       accum[nft.id] = nftTrack.trackId;
