@@ -75,6 +75,13 @@ export const removeNftFactory = async(knex: Knex, contract: NftFactory) => {
   throw 'not implemented'
 }
 
+export const updateNftFactoryTypeMetadataOverrides = async(knex: Knex, contractId: string, contract: NftFactory) => {
+  await knex.raw(`
+    update "${Table.nftFactories}"
+    set "typeMetadata" = jsonb_set("typeMetadata", '{overrides}', '${JSON.stringify(contract.typeMetadata?.overrides)}', true)
+    where id ILIKE '${contractId}';`
+  );
+}
 
 async function getPrimaryKeys(knex: Knex): Promise<{
   table_name: string,
