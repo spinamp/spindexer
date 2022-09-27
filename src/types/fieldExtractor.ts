@@ -121,7 +121,7 @@ export const resolveEthereumTrackId: Resolver = (nft, contract) => {
   const extractor = idStrategy(contract)
   const trackId = slugify(extractor(nft));
   if (!trackId) {
-    throw new Error('ID not extracted correctly');
+    throw new Error(`ID not extracted correctly for nft: ${nft.id}`);
   }
   return ethereumTrackId(nft.contractAddress, trackId);
 }
