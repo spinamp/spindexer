@@ -4,8 +4,14 @@ import { formatAddress } from '../types/address';
 import { NFT } from '../types/nft';
 import { ethereumTrackId } from '../utils/identifiers';
 
+const clientKey = process.env.SOUND_XYZ_KEY;
+if (!clientKey) {
+  throw 'No SoundXYZ API key configured'
+}
+
 const soundAPI = new GraphQLClient(
   'https://api.sound.xyz/graphql',
+  { headers: { 'x-sound-client-key': clientKey } }
 );
 
 const mapAPITrackToTrackID = (apiTrack: any): string => {

@@ -83,7 +83,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
         existingTrackIds,
       }
       inputsforNFTFactoryProcessing.push(input);
-      nftsWithoutTracks.map(nft => allErrorNFTs.push({
+      nftsWithoutTracks?.map(nft => allErrorNFTs.push({
         nftId: nft.id,
         processError: `Error on ${nft.id}: null id`
       }));
