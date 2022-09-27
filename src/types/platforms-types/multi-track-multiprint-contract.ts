@@ -89,7 +89,13 @@ const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {
   if (!input.contract) {
     throw new Error('No contract provided');
   }
-  return _.groupBy(input.nfts, nft => mapNFTtoTrackID(nft, input.contract));
+  return _.groupBy(input.nfts, nft => {
+    try {
+      return mapNFTtoTrackID(nft, input.contract);
+    } catch (e) {
+      return 'null';
+    }
+  });
 }
 
 export default {

@@ -6,7 +6,6 @@ import { getTrait, NFT, NftFactory } from './nft';
 type Extractor = (nft: NFT) => string;
 type StrategyExtractor = (nftFactory: NftFactory) => Extractor;
 type Resolver = (nft: NFT, contract: NftFactory) => string;
-type IDResolver = (nft: NFT, contract: NftFactory) => string | null;
 
 export type ExtractorTypes = {
   id?: IdExtractorTypes
@@ -118,11 +117,11 @@ const idStrategy: StrategyExtractor = (contract) => {
   throw new Error('no other id extraction options yet')
 }
 
-export const resolveEthereumTrackId: IDResolver = (nft, contract) => {
+export const resolveEthereumTrackId: Resolver = (nft, contract) => {
   const extractor = idStrategy(contract)
   const trackId = slugify(extractor(nft));
   if (!trackId) {
-    return null;
+    throw new Error(`ID not extracted correctly for nft: ${nft.id}`);
   }
   return ethereumTrackId(nft.contractAddress, trackId);
 }

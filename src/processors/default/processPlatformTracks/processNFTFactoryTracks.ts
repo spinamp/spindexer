@@ -93,7 +93,8 @@ export const getTrackInputs = async (
   }
   const trackMapping = mapNFTsToTrackIds(nftToTrackIdInput);
   const nftsWithoutTracks = trackMapping['null'];
-  const trackIds = Object.keys(trackMapping).filter(key => key !== null && key !== 'null');
+  delete trackMapping['null'];
+  const trackIds = Object.keys(trackMapping);
   const existingTrackIds = await dbClient.recordsExist(Table.processedTracks, trackIds);
   const newTrackIds = trackIds.filter(id => !existingTrackIds.includes(id));
 
