@@ -82,10 +82,10 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
         existingTrackIds,
       }
       inputsforNFTFactoryProcessing.push(input);
-    } catch {
+    } catch (e) {
       factoryNFTs.map(nft => allErrorNFTs.push({
         nftId: nft.id,
-        processError: `Missing type for nft_factory ${nftFactory.id}`
+        processError: `Error on ${nftFactory.id}: ${(e as Error).message}`
       }));
     }
   }
