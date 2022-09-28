@@ -74,7 +74,6 @@ const createTracks = async (
         processErrorName = error.name;
         processError = `Error mapping track on ${nftFactory.id}: ${error.message}`;
       }
-      console.log({ processError, processErrorName })
       trackNFTs.forEach(nft => {
         errorNFTs.push({
           nftId: nft.id,
