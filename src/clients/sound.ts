@@ -140,7 +140,6 @@ const init = async () => {
         ...apiTrack,
         tracks: [{
           ...apiTrack.tracks[0],
-          audio: await audioFromTrack(apiTrack.tracks[0].id),
         }]
       };
     });

@@ -17,8 +17,8 @@ const mapTrack: MapTrack = (
   if (!apiTrack) {
     throw new Error('missing api track');
   }
-  if (!apiTrack.tracks[0].audio) {
-    throw new Error('missing nft metadata audio_url');
+  if (!nft.metadata.animation_url) {
+    throw new Error('missing nft metadata animation_url');
   }
   return ({
     id: apiTrack.trackId,
@@ -27,7 +27,7 @@ const mapTrack: MapTrack = (
     slug: slugify(`${apiTrack.title} ${nft.createdAtTime.getTime()}`),
     description: apiTrack.description,
     platformId: nft.platformId,
-    lossyAudioURL: apiTrack.tracks[0].audio.url || nft.metadata.audio_url,
+    lossyAudioURL: nft.metadata.animation_url,
     lossyArtworkURL: apiTrack.coverImage.url,
     lossyAudioIPFSHash: extractHashFromURL(getNFTMetadataField(nft, 'animation_url'))!,
     lossyArtworkIPFSHash: extractHashFromURL(getNFTMetadataField(nft, 'image'))!,
