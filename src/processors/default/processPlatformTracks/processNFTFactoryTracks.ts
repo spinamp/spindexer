@@ -68,10 +68,18 @@ const createTracks = async (
       } as ArtistProfile;
       artistProfiles.push(artistProfile);
     } catch (error) {
+      let processErrorName: string | undefined = undefined;
+      let processError = `Error mapping track on ${nftFactory.id}: ${error}`;
+      if (error instanceof Error) {
+        processErrorName = error.name;
+        processError = `Error mapping track on ${nftFactory.id}: ${error.message}`;
+      }
+      console.log({ processError, processErrorName })
       trackNFTs.forEach(nft => {
         errorNFTs.push({
           nftId: nft.id,
-          processError: `Error mapping track: ${error}`
+          processError,
+          processErrorName
         });
       })
       return;

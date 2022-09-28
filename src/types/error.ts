@@ -3,8 +3,5 @@ export type ProcessTrackError = {
   message: string
 };
 
-export const FAILED_AUDIO_EXTRACTION = '1';
-
-export const ErrorMessages = {
-  [FAILED_AUDIO_EXTRACTION]: `Failed to extract audio from nft`
-}
+export const FailedAudioExtractionError = new Error('Failed to extract audio from nft');
+FailedAudioExtractionError.name = 'FailedAudioExtractionError';

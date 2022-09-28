@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
-import { FAILED_AUDIO_EXTRACTION } from '../error';
+import { FailedAudioExtractionError } from '../error';
 import { resolveArtistId, resolveArtistName, resolveArtworkUrl, resolveAudioUrl, resolveAvatarUrl, resolveEthereumTrackId, resolveTitle, resolveWebsiteUrl } from '../fieldExtractor';
 import { MapNFTsToTrackIds, MapTrack } from '../mapping';
 import { NFT, NftFactory } from '../nft';
@@ -25,11 +25,11 @@ const mapTrack: MapTrack = (
 
   const id = mapNFTtoTrackID(nft, contract);
   if (!id) {
-    throw new Error(FAILED_AUDIO_EXTRACTION)
+    throw new Error(`Attempted to map track with null id for nft ${nft.id}`)
   }
 
   if (!lossyAudioIPFSHash && !lossyAudioURL) {
-    throw new Error('Failed to extract audio from nft');
+    throw FailedAudioExtractionError;
   }
 
   if (!lossyArtworkIPFSHash && !lossyArtworkURL) {

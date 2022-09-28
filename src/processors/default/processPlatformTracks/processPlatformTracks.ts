@@ -4,7 +4,6 @@ import { DBClient, Table } from '../../../db/db';
 import { fromDBRecords } from '../../../db/orm';
 import { NFTsWithoutTracks } from '../../../triggers/missing';
 import { ArtistProfile, mapArtist } from '../../../types/artist';
-import { ErrorMessages } from '../../../types/error';
 import { NFTtoTrackIdsInput } from '../../../types/mapping';
 import { NFT, NftFactory } from '../../../types/nft';
 import { NFTProcessError } from '../../../types/nftProcessError';
@@ -41,7 +40,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
       nftId: nft.id,
       processError: `Missing platform type for platform ${platform.id}`
     }))
-    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'nftId', ['processError']);
+    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'nftId', ['processError', 'processErrorName']);
     return;
   }
   const platformClient = (clients as any)[platform.id];
@@ -89,17 +88,9 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
         processError: `Error on ${nft.id}: null id`,
       }));
     } catch (e) {
-      let processErrorCode: number | undefined = parseInt(e as string);
-      let processError = `Error on ${nftFactory.id}: ${e}`;
-      if (isNaN(processErrorCode)) {
-        processErrorCode = undefined;
-      } else {
-        processError = `Error on ${nftFactory.id}: ${ErrorMessages[e as keyof typeof ErrorMessages]}`;
-      }
       factoryNFTs.map(nft => allErrorNFTs.push({
         nftId: nft.id,
-        processError,
-        processErrorCode
+        processError: e as string,
       }));
     }
   }
@@ -123,7 +114,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
   const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(allNewTracks, clients.db, true);
 
   if (allErrorNFTs.length !== 0) {
-    await clients.db.upsert(Table.nftProcessErrors, allErrorNFTs, 'nftId', ['processError']);
+    await clients.db.upsert(Table.nftProcessErrors, allErrorNFTs, 'nftId', ['processError', 'processErrorName']);
   }
   if (oldIds && oldIds.length !== 0) {
     await clients.db.delete(Table.processedTracks, oldIds);
