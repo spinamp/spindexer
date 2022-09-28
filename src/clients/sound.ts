@@ -30,6 +30,7 @@ const mapAPITrackToTrackID = (apiTrack: any): string => {
 export type SoundClient = {
   fetchTracksByTrackId: (trackIds: string[]) => Promise<any[]>;
   audioFromTrack: (trackId: string) => Promise<any>;
+  fetchMintTimes: () => Promise<any>;
 }
 
 const init = async () => {
@@ -179,11 +180,32 @@ const init = async () => {
     return audioAPITracks;
   };
 
+  const fetchMintTimes = async (
+  ): Promise<any> => {
+    const { allMintedReleases } = await soundAPI.request(
+      gql`
+          {
+            allMintedReleases {
+              mintStartTime
+              contract {
+                  contractAddress
+              }
+            }
+        }
+        `,
+    );
+    return (allMintedReleases as Array<any>).reduce((accum, release: any) => {
+      accum[release.contract.contractAddress] = release.mintStartTime;
+      return accum;
+    }, {});
+  };
+
   return {
     audioFromTrack,
     getAllMintedReleases: getAllMintedReleasesFunction,
     fetchTracksByTrackId,
-    fetchTracksByNFT
+    fetchTracksByNFT,
+    fetchMintTimes
   };
 }
 

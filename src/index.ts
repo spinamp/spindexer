@@ -15,7 +15,7 @@ import { createERC721NFTsFromTransfersProcessor } from './processors/default/cre
 import { createNftFactoryFromERC721MetaFactoryProcessor } from './processors/default/createNftFactoryFromERC721MetaFactory';
 import { createNinaNfts } from './processors/default/createNinaNftProcesor';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
-import { errorProcessor } from './processors/default/errorProcessor';
+import { errorAndMetadataResetProcessor, errorProcessor } from './processors/default/errorProcessor';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
 import { insertSeedsIntoMempool } from './processors/default/insertSeedsIntoMempool';
@@ -65,6 +65,7 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
     ipfsAudioPinner,
     ipfsArtworkPinner,
     errorProcessor,
+    errorAndMetadataResetProcessor,
   ]
 };
 
