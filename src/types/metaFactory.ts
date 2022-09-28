@@ -7,6 +7,7 @@ import { Contract } from './contract'
 import { ArtistNameExtractorTypes, AvatarUrlExtractorTypes, IdExtractorTypes, TitleExtractorTypes, WebsiteUrlExtractorTypes } from './fieldExtractor'
 import { NftFactory, NFTContractTypeName, NFTStandard } from './nft'
 import { MusicPlatformType } from './platform'
+import { Clients } from './processor'
 
 export enum MetaFactoryTypeName {
   soundArtistProfileCreator = 'soundArtistProfileCreator',
@@ -25,7 +26,8 @@ export type MetaFactory = Contract & {
 
 export type MetaFactoryType = {
   newContractCreatedEvent: string,
-  creationEventToNftFactory?: (event: ethers.Event, autoApprove: boolean) => NftFactory
+  creationEventToNftFactory?: (event: ethers.Event, autoApprove: boolean, factoryMetadata?: unknown) => NftFactory
+  metadataAPI?: (events: ethers.Event[], clients: Clients) => Promise<any>
 }
 
 type MetaFactoryTypes = {
@@ -70,29 +72,37 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
   },
   soundCreatorV1: {
     newContractCreatedEvent: 'SoundEditionCreated',
-    creationEventToNftFactory: (event: any, autoApprove: boolean) => ({
-      id: formatAddress(event.args!.soundEdition),
-      platformId: 'sound',
-      startingBlock: event.blockNumber,
-      contractType: NFTContractTypeName.default,
-      standard: NFTStandard.ERC721,
-      autoApprove,
-      approved: autoApprove,
-      typeMetadata: {
-        overrides: {
-          type: MusicPlatformType['multi-track-multiprint-contract'],
-          artist: {
-            artistId: ethereumArtistId(event.args!.deployer),
-          },
-          extractor: {
-            id: IdExtractorTypes.TRACK_NUMBER,
-            title: TitleExtractorTypes.METADATA_TITLE,
-            artistName: ArtistNameExtractorTypes.METADATA_ARTIST,
-            avatarUrl: AvatarUrlExtractorTypes.METADATA_IMAGE,
-            websiteUrl: WebsiteUrlExtractorTypes.EXTERNAL_URL_WITH_ONLY_FIRST_SEGMENT
+    metadataAPI: async (events, clients: Clients) => {
+      const soundOfficialContracts = await clients.sound.fetchContractAddresses();
+      const editionAddresses = new Set(events.map(event => formatAddress(event.args!.soundEdition)));
+      const officialEditions = new Set([...editionAddresses].filter((address) => soundOfficialContracts.has(address)));
+      return officialEditions;
+    },
+    creationEventToNftFactory: (event: any, autoApprove: boolean, factoryMetadata: any) => {
+      const official = factoryMetadata.has(formatAddress(event.args!.soundEdition));
+      return ({
+        id: formatAddress(event.args!.soundEdition),
+        platformId: official ? 'sound' : 'sound-protocol',
+        startingBlock: event.blockNumber,
+        contractType: NFTContractTypeName.default,
+        standard: NFTStandard.ERC721,
+        autoApprove: official,
+        approved: official,
+        typeMetadata: {
+          overrides: {
+            type: MusicPlatformType['multi-track-multiprint-contract'],
+            artist: {
+              artistId: ethereumArtistId(event.args!.deployer),
+            },
+            extractor: {
+              id: IdExtractorTypes.TRACK_NUMBER,
+              title: TitleExtractorTypes.METADATA_TITLE,
+              artistName: ArtistNameExtractorTypes.METADATA_ARTIST,
+              avatarUrl: AvatarUrlExtractorTypes.METADATA_IMAGE,
+              websiteUrl: WebsiteUrlExtractorTypes.EXTERNAL_URL_WITH_ONLY_FIRST_SEGMENT
+            }
           }
         }
-      }
-    })
+      })}
   }
 }
