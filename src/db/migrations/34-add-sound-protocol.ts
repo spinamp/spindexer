@@ -26,6 +26,11 @@ const SOUND_PROTOCOL_FACTORY: MetaFactory =
 
 
 export const up = async (knex: Knex) => {
+
+  await knex.schema.alterTable(Table.nftProcessErrors, table => {
+    table.integer('processErrorCode');
+  });
+
   await addPlatform(knex, SOUND_PROTOCOL_PLATFORM);
   const message: CrdtMessage = getCrdtUpsertMessage<MetaFactory>(Table.metaFactories, SOUND_PROTOCOL_FACTORY);
   await knex(Table.seeds).insert(message);

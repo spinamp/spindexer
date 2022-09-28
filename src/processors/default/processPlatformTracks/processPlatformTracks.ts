@@ -4,6 +4,7 @@ import { DBClient, Table } from '../../../db/db';
 import { fromDBRecords } from '../../../db/orm';
 import { NFTsWithoutTracks } from '../../../triggers/missing';
 import { ArtistProfile, mapArtist } from '../../../types/artist';
+import { ErrorMessages } from '../../../types/error';
 import { NFTtoTrackIdsInput } from '../../../types/mapping';
 import { NFT, NftFactory } from '../../../types/nft';
 import { NFTProcessError } from '../../../types/nftProcessError';
@@ -85,12 +86,20 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
       inputsforNFTFactoryProcessing.push(input);
       nftsWithoutTracks?.map(nft => allErrorNFTs.push({
         nftId: nft.id,
-        processError: `Error on ${nft.id}: null id`
+        processError: `Error on ${nft.id}: null id`,
       }));
     } catch (e) {
+      let processErrorCode: number | undefined = parseInt(e as string);
+      let processError = `Error on ${nftFactory.id}: ${e}`;
+      if (isNaN(processErrorCode)) {
+        processErrorCode = undefined;
+      } else {
+        processError = `Error on ${nftFactory.id}: ${ErrorMessages[e as keyof typeof ErrorMessages]}`;
+      }
       factoryNFTs.map(nft => allErrorNFTs.push({
         nftId: nft.id,
-        processError: `Error on ${nftFactory.id}: ${(e as Error).message}`
+        processError,
+        processErrorCode
       }));
     }
   }
