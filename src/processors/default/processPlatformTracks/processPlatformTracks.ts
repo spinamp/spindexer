@@ -46,9 +46,21 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
   const platformClient = (clients as any)[platform.id];
   const nftFactories = await getNFTFactories(nfts, clients.db);
   const nftsByFactoryId = _.groupBy(nfts, nft => nft.contractAddress);
+  const nftFactoriesById = _.keyBy(nftFactories, factory => factory.id);
+  const nftsForApiTracks = nfts.filter(nft => {
+    const factory = nftFactoriesById[nft.contractAddress];
+    if (!factory) {
+      throw new Error(`Unexpected nft with no factory: ${nft.id}`);
+    }
+    const type = getNFTFactoryType(factory, platformType);
+    if (type.skipApiTracks) {
+      return false;
+    }
+    return true;
+  });
   let apiTracksByNFT;
-  if (platformClient && platformClient.fetchTracksByNFT) {
-    apiTracksByNFT = await platformClient.fetchTracksByNFT(nfts);
+  if (platformClient && platformClient.fetchTracksByNFT && nftsForApiTracks.length !== 0) {
+    apiTracksByNFT = await platformClient.fetchTracksByNFT(nftsForApiTracks);
   }
 
   let allNewTracks: ProcessedTrack[] = [];

@@ -72,7 +72,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
     newContractCreatedEvent: 'SoundEditionCreated',
     creationEventToNftFactory: (event: any, autoApprove: boolean) => ({
       id: formatAddress(event.args!.soundEdition),
-      platformId: 'sound-protocol-v1',
+      platformId: 'sound',
       startingBlock: event.blockNumber,
       contractType: NFTContractTypeName.default,
       standard: NFTStandard.ERC721,
