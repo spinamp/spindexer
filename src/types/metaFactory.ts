@@ -82,7 +82,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       const official = factoryMetadata.has(formatAddress(event.args!.soundEdition));
       return ({
         id: formatAddress(event.args!.soundEdition),
-        platformId: official ? 'sound' : 'sound-protocol',
+        platformId: official ? 'sound' : 'sound-protocol-v1',
         startingBlock: event.blockNumber,
         contractType: NFTContractTypeName.default,
         standard: NFTStandard.ERC721,
