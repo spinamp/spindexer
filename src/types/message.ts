@@ -64,8 +64,7 @@ export function getCrdtUpdateMessage<T>(table: Table, data: PartialValues<T>): C
     operation: CrdtOperation.UPDATE
   }
 }
-
-export function getCrdtUpsertMessages<T>(table: Table, id: string, data: Values<T> ): CrdtUpsertMessage {
+export function getCrdtUpsertMessage<T>(table: Table, data: Values<T> ): CrdtUpsertMessage {
   return {
     timestamp: new Date(),
     table,

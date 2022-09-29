@@ -7,7 +7,7 @@ import { DBClient, Table, Wheres, QueryOptions } from './db';
 import config from './knexfile';
 import { fromDBRecords, toDBRecords } from './orm';
 
-export const createDB = async (currentConfig: typeof config.development | typeof config.production) => {
+export const createDB = async (currentConfig: typeof config.development | typeof config.production | typeof config.test) => {
   const initialConfig = { ...currentConfig, connection: { ...currentConfig.connection, database: 'postgres' } };
   const initialDB = knex(initialConfig);
   const { rowCount } = await initialDB.raw(`SELECT 1 FROM pg_database WHERE datname='${process.env.POSTGRES_DATABASE}'`);
@@ -148,7 +148,7 @@ const init = async (): Promise<DBClient> => {
           if (!overrideAll){
             // remove undefined properties
             values = _.omitBy(dbUpsert, _.isUndefined)
-          } 
+          }
 
           try {
             await db(tableName)

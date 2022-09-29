@@ -15,6 +15,8 @@ const connectDB = async () => {
 }
 
 app.use(express.json());
+// app.use(cors({ origin: true }));
+
 // app.use(authMiddleware); // TODO custom authentication
 
 app.post(`${apiVersionPrefix}/seeds/platforms/`, async (req, res) => {
@@ -66,7 +68,10 @@ app.post(`${apiVersionPrefix}/seeds/artists/`, async (req, res) => {
   }
 });
 
-app.listen(3005, () => {
-  console.log(`Server running on port ${3005}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(3005, () => {
+    console.log(`Server running on port ${3005}`);
+  });
+}
 
+module.exports = app;
