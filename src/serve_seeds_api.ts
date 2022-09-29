@@ -5,31 +5,28 @@ import express from 'express';
 import { Table } from './db/db';
 import db from './db/sql-db'
 import { getCrdtUpdateMessage } from './types/message';
-import { MusicPlatform, MusicPlatformType } from './types/platform';
+import { MusicPlatform } from './types/platform';
 
 const apiVersionPrefix = '/v1';
 
 const app = express();
-const dbClient = await db.init();
+const dbClient = async () => {
+  return db.init();
+}
 
 app.use(express.json());
 // app.use(authMiddleware); // TODO custom authentication
 
 app.post(`${apiVersionPrefix}/seeds/platforms/`, async (req, res) => {
   try {
-    const message = getCrdtUpdateMessage<MusicPlatform>(Table.platforms,
-      {
-        id: 'heds',
-        type: MusicPlatformType['single-track-multiprint-contract'],
-        name: 'Heds',
-      }
-    )
-    console.log(message)
+    // TODO: validate that data conforms to MusicPlatform type structure
+    const message = getCrdtUpdateMessage<MusicPlatform>(Table.platforms, req.body)
 
-    await dbClient.upsert(Table.seeds, [message])
+    const myDB = await dbClient();
+    await myDB.upsert(Table.seeds, [message])
+
     res.sendStatus(200);
   } catch (e) {
-    console.log(e);
     res.sendStatus(500);
   }
 });
