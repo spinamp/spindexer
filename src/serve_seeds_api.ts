@@ -10,7 +10,7 @@ import { MusicPlatform } from './types/platform';
 const apiVersionPrefix = '/v1';
 
 const app = express();
-const dbClient = async () => {
+const connectDB = async () => {
   return db.init();
 }
 
@@ -18,37 +18,51 @@ app.use(express.json());
 // app.use(authMiddleware); // TODO custom authentication
 
 app.post(`${apiVersionPrefix}/seeds/platforms/`, async (req, res) => {
+  const dbClient = await connectDB();
+
   try {
     // TODO: validate that data conforms to MusicPlatform type structure
     const message = getCrdtUpdateMessage<MusicPlatform>(Table.platforms, req.body)
-
-    const myDB = await dbClient();
-    await myDB.upsert(Table.seeds, [message])
+    await dbClient.upsert(Table.seeds, [message])
 
     res.sendStatus(200);
   } catch (e) {
     res.sendStatus(500);
+  } finally {
+    dbClient.close()
   }
 });
+
 app.post(`${apiVersionPrefix}/seeds/tracks/`, async (req, res) => {
+  const dbClient = await connectDB();
   try {
     res.sendStatus(200);
   } catch (e) {
     res.sendStatus(500);
+  } finally {
+    dbClient.close()
   }
 });
+
 app.post(`${apiVersionPrefix}/seeds/contracts/`, async (req, res) => {
+  const dbClient = await connectDB();
   try {
     res.sendStatus(200);
   } catch (e) {
     res.sendStatus(500);
+  } finally {
+    dbClient.close()
   }
 });
+
 app.post(`${apiVersionPrefix}/seeds/artists/`, async (req, res) => {
+  const dbClient = await connectDB();
   try {
     res.sendStatus(200);
   } catch (e) {
     res.sendStatus(500);
+  } finally {
+    dbClient.close()
   }
 });
 
