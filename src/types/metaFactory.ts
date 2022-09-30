@@ -73,8 +73,14 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
   soundCreatorV1: {
     newContractCreatedEvent: 'SoundEditionCreated',
     metadataAPI: async (events, clients: Clients) => {
-      const soundOfficialContracts = await clients.sound.fetchContractAddresses();
       const editionAddresses = new Set(events.map(event => formatAddress(event.args!.soundEdition)));
+      let soundOfficialContracts = new Set();
+      try {
+        soundOfficialContracts = await clients.sound.fetchContractAddresses();
+      } catch {
+        // If API Fails/is down, assume it's official
+        return new Set([...editionAddresses]);
+      }
       const officialEditions = new Set([...editionAddresses].filter((address) => soundOfficialContracts.has(address)));
       return officialEditions;
     },
