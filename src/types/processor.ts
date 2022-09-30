@@ -5,6 +5,7 @@ import { CatalogClient } from '../clients/catalog';
 import { EthClient } from '../clients/ethereum';
 import { IPFSClient } from '../clients/ipfs';
 import { NOIZDClient } from '../clients/noizd';
+import { SolanaClient } from '../clients/solana';
 import { SoundClient } from '../clients/sound';
 import { DBClient } from '../db/db';
 
@@ -31,6 +32,7 @@ export type Clients = {
   catalog: CatalogClient,
   sound: SoundClient,
   noizd: NOIZDClient
+  solana: SolanaClient;
 }
 
 export type Processor = {
