@@ -27,7 +27,8 @@ export const soundPremintErrors: Trigger<undefined> = async (clients) => {
     select ${Table.nftProcessErrors}.*, ${Table.nfts}."contractAddress"
     from ${Table.nftProcessErrors} join ${Table.nfts}
     on ${Table.nftProcessErrors}."nftId" = ${Table.nfts}.id
-    where ${Table.nfts}."platformId" = 'sound-protocol-v1' and
+    where ${Table.nfts}."platformId" = 'sound-protocol-v1' or
+    ${Table.nfts}."platformId" = 'sound' and
     ${Table.nftProcessErrors}."processErrorName" = '${FailedAudioExtractionError.name}';
   `
 
