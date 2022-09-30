@@ -1,7 +1,7 @@
 import { gql, GraphQLClient } from 'graphql-request';
 
 import { formatAddress } from '../types/address';
-import { getTrait, NFT } from '../types/nft';
+import { getTraitType, NFT } from '../types/nft';
 import { ethereumTrackId } from '../utils/identifiers';
 
 const clientKey = process.env.SOUND_XYZ_KEY;
@@ -55,7 +55,7 @@ const init = async () => {
 
   const searchFunctionSingle = async (nft: NFT): Promise<any[]> => {
     console.dir(nft, { depth: null })
-    const title = getTrait(nft, 'Song Edition');
+    const title = getTraitType(nft, 'Song Edition');
     const result = await soundAPI.request(
       gql`
         {
