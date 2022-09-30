@@ -40,7 +40,8 @@ export type ERC721Transfer = Record & {
 export enum NFTContractTypeName {
   default = 'default',
   zora = 'zora',
-  nina = 'nina'
+  nina = 'nina',
+  candyMachine = 'candyMachine'
 }
 
 export enum NFTStandard {

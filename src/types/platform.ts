@@ -4,12 +4,14 @@ import { NFT } from './nft';
 import catalogMappers from './platforms-types/catalog';
 import chaosMappers from './platforms-types/chaos';
 import hedsCollabMappers from './platforms-types/heds-collab';
+import kotaMappers from './platforms-types/kota';
 import mintsongsV2Mappers from './platforms-types/mintsongs-v2';
 import multiTrackMultiprintContractMappers from './platforms-types/multi-track-multiprint-contract';
 import ninaMappers from './platforms-types/nina'
 import noizdMappers from './platforms-types/noizd';
 import singleTrackMultiprintContractMappers from './platforms-types/single-track-multiprint-contract';
 import soundMappers from './platforms-types/sound';
+
 
 export const API_PLATFORMS = ['noizd'];
 
@@ -23,7 +25,8 @@ export enum MusicPlatformType {
   chaos = 'chaos',
   mintsongsV2 = 'mintsongs-v2',
   nina = 'nina',
-  hedsCollab = 'heds-collab'
+  hedsCollab = 'heds-collab',
+  kota = 'kota'
 }
 
 export type MusicPlatform = {
@@ -86,5 +89,8 @@ export const platformConfigs: MusicPlatformTypeConfigs = {
   },
   zora: {
     mappers: singleTrackMultiprintContractMappers,
+  },
+  kota: {
+    mappers: kotaMappers
   }
 }

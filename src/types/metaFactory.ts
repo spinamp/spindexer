@@ -9,7 +9,8 @@ import { NftFactory, NFTContractTypeName, NFTStandard } from './nft'
 export enum MetaFactoryTypeName {
   soundArtistProfileCreator = 'soundArtistProfileCreator',
   ninaMintCreator = 'ninaMintCreator',
-  zoraDropCreator = 'zoraDropCreator'
+  zoraDropCreator = 'zoraDropCreator',
+  candyMachine = 'candyMachine'
 }
 
 export type MetaFactory = Contract & {
