@@ -108,10 +108,16 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
     }
   }
 
-  const allNewTrackIds: string[] = inputsforNFTFactoryProcessing.map(i => i.newTrackIds).flat().filter((id): id is string => !!id);
+  const newTrackIdsForAPI: string[] = inputsforNFTFactoryProcessing.map(i => {
+    if (i.nftFactoryType.skipApiTracks) {
+      return [];
+    } else {
+      return i.newTrackIds
+    }
+  }).flat().filter((id): id is string => !!id);
   let apiTrackData: any;
-  if (platformClient && allNewTrackIds.length > 0) {
-    apiTrackData = await getAPITrackData(allNewTrackIds, platformClient);
+  if (platformClient && newTrackIdsForAPI.length > 0) {
+    apiTrackData = await getAPITrackData(newTrackIdsForAPI, platformClient);
   }
 
   for (const input of inputsforNFTFactoryProcessing) {
