@@ -110,7 +110,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
 
   const allNewTrackIds: string[] = inputsforNFTFactoryProcessing.map(i => i.newTrackIds).flat().filter((id): id is string => !!id);
   let apiTrackData: any;
-  if (platformClient) {
+  if (platformClient && allNewTrackIds.length > 0) {
     apiTrackData = await getAPITrackData(allNewTrackIds, platformClient);
   }
 

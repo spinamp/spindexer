@@ -54,7 +54,6 @@ const init = async () => {
   };
 
   const searchFunctionSingle = async (nft: NFT): Promise<any[]> => {
-    console.dir(nft, { depth: null })
     const title = getTraitType(nft, 'Song Edition');
     const result = await soundAPI.request(
       gql`
