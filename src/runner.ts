@@ -4,6 +4,7 @@ import catalog from './clients/catalog';
 import ethereum from './clients/ethereum';
 import ipfs from './clients/ipfs';
 import noizd from './clients/noizd';
+import solana from './clients/solana';
 import sound from './clients/sound';
 import { DBClient, Table } from './db/db';
 import db from './db/sql-db';
@@ -17,6 +18,7 @@ export const initClients = async (existingDBClient?: DBClient) => {
   const catalogClient = await catalog.init();
   const soundClient = await sound.init();
   const noizdClient = await noizd.init();
+  const solanaClient = await solana.init();
 
   return {
     eth: ethClient,
@@ -26,7 +28,8 @@ export const initClients = async (existingDBClient?: DBClient) => {
     ipfs: ipfsClient,
     catalog: catalogClient,
     sound: soundClient,
-    noizd: noizdClient
+    noizd: noizdClient,
+    solana: solanaClient
   };
 }
 export const runProcessors = async (processors: Processor[], dbClient: DBClient) => {
