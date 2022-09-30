@@ -35,7 +35,8 @@ export const soundPremintErrors: Trigger<undefined> = async (clients) => {
   const errors = (await clients.db.rawSQL(query)).rows;
 
   try {
-    const mintTimes = await clients.sound.fetchMintTimes();
+    const contractAddresses: string[] = errors.map((e: any) => e.contractAddress);
+    const mintTimes = await clients.sound.fetchMintTimes(contractAddresses);
 
     const errorsToRetry = errors.filter((error: any) => {
       const errorMintTime = mintTimes[error.contractAddress];
