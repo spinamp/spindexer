@@ -1,43 +1,41 @@
 import 'dotenv/config';
 import './types/env';
+import cors from 'cors';
 import express from 'express';
 
 import { Table } from './db/db';
-import db from './db/sql-db'
 import { getCrdtUpdateMessage } from './types/message';
-import { MusicPlatform } from './types/platform';
+import { MusicPlatform, MusicPlatformType } from './types/platform';
+import { authMiddleware, connectDB } from './utils/seedsApi';
 
 const apiVersionPrefix = '/v1';
 
 const app = express();
-const connectDB = async () => {
-  return db.init();
-}
-
 app.use(express.json());
-// app.use(cors({ origin: true }));
-
-// app.use(authMiddleware); // TODO custom authentication
+app.use(cors({ origin: true }));
+app.use(authMiddleware);
 
 app.post(`${apiVersionPrefix}/seeds/platforms/`, async (req, res) => {
   const dbClient = await connectDB();
 
   try {
-    // TODO: validate that data conforms to MusicPlatform type structure
-    const message = getCrdtUpdateMessage<MusicPlatform>(Table.platforms, req.body)
+    const payload = req.body.msg.message
+
+    try {
+      const parsed = JSON.parse(payload);
+      if (!parsed.id || !parsed.name || !parsed.type) {
+        throw new Error('missing music platform fields')
+      }
+      if (!Object.values(MusicPlatformType).includes(parsed.type)) {
+        throw new Error('not a valid platform type')
+      }
+    } catch (e) {
+      return res.sendStatus(422);
+    }
+
+    const message = getCrdtUpdateMessage<MusicPlatform>(Table.platforms, payload)
     await dbClient.upsert(Table.seeds, [message])
 
-    res.sendStatus(200);
-  } catch (e) {
-    res.sendStatus(500);
-  } finally {
-    dbClient.close()
-  }
-});
-
-app.post(`${apiVersionPrefix}/seeds/tracks/`, async (req, res) => {
-  const dbClient = await connectDB();
-  try {
     res.sendStatus(200);
   } catch (e) {
     res.sendStatus(500);
@@ -58,6 +56,17 @@ app.post(`${apiVersionPrefix}/seeds/contracts/`, async (req, res) => {
 });
 
 app.post(`${apiVersionPrefix}/seeds/artists/`, async (req, res) => {
+  const dbClient = await connectDB();
+  try {
+    res.sendStatus(200);
+  } catch (e) {
+    res.sendStatus(500);
+  } finally {
+    dbClient.close()
+  }
+});
+
+app.post(`${apiVersionPrefix}/seeds/tracks/`, async (req, res) => {
   const dbClient = await connectDB();
   try {
     res.sendStatus(200);
