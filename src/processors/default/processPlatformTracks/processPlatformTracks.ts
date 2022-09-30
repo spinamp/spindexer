@@ -33,7 +33,7 @@ const getAPITrackData = async (trackIds: string[], client: TrackAPIClient) => {
   return apiTrackByTrackId;
 }
 const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clients: Clients) => {
-  console.log(`Getting ${platform.id} API tracks for ids: ${nfts.map(nft => nft.id)}`);
+  console.log(`Processing ${platform.id} tracks for ids: ${nfts.map(nft => nft.id)}`);
   const platformType = platformConfigs[platform.type];
   if (!platformType) {
     const errorNFTs = nfts.map(nft => ({
@@ -60,6 +60,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
   });
   let apiTracksByNFT;
   if (platformClient && platformClient.fetchTracksByNFT && nftsForApiTracks.length !== 0) {
+    console.log(`Querying ${platform.id} API tracks for ids: ${nftsForApiTracks.map(nft => nft.id)}`);
     apiTracksByNFT = await platformClient.fetchTracksByNFT(nftsForApiTracks);
   }
 
