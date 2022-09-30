@@ -27,7 +27,7 @@ export const errorAndMetadataResetProcessor: Processor = {
       return {
         id: error.nftId,
         metadata: null,
-        tokenUri: null,
+        tokenURI: null,
       }
     })
     const errorIds = nftErrors.map(e => e.nftId);
