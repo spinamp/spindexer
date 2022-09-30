@@ -1,7 +1,7 @@
 import { gql, GraphQLClient } from 'graphql-request';
 
 import { formatAddress } from '../types/address';
-import { NFT } from '../types/nft';
+import { getTrait, NFT } from '../types/nft';
 import { ethereumTrackId } from '../utils/identifiers';
 
 const clientKey = process.env.SOUND_XYZ_KEY;
@@ -52,45 +52,57 @@ const init = async () => {
     );
     return respose.audioFromTrack.audio;
   };
-  const getAllMintedReleasesFunction = async (
-  ): Promise<any[]> => {
-    const { allMintedReleases } = await soundAPI.request(
+
+  const searchFunctionSingle = async (nft: NFT): Promise<any[]> => {
+    console.dir(nft, { depth: null })
+    const title = getTrait(nft, 'Song Edition');
+    const result = await soundAPI.request(
       gql`
         {
-          allMintedReleases {
-              id
-              createdAt
-              title
-              titleSlug
-              description
-              editionId
-              coverImage {
-                id
-                url
-              }
-              artist {
-                id
-                name
-                soundHandle
-                artistContractAddress
-                user {
-                    publicAddress
-                    avatar {
-                      url
-                    }
-                }
-              }
-              tracks {
-                id
+          search(input:{ text: "${title}" }) {
+              releases {
+                createdAt
                 title
-                trackNumber
-                duration
+                titleSlug
+                description
+                editionId
+                coverImage {
+                  id
+                  url
+                }
+                artist {
+                  id
+                  name
+                  soundHandle
+                  artistContractAddress
+                  user {
+                      publicAddress
+                      avatar {
+                        url
+                      }
+                  }
+                }
+                tracks {
+                  id
+                  title
+                  trackNumber
+                  duration
+                }
               }
           }
       }
       `,
     );
-    return allMintedReleases.filter((release: any) => !!release.editionId);
+    return result.search.releases;
+  };
+
+  const searchFunction = async (nfts: NFT[]): Promise<any[]> => {
+    let results: any = [];
+    for (let i = 0; i < nfts.length; i++) {
+      const result = await searchFunctionSingle(nfts[i])
+      results = results.concat(result);
+    }
+    return results
   };
 
   const getNFTTitle = (nft: NFT) => {
@@ -120,7 +132,8 @@ const init = async () => {
   }
 
   const fetchTracksByNFT = async (nfts: NFT[]) => {
-    const apiResponse = await getAllMintedReleasesFunction();
+    const apiResponse = await searchFunction(nfts);
+    console.log({ apiResponse })
     const apiTracks = apiResponse.map(apiTrack => ({
       ...apiTrack,
       trackId: mapAPITrackToTrackID(apiTrack),
@@ -156,7 +169,9 @@ const init = async () => {
   };
 
   const fetchTracksByTrackId = async (trackIds: string[]) => {
-    const apiResponse = await getAllMintedReleasesFunction();
+    throw new Error('Functionality broken - needs to be fixes');
+    const apiResponse = await Promise.resolve([{} as any]); // todo
+    // const apiResponse = await searchFunction();
     const apiTracks = apiResponse.map(apiTrack => ({
       ...apiTrack,
       trackId: mapAPITrackToTrackID(apiTrack),
@@ -222,7 +237,7 @@ const init = async () => {
 
   return {
     audioFromTrack,
-    getAllMintedReleases: getAllMintedReleasesFunction,
+    searchFunction,
     fetchTracksByTrackId,
     fetchTracksByNFT,
     fetchMintTimes,
