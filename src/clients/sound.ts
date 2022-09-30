@@ -194,7 +194,7 @@ const init = async () => {
     return audioAPITracks;
   };
 
-  const fetchMintTimes = async (addresses: []): Promise<any> => {
+  const fetchMintTimes = async (addresses: string[]): Promise<any> => {
     let results: any = [];
     for (let i = 0; i < addresses.length; i++) {
       const { releaseContract } = await soundAPI.request(
