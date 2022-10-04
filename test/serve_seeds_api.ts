@@ -14,7 +14,7 @@ describe('Seeds API', () => {
   });
 
   describe('un-authenticated', () => {
-    it('returns an error without a signature', (done) => {
+    it('returns an error without a signature', () => {
       const message = wallet.sign(JSON.stringify({}))
       const body = {
         msg: message,
@@ -23,7 +23,8 @@ describe('Seeds API', () => {
       }
 
       supertest(app).post('/').send(body)
-        .expect(403, done);
+        .expect(403)
+        .end((err,res) => { if (err) throw err });
     });
   })
 
@@ -32,32 +33,35 @@ describe('Seeds API', () => {
       const platformsEndpoint = '/v1/seeds/platforms'
 
       describe('with the incorrect shape', () => {
-        it('returns an error', (done) => {
+        it('returns an error', () => {
           const message = wallet.sign(JSON.stringify({ blam: 'yam' }))
           const body = { msg: message, sig: message.signature, address: wallet.address }
 
           supertest(app).post(platformsEndpoint).send(body)
-            .expect(422, done);
+            .expect(422)
+            .end((err,res) => { if (err) throw err });
         })
       })
 
       describe('with an unknown platform', () => {
-        it('returns an error', (done) => {
+        it('returns an error', () => {
           const message = wallet.sign(JSON.stringify({ id: 'potato', name: 'potato', type: 'yum' }))
           const body = { msg: message, sig: message.signature, address: wallet.address }
 
           supertest(app).post(platformsEndpoint).send(body)
-            .expect(422, done);
+            .expect(422)
+            .end((err,res) => { if (err) throw err });
         })
       })
 
       describe('with a valid payload', () => {
-        it('adds the platform', (done) => {
+        it('adds the platform', () => {
           const message = wallet.sign(JSON.stringify({ id: 'jamboni', name: 'Jamboni Jams', type: MusicPlatformType.sound }));
           const body = { msg: message, sig: message.signature, address: wallet.address }
 
           supertest(app).post(platformsEndpoint).send(body)
-            .expect(200, done);
+            .expect(200)
+            .end((err,res) => { if (err) throw err });
         })
       })
     })

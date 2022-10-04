@@ -11,6 +11,7 @@ export const authMiddleware = (
   response: Response,
   next: NextFunction,
 ) => {
+
   try {
     let signer;
 
