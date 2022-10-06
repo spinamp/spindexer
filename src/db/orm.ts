@@ -46,7 +46,8 @@ const toRecordMapper: any = {
       metadataError: error.metadataError,
       numberOfRetries: error.numberOfRetries,
       lastRetry: error.lastRetry ? error.lastRetry.toISOString() : undefined,
-      processError: error.processError
+      processError: error.processError,
+      processErrorName: error.processErrorName
     });
   }),
 }
