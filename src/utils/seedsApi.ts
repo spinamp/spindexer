@@ -1,5 +1,6 @@
 import { isValidChecksumAddress } from 'ethereumjs-util'
 import { Request, Response, NextFunction } from 'express'
+import _ from 'lodash'
 import Web3 from 'web3';
 
 import { Table } from '../db/db';
@@ -15,9 +16,19 @@ type SeedPlatform = {
   type: MusicPlatformType
 }
 
+enum SeedPlatformKeys {
+  ID = 'id',
+  NAME = 'name',
+  TYPE = 'type',
+}
+
+type SeedContract = {
+  id: string,
+}
+
 type SeedPayload = {
   entity: SeedEntity,
-  data: SeedPlatform
+  data: any
 }
 
 export const authMiddleware = (
@@ -86,12 +97,13 @@ export const parseSeed = (payload: SeedPayload) => {
   const parsed = payload;
 
   if (payload.entity === 'platform') {
-    if (!parsed.data.id || !parsed.data.name || !parsed.data.type) {
+    if (!_.isEqual(Object.keys(parsed.data), Object.values(SeedPlatformKeys))) {
       throw new Error('missing platform entity required fields')
     }
     if (!Object.values(MusicPlatformType).includes(parsed.data.type)) {
       throw new Error('not a valid platform type')
     }
+  } else if (payload.entity === 'contract') {
   } else {
     throw new Error('unknown seed entity');
   }
