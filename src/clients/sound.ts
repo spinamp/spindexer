@@ -132,7 +132,6 @@ const init = async () => {
 
   const fetchTracksByNFT = async (nfts: NFT[]) => {
     const apiResponse = await searchFunction(nfts);
-    console.log({ apiResponse })
     const apiTracks = apiResponse.map(apiTrack => ({
       ...apiTrack,
       trackId: mapAPITrackToTrackID(apiTrack),
