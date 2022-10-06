@@ -6,24 +6,28 @@ import Web3 from 'web3';
 import { Table } from '../db/db';
 import db from '../db/sql-db'
 import { getCrdtUpdateMessage } from '../types/message'
+import { NFTContractTypeName, NftFactory, NFTStandard } from '../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../types/platform';
 
 type SeedEntity = 'platform' | 'contract'
 
-type SeedPlatform = {
-  id: string,
-  name: string,
-  type: MusicPlatformType
-}
-
-enum SeedPlatformKeys {
+enum SeedPlatformRequiredKeys {
   ID = 'id',
   NAME = 'name',
   TYPE = 'type',
 }
 
-type SeedContract = {
-  id: string,
+enum SeedNftFactoryRequiredKeys {
+  ID = 'id',
+  // startingBlock?: string, // ignore optional
+  PLATFORM_ID = 'platformId',
+  CONTRACT_TYPE = 'contractType', // validated against `NFTContractTypeName`
+  // name?: string, // ignore optional
+  // symbol?: string, // ignore optional
+  // typeMetadata?: TypeMetadata // ignore optional
+  STANDARD = 'standard', // validated against `NFTStandard`
+  AUTO_APPROVE = 'autoApprove',
+  APPROVED = 'approved'
 }
 
 type SeedPayload = {
@@ -93,29 +97,49 @@ const permittedAdminAddresses = (): string[] => {
 }
 
 
-export const parseSeed = (payload: SeedPayload) => {
-  const parsed = payload;
-
+export const validateSeed = (payload: SeedPayload) => {
   if (payload.entity === 'platform') {
-    if (!_.isEqual(Object.keys(parsed.data), Object.values(SeedPlatformKeys))) {
-      throw new Error('missing platform entity required fields')
+    if (!minimumKeysPresent(payload.data, SeedPlatformRequiredKeys)) {
+      throw new Error('platform entity is missing required fields')
     }
-    if (!Object.values(MusicPlatformType).includes(parsed.data.type)) {
+    if (!validForType(payload.data.type, MusicPlatformType)) {
       throw new Error('not a valid platform type')
     }
   } else if (payload.entity === 'contract') {
+    if (!minimumKeysPresent(payload.data, SeedNftFactoryRequiredKeys)) {
+      throw new Error('contract entity is missing required fields')
+    }
+    if (!validForType(payload.data.contractType, NFTContractTypeName)) {
+      throw new Error('not a valid contract type')
+    }
+    if (!validForType(payload.data.standard, NFTStandard)) {
+      throw new Error('not a valid contract standard')
+    }
   } else {
     throw new Error('unknown seed entity');
   }
-  return parsed;
+  return payload;
 }
 
-export const persistSeed = async (payload: any) => {
+export const persistSeed = async (payload: SeedPayload) => {
   const dbClient = await db.init();
+  let message: any;
   try {
-    const message = getCrdtUpdateMessage<MusicPlatform>(Table.platforms, payload)
+    if (payload.entity === 'platform') {
+      message = getCrdtUpdateMessage<MusicPlatform>(Table.platforms, payload as any)
+    } else if (payload.entity === 'contract') {
+      message = getCrdtUpdateMessage<NftFactory>(Table.nftFactories, payload as any)
+    }
     await dbClient.upsert(Table.seeds, [message])
   } finally {
     dbClient.close();
   }
+}
+
+const minimumKeysPresent = (input: any, requiredKeys: any) => {
+  return _.difference(Object.keys(input), Object.values(requiredKeys)).length === 0;
+}
+
+const validForType = (input: any, type: any) => {
+  return Object.values(type).includes(input)
 }

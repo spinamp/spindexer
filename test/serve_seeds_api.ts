@@ -65,12 +65,12 @@ describe('Seeds API', () => {
 
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
-            .expect(422, { error: 'missing platform entity required fields' })
+            .expect(422, { error: 'platform entity is missing required fields' })
             .end((err,res) => { if (err) throw err });
         })
       })
 
-      describe('with an unknown platform', () => {
+      describe('with an unknown type', () => {
         it('returns an error', () => {
           const body = { entity: 'platform', data: { id: 'potato', name: 'potato', type: 'yum' } }
           const signature = wallet.sign(JSON.stringify(body)).signature
@@ -96,33 +96,54 @@ describe('Seeds API', () => {
     })
 
     describe('contracts', () => {
-      // describe('with the incorrect shape', () => {
-      //   it('returns an error', () => {
-      //     const body = { entity: 'platform', data: { blam: 'yam' } };
-      //     const signature = wallet.sign(JSON.stringify(body)).signature
+      describe('with the incorrect shape', () => {
+        it('returns an error', () => {
+          const body = { entity: 'contract', data: { blam: 'yam' } };
+          const signature = wallet.sign(JSON.stringify(body)).signature
 
-      //     supertest(app).post(endpoint).send(body)
-      //       .set('x-signature', signature)
-      //       .expect(422, { error: 'missing platform entity required fields' })
-      //       .end((err,res) => { if (err) throw err });
-      //   })
-      // })
+          supertest(app).post(endpoint).send(body)
+            .set('x-signature', signature)
+            .expect(422, { error: 'contract entity is missing required fields' })
+            .end((err,res) => { if (err) throw err });
+        })
+      })
 
-      // describe('with an unknown platform', () => {
-      //   it('returns an error', () => {
-      //     const body = { entity: 'platform', data: { id: 'potato', name: 'potato', type: 'yum' } }
-      //     const signature = wallet.sign(JSON.stringify(body)).signature
+      describe('with an unknown contract type', () => {
+        it('returns an error', () => {
+          const body = {
+            entity: 'contract',
+            data: { id: '1', platformId: 'jamboni', contractType: 'UNKNOWN', standard: 'standard', autoApprove: false, approved: false }
+          }
+          const signature = wallet.sign(JSON.stringify(body)).signature
 
-      //     supertest(app).post(endpoint).send(body)
-      //       .set('x-signature', signature)
-      //       .expect(422, { error: 'not a valid platform type' })
-      //       .end((err,res) => { if (err) throw err });
-      //   })
-      // })
+          supertest(app).post(endpoint).send(body)
+            .set('x-signature', signature)
+            .expect(422, { error: 'not a valid contract type' })
+            .end((err,res) => { if (err) throw err });
+        })
+      })
+
+      describe('with an unknown standard', () => {
+        it('returns an error', () => {
+          const body = {
+            entity: 'contract',
+            data: { id: '1', platformId: 'jamboni', contractType: 'default', standard: 'UNKNOWN', autoApprove: false, approved: false }
+          }
+          const signature = wallet.sign(JSON.stringify(body)).signature
+
+          supertest(app).post(endpoint).send(body)
+            .set('x-signature', signature)
+            .expect(422, { error: 'not a valid contract standard' })
+            .end((err,res) => { if (err) throw err });
+        })
+      })
 
       describe('with a valid payload', () => {
         it('adds the seed', () => {
-          const body = { entity: 'contract', data: { id: 'jamboni', name: 'Jamboni Jams', type: MusicPlatformType.sound } }
+          const body = {
+            entity: 'contract',
+            data: { id: '1', platformId: 'jamboni', contractType: 'default', standard: 'erc721', autoApprove: false, approved: false }
+          }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
           supertest(app).post(endpoint).send(body)

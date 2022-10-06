@@ -3,7 +3,7 @@ import './types/env';
 import cors from 'cors';
 import express from 'express';
 
-import { authMiddleware, parseSeed, persistSeed } from './utils/seedsApi';
+import { authMiddleware, validateSeed, persistSeed } from './utils/seedsApi';
 
 const apiVersionPrefix = '/v1';
 
@@ -13,16 +13,14 @@ app.use(cors({ origin: true }));
 app.use(authMiddleware);
 
 app.post(`${apiVersionPrefix}/seeds/`, async (req, res) => {
-  let seed: any;
-
   try {
-    seed = parseSeed(req.body)
+    validateSeed(req.body)
   } catch (e: any) {
     return res.status(422).send({ error: e.message });
   }
 
   try {
-    persistSeed(seed)
+    persistSeed(req.body)
     res.sendStatus(200);
   } catch (e: any) {
     res.status(500).send({ error: e.message });
