@@ -6,7 +6,15 @@ import { MusicPlatformType } from '../src/types/platform';
 describe('Seeds API', () => {
   let app: any;
   const Web3 = new web3();
-  const wallet = Web3.eth.accounts.create('seedAdminWallet');
+
+  // TODO: rather stub out the permittedAdminAddresses() to contain this address
+  // instead of having to put the known address into .env
+  const testAdminWallet = {
+    address: '0x8eb97c37B0BDe7A09eA5b49D6D97cd57e10559ba',
+    privateKey: '0xe07cc69757e3b261ffeb70df20f832ae74da57e11dd440a5da75377abe8caefc',
+  }
+
+  const wallet = Web3.eth.accounts.privateKeyToAccount(testAdminWallet.privateKey)
 
   // TODO: spin up a test DB instead of using development
   before(() => {
@@ -26,6 +34,21 @@ describe('Seeds API', () => {
         .expect(403)
         .end((err,res) => { if (err) throw err });
     });
+
+    it('returns an error when using an unpermitted address', () => {
+      const badWallet = Web3.eth.accounts.create('unpermittedWallet');
+      const message = badWallet.sign(JSON.stringify({}))
+      const body = {
+        msg: message,
+        sig: message.signature,
+        address: badWallet.address,
+      }
+
+      supertest(app).post('/').send(body)
+        .expect(403)
+        .end((err,res) => { if (err) throw err });
+
+    })
   })
 
   describe('authenticated', () => {

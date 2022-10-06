@@ -22,7 +22,7 @@ export const authMiddleware = (
     }
 
     try {
-      signer = validateSignature(auth);
+      signer = validateSignature(auth, permittedAdminAddresses());
     } catch (e) {
       throw e;
     }
@@ -38,8 +38,8 @@ export function validateSignature(signatureData: {
   message: string;
   signature: string;
   signer: string;
-}): string {
-  let signer;
+}, permittedAddresses: string[]): string {
+  let signer: string;
   try {
     const web3 = new Web3();
     signer = web3.eth.accounts.recover( // TODO: check why this isn't erroring out with a blank signatureData.signature
@@ -60,12 +60,19 @@ export function validateSignature(signatureData: {
 
   if (
     !isValidChecksumAddress(signer) ||
-    // TODO: change to only allow a single ENV-stored signer
-    signatureData.signer.toLocaleLowerCase() !== signer.toLocaleLowerCase()
+    !permittedAddresses.includes(signer.toLowerCase())
   ) {
     console.error('Invalid signer address: ', signer);
     throw 'Invalid signer address';
   }
 
   return signer;
+}
+
+const permittedAdminAddresses = (): string[] => {
+  const addresses = process.env.PERMITTED_ADMIN_ADDRESSES?.toLowerCase();
+  if (!addresses) {
+    throw new Error('PERMITTED_ADMIN_ADDRESSES not set');
+  }
+  return addresses.split(',');
 }
