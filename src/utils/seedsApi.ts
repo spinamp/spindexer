@@ -16,9 +16,8 @@ export const authMiddleware = (
     let signer;
 
     const auth = {
-      message: request?.body?.msg,
-      signature: request?.body?.sig,
-      signer: request?.body?.address,
+      message: JSON.stringify(request.body),
+      signature: request.header('x-signature') || '',
     }
 
     try {
@@ -37,33 +36,24 @@ export const authMiddleware = (
 export function validateSignature(signatureData: {
   message: string;
   signature: string;
-  signer: string;
 }, permittedAddresses: string[]): string {
   let signer: string;
+
   try {
     const web3 = new Web3();
-    signer = web3.eth.accounts.recover( // TODO: check why this isn't erroring out with a blank signatureData.signature
+    signer = web3.eth.accounts.recover(
       signatureData.message,
       signatureData.signature,
     );
   } catch (e) {
-    console.error('Error verifying signature', e);
-    throw 'Error verifying signature';
-  }
-
-  if (
-    !signatureData.signature
-  ) {
-    console.error('No signature provided');
-    throw 'No signature provided';
+    throw `Error verifying signature: ${e}`;
   }
 
   if (
     !isValidChecksumAddress(signer) ||
     !permittedAddresses.includes(signer.toLowerCase())
   ) {
-    console.error('Invalid signer address: ', signer);
-    throw 'Invalid signer address';
+    throw `Invalid signer address: ${signer}`;
   }
 
   return signer;

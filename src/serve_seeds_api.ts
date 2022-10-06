@@ -19,7 +19,7 @@ app.post(`${apiVersionPrefix}/seeds/platforms/`, async (req, res) => {
   const dbClient = await connectDB();
 
   try {
-    const payload = req.body.msg.message
+    const payload = req.body
 
     try {
       const parsed = JSON.parse(payload);

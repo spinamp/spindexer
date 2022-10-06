@@ -23,28 +23,18 @@ describe('Seeds API', () => {
 
   describe('un-authenticated', () => {
     it('returns an error without a signature', () => {
-      const message = wallet.sign(JSON.stringify({}))
-      const body = {
-        msg: message,
-        sig: '',
-        address: wallet.address,
-      }
-
-      supertest(app).post('/').send(body)
+      supertest(app).post('/').send({})
         .expect(403)
         .end((err,res) => { if (err) throw err });
     });
 
     it('returns an error when using an unpermitted address', () => {
+      const body = {}
       const badWallet = Web3.eth.accounts.create('unpermittedWallet');
-      const message = badWallet.sign(JSON.stringify({}))
-      const body = {
-        msg: message,
-        sig: message.signature,
-        address: badWallet.address,
-      }
+      const signature = badWallet.sign(JSON.stringify(body)).signature
 
       supertest(app).post('/').send(body)
+        .set('x-signature', signature)
         .expect(403)
         .end((err,res) => { if (err) throw err });
 
@@ -57,10 +47,11 @@ describe('Seeds API', () => {
 
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
-          const message = wallet.sign(JSON.stringify({ blam: 'yam' }))
-          const body = { msg: message, sig: message.signature, address: wallet.address }
+          const body = { blam: 'yam' };
+          const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(platformsEndpoint).send(body)
+            .set('x-signature', signature)
             .expect(422)
             .end((err,res) => { if (err) throw err });
         })
@@ -68,10 +59,11 @@ describe('Seeds API', () => {
 
       describe('with an unknown platform', () => {
         it('returns an error', () => {
-          const message = wallet.sign(JSON.stringify({ id: 'potato', name: 'potato', type: 'yum' }))
-          const body = { msg: message, sig: message.signature, address: wallet.address }
+          const body = { id: 'potato', name: 'potato', type: 'yum' }
+          const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(platformsEndpoint).send(body)
+            .set('x-signature', signature)
             .expect(422)
             .end((err,res) => { if (err) throw err });
         })
@@ -79,10 +71,11 @@ describe('Seeds API', () => {
 
       describe('with a valid payload', () => {
         it('adds the platform', () => {
-          const message = wallet.sign(JSON.stringify({ id: 'jamboni', name: 'Jamboni Jams', type: MusicPlatformType.sound }));
-          const body = { msg: message, sig: message.signature, address: wallet.address }
+          const body = { id: 'jamboni', name: 'Jamboni Jams', type: MusicPlatformType.sound }
+          const signature = wallet.sign(JSON.stringify(body)).signature;
 
           supertest(app).post(platformsEndpoint).send(body)
+            .set('x-signature', signature)
             .expect(200)
             .end((err,res) => { if (err) throw err });
         })
