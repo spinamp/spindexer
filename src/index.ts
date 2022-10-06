@@ -45,6 +45,7 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
 
   return [
     insertSeedsIntoMempool,
+    errorAndMetadataResetProcessor,
     ...tableInsertsMempoolProcessors,
     ...tableUpdatesMempoolProcessors,
     ...metaFactoryProcessors,
@@ -65,7 +66,6 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
     ipfsAudioPinner,
     ipfsArtworkPinner,
     errorProcessor,
-    errorAndMetadataResetProcessor,
   ]
 };
 
