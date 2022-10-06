@@ -105,7 +105,8 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
               title: TitleExtractorTypes.METADATA_TITLE,
               artistName: ArtistNameExtractorTypes.METADATA_ARTIST,
               avatarUrl: AvatarUrlExtractorTypes.METADATA_IMAGE,
-              websiteUrl: WebsiteUrlExtractorTypes.EXTERNAL_URL_WITH_ONLY_FIRST_SEGMENT
+              websiteUrl: WebsiteUrlExtractorTypes.METADATA_EXTERNAL_URL,
+              artistWebsiteUrl: WebsiteUrlExtractorTypes.EXTERNAL_URL_WITH_ONLY_FIRST_SEGMENT
             }
           }
         }

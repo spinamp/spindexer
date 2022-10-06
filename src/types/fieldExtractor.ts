@@ -14,6 +14,7 @@ export type ExtractorTypes = {
   artworkUrl?: ArtworkUrlExtractorTypes
   avatarUrl?: AvatarUrlExtractorTypes
   websiteUrl?: WebsiteUrlExtractorTypes
+  artistWebsiteUrl?: WebsiteUrlExtractorTypes
   artistName?: ArtistNameExtractorTypes
   artistId?: ArtistIdExtractorTypes
 }
@@ -121,6 +122,14 @@ const websiteUrlStrategy: StrategyExtractor = (contract) => {
   return websiteUrlExtractors[websiteUrlExtractorOverride];
 }
 
+const artistWebsiteUrlStrategy: StrategyExtractor = (contract) => {
+  const artistWebsiteUrlExtractorOverride = contract.typeMetadata?.overrides?.extractor?.artistWebsiteUrl;
+  if (!artistWebsiteUrlExtractorOverride) {
+    return websiteUrlExtractors[WebsiteUrlExtractorTypes.METADATA_EXTERNAL_URL]
+  }
+  return websiteUrlExtractors[artistWebsiteUrlExtractorOverride];
+}
+
 const audioUrlStrategy: StrategyExtractor = (contract) => {
   const audioUrlExtractorOverride = contract.typeMetadata?.overrides?.extractor?.audioUrl;
   if (!audioUrlExtractorOverride) {
@@ -221,6 +230,10 @@ export const resolveArtistId: Resolver = (nft, contract) => {
 
 export const resolveWebsiteUrl: Resolver = (nft, contract) => {
   return websiteUrlStrategy(contract)(nft);
+}
+
+export const resolveArtistWebsiteUrl: Resolver = (nft, contract) => {
+  return artistWebsiteUrlStrategy(contract)(nft);
 }
 
 export const resolveAudioUrl: Resolver = (nft, contract) => {
