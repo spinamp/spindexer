@@ -42,6 +42,7 @@ export type PlatformMapper = {
 export type MusicPlatformTypeConfig = {
   mappers: PlatformMapper
   initialTrackCursor?: string
+  skipApiTracks?: boolean
 };
 
 export type MusicPlatformTypeConfigs = {
@@ -71,6 +72,7 @@ export const platformConfigs: MusicPlatformTypeConfigs = {
   },
   'multi-track-multiprint-contract': {
     mappers: multiTrackMultiprintContractMappers,
+    skipApiTracks: true
   },
   'chaos': {
     mappers: chaosMappers,

@@ -119,3 +119,25 @@ export const getTrait = (nft: NFT, type: string) => {
   }
   return traitAttribute.value;
 };
+
+export const getTraitType = (nft: NFT, value: string) => {
+  if (!nft.metadata) {
+    console.error({ nft })
+    throw new Error('Missing nft metadata');
+  }
+  if (!nft.metadata.attributes) {
+    console.error({ nft })
+    throw new Error('Missing attributes');
+  }
+  const traitAttribute = nft.metadata.attributes.find((attribute: any) => {
+    if (!attribute || !attribute.value) {
+      console.dir({ nft, value }, { depth: null })
+      throw new Error('Unknown attribute/trait');
+    }
+    return attribute.value.toLowerCase() === value.toLowerCase()
+  });
+  if (!traitAttribute) {
+    throw new Error(`Trait value not found: ${value}`);
+  }
+  return traitAttribute.trait_type;
+};
