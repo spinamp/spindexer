@@ -89,7 +89,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       return ({
         id: formatAddress(event.args!.soundEdition),
         platformId: official ? 'sound' : 'sound-protocol-v1',
-        startingBlock: event.blockNumber,
+        startingBlock: `${parseInt(event.blockNumber) - 1}`,
         contractType: NFTContractTypeName.default,
         standard: NFTStandard.ERC721,
         autoApprove: official,
