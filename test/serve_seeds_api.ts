@@ -42,39 +42,52 @@ describe('Seeds API', () => {
   })
 
   describe('authenticated', () => {
-    describe('platforms', () => {
-      const platformsEndpoint = '/v1/seeds/platforms'
+    const endpoint = '/v1/seeds'
 
+    describe('an unsupported seed entity', () => {
+      it('returns an error', () => {
+        const body = { entity: 'crypto-dollars', data: { blam: 'yam' } };
+        const signature = wallet.sign(JSON.stringify(body)).signature
+
+        supertest(app).post(endpoint).send(body)
+          .set('x-signature', signature)
+          .expect(422, { error: 'unknown seed entity' })
+          .end((err,res) => { if (err) throw err });
+
+      })
+    })
+
+    describe('platforms', () => {
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
-          const body = { blam: 'yam' };
+          const body = { entity: 'platform', data: { blam: 'yam' } };
           const signature = wallet.sign(JSON.stringify(body)).signature
 
-          supertest(app).post(platformsEndpoint).send(body)
+          supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
-            .expect(422)
+            .expect(422, { error: 'missing platform entity required fields' })
             .end((err,res) => { if (err) throw err });
         })
       })
 
       describe('with an unknown platform', () => {
         it('returns an error', () => {
-          const body = { id: 'potato', name: 'potato', type: 'yum' }
+          const body = { entity: 'platform', data: { id: 'potato', name: 'potato', type: 'yum' } }
           const signature = wallet.sign(JSON.stringify(body)).signature
 
-          supertest(app).post(platformsEndpoint).send(body)
+          supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
-            .expect(422)
+            .expect(422, { error: 'not a valid platform type' })
             .end((err,res) => { if (err) throw err });
         })
       })
 
       describe('with a valid payload', () => {
         it('adds the platform', () => {
-          const body = { id: 'jamboni', name: 'Jamboni Jams', type: MusicPlatformType.sound }
+          const body = { entity: 'platform', data: { id: 'jamboni', name: 'Jamboni Jams', type: MusicPlatformType.sound } }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
-          supertest(app).post(platformsEndpoint).send(body)
+          supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
             .expect(200)
             .end((err,res) => { if (err) throw err });

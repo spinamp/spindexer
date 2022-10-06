@@ -2,9 +2,23 @@ import { isValidChecksumAddress } from 'ethereumjs-util'
 import { Request, Response, NextFunction } from 'express'
 import Web3 from 'web3';
 
+import { Table } from '../db/db';
 import db from '../db/sql-db'
+import { getCrdtUpdateMessage } from '../types/message'
+import { MusicPlatform, MusicPlatformType } from '../types/platform';
 
-export const connectDB = async () => { return db.init(); }
+type SeedEntity = 'platform' | 'contract'
+
+type SeedPlatform = {
+  id: string,
+  name: string,
+  type: MusicPlatformType
+}
+
+type SeedPayload = {
+  entity: SeedEntity,
+  data: SeedPlatform
+}
 
 export const authMiddleware = (
   request: Request,
@@ -13,7 +27,7 @@ export const authMiddleware = (
 ) => {
 
   try {
-    let signer;
+    let signer: any;
 
     const auth = {
       message: JSON.stringify(request.body),
@@ -65,4 +79,31 @@ const permittedAdminAddresses = (): string[] => {
     throw new Error('PERMITTED_ADMIN_ADDRESSES not set');
   }
   return addresses.split(',');
+}
+
+
+export const parseSeed = (payload: SeedPayload) => {
+  const parsed = payload;
+
+  if (payload.entity === 'platform') {
+    if (!parsed.data.id || !parsed.data.name || !parsed.data.type) {
+      throw new Error('missing platform entity required fields')
+    }
+    if (!Object.values(MusicPlatformType).includes(parsed.data.type)) {
+      throw new Error('not a valid platform type')
+    }
+  } else {
+    throw new Error('unknown seed entity');
+  }
+  return parsed;
+}
+
+export const persistSeed = async (payload: any) => {
+  const dbClient = await db.init();
+  try {
+    const message = getCrdtUpdateMessage<MusicPlatform>(Table.platforms, payload)
+    await dbClient.upsert(Table.seeds, [message])
+  } finally {
+    dbClient.close();
+  }
 }
