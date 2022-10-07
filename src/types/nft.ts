@@ -26,6 +26,7 @@ export type NFT = Record & {
   standard: NFTStandard;
   approved: boolean;
   burned: boolean;
+  publicReleaseTime?: Date;
 }
 
 export type ERC721Transfer = Record & {
@@ -49,6 +50,7 @@ export enum NFTStandard {
 }
 
 export type TypeMetadata = {
+  other?: any
   overrides: {
     track?: Partial<ProcessedTrack>
     artist?: Partial<ArtistProfile>

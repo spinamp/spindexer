@@ -31,6 +31,7 @@ export type SoundClient = {
   fetchTracksByTrackId: (trackIds: string[]) => Promise<any[]>;
   audioFromTrack: (trackId: string) => Promise<any>;
   fetchMintTimes: (addresses: string[]) => Promise<any>;
+  fetchPublicTimes: (addresses: string[]) => Promise<any>;
   fetchContractAddresses: () => Promise<Set<string>>;
 }
 
@@ -193,18 +194,42 @@ const init = async () => {
     return audioAPITracks;
   };
 
+  const fetchPublicTimes = async (addresses: string[]): Promise<any> => {
+    let results: any = [];
+    for (let i = 0; i < addresses.length; i++) {
+      const { releaseContract } = await soundAPI.request(
+        gql`
+            {
+              releaseContract(contractAddress:"${addresses[i]}") {
+                publicListeningPartyStart
+                contract {
+                    contractAddress
+                }
+              }
+            }
+            `,
+      );
+      results = results.concat(releaseContract);
+    }
+
+    return (results as Array<any>).reduce((accum, release: any) => {
+      accum[release.contract.contractAddress] = release.publicListeningPartyStart;
+      return accum;
+    }, {});
+  };
+
   const fetchMintTimes = async (addresses: string[]): Promise<any> => {
     let results: any = [];
     for (let i = 0; i < addresses.length; i++) {
       const { releaseContract } = await soundAPI.request(
         gql`
-              {
-                releaseContract(contractAddress:"${addresses[i]}") {
-                  mintStartTime
-                  contract {
-                      contractAddress
-                  }
+            {
+              releaseContract(contractAddress:"${addresses[i]}") {
+                mintStartTime
+                contract {
+                    contractAddress
                 }
+              }
             }
             `,
       );
@@ -243,6 +268,7 @@ const init = async () => {
     fetchTracksByTrackId,
     fetchTracksByNFT,
     fetchMintTimes,
+    fetchPublicTimes,
     fetchContractAddresses
   };
 }

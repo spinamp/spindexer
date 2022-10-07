@@ -74,18 +74,20 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
     newContractCreatedEvent: 'SoundEditionCreated',
     metadataAPI: async (events, clients: Clients) => {
       const editionAddresses = new Set(events.map(event => formatAddress(event.args!.soundEdition)));
-      let soundOfficialContracts = new Set();
+      let soundPublicTimes: any;
       try {
-        soundOfficialContracts = await clients.sound.fetchContractAddresses();
+        soundPublicTimes = await clients.sound.fetchPublicTimes([...editionAddresses]);
       } catch {
         // If API Fails/is down, assume it's official
         return new Set([...editionAddresses]);
       }
-      const officialEditions = new Set([...editionAddresses].filter((address) => soundOfficialContracts.has(address)));
-      return officialEditions;
+      const publicAddresses = new Set(Object.keys(soundPublicTimes));
+      const officialEditions = new Set([...editionAddresses].filter((address) => publicAddresses.has(address)));
+      return { soundPublicTimes, officialEditions };
     },
     creationEventToNftFactory: (event: any, autoApprove: boolean, factoryMetadata: any) => {
-      const official = factoryMetadata.has(formatAddress(event.args!.soundEdition));
+      const official = factoryMetadata.officialEditions.has(formatAddress(event.args!.soundEdition));
+      const publicReleaseTime = new Date(factoryMetadata.soundPublicTimes[formatAddress(event.args!.soundEdition)]);
       return ({
         id: formatAddress(event.args!.soundEdition),
         platformId: official ? 'sound' : 'sound-protocol-v1',
@@ -95,6 +97,9 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
         autoApprove: official,
         approved: official,
         typeMetadata: {
+          other: {
+            publicReleaseTime
+          },
           overrides: {
             type: MusicPlatformType['multi-track-multiprint-contract'],
             artist: {
