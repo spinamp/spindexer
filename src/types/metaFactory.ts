@@ -78,8 +78,8 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       try {
         soundPublicTimes = await clients.sound.fetchPublicTimes([...editionAddresses]);
       } catch {
-        // If API Fails/is down, assume it's official
-        return new Set([...editionAddresses]);
+        // If API Fails/is down, assume it's official and no presales
+        return { officialEditions: new Set([...editionAddresses]), soundPublicTimes: {} };
       }
       const publicAddresses = new Set(Object.keys(soundPublicTimes));
       const officialEditions = new Set([...editionAddresses].filter((address) => publicAddresses.has(address)));
@@ -87,7 +87,8 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
     },
     creationEventToNftFactory: (event: any, autoApprove: boolean, factoryMetadata: any) => {
       const official = factoryMetadata.officialEditions.has(formatAddress(event.args!.soundEdition));
-      const publicReleaseTime = new Date(factoryMetadata.soundPublicTimes[formatAddress(event.args!.soundEdition)]);
+      const publicReleaseTimeRaw = factoryMetadata.soundPublicTimes[formatAddress(event.args!.soundEdition)];
+      const publicReleaseTime = publicReleaseTimeRaw ? new Date(publicReleaseTimeRaw) : undefined;
       return ({
         id: formatAddress(event.args!.soundEdition),
         platformId: official ? 'sound' : 'sound-protocol-v1',
