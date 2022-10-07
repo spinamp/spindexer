@@ -87,7 +87,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
     },
     creationEventToNftFactory: (event: any, autoApprove: boolean, factoryMetadata: any) => {
       const official = factoryMetadata.officialEditions.has(formatAddress(event.args!.soundEdition));
-      const publicTime = new Date(factoryMetadata.soundPublicTimes[formatAddress(event.args!.soundEdition)]);
+      const publicReleaseTime = new Date(factoryMetadata.soundPublicTimes[formatAddress(event.args!.soundEdition)]);
       return ({
         id: formatAddress(event.args!.soundEdition),
         platformId: official ? 'sound' : 'sound-protocol-v1',
@@ -98,7 +98,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
         approved: official,
         typeMetadata: {
           other: {
-            publicTime
+            publicReleaseTime
           },
           overrides: {
             type: MusicPlatformType['multi-track-multiprint-contract'],
