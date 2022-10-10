@@ -126,9 +126,9 @@ export const persistSeed = async (payload: SeedPayload) => {
   let message: any;
   try {
     if (payload.entity === 'platform') {
-      message = getCrdtUpdateMessage<MusicPlatform>(Table.platforms, payload as any)
+      message = getCrdtUpdateMessage<MusicPlatform>(Table.platforms, payload.data as any)
     } else if (payload.entity === 'contract') {
-      message = getCrdtUpdateMessage<NftFactory>(Table.nftFactories, payload as any)
+      message = getCrdtUpdateMessage<NftFactory>(Table.nftFactories, payload.data as any)
     }
     await dbClient.upsert(Table.seeds, [message])
   } finally {

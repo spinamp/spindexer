@@ -20,7 +20,7 @@ app.post(`${apiVersionPrefix}/seeds/`, async (req, res) => {
   }
 
   try {
-    persistSeed(req.body)
+    await persistSeed(req.body)
     res.sendStatus(200);
   } catch (e: any) {
     res.status(500).send({ error: e.message });
