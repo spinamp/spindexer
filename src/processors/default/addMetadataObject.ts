@@ -7,6 +7,7 @@ import { getMetadataURL } from '../../types/metadata';
 import { NFT, NftFactory } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 import { rollPromises } from '../../utils/rollingPromises';
+import { cleanURL } from '../../utils/sanitizers';
 
 const name = 'addMetadataObject';
 
@@ -36,7 +37,7 @@ const getMetadataObject = async (nft: NFT, timeout: number, axios: Axios, ipfs: 
     }
   }
 
-  let queryURL = metadataURL;
+  let queryURL = cleanURL(metadataURL);
   if (nft.metadataIPFSHash) {
     queryURL = ipfs.getHTTPURL(nft.metadataIPFSHash);
   }
