@@ -70,6 +70,10 @@ describe('Seeds API', () => {
         })
       })
 
+      describe('with unsupported fields', () => {
+        it('returns an error');
+      })
+
       describe('with an unknown type', () => {
         it('returns an error', () => {
           const body = { entity: 'platform', data: { id: 'potato', name: 'potato', type: 'yum' } }
@@ -83,7 +87,7 @@ describe('Seeds API', () => {
       })
 
       describe('with a valid payload', () => {
-        it('adds the seed', () => {
+        it('returns a 200', () => {
           const body = { entity: 'platform', data: { id: 'jamboni', name: 'Jamboni Jams', type: MusicPlatformType.sound } }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
@@ -92,6 +96,7 @@ describe('Seeds API', () => {
             .expect(200)
             .end((err,res) => { if (err) throw err });
         })
+        it('persists the seed');
       })
     })
 
@@ -106,6 +111,10 @@ describe('Seeds API', () => {
             .expect(422, { error: 'contract entity is missing required fields' })
             .end((err,res) => { if (err) throw err });
         })
+      })
+
+      describe('with unsupported fields', () => {
+        it('returns an error');
       })
 
       describe('with an unknown contract type', () => {
@@ -139,7 +148,7 @@ describe('Seeds API', () => {
       })
 
       describe('with a valid payload', () => {
-        it('adds the seed', () => {
+        it('returns a 200', () => {
           const body = {
             entity: 'contract',
             data: { id: '1', platformId: 'jamboni', contractType: 'default', standard: 'erc721', autoApprove: false, approved: false }
@@ -151,6 +160,75 @@ describe('Seeds API', () => {
             .expect(200)
             .end((err,res) => { if (err) throw err });
         })
+        it('persists the seed');
+      })
+    })
+
+    describe('artists', () => {
+      describe('with the incorrect shape', () => {
+        it('returns an error', () => {
+          const body = { entity: 'artist', data: { blam: 'yam' } };
+          const signature = wallet.sign(JSON.stringify(body)).signature
+
+          supertest(app).post(endpoint).send(body)
+            .set('x-signature', signature)
+            .expect(422, { error: 'artist entity is missing required fields' })
+            .end((err,res) => { if (err) throw err });
+        })
+      })
+
+      describe('with unsupported fields', () => {
+        it('returns an error');
+      })
+
+      describe('with a valid payload', () => {
+        it('returns a 200', () => {
+          const body = {
+            entity: 'artist',
+            data: { artistId: '1', platformId: 'jamboni', name: 'Jammed Jams' }
+          }
+          const signature = wallet.sign(JSON.stringify(body)).signature;
+
+          supertest(app).post(endpoint).send(body)
+            .set('x-signature', signature)
+            .expect(200)
+            .end((err,res) => { if (err) throw err });
+        })
+        it('persists the seed');
+      })
+    })
+
+    describe('tracks', () => {
+      describe('with the incorrect shape', () => {
+        it('returns an error', () => {
+          const body = { entity: 'track', data: { blam: 'yam' } };
+          const signature = wallet.sign(JSON.stringify(body)).signature
+
+          supertest(app).post(endpoint).send(body)
+            .set('x-signature', signature)
+            .expect(422, { error: 'track entity is missing required fields' })
+            .end((err,res) => { if (err) throw err });
+        })
+      })
+
+      describe('with unsupported fields', () => {
+        it('returns an error');
+      })
+
+      describe('with a valid payload', () => {
+        it('returns a 200', () => {
+          const body = {
+            entity: 'track',
+            data: { artistId: '1', platformId: 'jamboni', name: 'Jammed Jams' }
+          }
+          const signature = wallet.sign(JSON.stringify(body)).signature;
+
+          supertest(app).post(endpoint).send(body)
+            .set('x-signature', signature)
+            .expect(200)
+            .end((err,res) => { if (err) { throw err } });
+        })
+        it('persists the seed');
       })
     })
   })
