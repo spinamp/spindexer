@@ -198,15 +198,15 @@ describe('Seeds API', () => {
       })
     })
 
-    describe('track', () => {
+    describe('nftProcessedTrack', () => {
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
-          const body = { entity: 'track', data: { blam: 'yam' } };
+          const body = { entity: 'nftProcessedTrack', data: { blam: 'yam' } };
           const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
-            .expect(422, { error: 'track entity is missing required fields' })
+            .expect(422, { error: 'nftProcessedTrack entity is missing required fields' })
             .end((err,res) => { if (err) throw err });
         })
       })
@@ -218,7 +218,7 @@ describe('Seeds API', () => {
       describe('with a valid payload', () => {
         it('returns a 200', () => {
           const body = {
-            entity: 'track',
+            entity: 'nftProcessedTrack',
             data: { artistId: '1', platformId: 'jamboni', name: 'Jammed Jams' }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;
