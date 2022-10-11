@@ -57,15 +57,15 @@ describe('Seeds API', () => {
       })
     })
 
-    describe('platform', () => {
+    describe('platforms', () => {
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
-          const body = { entity: 'platform', data: { blam: 'yam' } };
+          const body = { entity: 'platforms', data: { blam: 'yam' } };
           const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
-            .expect(422, { error: 'platform entity is missing required fields' })
+            .expect(422, { error: 'platforms entity is missing required fields' })
             .end((err,res) => { if (err) throw err });
         })
       })
@@ -76,7 +76,7 @@ describe('Seeds API', () => {
 
       describe('with an unknown type', () => {
         it('returns an error', () => {
-          const body = { entity: 'platform', data: { id: 'potato', name: 'potato', type: 'yum' } }
+          const body = { entity: 'platforms', data: { id: 'potato', name: 'potato', type: 'yum' } }
           const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(endpoint).send(body)
@@ -88,7 +88,7 @@ describe('Seeds API', () => {
 
       describe('with a valid payload', () => {
         it('returns a 200', () => {
-          const body = { entity: 'platform', data: { id: 'jamboni', name: 'Jamboni Jams', type: MusicPlatformType.sound } }
+          const body = { entity: 'platforms', data: { id: 'jamboni', name: 'Jamboni Jams', type: MusicPlatformType.sound } }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
           supertest(app).post(endpoint).send(body)
@@ -100,15 +100,15 @@ describe('Seeds API', () => {
       })
     })
 
-    describe('nftFactory', () => {
+    describe('nftFactories', () => {
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
-          const body = { entity: 'nftFactory', data: { blam: 'yam' } };
+          const body = { entity: 'nftFactories', data: { blam: 'yam' } };
           const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
-            .expect(422, { error: 'nftFactory entity is missing required fields' })
+            .expect(422, { error: 'nftFactories entity is missing required fields' })
             .end((err,res) => { if (err) throw err });
         })
       })
@@ -117,10 +117,10 @@ describe('Seeds API', () => {
         it('returns an error');
       })
 
-      describe('with an unknown nftFactory type', () => {
+      describe('with an unknown nftFactories type', () => {
         it('returns an error', () => {
           const body = {
-            entity: 'nftFactory',
+            entity: 'nftFactories',
             data: { id: '1', platformId: 'jamboni', contractType: 'UNKNOWN', standard: 'standard', autoApprove: false, approved: false }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature
@@ -135,14 +135,14 @@ describe('Seeds API', () => {
       describe('with an unknown standard', () => {
         it('returns an error', () => {
           const body = {
-            entity: 'nftFactory',
+            entity: 'nftFactories',
             data: { id: '1', platformId: 'jamboni', contractType: 'default', standard: 'UNKNOWN', autoApprove: false, approved: false }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
-            .expect(422, { error: 'not a valid nftFactory standard' })
+            .expect(422, { error: 'not a valid nftFactories standard' })
             .end((err,res) => { if (err) throw err });
         })
       })
@@ -150,7 +150,7 @@ describe('Seeds API', () => {
       describe('with a valid payload', () => {
         it('returns a 200', () => {
           const body = {
-            entity: 'nftFactory',
+            entity: 'nftFactories',
             data: { id: '1', platformId: 'jamboni', contractType: 'default', standard: 'erc721', autoApprove: false, approved: false }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;
@@ -164,15 +164,15 @@ describe('Seeds API', () => {
       })
     })
 
-    describe('artistProfile', () => {
+    describe('artistProfiles', () => {
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
-          const body = { entity: 'artistProfile', data: { blam: 'yam' } };
+          const body = { entity: 'artistProfiles', data: { blam: 'yam' } };
           const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
-            .expect(422, { error: 'artistProfile entity is missing required fields' })
+            .expect(422, { error: 'artistProfiles entity is missing required fields' })
             .end((err,res) => { if (err) throw err });
         })
       })
@@ -184,7 +184,7 @@ describe('Seeds API', () => {
       describe('with a valid payload', () => {
         it('returns a 200', () => {
           const body = {
-            entity: 'artistProfile',
+            entity: 'artistProfiles',
             data: { artistId: '1', platformId: 'jamboni', name: 'Jammed Jams' }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;
@@ -198,15 +198,15 @@ describe('Seeds API', () => {
       })
     })
 
-    describe('processedTrack', () => {
+    describe('processedTracks', () => {
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
-          const body = { entity: 'processedTrack', data: { blam: 'yam' } };
+          const body = { entity: 'processedTracks', data: { blam: 'yam' } };
           const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
-            .expect(422, { error: 'processedTrack entity is missing required fields' })
+            .expect(422, { error: 'processedTracks entity is missing required fields' })
             .end((err,res) => { if (err) throw err });
         })
       })
@@ -218,7 +218,7 @@ describe('Seeds API', () => {
       describe('with a valid payload', () => {
         it('returns a 200', () => {
           const body = {
-            entity: 'processedTrack',
+            entity: 'processedTracks',
             data: { artistId: '1', platformId: 'jamboni', name: 'Jammed Jams' }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;

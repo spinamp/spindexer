@@ -1,15 +1,21 @@
 import { isValidChecksumAddress } from 'ethereumjs-util'
 import { Request, Response, NextFunction } from 'express'
-import _ from 'lodash'
 import Web3 from 'web3';
 
 import { Table } from '../db/db';
 import db from '../db/sql-db'
 import { getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
-import { NFTContractTypeName, NftFactory, NFTStandard } from '../types/nft';
+import { NFTContractTypeName, NFTStandard } from '../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../types/platform';
 
-type SeedEntity = 'platform' | 'nftFactory' | 'artistProfile' | 'processedTrack'
+enum SeedEntities {
+  'platforms',
+  'nftFactories',
+  'artistProfiles',
+  'processedTracks'
+}
+
+type SeedEntity = keyof typeof SeedEntities;
 
 enum SeedPlatformRequiredKeys {
   ID = 'id',
@@ -19,25 +25,11 @@ enum SeedPlatformRequiredKeys {
 
 enum SeedContractRequiredKeys {
   ID = 'id',
-  // startingBlock?: string, // ignore optional
   PLATFORM_ID = 'platformId',
   CONTRACT_TYPE = 'contractType', // validated against `NFTContractTypeName`
-  // name?: string, // ignore optional
-  // symbol?: string, // ignore optional
-  // typeMetadata?: TypeMetadata // ignore optional
   STANDARD = 'standard', // validated against `NFTStandard`
   AUTO_APPROVE = 'autoApprove',
   APPROVED = 'approved'
-}
-
-enum SeedArtistRequiredKeys {
-  ARTIST_ID = 'artistId',
-  PLATFORM_ID = 'platformId',
-}
-
-enum SeedTrackRequiredKeys {
-  ARTIST_ID = 'artistId',
-  PLATFORM_ID = 'platformId',
 }
 
 type SeedPayload = {
@@ -108,31 +100,31 @@ const permittedAdminAddresses = (): string[] => {
 
 
 export const validateSeed = (payload: SeedPayload) => {
-  if (payload.entity === 'platform') {
-    if (!exactKeysPresent(payload.data, SeedPlatformRequiredKeys)) {
-      throw new Error('platform entity is missing required fields')
+  if (payload.entity === 'platforms') {
+    if (!containsAllKeys(payload.data, Object.values(SeedPlatformRequiredKeys))) {
+      throw new Error('platforms entity is missing required fields')
     }
     if (!validForType(payload.data.type, MusicPlatformType)) {
       throw new Error('not a valid platform type')
     }
-  } else if (payload.entity === 'nftFactory') {
-    if (!exactKeysPresent(payload.data, SeedContractRequiredKeys)) {
-      throw new Error('nftFactory entity is missing required fields')
+  } else if (payload.entity === 'nftFactories') {
+    if (!containsAllKeys(payload.data, Object.values(SeedContractRequiredKeys))) {
+      throw new Error('nftFactories entity is missing required fields')
     }
     if (!validForType(payload.data.contractType, NFTContractTypeName)) {
       throw new Error('not a valid contract type')
     }
     if (!validForType(payload.data.standard, NFTStandard)) {
-      throw new Error('not a valid nftFactory standard')
+      throw new Error('not a valid nftFactories standard')
     }
-  } else if (payload.entity === 'artistProfile') {
-    if (!payload.data?.artistId || !payload.data?.platformId) {
-      throw new Error('artistProfile entity is missing required fields')
+  } else if (payload.entity === 'artistProfiles') {
+    if (!containsAllKeys(payload.data, ['artistId', 'platformId'])) {
+      throw new Error('artistProfiles entity is missing required fields')
     }
     // TODO: only permit name, avatarUrl, websiteUrl
-  } else if (payload.entity === 'processedTrack') {
+  } else if (payload.entity === 'processedTracks') {
     if (!payload.data?.artistId || !payload.data?.platformId) {
-      throw new Error('processedTrack entity is missing required fields')
+      throw new Error('processedTracks entity is missing required fields')
     }
     // TODO: only permit name, title, description, websiteUrl, artworkUrl, audioUrl, etc
   } else {
@@ -142,28 +134,31 @@ export const validateSeed = (payload: SeedPayload) => {
 }
 
 export const persistSeed = async (payload: SeedPayload) => {
-  const dbClient = await db.init();
   let message: any;
+  let dbClient: any;
+
+  if (!Object.values(SeedEntities).includes(payload.entity)) {
+    throw new Error('unknown seed entity');
+  }
+
+  if (['platforms', 'nftFactories'].includes(payload.entity)) {
+    message = getCrdtUpsertMessage<MusicPlatform>(Table[payload.entity], payload.data as any)
+  } else if (['artistProfiles', 'processedTracks'].includes(payload.entity)) {
+    message = getCrdtUpdateMessage<MusicPlatform>(Table[payload.entity], payload.data as any)
+  }
+
   try {
-    if (payload.entity === 'platform') {
-      message = getCrdtUpsertMessage<MusicPlatform>(Table.platforms, payload.data as any)
-    } else if (payload.entity === 'nftFactory') {
-      message = getCrdtUpsertMessage<NftFactory>(Table.nftFactories, payload.data as any)
-    } else if (payload.entity === 'artistProfile') {
-      message = getCrdtUpdateMessage<NftFactory>(Table.artistProfiles, payload.data as any)
-    } else if (payload.entity === 'processedTrack') {
-      message = getCrdtUpdateMessage<NftFactory>(Table.processedTracks, payload.data as any)
-    }
+    dbClient = await db.init();
     await dbClient.upsert(Table.seeds, [message])
   } finally {
     dbClient.close();
   }
 }
 
-const exactKeysPresent = (input: any, requiredKeys: any) => {
-  return _.difference(Object.keys(input), Object.values(requiredKeys)).length === 0;
+const containsAllKeys = (input: any, keys: any): boolean => {
+  return keys.every((key: any) => input.hasOwnProperty(key))
 }
 
-const validForType = (input: any, type: any) => {
+const validForType = (input: any, type: any): boolean => {
   return Object.values(type).includes(input)
 }
