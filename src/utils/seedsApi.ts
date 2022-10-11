@@ -9,7 +9,7 @@ import { getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
 import { NFTContractTypeName, NftFactory, NFTStandard } from '../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../types/platform';
 
-type SeedEntity = 'platform' | 'nftFactory' | 'artistProfile' | 'nftProcessedTrack'
+type SeedEntity = 'platform' | 'nftFactory' | 'artistProfile' | 'processedTrack'
 
 enum SeedPlatformRequiredKeys {
   ID = 'id',
@@ -130,9 +130,9 @@ export const validateSeed = (payload: SeedPayload) => {
       throw new Error('artistProfile entity is missing required fields')
     }
     // TODO: only permit name, avatarUrl, websiteUrl
-  } else if (payload.entity === 'nftProcessedTrack') {
+  } else if (payload.entity === 'processedTrack') {
     if (!payload.data?.artistId || !payload.data?.platformId) {
-      throw new Error('nftProcessedTrack entity is missing required fields')
+      throw new Error('processedTrack entity is missing required fields')
     }
     // TODO: only permit name, title, description, websiteUrl, artworkUrl, audioUrl, etc
   } else {
@@ -151,8 +151,8 @@ export const persistSeed = async (payload: SeedPayload) => {
       message = getCrdtUpsertMessage<NftFactory>(Table.nftFactories, payload.data as any)
     } else if (payload.entity === 'artistProfile') {
       message = getCrdtUpdateMessage<NftFactory>(Table.artistProfiles, payload.data as any)
-    } else if (payload.entity === 'nftProcessedTrack') {
-      message = getCrdtUpdateMessage<NftFactory>(Table.nfts_processedTracks, payload.data as any)
+    } else if (payload.entity === 'processedTrack') {
+      message = getCrdtUpdateMessage<NftFactory>(Table.processedTracks, payload.data as any)
     }
     await dbClient.upsert(Table.seeds, [message])
   } finally {
