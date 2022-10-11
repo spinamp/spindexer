@@ -57,7 +57,7 @@ describe('Seeds API', () => {
       })
     })
 
-    describe('platforms', () => {
+    describe('platform', () => {
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
           const body = { entity: 'platform', data: { blam: 'yam' } };
@@ -100,15 +100,15 @@ describe('Seeds API', () => {
       })
     })
 
-    describe('contracts', () => {
+    describe('nftFactory', () => {
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
-          const body = { entity: 'contract', data: { blam: 'yam' } };
+          const body = { entity: 'nftFactory', data: { blam: 'yam' } };
           const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
-            .expect(422, { error: 'contract entity is missing required fields' })
+            .expect(422, { error: 'nftFactory entity is missing required fields' })
             .end((err,res) => { if (err) throw err });
         })
       })
@@ -117,10 +117,10 @@ describe('Seeds API', () => {
         it('returns an error');
       })
 
-      describe('with an unknown contract type', () => {
+      describe('with an unknown nftFactory type', () => {
         it('returns an error', () => {
           const body = {
-            entity: 'contract',
+            entity: 'nftFactory',
             data: { id: '1', platformId: 'jamboni', contractType: 'UNKNOWN', standard: 'standard', autoApprove: false, approved: false }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature
@@ -135,14 +135,14 @@ describe('Seeds API', () => {
       describe('with an unknown standard', () => {
         it('returns an error', () => {
           const body = {
-            entity: 'contract',
+            entity: 'nftFactory',
             data: { id: '1', platformId: 'jamboni', contractType: 'default', standard: 'UNKNOWN', autoApprove: false, approved: false }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
-            .expect(422, { error: 'not a valid contract standard' })
+            .expect(422, { error: 'not a valid nftFactory standard' })
             .end((err,res) => { if (err) throw err });
         })
       })
@@ -150,7 +150,7 @@ describe('Seeds API', () => {
       describe('with a valid payload', () => {
         it('returns a 200', () => {
           const body = {
-            entity: 'contract',
+            entity: 'nftFactory',
             data: { id: '1', platformId: 'jamboni', contractType: 'default', standard: 'erc721', autoApprove: false, approved: false }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;
@@ -164,15 +164,15 @@ describe('Seeds API', () => {
       })
     })
 
-    describe('artists', () => {
+    describe('artistProfile', () => {
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
-          const body = { entity: 'artist', data: { blam: 'yam' } };
+          const body = { entity: 'artistProfile', data: { blam: 'yam' } };
           const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
-            .expect(422, { error: 'artist entity is missing required fields' })
+            .expect(422, { error: 'artistProfile entity is missing required fields' })
             .end((err,res) => { if (err) throw err });
         })
       })
@@ -184,7 +184,7 @@ describe('Seeds API', () => {
       describe('with a valid payload', () => {
         it('returns a 200', () => {
           const body = {
-            entity: 'artist',
+            entity: 'artistProfile',
             data: { artistId: '1', platformId: 'jamboni', name: 'Jammed Jams' }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;
@@ -198,7 +198,7 @@ describe('Seeds API', () => {
       })
     })
 
-    describe('tracks', () => {
+    describe('track', () => {
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
           const body = { entity: 'track', data: { blam: 'yam' } };

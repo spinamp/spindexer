@@ -9,7 +9,7 @@ import { getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
 import { NFTContractTypeName, NftFactory, NFTStandard } from '../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../types/platform';
 
-type SeedEntity = 'platform' | 'contract' | 'artist' | 'track'
+type SeedEntity = 'platform' | 'nftFactory' | 'artistProfile' | 'track'
 
 enum SeedPlatformRequiredKeys {
   ID = 'id',
@@ -115,19 +115,19 @@ export const validateSeed = (payload: SeedPayload) => {
     if (!validForType(payload.data.type, MusicPlatformType)) {
       throw new Error('not a valid platform type')
     }
-  } else if (payload.entity === 'contract') {
+  } else if (payload.entity === 'nftFactory') {
     if (!exactKeysPresent(payload.data, SeedContractRequiredKeys)) {
-      throw new Error('contract entity is missing required fields')
+      throw new Error('nftFactory entity is missing required fields')
     }
     if (!validForType(payload.data.contractType, NFTContractTypeName)) {
       throw new Error('not a valid contract type')
     }
     if (!validForType(payload.data.standard, NFTStandard)) {
-      throw new Error('not a valid contract standard')
+      throw new Error('not a valid nftFactory standard')
     }
-  } else if (payload.entity === 'artist') {
+  } else if (payload.entity === 'artistProfile') {
     if (!payload.data?.artistId || !payload.data?.platformId) {
-      throw new Error('artist entity is missing required fields')
+      throw new Error('artistProfile entity is missing required fields')
     }
     // TODO: only permit name, avatarUrl, websiteUrl
   } else if (payload.entity === 'track') {
@@ -147,9 +147,9 @@ export const persistSeed = async (payload: SeedPayload) => {
   try {
     if (payload.entity === 'platform') {
       message = getCrdtUpsertMessage<MusicPlatform>(Table.platforms, payload.data as any)
-    } else if (payload.entity === 'contract') {
+    } else if (payload.entity === 'nftFactory') {
       message = getCrdtUpsertMessage<NftFactory>(Table.nftFactories, payload.data as any)
-    } else if (payload.entity === 'artist') {
+    } else if (payload.entity === 'artistProfile') {
       message = getCrdtUpdateMessage<NftFactory>(Table.artistProfiles, payload.data as any)
     } else if (payload.entity === 'track') {
       message = getCrdtUpdateMessage<NftFactory>(Table.nfts_processedTracks, payload.data as any)
