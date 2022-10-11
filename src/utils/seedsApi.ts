@@ -4,9 +4,11 @@ import Web3 from 'web3';
 
 import { Table } from '../db/db';
 import db from '../db/sql-db'
+import { ArtistProfileKeys } from '../types/artist';
 import { getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
-import { NFTContractTypeName, NFTStandard } from '../types/nft';
-import { MusicPlatform, MusicPlatformType } from '../types/platform';
+import { NFTContractTypeName, NFTFactoryKeys, NFTStandard } from '../types/nft';
+import { MusicPlatform, MusicPlatformKeys, MusicPlatformType } from '../types/platform';
+import { ProcessedTrackKeys } from '../types/track';
 
 enum SeedEntities {
   'platforms',
@@ -23,7 +25,7 @@ enum SeedPlatformRequiredKeys {
   TYPE = 'type',
 }
 
-enum SeedContractRequiredKeys {
+enum SeedNFTFactoryRequiredKeys {
   ID = 'id',
   PLATFORM_ID = 'platformId',
   CONTRACT_TYPE = 'contractType', // validated against `NFTContractTypeName`
@@ -104,12 +106,18 @@ export const validateSeed = (payload: SeedPayload) => {
     if (!containsAllKeys(payload.data, Object.values(SeedPlatformRequiredKeys))) {
       throw new Error('platforms entity is missing required fields')
     }
+    if (!containsNoExtraKeys(payload.data, MusicPlatformKeys)) {
+      throw new Error('platforms entity has unsupported fields')
+    }
     if (!validForType(payload.data.type, MusicPlatformType)) {
       throw new Error('not a valid platform type')
     }
   } else if (payload.entity === 'nftFactories') {
-    if (!containsAllKeys(payload.data, Object.values(SeedContractRequiredKeys))) {
+    if (!containsAllKeys(payload.data, Object.values(SeedNFTFactoryRequiredKeys))) {
       throw new Error('nftFactories entity is missing required fields')
+    }
+    if (!containsNoExtraKeys(payload.data, NFTFactoryKeys)) {
+      throw new Error('nftFactories entity has unsupported fields')
     }
     if (!validForType(payload.data.contractType, NFTContractTypeName)) {
       throw new Error('not a valid contract type')
@@ -121,12 +129,16 @@ export const validateSeed = (payload: SeedPayload) => {
     if (!containsAllKeys(payload.data, ['artistId', 'platformId'])) {
       throw new Error('artistProfiles entity is missing required fields')
     }
-    // TODO: only permit name, avatarUrl, websiteUrl
+    if (!containsNoExtraKeys(payload.data, ArtistProfileKeys)) {
+      throw new Error('artistProfiles entity has unsupported fields')
+    }
   } else if (payload.entity === 'processedTracks') {
     if (!payload.data?.artistId || !payload.data?.platformId) {
       throw new Error('processedTracks entity is missing required fields')
     }
-    // TODO: only permit name, title, description, websiteUrl, artworkUrl, audioUrl, etc
+    if (!containsNoExtraKeys(payload.data, ProcessedTrackKeys)) {
+      throw new Error('processedTracks entity has unsupported fields')
+    }
   } else {
     throw new Error('unknown seed entity');
   }
@@ -157,6 +169,10 @@ export const persistSeed = async (payload: SeedPayload) => {
 
 const containsAllKeys = (input: any, keys: any): boolean => {
   return keys.every((key: any) => input.hasOwnProperty(key))
+}
+
+const containsNoExtraKeys = (input: any, keys: any): boolean => {
+  return Object.keys(input).every((key: any) => keys.includes(key))
 }
 
 const validForType = (input: any, type: any): boolean => {

@@ -16,6 +16,8 @@ export type ArtistProfile = TimeField & {
   websiteUrl?: string;
 }
 
+export const ArtistProfileKeys = ['platformInternalId', 'artistId', 'name', 'platformId', 'avatarUrl', 'websiteUrl'];
+
 export const mapArtist = (artistProfile: ArtistProfile): Artist => {
   return {
     name: artistProfile.name,

@@ -70,10 +70,6 @@ describe('Seeds API', () => {
         })
       })
 
-      describe('with unsupported fields', () => {
-        it('returns an error');
-      })
-
       describe('with an unknown type', () => {
         it('returns an error', () => {
           const body = { entity: 'platforms', data: { id: 'potato', name: 'potato', type: 'yum' } }
@@ -82,6 +78,18 @@ describe('Seeds API', () => {
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
             .expect(422, { error: 'not a valid platform type' })
+            .end((err,res) => { if (err) throw err });
+        })
+      })
+
+      describe('with unsupported fields', () => {
+        it('returns an error', () => {
+          const body = { entity: 'platforms', data: { id: 'potato', name: 'potato', type: MusicPlatformType.sound, hackyou: 'boo' } }
+          const signature = wallet.sign(JSON.stringify(body)).signature
+
+          supertest(app).post(endpoint).send(body)
+            .set('x-signature', signature)
+            .expect(422, { error: 'platforms entity has unsupported fields' })
             .end((err,res) => { if (err) throw err });
         })
       })
@@ -111,10 +119,6 @@ describe('Seeds API', () => {
             .expect(422, { error: 'nftFactories entity is missing required fields' })
             .end((err,res) => { if (err) throw err });
         })
-      })
-
-      describe('with unsupported fields', () => {
-        it('returns an error');
       })
 
       describe('with an unknown nftFactories type', () => {
@@ -147,11 +151,26 @@ describe('Seeds API', () => {
         })
       })
 
+      describe('with unsupported fields', () => {
+        it('returns an error', () => {
+          const body = {
+            entity: 'nftFactories',
+            data: { id: '1', platformId: 'jamboni', name: 'lala', contractType: 'default', standard: 'erc721', autoApprove: false, approved: false, hackyou: 'boo' }
+          }
+          const signature = wallet.sign(JSON.stringify(body)).signature;
+
+          supertest(app).post(endpoint).send(body)
+            .set('x-signature', signature)
+            .expect(422, { error: 'nftFactories entity has unsupported fields' })
+            .end((err,res) => { if (err) throw err });
+        })
+      })
+
       describe('with a valid payload', () => {
         it('returns a 200', () => {
           const body = {
             entity: 'nftFactories',
-            data: { id: '1', platformId: 'jamboni', contractType: 'default', standard: 'erc721', autoApprove: false, approved: false }
+            data: { id: '1', platformId: 'jamboni', name: 'lala', contractType: 'default', standard: 'erc721', autoApprove: false, approved: false }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
@@ -178,7 +197,18 @@ describe('Seeds API', () => {
       })
 
       describe('with unsupported fields', () => {
-        it('returns an error');
+        it('returns an error', () => {
+          const body = {
+            entity: 'artistProfiles',
+            data: { artistId: '1', platformId: 'jamboni', name: 'Jammed Jams', hackyou: 'boo' }
+          }
+          const signature = wallet.sign(JSON.stringify(body)).signature;
+
+          supertest(app).post(endpoint).send(body)
+            .set('x-signature', signature)
+            .expect(422, { error: 'artistProfiles entity has unsupported fields' })
+            .end((err,res) => { if (err) throw err });
+        })
       })
 
       describe('with a valid payload', () => {
@@ -212,14 +242,25 @@ describe('Seeds API', () => {
       })
 
       describe('with unsupported fields', () => {
-        it('returns an error');
+        it('returns an error', () => {
+          const body = {
+            entity: 'processedTracks',
+            data: { artistId: '1', platformId: 'jamboni', title: 'Jammed Jams', hackyou: 'boo' }
+          }
+          const signature = wallet.sign(JSON.stringify(body)).signature;
+
+          supertest(app).post(endpoint).send(body)
+            .set('x-signature', signature)
+            .expect(422, { error: 'processedTracks entity has unsupported fields' })
+            .end((err,res) => { if (err) throw err });
+        })
       })
 
       describe('with a valid payload', () => {
         it('returns a 200', () => {
           const body = {
             entity: 'processedTracks',
-            data: { artistId: '1', platformId: 'jamboni', name: 'Jammed Jams' }
+            data: { artistId: '1', platformId: 'jamboni', title: 'Jammed Jams' }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
