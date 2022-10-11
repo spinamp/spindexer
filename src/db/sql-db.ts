@@ -21,7 +21,12 @@ const loadDB = async () => {
   const currentConfig = config[process.env.NODE_ENV]
   await createDB(currentConfig);
   const db = knex(currentConfig);
-  await db.migrate.latest();
+  try {
+    await db.migrate.latest();
+  } catch (e: any) {
+    console.log(e.message);
+    throw e
+  }
   return db;
 }
 
