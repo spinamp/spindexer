@@ -16,22 +16,31 @@ enum SeedEntities {
   'artistProfiles',
   'processedTracks'
 }
-
 type SeedEntity = keyof typeof SeedEntities;
 
-enum SeedPlatformRequiredKeys {
+enum PlatformsRequiredKeys {
   ID = 'id',
   NAME = 'name',
   TYPE = 'type',
 }
 
-enum SeedNFTFactoryRequiredKeys {
+enum NFTFactoriesRequiredKeys {
   ID = 'id',
   PLATFORM_ID = 'platformId',
   CONTRACT_TYPE = 'contractType', // validated against `NFTContractTypeName`
   STANDARD = 'standard', // validated against `NFTStandard`
   AUTO_APPROVE = 'autoApprove',
   APPROVED = 'approved'
+}
+
+enum ArtistProfilesRequiredKeys {
+  ARTIST_ID = 'artistId',
+  PLATFORM_ID = 'platformId',
+}
+
+enum ProcessedTracksRequiredKeys {
+  ARTIST_ID = 'artistId',
+  PLATFORM_ID = 'platformId',
 }
 
 type SeedPayload = {
@@ -101,48 +110,55 @@ const permittedAdminAddresses = (): string[] => {
 }
 
 
-export const validateSeed = (payload: SeedPayload) => {
+export const validateSeed = (payload: SeedPayload): void => {
+  entityValidator(payload);
 
-  if (payload.entity === 'platforms') {
-    minimumKeysPresent(payload, Object.values(SeedPlatformRequiredKeys));
-    onlyValidKeysPresent(payload, MusicPlatformKeys);
-    typeValidator(payload, 'type', MusicPlatformType);
-
-  } else if (payload.entity === 'nftFactories') {
-    minimumKeysPresent(payload, Object.values(SeedNFTFactoryRequiredKeys));
-    onlyValidKeysPresent(payload, NFTFactoryKeys);
-    typeValidator(payload, 'contractType', NFTContractTypeName);
-    typeValidator(payload, 'standard', NFTStandard);
-
-  } else if (payload.entity === 'artistProfiles') {
-    minimumKeysPresent(payload, ['artistId', 'platformId']);
-    onlyValidKeysPresent(payload, ArtistProfileKeys);
-
-  } else if (payload.entity === 'processedTracks') {
-    minimumKeysPresent(payload, ['artistId', 'platformId']);
-    onlyValidKeysPresent(payload, ProcessedTrackKeys);
-  } else {
-    throw new Error('unknown seed entity');
+  const validatorFunctions = {
+    'platforms': [
+      () => minimumKeysPresent(payload, Object.values(PlatformsRequiredKeys)),
+      () => onlyValidKeysPresent(payload, MusicPlatformKeys),
+      () => typeValidator(payload, 'type', MusicPlatformType),
+    ],
+    'nftFactories': [
+      () => minimumKeysPresent(payload, Object.values(NFTFactoriesRequiredKeys)),
+      () => onlyValidKeysPresent(payload, NFTFactoryKeys),
+      () => typeValidator(payload, 'contractType', NFTContractTypeName),
+      () => typeValidator(payload, 'standard', NFTStandard),
+    ],
+    'artistProfiles': [
+      () => minimumKeysPresent(payload, Object.values(ArtistProfilesRequiredKeys)),
+      () => onlyValidKeysPresent(payload, ArtistProfileKeys),
+    ],
+    'processedTracks': [
+      () => minimumKeysPresent(payload, Object.values(ProcessedTracksRequiredKeys)),
+      () => onlyValidKeysPresent(payload, ProcessedTrackKeys),
+    ],
   }
 
-  return payload;
+  validatorFunctions[payload.entity].forEach((fn) => fn());
 }
 
-const minimumKeysPresent = (input: any, keys: any): void => {
+const minimumKeysPresent = (input: SeedPayload, keys: any): void => {
   if (!containsAllKeys(input.data, keys)) {
     throw new Error(`${input.entity} entity is missing required fields`)
   }
 }
 
-const onlyValidKeysPresent = (input: any, keys: any): void => {
+const onlyValidKeysPresent = (input: SeedPayload, keys: any): void => {
   if (!containsNoExtraKeys(input.data, keys)) {
     throw new Error(`${input.entity} entity has unsupported fields`)
   }
 }
 
-const typeValidator = (input: any, key: string, validOptions: any): void => {
+const typeValidator = (input: SeedPayload, key: string, validOptions: any): void => {
   if (!validForType(input.data[key], validOptions)) {
     throw new Error(`not a valid ${input.entity} ${key}`)
+  }
+}
+
+const entityValidator = (input: SeedPayload): void => {
+  if (!Object.values(SeedEntities).includes(input.entity)) {
+    throw new Error('unknown seed entity');
   }
 }
 
@@ -150,9 +166,7 @@ export const persistSeed = async (payload: SeedPayload) => {
   let message: any;
   let dbClient: any;
 
-  if (!Object.values(SeedEntities).includes(payload.entity)) {
-    throw new Error('unknown seed entity');
-  }
+  entityValidator(payload);
 
   if (['platforms', 'nftFactories'].includes(payload.entity)) {
     message = getCrdtUpsertMessage<MusicPlatform>(Table[payload.entity], payload.data as any)
