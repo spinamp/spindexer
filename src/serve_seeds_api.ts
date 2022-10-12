@@ -3,7 +3,8 @@ import './types/env';
 import cors from 'cors';
 import express from 'express';
 
-import { authMiddleware, persistSeed, validateSeed } from './utils/seedsApi';
+import { persistSeed, validateSeed } from './types/seeds';
+import { authMiddleware } from './utils/seedsMiddleware';
 
 const apiVersionPrefix = '/v1';
 
