@@ -77,7 +77,7 @@ describe('Seeds API', () => {
 
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
-            .expect(422, { error: 'not a valid platform type' })
+            .expect(422, { error: 'not a valid platforms type' })
             .end((err,res) => { if (err) throw err });
         })
       })
@@ -131,7 +131,7 @@ describe('Seeds API', () => {
 
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
-            .expect(422, { error: 'not a valid contract type' })
+            .expect(422, { error: 'not a valid nftFactories contractType' })
             .end((err,res) => { if (err) throw err });
         })
       })
