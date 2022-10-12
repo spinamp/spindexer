@@ -139,19 +139,19 @@ export const validateSeed = (payload: SeedPayload): void => {
 }
 
 const minimumKeysPresent = (input: SeedPayload, keys: any): void => {
-  if (!containsAllKeys(input.data, keys)) {
+  if (!keys.every((key: any) => input.data.hasOwnProperty(key))) {
     throw new Error(`${input.entity} entity is missing required fields`)
   }
 }
 
 const onlyValidKeysPresent = (input: SeedPayload, keys: any): void => {
-  if (!containsNoExtraKeys(input.data, keys)) {
+  if (!Object.keys(input.data).every((key: any) => keys.includes(key))) {
     throw new Error(`${input.entity} entity has unsupported fields`)
   }
 }
 
 const typeValidator = (input: SeedPayload, key: string, validOptions: any): void => {
-  if (!validForType(input.data[key], validOptions)) {
+  if (!Object.values(validOptions).includes(input.data[key])) {
     throw new Error(`not a valid ${input.entity} ${key}`)
   }
 }
@@ -180,16 +180,4 @@ export const persistSeed = async (payload: SeedPayload) => {
   } finally {
     dbClient.close();
   }
-}
-
-const containsAllKeys = (input: any, keys: any): boolean => {
-  return keys.every((key: any) => input.hasOwnProperty(key))
-}
-
-const containsNoExtraKeys = (input: any, keys: any): boolean => {
-  return Object.keys(input).every((key: any) => keys.includes(key))
-}
-
-const validForType = (input: any, type: any): boolean => {
-  return Object.values(type).includes(input)
 }
