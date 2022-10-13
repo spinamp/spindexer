@@ -12,34 +12,17 @@ enum SeedEntities {
 }
 type SeedEntity = keyof typeof SeedEntities;
 
-const PlatformValidKeys = ['id', 'type', 'name'];
-const NFTFactoryValidKeys = ['id', 'platformId', 'contractType', 'name', 'symbol', 'typeMetadata', 'standard', 'autoApprove', 'approved'];
-const ArtistValidKeys = ['id', 'name'];
-const ProcessedTrackValidKeys = ['id', 'title', 'slug', 'description', 'websiteUrl', 'lossyAudioURL', 'lossyAudioIPFSHash', 'lossyArtworkURL', 'lossyArtworkIPFSHash'];
+const PlatformRequiredKeys = ['id', 'name', 'type'];
+const PlatformValidKeys = PlatformRequiredKeys;
 
-enum PlatformsRequiredKeys {
-  ID = 'id',
-  NAME = 'name',
-  TYPE = 'type',
-}
-enum NFTFactoriesRequiredKeys {
-  ID = 'id',
-  PLATFORM_ID = 'platformId',
-  CONTRACT_TYPE = 'contractType',
-  NAME = 'name',
-  SYMBOL = 'symbol',
-  TYPE_METADATA = 'typeMetadata',
-  STANDARD = 'standard',
-  AUTO_APPROVE = 'autoApprove',
-  APPROVED = 'approved'
-}
-enum ArtistsRequiredKeys {
-  ID = 'id',
-  NAME = 'name',
-}
-enum ProcessedTracksRequiredKeys {
-  ID = 'id',
-}
+const NFTFactoryRequiredKeys = ['id', 'platformId', 'contractType', 'name', 'symbol', 'typeMetadata', 'standard', 'autoApprove', 'approved'];
+const NFTFactoryValidKeys = NFTFactoryRequiredKeys;
+
+const ArtistRequiredKeys = ['id'];
+const ArtistValidKeys = ['id', 'name'];
+
+const ProcessedTrackRequiredKeys = ['id'];
+const ProcessedTrackValidKeys = ['id', 'title', 'slug', 'description', 'websiteUrl', 'lossyAudioURL', 'lossyAudioIPFSHash', 'lossyArtworkURL', 'lossyArtworkIPFSHash'];
 
 type SeedPayload = {
   entity: SeedEntity,
@@ -51,22 +34,22 @@ export const validateSeed = (payload: SeedPayload): void => {
 
   const validatorFunctions = {
     'platforms': [
-      () => minimumKeysPresent(payload, Object.values(PlatformsRequiredKeys)),
+      () => minimumKeysPresent(payload, PlatformRequiredKeys),
       () => onlyValidKeysPresent(payload, PlatformValidKeys),
       () => typeValidator(payload, 'type', MusicPlatformType),
     ],
     'nftFactories': [
-      () => minimumKeysPresent(payload, Object.values(NFTFactoriesRequiredKeys)),
+      () => minimumKeysPresent(payload, NFTFactoryRequiredKeys),
       () => onlyValidKeysPresent(payload, NFTFactoryValidKeys),
       () => typeValidator(payload, 'contractType', NFTContractTypeName),
       () => typeValidator(payload, 'standard', NFTStandard),
     ],
     'artists': [
-      () => minimumKeysPresent(payload, Object.values(ArtistsRequiredKeys)),
+      () => minimumKeysPresent(payload, ArtistRequiredKeys),
       () => onlyValidKeysPresent(payload, ArtistValidKeys),
     ],
     'processedTracks': [
-      () => minimumKeysPresent(payload, Object.values(ProcessedTracksRequiredKeys)),
+      () => minimumKeysPresent(payload, ProcessedTrackRequiredKeys),
       () => onlyValidKeysPresent(payload, ProcessedTrackValidKeys),
     ],
   }
