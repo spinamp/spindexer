@@ -7,46 +7,39 @@ import { MusicPlatformType } from '../types/platform';
 enum SeedEntities {
   'platforms',
   'nftFactories',
-  'artistProfiles',
   'artists',
   'processedTracks'
 }
 type SeedEntity = keyof typeof SeedEntities;
+
+const PlatformValidKeys = ['id', 'type', 'name'];
+const NFTFactoryValidKeys = ['id', 'platformId', 'contractType', 'name', 'symbol', 'typeMetadata', 'standard', 'autoApprove', 'approved'];
+const ArtistValidKeys = ['id', 'name'];
+const ProcessedTrackValidKeys = ['id', 'title', 'slug', 'description', 'websiteUrl', 'lossyAudioURL', 'lossyAudioIPFSHash', 'lossyArtworkURL', 'lossyArtworkIPFSHash'];
 
 enum PlatformsRequiredKeys {
   ID = 'id',
   NAME = 'name',
   TYPE = 'type',
 }
-const PlatformKeys = ['id', 'type', 'name'];
-
 enum NFTFactoriesRequiredKeys {
   ID = 'id',
   PLATFORM_ID = 'platformId',
   CONTRACT_TYPE = 'contractType',
+  NAME = 'name',
+  SYMBOL = 'symbol',
+  TYPE_METADATA = 'typeMetadata',
   STANDARD = 'standard',
   AUTO_APPROVE = 'autoApprove',
   APPROVED = 'approved'
 }
-const NFTFactoryKeys = ['id', 'platformId', 'contractType', 'name', 'symbol', 'typeMetadata', 'standard', 'autoApprove', 'approved'];
-
-enum ArtistProfilesRequiredKeys {
-  ARTIST_ID = 'artistId',
-  PLATFORM_ID = 'platformId',
-}
-const ArtistProfileKeys = ['platformInternalId', 'artistId', 'name', 'platformId', 'avatarUrl', 'websiteUrl'];
-
 enum ArtistsRequiredKeys {
   ID = 'id',
   NAME = 'name',
 }
-const ArtistKeys = ['id', 'name'];
-
 enum ProcessedTracksRequiredKeys {
-  ARTIST_ID = 'artistId',
-  PLATFORM_ID = 'platformId',
+  ID = 'id',
 }
-const ProcessedTrackKeys = ['platformInternalId', 'title', 'slug', 'platformId', 'description', 'websiteUrl', 'artistId', 'lossyAudioURL', 'lossyAudioIPFSHash', 'lossyArtworkURL', 'lossyArtworkIPFSHash'];
 
 type SeedPayload = {
   entity: SeedEntity,
@@ -59,26 +52,22 @@ export const validateSeed = (payload: SeedPayload): void => {
   const validatorFunctions = {
     'platforms': [
       () => minimumKeysPresent(payload, Object.values(PlatformsRequiredKeys)),
-      () => onlyValidKeysPresent(payload, PlatformKeys),
+      () => onlyValidKeysPresent(payload, PlatformValidKeys),
       () => typeValidator(payload, 'type', MusicPlatformType),
     ],
     'nftFactories': [
       () => minimumKeysPresent(payload, Object.values(NFTFactoriesRequiredKeys)),
-      () => onlyValidKeysPresent(payload, NFTFactoryKeys),
+      () => onlyValidKeysPresent(payload, NFTFactoryValidKeys),
       () => typeValidator(payload, 'contractType', NFTContractTypeName),
       () => typeValidator(payload, 'standard', NFTStandard),
     ],
-    'artistProfiles': [
-      () => minimumKeysPresent(payload, Object.values(ArtistProfilesRequiredKeys)),
-      () => onlyValidKeysPresent(payload, ArtistProfileKeys),
-    ],
     'artists': [
       () => minimumKeysPresent(payload, Object.values(ArtistsRequiredKeys)),
-      () => onlyValidKeysPresent(payload, ArtistKeys),
+      () => onlyValidKeysPresent(payload, ArtistValidKeys),
     ],
     'processedTracks': [
       () => minimumKeysPresent(payload, Object.values(ProcessedTracksRequiredKeys)),
-      () => onlyValidKeysPresent(payload, ProcessedTrackKeys),
+      () => onlyValidKeysPresent(payload, ProcessedTrackValidKeys),
     ],
   }
 
@@ -117,7 +106,7 @@ export const persistSeed = async (payload: SeedPayload) => {
 
   if (['platforms', 'nftFactories'].includes(payload.entity)) {
     message = getCrdtUpsertMessage(Table[payload.entity], payload.data as any)
-  } else if (['artistProfiles', 'processedTracks', 'artists'].includes(payload.entity)) {
+  } else if (['processedTracks', 'artists'].includes(payload.entity)) {
     message = getCrdtUpdateMessage(Table[payload.entity], payload.data as any)
   } else {
     throw new Error(`message not defined for entity: '${payload.entity}'`);

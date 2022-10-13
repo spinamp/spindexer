@@ -50,6 +50,8 @@ describe('Seeds API server', () => {
     })
 
     describe('platforms', () => {
+      const validData = { id: 'jamboni', name: 'Jamboni Jams', type: 'sound' };
+
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
           const body = { entity: 'platforms', data: { blam: 'yam' } };
@@ -64,7 +66,7 @@ describe('Seeds API server', () => {
 
       describe('with an unknown type', () => {
         it('returns an error', () => {
-          const body = { entity: 'platforms', data: { id: 'potato', name: 'potato', type: 'yum' } }
+          const body = { entity: 'platforms', data: { ...validData, type: 'yum' } }
           const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(endpoint).send(body)
@@ -76,7 +78,7 @@ describe('Seeds API server', () => {
 
       describe('with unsupported fields', () => {
         it('returns an error', () => {
-          const body = { entity: 'platforms', data: { id: 'potato', name: 'potato', type: 'sound', hackyou: 'boo' } }
+          const body = { entity: 'platforms', data: { ...validData, hackyou: 'boo' } }
           const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(endpoint).send(body)
@@ -88,7 +90,7 @@ describe('Seeds API server', () => {
 
       describe('with a valid payload', () => {
         it('returns a 200', async () => {
-          const body = { entity: 'platforms', data: { id: 'jamboni', name: 'Jamboni Jams', type: 'sound' } }
+          const body = { entity: 'platforms', data: validData }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
           supertest(app).post(endpoint).send(body)
@@ -101,6 +103,8 @@ describe('Seeds API server', () => {
     })
 
     describe('nftFactories', () => {
+      const validData = { id: '1', platformId: 'jamboni', contractType: 'default', name: 'jambori', symbol: 'JAM', typeMetadata: {}, standard: 'erc721', autoApprove: false, approved: false };
+
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
           const body = { entity: 'nftFactories', data: { blam: 'yam' } };
@@ -117,7 +121,7 @@ describe('Seeds API server', () => {
         it('returns an error', () => {
           const body = {
             entity: 'nftFactories',
-            data: { id: '1', platformId: 'jamboni', contractType: 'UNKNOWN', standard: 'standard', autoApprove: false, approved: false }
+            data: { ...validData, contractType: 'UNKNOWN' }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature
 
@@ -132,7 +136,7 @@ describe('Seeds API server', () => {
         it('returns an error', () => {
           const body = {
             entity: 'nftFactories',
-            data: { id: '1', platformId: 'jamboni', contractType: 'default', standard: 'UNKNOWN', autoApprove: false, approved: false }
+            data: { ...validData, standard: 'UNKNOWN' }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature
 
@@ -147,7 +151,7 @@ describe('Seeds API server', () => {
         it('returns an error', () => {
           const body = {
             entity: 'nftFactories',
-            data: { id: '1', platformId: 'jamboni', name: 'lala', contractType: 'default', standard: 'erc721', autoApprove: false, approved: false, hackyou: 'boo' }
+            data: { ...validData, hackyou: 'boo' },
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
@@ -162,7 +166,7 @@ describe('Seeds API server', () => {
         it('returns a 200', async () => {
           const body = {
             entity: 'nftFactories',
-            data: { id: '1', platformId: 'jamboni', name: 'lala', contractType: 'default', standard: 'erc721', autoApprove: false, approved: false }
+            data: validData
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
@@ -176,6 +180,8 @@ describe('Seeds API server', () => {
     })
 
     describe('artists', () => {
+      const validData = { id: '1', name: 'Jammed Jams' };
+
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
           const body = { entity: 'artists', data: { blam: 'yam' } };
@@ -192,7 +198,7 @@ describe('Seeds API server', () => {
         it('returns an error', () => {
           const body = {
             entity: 'artists',
-            data: { id: '1', name: 'Jammed Jams', hackyou: 'boo' }
+            data: { ...validData, hackyou: 'boo' }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
@@ -207,52 +213,7 @@ describe('Seeds API server', () => {
         it('returns a 200', async () => {
           const body = {
             entity: 'artists',
-            data: { id: '1', name: 'Jammed Jams' }
-          }
-          const signature = wallet.sign(JSON.stringify(body)).signature;
-
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(200)
-            .end((err,res) => { if (err) throwDBHint(err) });
-        })
-        it('persists the seed');
-      })
-    })
-
-    describe('artistProfiles', () => {
-      describe('with the incorrect shape', () => {
-        it('returns an error', () => {
-          const body = { entity: 'artistProfiles', data: { blam: 'yam' } };
-          const signature = wallet.sign(JSON.stringify(body)).signature
-
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(422, { error: 'artistProfiles entity is missing required fields' })
-            .end((err,res) => { if (err) throw err });
-        })
-      })
-
-      describe('with unsupported fields', () => {
-        it('returns an error', () => {
-          const body = {
-            entity: 'artistProfiles',
-            data: { artistId: '1', platformId: 'jamboni', name: 'Jammed Jams', hackyou: 'boo' }
-          }
-          const signature = wallet.sign(JSON.stringify(body)).signature;
-
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(422, { error: 'artistProfiles entity has unsupported fields' })
-            .end((err,res) => { if (err) throw err });
-        })
-      })
-
-      describe('with a valid payload', () => {
-        it('returns a 200', async () => {
-          const body = {
-            entity: 'artistProfiles',
-            data: { artistId: '1', platformId: 'jamboni', name: 'Jammed Jams' }
+            data: validData
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
@@ -266,6 +227,8 @@ describe('Seeds API server', () => {
     })
 
     describe('processedTracks', () => {
+      const validData = { id: '1', title: 'Jammed Jams', description: 'Wicked jams!' }
+
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
           const body = { entity: 'processedTracks', data: { blam: 'yam' } };
@@ -282,7 +245,7 @@ describe('Seeds API server', () => {
         it('returns an error', () => {
           const body = {
             entity: 'processedTracks',
-            data: { artistId: '1', platformId: 'jamboni', title: 'Jammed Jams', hackyou: 'boo' }
+            data: { ...validData, hackyou: 'boo' }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
@@ -297,7 +260,7 @@ describe('Seeds API server', () => {
         it('returns a 200', async () => {
           const body = {
             entity: 'processedTracks',
-            data: { artistId: '1', platformId: 'jamboni', title: 'Jammed Jams' }
+            data: validData
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
