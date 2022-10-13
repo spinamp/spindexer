@@ -15,7 +15,7 @@ type SeedEntity = keyof typeof SeedEntities;
 const PlatformRequiredKeys = ['id', 'name', 'type'];
 const PlatformValidKeys = PlatformRequiredKeys;
 
-const NFTFactoryRequiredKeys = ['id', 'platformId', 'contractType', 'name', 'symbol', 'typeMetadata', 'standard', 'autoApprove', 'approved'];
+const NFTFactoryRequiredKeys = ['id', 'startingBlock', 'platformId', 'contractType', 'name', 'symbol', 'typeMetadata', 'standard', 'autoApprove', 'approved'];
 const NFTFactoryValidKeys = NFTFactoryRequiredKeys;
 
 const ArtistRequiredKeys = ['id'];

@@ -103,7 +103,7 @@ describe('Seeds API server', () => {
     })
 
     describe('nftFactories', () => {
-      const validData = { id: '1', platformId: 'jamboni', contractType: 'default', name: 'jambori', symbol: 'JAM', typeMetadata: {}, standard: 'erc721', autoApprove: false, approved: false };
+      const validData = { id: '1', startingBlock: '123', platformId: 'jamboni', contractType: 'default', name: 'jambori', symbol: 'JAM', typeMetadata: {}, standard: 'erc721', autoApprove: false, approved: false };
 
       describe('with the incorrect shape', () => {
         it('returns an error', () => {
