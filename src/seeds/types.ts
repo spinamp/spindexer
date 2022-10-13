@@ -1,14 +1,14 @@
-
 import { Table } from '../db/db';
 import db from '../db/sql-db'
 import { getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
 import { NFTContractTypeName, NFTStandard } from '../types/nft';
-import { MusicPlatform, MusicPlatformType } from '../types/platform';
+import { MusicPlatformType } from '../types/platform';
 
 enum SeedEntities {
   'platforms',
   'nftFactories',
   'artistProfiles',
+  'artists',
   'processedTracks'
 }
 type SeedEntity = keyof typeof SeedEntities;
@@ -35,6 +35,12 @@ enum ArtistProfilesRequiredKeys {
   PLATFORM_ID = 'platformId',
 }
 const ArtistProfileKeys = ['platformInternalId', 'artistId', 'name', 'platformId', 'avatarUrl', 'websiteUrl'];
+
+enum ArtistsRequiredKeys {
+  ID = 'id',
+  NAME = 'name',
+}
+const ArtistKeys = ['id', 'name'];
 
 enum ProcessedTracksRequiredKeys {
   ARTIST_ID = 'artistId',
@@ -65,6 +71,10 @@ export const validateSeed = (payload: SeedPayload): void => {
     'artistProfiles': [
       () => minimumKeysPresent(payload, Object.values(ArtistProfilesRequiredKeys)),
       () => onlyValidKeysPresent(payload, ArtistProfileKeys),
+    ],
+    'artists': [
+      () => minimumKeysPresent(payload, Object.values(ArtistsRequiredKeys)),
+      () => onlyValidKeysPresent(payload, ArtistKeys),
     ],
     'processedTracks': [
       () => minimumKeysPresent(payload, Object.values(ProcessedTracksRequiredKeys)),
@@ -106,14 +116,19 @@ export const persistSeed = async (payload: SeedPayload) => {
   entityValidator(payload);
 
   if (['platforms', 'nftFactories'].includes(payload.entity)) {
-    message = getCrdtUpsertMessage<MusicPlatform>(Table[payload.entity], payload.data as any)
-  } else if (['artistProfiles', 'processedTracks'].includes(payload.entity)) {
-    message = getCrdtUpdateMessage<MusicPlatform>(Table[payload.entity], payload.data as any)
+    message = getCrdtUpsertMessage(Table[payload.entity], payload.data as any)
+  } else if (['artistProfiles', 'processedTracks', 'artists'].includes(payload.entity)) {
+    message = getCrdtUpdateMessage(Table[payload.entity], payload.data as any)
+  } else {
+    throw new Error(`message not defined for entity: '${payload.entity}'`);
   }
 
   try {
     dbClient = await db.init();
     await dbClient.upsert(Table.seeds, [message])
+  } catch (e: any) {
+    console.error(e);
+    throw new Error(e.message);
   } finally {
     dbClient.close();
   }

@@ -24,6 +24,7 @@ export const createSeedsAPIServer = () => {
       await persistSeed(req.body)
       res.sendStatus(200);
     } catch (e: any) {
+      console.log(e);
       res.status(500).send({ error: e.message });
     }
   });

@@ -2,7 +2,6 @@ import { isValidChecksumAddress } from 'ethereumjs-util'
 import { Request, Response, NextFunction } from 'express'
 import Web3 from 'web3';
 
-
 export const authMiddleware = (
   request: Request,
   response: Response,

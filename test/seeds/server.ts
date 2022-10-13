@@ -87,7 +87,7 @@ describe('Seeds API server', () => {
       })
 
       describe('with a valid payload', () => {
-        it('returns a 200', () => {
+        it('returns a 200', async () => {
           const body = { entity: 'platforms', data: { id: 'jamboni', name: 'Jamboni Jams', type: 'sound' } }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
@@ -159,10 +159,55 @@ describe('Seeds API server', () => {
       })
 
       describe('with a valid payload', () => {
-        it('returns a 200', () => {
+        it('returns a 200', async () => {
           const body = {
             entity: 'nftFactories',
             data: { id: '1', platformId: 'jamboni', name: 'lala', contractType: 'default', standard: 'erc721', autoApprove: false, approved: false }
+          }
+          const signature = wallet.sign(JSON.stringify(body)).signature;
+
+          supertest(app).post(endpoint).send(body)
+            .set('x-signature', signature)
+            .expect(200)
+            .end((err,res) => { if (err) throwDBHint(err) });
+        })
+        it('persists the seed');
+      })
+    })
+
+    describe('artists', () => {
+      describe('with the incorrect shape', () => {
+        it('returns an error', () => {
+          const body = { entity: 'artists', data: { blam: 'yam' } };
+          const signature = wallet.sign(JSON.stringify(body)).signature
+
+          supertest(app).post(endpoint).send(body)
+            .set('x-signature', signature)
+            .expect(422, { error: 'artists entity is missing required fields' })
+            .end((err,res) => { if (err) throw err });
+        })
+      })
+
+      describe('with unsupported fields', () => {
+        it('returns an error', () => {
+          const body = {
+            entity: 'artists',
+            data: { id: '1', name: 'Jammed Jams', hackyou: 'boo' }
+          }
+          const signature = wallet.sign(JSON.stringify(body)).signature;
+
+          supertest(app).post(endpoint).send(body)
+            .set('x-signature', signature)
+            .expect(422, { error: 'artists entity has unsupported fields' })
+            .end((err,res) => { if (err) throw err });
+        })
+      })
+
+      describe('with a valid payload', () => {
+        it('returns a 200', async () => {
+          const body = {
+            entity: 'artists',
+            data: { id: '1', name: 'Jammed Jams' }
           }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
@@ -204,7 +249,7 @@ describe('Seeds API server', () => {
       })
 
       describe('with a valid payload', () => {
-        it('returns a 200', () => {
+        it('returns a 200', async () => {
           const body = {
             entity: 'artistProfiles',
             data: { artistId: '1', platformId: 'jamboni', name: 'Jammed Jams' }
@@ -249,7 +294,7 @@ describe('Seeds API server', () => {
       })
 
       describe('with a valid payload', () => {
-        it('returns a 200', () => {
+        it('returns a 200', async () => {
           const body = {
             entity: 'processedTracks',
             data: { artistId: '1', platformId: 'jamboni', title: 'Jammed Jams' }
