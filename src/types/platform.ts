@@ -31,7 +31,6 @@ export type MusicPlatform = {
   type: MusicPlatformType
   name: string
 }
-export const MusicPlatformKeys: Array<keyof MusicPlatform> = ['id', 'type', 'name'];
 
 export type PlatformMapper = {
   mapNFTsToTrackIds: MapNFTsToTrackIds

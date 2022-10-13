@@ -1,24 +1,18 @@
 import supertest from 'supertest'
 import web3 from 'web3';
 
-import { MusicPlatformType } from '../src/types/platform';
+import { createSeedsAPIServer } from '../../src/seeds/server';
+import { TEST_ADMIN_WALLET } from '../pretest';
 
-describe('Seeds API', () => {
+const throwDBHint = (err: any) => { throw new Error(`${err.message}\nHINT: tests run against dev DB. Ensure that DB running, migrated, and working as expected`) };
+
+describe('Seeds API server', () => {
   let app: any;
   const Web3 = new web3();
+  const wallet = Web3.eth.accounts.privateKeyToAccount(TEST_ADMIN_WALLET.privateKey)
 
-  // TODO: rather stub out the permittedAdminAddresses() to contain this address
-  // instead of having to put the known address into .env
-  const testAdminWallet = {
-    address: '0x8eb97c37B0BDe7A09eA5b49D6D97cd57e10559ba',
-    privateKey: '0xe07cc69757e3b261ffeb70df20f832ae74da57e11dd440a5da75377abe8caefc',
-  }
-
-  const wallet = Web3.eth.accounts.privateKeyToAccount(testAdminWallet.privateKey)
-
-  // TODO: spin up a test DB instead of using development
   before(() => {
-    app = require('../src/serve_seeds_api.ts');
+    app = createSeedsAPIServer();
   });
 
   describe('un-authenticated', () => {
@@ -37,7 +31,6 @@ describe('Seeds API', () => {
         .set('x-signature', signature)
         .expect(403)
         .end((err,res) => { if (err) throw err });
-
     })
   })
 
@@ -53,7 +46,6 @@ describe('Seeds API', () => {
           .set('x-signature', signature)
           .expect(422, { error: 'unknown seed entity' })
           .end((err,res) => { if (err) throw err });
-
       })
     })
 
@@ -84,7 +76,7 @@ describe('Seeds API', () => {
 
       describe('with unsupported fields', () => {
         it('returns an error', () => {
-          const body = { entity: 'platforms', data: { id: 'potato', name: 'potato', type: MusicPlatformType.sound, hackyou: 'boo' } }
+          const body = { entity: 'platforms', data: { id: 'potato', name: 'potato', type: 'sound', hackyou: 'boo' } }
           const signature = wallet.sign(JSON.stringify(body)).signature
 
           supertest(app).post(endpoint).send(body)
@@ -96,13 +88,13 @@ describe('Seeds API', () => {
 
       describe('with a valid payload', () => {
         it('returns a 200', () => {
-          const body = { entity: 'platforms', data: { id: 'jamboni', name: 'Jamboni Jams', type: MusicPlatformType.sound } }
+          const body = { entity: 'platforms', data: { id: 'jamboni', name: 'Jamboni Jams', type: 'sound' } }
           const signature = wallet.sign(JSON.stringify(body)).signature;
 
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
             .expect(200)
-            .end((err,res) => { if (err) throw err });
+            .end((err,res) => { if (err) { throwDBHint(err) } });
         })
         it('persists the seed');
       })
@@ -177,7 +169,7 @@ describe('Seeds API', () => {
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
             .expect(200)
-            .end((err,res) => { if (err) throw err });
+            .end((err,res) => { if (err) throwDBHint(err) });
         })
         it('persists the seed');
       })
@@ -222,7 +214,7 @@ describe('Seeds API', () => {
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
             .expect(200)
-            .end((err,res) => { if (err) throw err });
+            .end((err,res) => { if (err) throwDBHint(err) });
         })
         it('persists the seed');
       })
@@ -267,7 +259,7 @@ describe('Seeds API', () => {
           supertest(app).post(endpoint).send(body)
             .set('x-signature', signature)
             .expect(200)
-            .end((err,res) => { if (err) { throw err } });
+            .end((err,res) => { if (err) { throwDBHint(err) } });
         })
         it('persists the seed');
       })

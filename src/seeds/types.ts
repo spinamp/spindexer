@@ -1,12 +1,9 @@
 
 import { Table } from '../db/db';
 import db from '../db/sql-db'
-
-import { ArtistProfileKeys } from './artist';
-import { getCrdtUpdateMessage, getCrdtUpsertMessage } from './message'
-import { NFTContractTypeName, NFTFactoryKeys, NFTStandard } from './nft';
-import { MusicPlatform, MusicPlatformKeys, MusicPlatformType } from './platform';
-import { ProcessedTrackKeys } from './track';
+import { getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
+import { NFTContractTypeName, NFTStandard } from '../types/nft';
+import { MusicPlatform, MusicPlatformType } from '../types/platform';
 
 enum SeedEntities {
   'platforms',
@@ -21,25 +18,29 @@ enum PlatformsRequiredKeys {
   NAME = 'name',
   TYPE = 'type',
 }
+const PlatformKeys = ['id', 'type', 'name'];
 
 enum NFTFactoriesRequiredKeys {
   ID = 'id',
   PLATFORM_ID = 'platformId',
-  CONTRACT_TYPE = 'contractType', // validated against `NFTContractTypeName`
-  STANDARD = 'standard', // validated against `NFTStandard`
+  CONTRACT_TYPE = 'contractType',
+  STANDARD = 'standard',
   AUTO_APPROVE = 'autoApprove',
   APPROVED = 'approved'
 }
+const NFTFactoryKeys = ['id', 'platformId', 'contractType', 'name', 'symbol', 'typeMetadata', 'standard', 'autoApprove', 'approved'];
 
 enum ArtistProfilesRequiredKeys {
   ARTIST_ID = 'artistId',
   PLATFORM_ID = 'platformId',
 }
+const ArtistProfileKeys = ['platformInternalId', 'artistId', 'name', 'platformId', 'avatarUrl', 'websiteUrl'];
 
 enum ProcessedTracksRequiredKeys {
   ARTIST_ID = 'artistId',
   PLATFORM_ID = 'platformId',
 }
+const ProcessedTrackKeys = ['platformInternalId', 'title', 'slug', 'platformId', 'description', 'websiteUrl', 'artistId', 'lossyAudioURL', 'lossyAudioIPFSHash', 'lossyArtworkURL', 'lossyArtworkIPFSHash'];
 
 type SeedPayload = {
   entity: SeedEntity,
@@ -52,7 +53,7 @@ export const validateSeed = (payload: SeedPayload): void => {
   const validatorFunctions = {
     'platforms': [
       () => minimumKeysPresent(payload, Object.values(PlatformsRequiredKeys)),
-      () => onlyValidKeysPresent(payload, MusicPlatformKeys),
+      () => onlyValidKeysPresent(payload, PlatformKeys),
       () => typeValidator(payload, 'type', MusicPlatformType),
     ],
     'nftFactories': [

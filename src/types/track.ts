@@ -26,8 +26,6 @@ export type ProcessedTrack = Record & {
   artistId: string;
 } & ProcessedTrackAudio & ProcessedTrackArtwork;
 
-export const ProcessedTrackKeys = ['platformInternalId', 'title', 'slug', 'platformId', 'description', 'websiteUrl', 'artistId', 'lossyAudioURL', 'lossyAudioIPFSHash', 'lossyArtworkURL', 'lossyArtworkIPFSHash'];
-
 export const mergeProcessedTracks = async (newProcessedTracks: ProcessedTrack[], dbClient: DBClient, prioritizeNew: boolean) => {
   const platformInternalIds = newProcessedTracks.map(t => t.platformInternalId);
   const existingProcessedTracks = await dbClient.getRecords<ProcessedTrack>(Table.processedTracks,
