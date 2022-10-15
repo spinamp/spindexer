@@ -30,6 +30,11 @@ type SeedPayload = {
   data: any,
 }
 
+const crdtOperationMessageFnMap = {
+  [CrdtOperation.UPSERT]: getCrdtUpsertMessage,
+  [CrdtOperation.UPDATE]: getCrdtUpdateMessage,
+}
+
 export const validateSeed = (payload: SeedPayload): void => {
   entityValidator(payload);
 
@@ -86,18 +91,15 @@ const entityValidator = (input: SeedPayload): void => {
 }
 
 export const persistSeed = async (payload: SeedPayload) => {
-  let message: any;
   let dbClient: any;
-
   entityValidator(payload);
 
-  if (['platforms', 'nftFactories'].includes(payload.entity)) {
-    message = getCrdtUpsertMessage(Table[payload.entity], payload.data as any)
-  } else if (['processedTracks', 'artists'].includes(payload.entity)) {
-    message = getCrdtUpdateMessage(Table[payload.entity], payload.data as any)
-  } else {
-    throw new Error(`message not defined for entity: '${payload.entity}'`);
+  const messageFn = crdtOperationMessageFnMap[payload.operation];
+  if (!messageFn) {
+    throw new Error('must specify either `upsert` or `update` operation');
   }
+
+  const message = messageFn(Table[payload.entity], payload.data as any)
 
   try {
     dbClient = await db.init();

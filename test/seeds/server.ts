@@ -65,7 +65,7 @@ describe('Seeds API server', () => {
       const validData = { id: 'jamboni', name: 'Jamboni Jams', type: 'sound' };
       const validUpsert = { entity: 'platforms', operation: 'upsert', data: validData };
 
-      describe('with the incorrect shape', () => {
+      describe('without required fields', () => {
         it('returns an error', () => {
           const body = { ...validUpsert, data: { blam: 'yam' } };
           const signature = wallet.sign(JSON.stringify(body)).signature;
@@ -119,7 +119,7 @@ describe('Seeds API server', () => {
       const validData = { id: '1', startingBlock: '123', platformId: 'jamboni', contractType: 'default', typeMetadata: {}, standard: 'erc721', autoApprove: false, approved: false };
       const validUpsert = { entity: 'nftFactories', operation: 'upsert', data: { ...validData } };
 
-      describe('with the incorrect shape', () => {
+      describe('without required fields', () => {
         it('returns an error', () => {
           const body = { ...validUpsert, data: { blam: 'yam' } };
           const signature = wallet.sign(JSON.stringify(body)).signature;
@@ -185,7 +185,7 @@ describe('Seeds API server', () => {
       const validData = { id: '1', name: 'Jammed Jams' };
       const validUpdate = { entity: 'artists', operation: 'update', data: { ...validData } };
 
-      describe('with the incorrect shape', () => {
+      describe('without required fields', () => {
         it('returns an error', () => {
           const body = { ...validUpdate, data: { blam: 'yam' } };
           const signature = wallet.sign(JSON.stringify(body)).signature;
@@ -227,7 +227,7 @@ describe('Seeds API server', () => {
       const validData = { id: '1', title: 'Jammed Jams', description: 'Wicked jams!', websiteUrl: 'https://app.spinamp.xyz' };
       const validUpdate = { entity: 'processedTracks', operation: 'update', data: { ...validData } };
 
-      describe('with the incorrect shape', () => {
+      describe('without required fields', () => {
         it('returns an error', () => {
           const body = { ...validUpdate, data: { blam: 'yam' } };
           const signature = wallet.sign(JSON.stringify(body)).signature;
