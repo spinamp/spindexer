@@ -18,13 +18,13 @@ const mapAPITrackToTrackID = (apiTrack: any): string => {
   if (!apiTrack) {
     throw new Error('Missing sound.xyz api track');
   }
-  if (!apiTrack.artist || !apiTrack.artist.artistContractAddress) {
-    throw new Error('Missing sound.xyz api track artist');
+  if (!apiTrack.contractAddress) {
+    throw new Error('Missing sound.xyz api track contract address');
   }
   if (!apiTrack.editionId) {
     throw new Error('Missing sound.xyz api track editionId');
   }
-  return ethereumTrackId(apiTrack.artist.artistContractAddress, apiTrack.editionId);
+  return ethereumTrackId(apiTrack.contractAddress, apiTrack.editionId);
 };
 
 export type SoundClient = {
@@ -66,6 +66,7 @@ const init = async () => {
                 titleSlug
                 description
                 editionId
+                contractAddress
                 coverImage {
                   id
                   url
@@ -74,7 +75,6 @@ const init = async () => {
                   id
                   name
                   soundHandle
-                  artistContractAddress
                   user {
                       publicAddress
                       avatar {
@@ -126,7 +126,7 @@ const init = async () => {
   }
 
   const nftMatchesTrack = (nft: NFT, apiTrack: any) => {
-    const sameArtistAsNFT = formatAddress(apiTrack.artist.artistContractAddress) === formatAddress(nft.contractAddress);
+    const sameArtistAsNFT = formatAddress(apiTrack.contractAddress) === formatAddress(nft.contractAddress);
     const sameTrackAsNFT = apiTrack.title.trim() === getNFTTitle(nft);
     return sameArtistAsNFT && sameTrackAsNFT;
   }
