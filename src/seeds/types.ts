@@ -22,8 +22,9 @@ type SeedPayload = {
 
 const AllPlatformKeys = ['id', 'name', 'type'];
 
-const AllNFTFactoryKeys = ['id', 'startingBlock', 'platformId', 'contractType', 'standard', 'typeMetadata', 'autoApprove', 'approved'];
-const RequiredNFTFactoryKeys = AllNFTFactoryKeys.filter((key) => key !== 'typeMetadata');
+const AllUpsertNFTFactoryKeys = ['id', 'startingBlock', 'platformId', 'contractType', 'standard', 'typeMetadata', 'autoApprove', 'approved'];
+const MinUpsertNFTFactoryKeys = AllUpsertNFTFactoryKeys.filter((key) => !['typeMetadata'].includes(key));
+const ValidUpdateNFTFactoryKeys = ['id', 'autoApprove', 'approved'];
 
 const ArtistRequiredKeys = ['id'];
 const ArtistValidKeys = ArtistRequiredKeys.concat('name');
@@ -54,16 +55,14 @@ export const validateSeed = (payload: SeedPayload): void => {
     },
     'nftFactories': {
       'upsert': [
-        () => minimumKeysPresent(payload, RequiredNFTFactoryKeys),
-        () => onlyValidKeysPresent(payload, AllNFTFactoryKeys),
+        () => minimumKeysPresent(payload, MinUpsertNFTFactoryKeys),
+        () => onlyValidKeysPresent(payload, AllUpsertNFTFactoryKeys),
         () => typeValidator(payload, 'contractType', NFTContractTypeName),
         () => typeValidator(payload, 'standard', NFTStandard),
       ],
       'update': [
         () => minimumKeysPresent(payload, ['id']),
-        () => onlyValidKeysPresent(payload, AllNFTFactoryKeys),
-        () => typeValidatorOptional(payload, 'contractType', NFTContractTypeName),
-        () => typeValidatorOptional(payload, 'standard', NFTStandard),
+        () => onlyValidKeysPresent(payload, ValidUpdateNFTFactoryKeys),
       ],
     },
     'artists': {

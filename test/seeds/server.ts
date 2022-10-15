@@ -188,9 +188,8 @@ describe('Seeds API server', () => {
     })
 
     describe('nftFactories', () => {
-      const validData = { id: '1', startingBlock: '123', platformId: 'jamboni', contractType: 'default', typeMetadata: {}, standard: 'erc721', autoApprove: false, approved: false };
-
       describe('upsert', () => {
+        const validData = { id: '1', startingBlock: '123', platformId: 'jamboni', contractType: 'default', typeMetadata: {}, standard: 'erc721', autoApprove: false, approved: false };
         const validUpsert = { entity: 'nftFactories', operation: 'upsert', data: { ...validData } };
 
         describe('without a required field', () => {
@@ -257,6 +256,7 @@ describe('Seeds API server', () => {
       })
 
       describe('update', () => {
+        const validData = { id: '1', autoApprove: false, approved: false };
         const validUpdate = { entity: 'nftFactories', operation: 'update', data: { ...validData } };
 
         describe('without a required field', () => {
@@ -268,30 +268,6 @@ describe('Seeds API server', () => {
             supertest(app).post(endpoint).send(body)
               .set('x-signature', signature)
               .expect(422, { error: 'nftFactories entity is missing required fields' })
-              .end((err,res) => { if (err) throw err });
-          })
-        })
-
-        describe('with an unknown nftFactories type', () => {
-          it('returns an error', () => {
-            const body = { ...validUpdate, data: { ...validData, contractType: 'UNKNOWN' } };
-            const signature = wallet.sign(JSON.stringify(body)).signature;
-
-            supertest(app).post(endpoint).send(body)
-              .set('x-signature', signature)
-              .expect(422, { error: 'not a valid nftFactories contractType' })
-              .end((err,res) => { if (err) throw err });
-          })
-        })
-
-        describe('with an unknown standard', () => {
-          it('returns an error', () => {
-            const body = { ...validUpdate, data: { ...validData, standard: 'UNKNOWN' } };
-            const signature = wallet.sign(JSON.stringify(body)).signature;
-
-            supertest(app).post(endpoint).send(body)
-              .set('x-signature', signature)
-              .expect(422, { error: 'not a valid nftFactories standard' })
               .end((err,res) => { if (err) throw err });
           })
         })
@@ -310,7 +286,7 @@ describe('Seeds API server', () => {
 
         describe('with a valid but incomplete payload', () => {
           it('returns a 200', async () => {
-            const { 'standard': _remove1, 'typeMetadata': _remove2, ...rest } = validData;
+            const { 'approved': _remove1, ...rest } = validData;
             const body = { ...validUpdate, data: rest };
             const signature = wallet.sign(JSON.stringify(body)).signature;
 
