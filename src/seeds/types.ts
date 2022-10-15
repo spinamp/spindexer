@@ -20,22 +20,19 @@ type SeedPayload = {
   data: any,
 }
 
-const AllPlatformKeys = ['id', 'name', 'type'];
-
-const AllUpsertNFTFactoryKeys = ['id', 'startingBlock', 'platformId', 'contractType', 'standard', 'typeMetadata', 'autoApprove', 'approved'];
-const MinUpsertNFTFactoryKeys = AllUpsertNFTFactoryKeys.filter((key) => !['typeMetadata'].includes(key));
-const ValidUpdateNFTFactoryKeys = ['id', 'autoApprove', 'approved'];
-
-const ArtistRequiredKeys = ['id'];
-const ArtistValidKeys = ArtistRequiredKeys.concat('name');
-
-const ProcessedTrackRequiredKeys = ['id'];
-const ProcessedTrackValidKeys = ProcessedTrackRequiredKeys.concat('title', 'description', 'websiteUrl');
-
 const crdtOperationMessageFnMap = {
   [CrdtOperation.UPSERT]: getCrdtUpsertMessage,
   [CrdtOperation.UPDATE]: getCrdtUpdateMessage,
 }
+
+const PlatformValidKeys = ['id', 'name', 'type'];
+
+const NFTFactoryValidUpdateKeys = ['id', 'autoApprove', 'approved'];
+const NFTFactoryValidUpsertKeys = ['id', 'startingBlock', 'platformId', 'contractType', 'standard', 'typeMetadata', 'autoApprove', 'approved'];
+const NFTFactoryMinUpsertKeys = NFTFactoryValidUpsertKeys.filter((key) => !['typeMetadata'].includes(key));
+
+const ArtistValidKeys = ['id', 'name'];
+const ProcessedTrackValidKeys = ['id', 'title', 'description', 'websiteUrl'];
 
 export const validateSeed = (payload: SeedPayload): void => {
   entityValidator(payload);
@@ -43,39 +40,45 @@ export const validateSeed = (payload: SeedPayload): void => {
   const validatorFunctions: any = {
     'platforms': {
       'upsert': [
-        () => minimumKeysPresent(payload, AllPlatformKeys),
-        () => onlyValidKeysPresent(payload, AllPlatformKeys),
+        () => minimumKeysPresent(payload, PlatformValidKeys),
+        () => onlyValidKeysPresent(payload, PlatformValidKeys),
         () => typeValidator(payload, 'type', MusicPlatformType),
       ],
       'update': [
         () => minimumKeysPresent(payload, ['id']),
-        () => onlyValidKeysPresent(payload, AllPlatformKeys),
+        () => onlyValidKeysPresent(payload, PlatformValidKeys),
         () => typeValidatorOptional(payload, 'type', MusicPlatformType),
       ],
     },
     'nftFactories': {
       'upsert': [
-        () => minimumKeysPresent(payload, MinUpsertNFTFactoryKeys),
-        () => onlyValidKeysPresent(payload, AllUpsertNFTFactoryKeys),
+        () => minimumKeysPresent(payload, NFTFactoryMinUpsertKeys),
+        () => onlyValidKeysPresent(payload, NFTFactoryValidUpsertKeys),
         () => typeValidator(payload, 'contractType', NFTContractTypeName),
         () => typeValidator(payload, 'standard', NFTStandard),
       ],
       'update': [
         () => minimumKeysPresent(payload, ['id']),
-        () => onlyValidKeysPresent(payload, ValidUpdateNFTFactoryKeys),
+        () => onlyValidKeysPresent(payload, NFTFactoryValidUpdateKeys),
       ],
     },
     'artists': {
-      'upsert': [],
+      'upsert': [
+        () => minimumKeysPresent(payload, ArtistValidKeys),
+        () => onlyValidKeysPresent(payload, ArtistValidKeys),
+      ],
       'update': [
-        () => minimumKeysPresent(payload, ArtistRequiredKeys),
+        () => minimumKeysPresent(payload, ['id']),
         () => onlyValidKeysPresent(payload, ArtistValidKeys),
       ],
     },
     'processedTracks': {
-      'upsert': [],
+      'upsert': [
+        () => minimumKeysPresent(payload, ProcessedTrackValidKeys),
+        () => onlyValidKeysPresent(payload, ProcessedTrackValidKeys),
+      ],
       'update': [
-        () => minimumKeysPresent(payload, ProcessedTrackRequiredKeys),
+        () => minimumKeysPresent(payload, ['id']),
         () => onlyValidKeysPresent(payload, ProcessedTrackValidKeys),
       ],
     }

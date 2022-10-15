@@ -315,85 +315,204 @@ describe('Seeds API server', () => {
 
     describe('artists', () => {
       const validData = { id: '1', name: 'Jammed Jams' };
-      const validUpdate = { entity: 'artists', operation: 'update', data: { ...validData } };
 
-      describe('without required fields', () => {
-        it('returns an error', () => {
-          const body = { ...validUpdate, data: { blam: 'yam' } };
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+      describe('upsert', () => {
+        const validUpsert = { entity: 'artists', operation: 'upsert', data: { ...validData } };
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(422, { error: 'artists entity is missing required fields' })
-            .end((err,res) => { if (err) throw err });
+        describe('without a required field', () => {
+          it('returns an error', () => {
+            const { 'id': remove, ...rest } = validData;
+            const body = { ...validUpsert, data: rest };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'artists entity is missing required fields' })
+              .end((err,res) => { if (err) throw err });
+          })
+        })
+
+        describe('with unsupported fields', () => {
+          it('returns an error', () => {
+            const body = { ...validUpsert, data: { ...validData, hackyou: 'boo' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'artists entity has unsupported fields' })
+              .end((err,res) => { if (err) throw err });
+          })
+        })
+
+        describe('with a valid payload', () => {
+          it('returns a 200', async () => {
+            const body = validUpsert;
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(200)
+              .end((err,res) => { if (err) throwDBHint(err) });
+          })
+          it('persists the seed');
         })
       })
 
-      describe('with unsupported fields', () => {
-        it('returns an error', () => {
-          const body = { ...validUpdate, data: { ...validData, hackyou: 'boo' } };
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+      describe('update', () => {
+        const validUpdate = { entity: 'artists', operation: 'update', data: { ...validData } };
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(422, { error: 'artists entity has unsupported fields' })
-            .end((err,res) => { if (err) throw err });
+        describe('without a required field', () => {
+          it('returns an error', () => {
+            const { 'id': remove, ...rest } = validData;
+            const body = { ...validUpdate, data: rest };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'artists entity is missing required fields' })
+              .end((err,res) => { if (err) throw err });
+          })
         })
-      })
 
-      describe('with a valid payload', () => {
-        it('returns a 200', async () => {
-          const body = validUpdate;
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+        describe('with unsupported fields', () => {
+          it('returns an error', () => {
+            const body = { ...validUpdate, data: { ...validData, hackyou: 'boo' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(200)
-            .end((err,res) => { if (err) throwDBHint(err) });
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'artists entity has unsupported fields' })
+              .end((err,res) => { if (err) throw err });
+          })
         })
-        it('persists the seed');
+
+        describe('with a valid but incomplete payload', () => {
+          it('returns a 200', async () => {
+            const { 'name': _remove, ...rest } = validData;
+            const body = { ...validUpdate, data: rest };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(200)
+              .end((err,res) => { if (err) throwDBHint(err) });
+          })
+          it('persists the seed');
+        })
+
+        describe('with a valid payload', () => {
+          it('returns a 200', async () => {
+            const body = validUpdate;
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(200)
+              .end((err,res) => { if (err) throwDBHint(err) });
+          })
+          it('persists the seed');
+        })
       })
     })
 
     describe('processedTracks', () => {
       const validData = { id: '1', title: 'Jammed Jams', description: 'Wicked jams!', websiteUrl: 'https://app.spinamp.xyz' };
-      const validUpdate = { entity: 'processedTracks', operation: 'update', data: { ...validData } };
 
-      describe('without required fields', () => {
-        it('returns an error', () => {
-          const body = { ...validUpdate, data: { blam: 'yam' } };
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+      describe('upsert', () => {
+        const validUpsert = { entity: 'processedTracks', operation: 'upsert', data: { ...validData } };
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(422, { error: 'processedTracks entity is missing required fields' })
-            .end((err,res) => { if (err) throw err });
+        describe('without a required field', () => {
+          it('returns an error', () => {
+            const { 'title': remove, ...rest } = validData;
+            const body = { ...validUpsert, data: rest };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'processedTracks entity is missing required fields' })
+              .end((err,res) => { if (err) throw err });
+          })
+        })
+
+        describe('with unsupported fields', () => {
+          it('returns an error', () => {
+            const body = { ...validUpsert, data: { ...validData, hackyou: 'boo' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'processedTracks entity has unsupported fields' })
+              .end((err,res) => { if (err) throw err });
+          })
+        })
+
+        describe('with a valid payload', () => {
+          it('returns a 200', async () => {
+            const body = validUpsert;
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(200)
+              .end((err,res) => { if (err) { throwDBHint(err) } });
+          })
+          it('persists the seed');
         })
       })
 
-      describe('with unsupported fields', () => {
-        it('returns an error', () => {
-          const body = { ...validUpdate, data: { ...validData, hackyou: 'boo' } };
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+      describe ('update',() => {
+        const validUpdate = { entity: 'processedTracks', operation: 'update', data: { ...validData } };
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(422, { error: 'processedTracks entity has unsupported fields' })
-            .end((err,res) => { if (err) throw err });
+        describe('without required fields', () => {
+          it('returns an error', () => {
+            const body = { ...validUpdate, data: { blam: 'yam' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'processedTracks entity is missing required fields' })
+              .end((err,res) => { if (err) throw err });
+          })
         })
-      })
 
-      describe('with a valid payload', () => {
-        it('returns a 200', async () => {
-          const body = validUpdate;
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+        describe('with unsupported fields', () => {
+          it('returns an error', () => {
+            const body = { ...validUpdate, data: { ...validData, hackyou: 'boo' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(200)
-            .end((err,res) => { if (err) { throwDBHint(err) } });
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'processedTracks entity has unsupported fields' })
+              .end((err,res) => { if (err) throw err });
+          })
         })
-        it('persists the seed');
+
+        describe('with a valid but incomplete payload', () => {
+          it('returns a 200', async () => {
+            const { 'title': _remove1, 'websiteUrl': _remove2, ...rest } = validData;
+            const body = { ...validUpdate, data: rest };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(200)
+              .end((err,res) => { if (err) { throwDBHint(err) } });
+          })
+          it('persists the seed');
+        })
+
+        describe('with a valid payload', () => {
+          it('returns a 200', async () => {
+            const body = validUpdate;
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(200)
+              .end((err,res) => { if (err) { throwDBHint(err) } });
+          })
+          it('persists the seed');
+        })
       })
     })
   })
