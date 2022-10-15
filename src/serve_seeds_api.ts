@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { createSeedsAPIServer } from './seeds/server';
 
 createSeedsAPIServer().listen(process.env.SEEDS_API_PORT, () => {
