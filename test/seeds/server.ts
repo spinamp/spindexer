@@ -63,121 +63,277 @@ describe('Seeds API server', () => {
 
     describe('platforms', () => {
       const validData = { id: 'jamboni', name: 'Jamboni Jams', type: 'sound' };
-      const validUpsert = { entity: 'platforms', operation: 'upsert', data: validData };
 
-      describe('without required fields', () => {
-        it('returns an error', () => {
-          const body = { ...validUpsert, data: { blam: 'yam' } };
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+      describe('upsert', () => {
+        const validUpsert = { entity: 'platforms', operation: 'upsert', data: validData };
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(422, { error: 'platforms entity is missing required fields' })
-            .end((err,res) => { if (err) throw err });
+        describe('without a required field', () => {
+          it('returns an error', () => {
+            const { 'name': remove, ...rest } = validData;
+            const body = { ...validUpsert, data: { ...rest } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'platforms entity is missing required fields' })
+              .end((err,res) => { if (err) throw err });
+          })
+        })
+
+        describe('with an unknown type', () => {
+          it('returns an error', () => {
+            const body = { ...validUpsert, data: { ...validData, type: 'yum' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'not a valid platforms type' })
+              .end((err,res) => { if (err) throw err });
+          })
+        })
+
+        describe('with unsupported fields', () => {
+          it('returns an error', () => {
+            const body = { ...validUpsert, data: { ...validData, hackyou: 'boo' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'platforms entity has unsupported fields' })
+              .end((err,res) => { if (err) throw err });
+          })
+        })
+
+        describe('with a valid payload', () => {
+          it('returns a 200', async () => {
+            const body = validUpsert;
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(200)
+              .end((err,res) => { if (err) { throwDBHint(err) } });
+          })
+          it('persists the seed');
         })
       })
 
-      describe('with an unknown type', () => {
-        it('returns an error', () => {
-          const body = { ...validUpsert, data: { ...validData, type: 'yum' } };
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+      describe('update', () => {
+        const validUpdate = { entity: 'platforms', operation: 'update', data: validData };
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(422, { error: 'not a valid platforms type' })
-            .end((err,res) => { if (err) throw err });
+        describe('without a required field', () => {
+          it('returns an error', () => {
+            const { 'id': remove, ...rest } = validData;
+            const body = { ...validUpdate, data: { ...rest } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'platforms entity is missing required fields' })
+              .end((err,res) => { if (err) throw err });
+          })
         })
-      })
 
-      describe('with unsupported fields', () => {
-        it('returns an error', () => {
-          const body = { ...validUpsert, data: { ...validData, hackyou: 'boo' } };
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+        describe('with an unknown type', () => {
+          it('returns an error', () => {
+            const body = { ...validUpdate, data: { ...validData, type: 'yum' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(422, { error: 'platforms entity has unsupported fields' })
-            .end((err,res) => { if (err) throw err });
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'not a valid platforms type' })
+              .end((err,res) => { if (err) throw err });
+          })
         })
-      })
 
-      describe('with a valid payload', () => {
-        it('returns a 200', async () => {
-          const body = validUpsert;
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+        describe('with unsupported fields', () => {
+          it('returns an error', () => {
+            const body = { ...validUpdate, data: { ...validData, hackyou: 'boo' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(200)
-            .end((err,res) => { if (err) { throwDBHint(err) } });
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'platforms entity has unsupported fields' })
+              .end((err,res) => { if (err) throw err });
+          })
         })
-        it('persists the seed');
+
+        describe('with a valid and complete payload', () => {
+          it('returns a 200', async () => {
+            const body = validUpdate;
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(200)
+              .end((err,res) => { if (err) { throwDBHint(err) } });
+          })
+          it('persists the seed');
+        })
+
+        describe('with a valid but incomplete payload', () => {
+          it('returns a 200', async () => {
+            const { 'type': remove, ...rest } = validData;
+            const body = { ...validUpdate, data: rest };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(200)
+              .end((err,res) => { if (err) { throwDBHint(err) } });
+          })
+          it('persists the seed');
+        })
       })
     })
 
     describe('nftFactories', () => {
       const validData = { id: '1', startingBlock: '123', platformId: 'jamboni', contractType: 'default', typeMetadata: {}, standard: 'erc721', autoApprove: false, approved: false };
-      const validUpsert = { entity: 'nftFactories', operation: 'upsert', data: { ...validData } };
 
-      describe('without required fields', () => {
-        it('returns an error', () => {
-          const body = { ...validUpsert, data: { blam: 'yam' } };
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+      describe('upsert', () => {
+        const validUpsert = { entity: 'nftFactories', operation: 'upsert', data: { ...validData } };
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(422, { error: 'nftFactories entity is missing required fields' })
-            .end((err,res) => { if (err) throw err });
+        describe('without a required field', () => {
+          it('returns an error', () => {
+            const { 'startingBlock': remove, ...rest } = validData;
+            const body = { ...validUpsert, data: { ...rest } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'nftFactories entity is missing required fields' })
+              .end((err,res) => { if (err) throw err });
+          })
+        })
+
+        describe('with an unknown nftFactories type', () => {
+          it('returns an error', () => {
+            const body = { ...validUpsert, data: { ...validData, contractType: 'UNKNOWN' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'not a valid nftFactories contractType' })
+              .end((err,res) => { if (err) throw err });
+          })
+        })
+
+        describe('with an unknown standard', () => {
+          it('returns an error', () => {
+            const body = { ...validUpsert, data: { ...validData, standard: 'UNKNOWN' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'not a valid nftFactories standard' })
+              .end((err,res) => { if (err) throw err });
+          })
+        })
+
+        describe('with unsupported fields', () => {
+          it('returns an error', () => {
+            const body = { ...validUpsert, data: { ...validData, hackyou: 'boo' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'nftFactories entity has unsupported fields' })
+              .end((err,res) => { if (err) throw err });
+          })
+        })
+
+        describe('with a valid payload', () => {
+          it('returns a 200', async () => {
+            const body = validUpsert;
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(200)
+              .end((err,res) => { if (err) throwDBHint(err) });
+          })
+          it('persists the seed');
         })
       })
 
-      describe('with an unknown nftFactories type', () => {
-        it('returns an error', () => {
-          const body = { ...validUpsert, data: { ...validData, contractType: 'UNKNOWN' } };
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+      describe('update', () => {
+        const validUpdate = { entity: 'nftFactories', operation: 'update', data: { ...validData } };
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(422, { error: 'not a valid nftFactories contractType' })
-            .end((err,res) => { if (err) throw err });
+        describe('without a required field', () => {
+          it('returns an error', () => {
+            const { 'id': remove, ...rest } = validData;
+            const body = { ...validUpdate, data: rest };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'nftFactories entity is missing required fields' })
+              .end((err,res) => { if (err) throw err });
+          })
         })
-      })
 
-      describe('with an unknown standard', () => {
-        it('returns an error', () => {
-          const body = { ...validUpsert, data: { ...validData, standard: 'UNKNOWN' } };
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+        describe('with an unknown nftFactories type', () => {
+          it('returns an error', () => {
+            const body = { ...validUpdate, data: { ...validData, contractType: 'UNKNOWN' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(422, { error: 'not a valid nftFactories standard' })
-            .end((err,res) => { if (err) throw err });
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'not a valid nftFactories contractType' })
+              .end((err,res) => { if (err) throw err });
+          })
         })
-      })
 
-      describe('with unsupported fields', () => {
-        it('returns an error', () => {
-          const body = { ...validUpsert, data: { ...validData, hackyou: 'boo' } };
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+        describe('with an unknown standard', () => {
+          it('returns an error', () => {
+            const body = { ...validUpdate, data: { ...validData, standard: 'UNKNOWN' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(422, { error: 'nftFactories entity has unsupported fields' })
-            .end((err,res) => { if (err) throw err });
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'not a valid nftFactories standard' })
+              .end((err,res) => { if (err) throw err });
+          })
         })
-      })
 
-      describe('with a valid payload', () => {
-        it('returns a 200', async () => {
-          const body = validUpsert;
-          const signature = wallet.sign(JSON.stringify(body)).signature;
+        describe('with unsupported fields', () => {
+          it('returns an error', () => {
+            const body = { ...validUpdate, data: { ...validData, hackyou: 'boo' } };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
 
-          supertest(app).post(endpoint).send(body)
-            .set('x-signature', signature)
-            .expect(200)
-            .end((err,res) => { if (err) throwDBHint(err) });
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'nftFactories entity has unsupported fields' })
+              .end((err,res) => { if (err) throw err });
+          })
         })
-        it('persists the seed');
+
+        describe('with a valid but incomplete payload', () => {
+          it('returns a 200', async () => {
+            const { 'standard': _remove1, 'typeMetadata': _remove2, ...rest } = validData;
+            const body = { ...validUpdate, data: rest };
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(200)
+              .end((err,res) => { if (err) throwDBHint(err) });
+          })
+          it('persists the seed');
+        })
+
+        describe('with a valid payload', () => {
+          it('returns a 200', async () => {
+            const body = validUpdate;
+            const signature = wallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(200)
+              .end((err,res) => { if (err) throwDBHint(err) });
+          })
+          it('persists the seed');
+        })
       })
     })
 

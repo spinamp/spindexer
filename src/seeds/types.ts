@@ -1,3 +1,5 @@
+
+
 import { Table } from '../db/db';
 import db from '../db/sql-db'
 import { CrdtOperation, getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
@@ -12,23 +14,22 @@ enum SeedEntities {
 }
 type SeedEntity = keyof typeof SeedEntities;
 
-const PlatformRequiredKeys = ['id'];
-const PlatformValidKeys = PlatformRequiredKeys.concat('name', 'type');
+type SeedPayload = {
+  entity: SeedEntity,
+  operation: CrdtOperation,
+  data: any,
+}
 
-const NFTFactoryRequiredKeys = ['id', 'startingBlock', 'platformId', 'contractType', 'standard', 'autoApprove', 'approved'];
-const NFTFactoryValidKeys = NFTFactoryRequiredKeys.concat('typeMetadata');
+const AllPlatformKeys = ['id', 'name', 'type'];
+
+const AllNFTFactoryKeys = ['id', 'startingBlock', 'platformId', 'contractType', 'standard', 'typeMetadata', 'autoApprove', 'approved'];
+const RequiredNFTFactoryKeys = AllNFTFactoryKeys.filter((key) => key !== 'typeMetadata');
 
 const ArtistRequiredKeys = ['id'];
 const ArtistValidKeys = ArtistRequiredKeys.concat('name');
 
 const ProcessedTrackRequiredKeys = ['id'];
 const ProcessedTrackValidKeys = ProcessedTrackRequiredKeys.concat('title', 'description', 'websiteUrl');
-
-type SeedPayload = {
-  entity: SeedEntity,
-  operation: CrdtOperation,
-  data: any,
-}
 
 const crdtOperationMessageFnMap = {
   [CrdtOperation.UPSERT]: getCrdtUpsertMessage,
@@ -38,29 +39,50 @@ const crdtOperationMessageFnMap = {
 export const validateSeed = (payload: SeedPayload): void => {
   entityValidator(payload);
 
-  const validatorFunctions = {
-    'platforms': [ // upsert set
-      () => minimumKeysPresent(payload, PlatformRequiredKeys),
-      () => onlyValidKeysPresent(payload, PlatformValidKeys),
-      () => typeValidator(payload, 'type', MusicPlatformType),
-    ],
-    'nftFactories': [ // upsert set
-      () => minimumKeysPresent(payload, NFTFactoryRequiredKeys),
-      () => onlyValidKeysPresent(payload, NFTFactoryValidKeys),
-      () => typeValidator(payload, 'contractType', NFTContractTypeName),
-      () => typeValidator(payload, 'standard', NFTStandard),
-    ],
-    'artists': [ // update set
-      () => minimumKeysPresent(payload, ArtistRequiredKeys),
-      () => onlyValidKeysPresent(payload, ArtistValidKeys),
-    ],
-    'processedTracks': [ //update set
-      () => minimumKeysPresent(payload, ProcessedTrackRequiredKeys),
-      () => onlyValidKeysPresent(payload, ProcessedTrackValidKeys),
-    ],
+  const validatorFunctions: any = {
+    'platforms': {
+      'upsert': [
+        () => minimumKeysPresent(payload, AllPlatformKeys),
+        () => onlyValidKeysPresent(payload, AllPlatformKeys),
+        () => typeValidator(payload, 'type', MusicPlatformType),
+      ],
+      'update': [
+        () => minimumKeysPresent(payload, ['id']),
+        () => onlyValidKeysPresent(payload, AllPlatformKeys),
+        () => typeValidatorOptional(payload, 'type', MusicPlatformType),
+      ],
+    },
+    'nftFactories': {
+      'upsert': [
+        () => minimumKeysPresent(payload, RequiredNFTFactoryKeys),
+        () => onlyValidKeysPresent(payload, AllNFTFactoryKeys),
+        () => typeValidator(payload, 'contractType', NFTContractTypeName),
+        () => typeValidator(payload, 'standard', NFTStandard),
+      ],
+      'update': [
+        () => minimumKeysPresent(payload, ['id']),
+        () => onlyValidKeysPresent(payload, AllNFTFactoryKeys),
+        () => typeValidatorOptional(payload, 'contractType', NFTContractTypeName),
+        () => typeValidatorOptional(payload, 'standard', NFTStandard),
+      ],
+    },
+    'artists': {
+      'upsert': [],
+      'update': [
+        () => minimumKeysPresent(payload, ArtistRequiredKeys),
+        () => onlyValidKeysPresent(payload, ArtistValidKeys),
+      ],
+    },
+    'processedTracks': {
+      'upsert': [],
+      'update': [
+        () => minimumKeysPresent(payload, ProcessedTrackRequiredKeys),
+        () => onlyValidKeysPresent(payload, ProcessedTrackValidKeys),
+      ],
+    }
   }
 
-  validatorFunctions[payload.entity].forEach((fn) => fn());
+  validatorFunctions[payload.entity][payload.operation].forEach((fn: any) => fn());
 }
 
 const minimumKeysPresent = (input: SeedPayload, keys: any): void => {
@@ -78,6 +100,12 @@ const onlyValidKeysPresent = (input: SeedPayload, keys: any): void => {
 const typeValidator = (input: SeedPayload, key: string, validOptions: any): void => {
   if (!Object.values(validOptions).includes(input.data[key])) {
     throw new Error(`not a valid ${input.entity} ${key}`)
+  }
+}
+
+const typeValidatorOptional = (input: SeedPayload, key: string, validOptions: any): void => {
+  if (input.data[key]) {
+    typeValidator(input, key, validOptions);
   }
 }
 
