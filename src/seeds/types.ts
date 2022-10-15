@@ -1,6 +1,6 @@
 import { Table } from '../db/db';
 import db from '../db/sql-db'
-import { getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
+import { CrdtOperation, getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
 import { NFTContractTypeName, NFTStandard } from '../types/nft';
 import { MusicPlatformType } from '../types/platform';
 
@@ -12,43 +12,44 @@ enum SeedEntities {
 }
 type SeedEntity = keyof typeof SeedEntities;
 
-const PlatformRequiredKeys = ['id', 'name', 'type'];
-const PlatformValidKeys = PlatformRequiredKeys;
+const PlatformRequiredKeys = ['id'];
+const PlatformValidKeys = PlatformRequiredKeys.concat('name', 'type');
 
-const NFTFactoryRequiredKeys = ['id', 'startingBlock', 'platformId', 'contractType', 'name', 'symbol', 'typeMetadata', 'standard', 'autoApprove', 'approved'];
-const NFTFactoryValidKeys = NFTFactoryRequiredKeys;
+const NFTFactoryRequiredKeys = ['id', 'startingBlock', 'platformId', 'contractType', 'standard', 'autoApprove', 'approved'];
+const NFTFactoryValidKeys = NFTFactoryRequiredKeys.concat('typeMetadata');
 
 const ArtistRequiredKeys = ['id'];
-const ArtistValidKeys = ['id', 'name'];
+const ArtistValidKeys = ArtistRequiredKeys.concat('name');
 
 const ProcessedTrackRequiredKeys = ['id'];
-const ProcessedTrackValidKeys = ['id', 'title', 'slug', 'description', 'websiteUrl', 'lossyAudioURL', 'lossyAudioIPFSHash', 'lossyArtworkURL', 'lossyArtworkIPFSHash'];
+const ProcessedTrackValidKeys = ProcessedTrackRequiredKeys.concat('title', 'description', 'websiteUrl');
 
 type SeedPayload = {
   entity: SeedEntity,
-  data: any
+  operation: CrdtOperation,
+  data: any,
 }
 
 export const validateSeed = (payload: SeedPayload): void => {
   entityValidator(payload);
 
   const validatorFunctions = {
-    'platforms': [
+    'platforms': [ // upsert set
       () => minimumKeysPresent(payload, PlatformRequiredKeys),
       () => onlyValidKeysPresent(payload, PlatformValidKeys),
       () => typeValidator(payload, 'type', MusicPlatformType),
     ],
-    'nftFactories': [
+    'nftFactories': [ // upsert set
       () => minimumKeysPresent(payload, NFTFactoryRequiredKeys),
       () => onlyValidKeysPresent(payload, NFTFactoryValidKeys),
       () => typeValidator(payload, 'contractType', NFTContractTypeName),
       () => typeValidator(payload, 'standard', NFTStandard),
     ],
-    'artists': [
+    'artists': [ // update set
       () => minimumKeysPresent(payload, ArtistRequiredKeys),
       () => onlyValidKeysPresent(payload, ArtistValidKeys),
     ],
-    'processedTracks': [
+    'processedTracks': [ //update set
       () => minimumKeysPresent(payload, ProcessedTrackRequiredKeys),
       () => onlyValidKeysPresent(payload, ProcessedTrackValidKeys),
     ],
@@ -78,6 +79,9 @@ const typeValidator = (input: SeedPayload, key: string, validOptions: any): void
 const entityValidator = (input: SeedPayload): void => {
   if (!Object.values(SeedEntities).includes(input.entity)) {
     throw new Error('unknown seed entity');
+  }
+  if (!Object.values(CrdtOperation).includes(input.operation)) {
+    throw new Error('must specify either `upsert` or `update` operation');
   }
 }
 
