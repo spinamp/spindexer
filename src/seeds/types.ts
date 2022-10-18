@@ -90,6 +90,10 @@ const minimumKeysPresent = (input: SeedPayload, keys: any): void => {
   if (!keys.every((key: any) => input.data.hasOwnProperty(key))) {
     throw new Error(`${input.entity} entity is missing required fields`)
   }
+  const inputKeys = Object.keys(input.data);
+  if (inputKeys.length <= 1) {
+    throw new Error(`At least one non-id field is needed in the payload`);
+  }
 }
 
 // Checks that every key in the input data is valid
@@ -123,7 +127,7 @@ const entityValidator = (input: SeedPayload): void => {
 }
 
 export const persistSeed = async (payload: SeedPayload) => {
-  let dbClient: any;
+  const dbClient = await db.init();
   validateSeed(payload);
 
   const messageFn = crdtOperationMessageFnMap[payload.operation];
@@ -134,12 +138,12 @@ export const persistSeed = async (payload: SeedPayload) => {
   const message = messageFn(Table[payload.entity], payload.data as any)
 
   try {
-    dbClient = await db.init();
+    console.log(`Upserting ${JSON.stringify(message)}`)
     await dbClient.upsert(Table.seeds, [message])
   } catch (e: any) {
     console.error(e);
     throw new Error(e.message);
   } finally {
-    dbClient.close();
+    await dbClient.close();
   }
 }
