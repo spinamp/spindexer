@@ -124,7 +124,7 @@ const entityValidator = (input: SeedPayload): void => {
 
 export const persistSeed = async (payload: SeedPayload) => {
   let dbClient: any;
-  entityValidator(payload);
+  validateSeed(payload);
 
   const messageFn = crdtOperationMessageFnMap[payload.operation];
   if (!messageFn) {
