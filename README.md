@@ -57,6 +57,11 @@ In production, we recommend running the script once a minute to keep it up to da
 watch -n 60 "yarn start >> ./log" 2>&1
 ```
 
+If you want to allow adjustmends to the [CRDT](/crdt.md) seeds via the Seeds API, run:
+```
+yarn serve-seeds-api
+```
+
 ## Operations
 Sometimes things fail (eg: an offchain API is down). This is fine and expected. Things should continue as expected on the next run of the script. Most NFTs/Tracks/Platforms that cause failure/errors are moved into an error queue and retried a few times after some delay so that they don't block progress for the rest of the indexer.
 
@@ -83,6 +88,12 @@ There are a few design goals for the system:
  - Allow extensions with additional new contracts and platforms without requiring a DB rebuild nor re-processing from start
  - Allow extensions with additional metadata or data transformations being added without requiring a DB rebuild nor re-processing from the start
  - Allow for decentralization and even some consensus without any co-ordination
+
+## Tests
+The Seeds API is covered by end-to-end tests. More test coverage to follow as the codebase matures. To run tests locally:
+```
+yarn test:watch
+```
 
 ## Contributing
 The repo is still early and not hyper-polished or perfectly documented. Contributor guidelines are not ready yet, clear development docs and style/standard expectations are not extremely well documented yet. Interfaces are not well documented yet. Keep this in mind, so if you'd like to contribute:

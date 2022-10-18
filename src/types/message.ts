@@ -64,13 +64,11 @@ export function getCrdtUpdateMessage<T>(table: Table, data: PartialValues<T>): C
     operation: CrdtOperation.UPDATE
   }
 }
-
 export function getCrdtUpsertMessage<T>(table: Table, data: Values<T> ): CrdtUpsertMessage {
-  const time = new Date();
   return {
-    timestamp: time,
+    timestamp: new Date(),
     table,
-    data: data,
+    data,
     operation: CrdtOperation.UPSERT
   }
 }
