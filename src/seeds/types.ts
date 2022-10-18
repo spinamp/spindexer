@@ -64,8 +64,7 @@ export const validateSeed = (payload: SeedPayload): void => {
     },
     'artists': {
       'upsert': [
-        () => minimumKeysPresent(payload, ArtistValidKeys),
-        () => onlyValidKeysPresent(payload, ArtistValidKeys),
+        () => { throw new Error('Artist upsert not supported') },
       ],
       'update': [
         () => minimumKeysPresent(payload, ['id']),
@@ -74,8 +73,7 @@ export const validateSeed = (payload: SeedPayload): void => {
     },
     'processedTracks': {
       'upsert': [
-        () => minimumKeysPresent(payload, ProcessedTrackValidKeys),
-        () => onlyValidKeysPresent(payload, ProcessedTrackValidKeys),
+        () => { throw new Error('Track upsert not supported') },
       ],
       'update': [
         () => minimumKeysPresent(payload, ['id']),
@@ -87,24 +85,28 @@ export const validateSeed = (payload: SeedPayload): void => {
   validatorFunctions[payload.entity][payload.operation].forEach((fn: any) => fn());
 }
 
+// Checks that every expected key is present in the input data
 const minimumKeysPresent = (input: SeedPayload, keys: any): void => {
   if (!keys.every((key: any) => input.data.hasOwnProperty(key))) {
     throw new Error(`${input.entity} entity is missing required fields`)
   }
 }
 
+// Checks that every key in the input data is valid
 const onlyValidKeysPresent = (input: SeedPayload, keys: any): void => {
   if (!Object.keys(input.data).every((key: any) => keys.includes(key))) {
     throw new Error(`${input.entity} entity has unsupported fields`)
   }
 }
 
+// Checks that the given key on the input data exists and is a valid type
 const typeValidator = (input: SeedPayload, key: string, validOptions: any): void => {
   if (!Object.values(validOptions).includes(input.data[key])) {
     throw new Error(`not a valid ${input.entity} ${key}`)
   }
 }
 
+// Checks that the given key on the input data is a valid type, if it exists
 const typeValidatorOptional = (input: SeedPayload, key: string, validOptions: any): void => {
   if (input.data[key]) {
     typeValidator(input, key, validOptions);
