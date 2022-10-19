@@ -614,7 +614,7 @@ const SOUND_PROTOCOL_PLATFORM: MusicPlatform = {
 const SOUND_PROTOCOL_META_FACTORY: MetaFactory = {
   id: '0xaef3e8c8723d9c31863be8de54df2668ef7c4b89',
   startingBlock: '15570833',
-  platformId: 'sound', // TODO: double check this!!
+  platformId: 'sound',
   contractType: MetaFactoryTypeName.soundCreatorV1,
   gap: '500000',
   standard: NFTStandard.ERC721,
