@@ -3,7 +3,8 @@ import _ from 'lodash';
 import { extractHashFromURL } from '../../clients/ipfs';
 import { slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
-import { resolveArtistId, resolveArtistName, resolveArtworkUrl, resolveAudioUrl, resolveEthereumTrackId, resolveTitle, resolveWebsiteUrl } from '../fieldExtractor';
+import { FailedAudioExtractionError } from '../error';
+import { resolveArtistId, resolveArtistName, resolveArtistWebsiteUrl, resolveArtworkUrl, resolveAudioUrl, resolveAvatarUrl, resolveEthereumTrackId, resolveTitle, resolveWebsiteUrl } from '../fieldExtractor';
 import { MapNFTsToTrackIds, MapTrack } from '../mapping';
 import { NFT, NftFactory } from '../nft';
 import { ProcessedTrack } from '../track';
@@ -28,11 +29,11 @@ const mapTrack: MapTrack = (
   }
 
   if (!lossyAudioIPFSHash && !lossyAudioURL) {
-    throw new Error('Failed to extract audio from nft');
+    throw FailedAudioExtractionError;
   }
 
   if (!lossyArtworkIPFSHash && !lossyArtworkURL) {
-    throw new Error('Failed to extract audio from nft');
+    throw new Error('Failed to extract artwork from nft');
   }
 
   const track: Partial<ProcessedTrack> = {
@@ -70,8 +71,8 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
     artistId: resolveArtistId(nft, contract),
     platformInternalId: contract.platformId,
     platformId: contract.platformId,
-    avatarUrl: undefined,
-    websiteUrl: nft.metadata.external_url,
+    avatarUrl: resolveAvatarUrl(nft,contract),
+    websiteUrl: resolveArtistWebsiteUrl(nft, contract),
     createdAtTime: nft.createdAtTime,
     createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
     ...contract.typeMetadata?.overrides?.artist

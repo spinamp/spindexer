@@ -1,0 +1,11 @@
+{
+  "bail": true,
+  "exit": true,
+  "extension": ["js", "ts"],
+  "file": ["./test/pretest.ts"],
+  "recursive": true,
+  "require": "ts-node/register",
+  "timeout": "15000",
+  "slow": 1000,
+  "watch-files": ["src/**/*.ts", "test/**/*.ts"]
+}

@@ -26,6 +26,7 @@ export type NFT = Record & {
   standard: NFTStandard;
   approved: boolean;
   burned: boolean;
+  publicReleaseTime?: Date;
 }
 
 export type ERC721Transfer = Record & {
@@ -49,6 +50,7 @@ export enum NFTStandard {
 }
 
 export type TypeMetadata = {
+  other?: any
   overrides: {
     track?: Partial<ProcessedTrack>
     artist?: Partial<ArtistProfile>
@@ -118,4 +120,26 @@ export const getTrait = (nft: NFT, type: string) => {
     throw new Error(`Trait not found: ${type}`);
   }
   return traitAttribute.value;
+};
+
+export const getTraitType = (nft: NFT, value: string) => {
+  if (!nft.metadata) {
+    console.error({ nft })
+    throw new Error('Missing nft metadata');
+  }
+  if (!nft.metadata.attributes) {
+    console.error({ nft })
+    throw new Error('Missing attributes');
+  }
+  const traitAttribute = nft.metadata.attributes.find((attribute: any) => {
+    if (!attribute || !attribute.value) {
+      console.dir({ nft, value }, { depth: null })
+      throw new Error('Unknown attribute/trait');
+    }
+    return attribute.value.toLowerCase() === value.toLowerCase()
+  });
+  if (!traitAttribute) {
+    throw new Error(`Trait value not found: ${value}`);
+  }
+  return traitAttribute.trait_type;
 };

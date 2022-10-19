@@ -4,12 +4,16 @@ import { ethereumArtistId } from '../utils/identifiers'
 
 import { formatAddress } from './address'
 import { Contract } from './contract'
+import { ArtistNameExtractorTypes, AvatarUrlExtractorTypes, IdExtractorTypes, TitleExtractorTypes, WebsiteUrlExtractorTypes } from './fieldExtractor'
 import { NftFactory, NFTContractTypeName, NFTStandard } from './nft'
+import { MusicPlatformType } from './platform'
+import { Clients } from './processor'
 
 export enum MetaFactoryTypeName {
   soundArtistProfileCreator = 'soundArtistProfileCreator',
   ninaMintCreator = 'ninaMintCreator',
-  zoraDropCreator = 'zoraDropCreator'
+  zoraDropCreator = 'zoraDropCreator',
+  soundCreatorV1 = 'soundCreatorV1'
 }
 
 export type MetaFactory = Contract & {
@@ -22,7 +26,8 @@ export type MetaFactory = Contract & {
 
 export type MetaFactoryType = {
   newContractCreatedEvent: string,
-  creationEventToNftFactory?: (event: ethers.Event, autoApprove: boolean, approved: boolean) => NftFactory
+  creationEventToNftFactory?: (event: ethers.Event, autoApprove: boolean, factoryMetadata?: unknown) => NftFactory
+  metadataAPI?: (events: ethers.Event[], clients: Clients) => Promise<any>
 }
 
 type MetaFactoryTypes = {
@@ -32,26 +37,26 @@ type MetaFactoryTypes = {
 export const MetaFactoryTypes: MetaFactoryTypes = {
   soundArtistProfileCreator: {
     newContractCreatedEvent: 'CreatedArtist',
-    creationEventToNftFactory: (event: any, autoApprove: boolean, approved: boolean) => ({
+    creationEventToNftFactory: (event: any, autoApprove: boolean) => ({
       id: formatAddress(event.args!.artistAddress),
       platformId: 'sound',
       startingBlock: event.blockNumber,
       contractType: NFTContractTypeName.default,
       standard: NFTStandard.ERC721,
       autoApprove,
-      approved
+      approved: autoApprove
     })
   },
   zoraDropCreator: {
     newContractCreatedEvent: 'CreatedDrop',
-    creationEventToNftFactory: (event: any, autoApprove: boolean, approved: boolean) => ({
+    creationEventToNftFactory: (event: any, autoApprove: boolean) => ({
       id: formatAddress(event.args!.editionContractAddress),
       platformId: 'zora',
       startingBlock: event.blockNumber,
       contractType: NFTContractTypeName.default,
       standard: NFTStandard.ERC721,
       autoApprove,
-      approved,
+      approved: autoApprove,
       typeMetadata: {
         overrides: {
           artist: {
@@ -64,5 +69,53 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
         }
       }
     })
+  },
+  soundCreatorV1: {
+    newContractCreatedEvent: 'SoundEditionCreated',
+    metadataAPI: async (events, clients: Clients) => {
+      const editionAddresses = new Set(events.map(event => formatAddress(event.args!.soundEdition)));
+      let soundPublicTimes: any;
+      try {
+        soundPublicTimes = await clients.sound.fetchPublicTimes([...editionAddresses]);
+      } catch {
+        // If API Fails/is down, assume it's official and no presales
+        return { officialEditions: new Set([...editionAddresses]), soundPublicTimes: {} };
+      }
+      const publicAddresses = new Set(Object.keys(soundPublicTimes));
+      const officialEditions = new Set([...editionAddresses].filter((address) => publicAddresses.has(address)));
+      return { soundPublicTimes, officialEditions };
+    },
+    creationEventToNftFactory: (event: any, autoApprove: boolean, factoryMetadata: any) => {
+      const official = factoryMetadata.officialEditions.has(formatAddress(event.args!.soundEdition));
+      const publicReleaseTimeRaw = factoryMetadata.soundPublicTimes[formatAddress(event.args!.soundEdition)];
+      const publicReleaseTime = publicReleaseTimeRaw ? new Date(publicReleaseTimeRaw) : undefined;
+      return ({
+        id: formatAddress(event.args!.soundEdition),
+        platformId: official ? 'sound' : 'sound-protocol-v1',
+        startingBlock: `${parseInt(event.blockNumber) - 1}`,
+        contractType: NFTContractTypeName.default,
+        standard: NFTStandard.ERC721,
+        autoApprove: official,
+        approved: official,
+        typeMetadata: {
+          other: {
+            publicReleaseTime
+          },
+          overrides: {
+            type: MusicPlatformType['multi-track-multiprint-contract'],
+            artist: {
+              artistId: ethereumArtistId(event.args!.deployer),
+            },
+            extractor: {
+              id: IdExtractorTypes.TRACK_NUMBER,
+              title: TitleExtractorTypes.METADATA_TITLE,
+              artistName: ArtistNameExtractorTypes.METADATA_ARTIST,
+              avatarUrl: AvatarUrlExtractorTypes.METADATA_IMAGE,
+              websiteUrl: WebsiteUrlExtractorTypes.METADATA_EXTERNAL_URL,
+              artistWebsiteUrl: WebsiteUrlExtractorTypes.EXTERNAL_URL_WITH_ONLY_FIRST_SEGMENT
+            }
+          }
+        }
+      })}
   }
 }
