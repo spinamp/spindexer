@@ -1,12 +1,12 @@
+import path from 'path';
+
 import { Knex } from 'knex';
 
-import { ARTIFACTS } from '../../constants/artistIntegrations';
-import { addNftFactory, removeNftFactory } from '../migration-helpers';
-
 export const up = async (knex: Knex) => {
-  await addNftFactory(knex, ARTIFACTS);
+  const migrationName = path.basename(__filename);
+  console.log(`deprecation warning: ${migrationName} replaced by CRDT in migration 37`);
 }
 
 export const down = async (knex: Knex) => {
-  await removeNftFactory(knex, ARTIFACTS);
+  return;
 }
