@@ -5,14 +5,14 @@ import { NftFactory, NFTContractTypeName, NFTStandard } from '../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../types/platform';
 import { ethereumArtistId } from '../utils/identifiers';
 
-// Custom artist and platform migration details are being extracted in preparation
+// Custom artist and platform migration details extracted in preparation
 // for a fully CRDT based approach
 
-// Artist Migration 01
+// Migration 01
 const NOIZD_PLATFORM: MusicPlatform = {
   id: 'noizd',
   type: MusicPlatformType.noizd,
-  name: 'NOIZD_CONTRACT'
+  name: 'NOIZD'
 }
 const CATALOG_PLATFORM: MusicPlatform = {
   id: 'catalog',
@@ -29,14 +29,14 @@ const ZORA_ORIGINAL_PLATFORM: MusicPlatform = {
   type: MusicPlatformType.zora,
   name: 'Zora'
 }
-const ZORA_PLATFORM: MusicPlatform = {
+const ZORA_LATEST_PLATFORM: MusicPlatform = {
   id: 'zora',
   type: MusicPlatformType.zora,
   name: 'Zora'
 }
 
-// Artist Migration 02
-const NOIZD_CONTRACT: NftFactory = {
+// Migration 02
+const NOIZD_FACTORY: NftFactory = {
   id: '0xf5819e27b9bad9f97c177bf007c1f96f26d91ca6',
   platformId: NOIZD_PLATFORM.id,
   startingBlock: '13470560',
@@ -46,7 +46,7 @@ const NOIZD_CONTRACT: NftFactory = {
   approved: true
 }
 
-const CATALOG_CONTRACT: NftFactory = {
+const CATALOG_FACTORY: NftFactory = {
   id: '0x0bc2a24ce568dad89691116d5b34deb6c203f342',
   platformId: CATALOG_PLATFORM.id,
   startingBlock: '14566825',
@@ -56,7 +56,7 @@ const CATALOG_CONTRACT: NftFactory = {
   approved: true
 }
 
-const ZORA_ORIGINAL_CONTRACT: NftFactory = {
+const ZORA_ORIGINAL_FACTORY: NftFactory = {
   id: '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7',
   platformId: ZORA_ORIGINAL_PLATFORM.id,
   startingBlock: '11565019',
@@ -66,7 +66,7 @@ const ZORA_ORIGINAL_CONTRACT: NftFactory = {
   approved: true
 }
 
-// Artist Migration 03
+// Migration 03
 const SOUND_ORIGINAL_META_FACTORY: MetaFactory = {
   id: '0x78e3adc0e811e4f93bd9f1f9389b923c9a3355c2',
   platformId: SOUND_ORIGINAL_PLATFORM.id,
@@ -77,13 +77,13 @@ const SOUND_ORIGINAL_META_FACTORY: MetaFactory = {
   autoApprove: true
 }
 
-// Artist Migration 04
+// Migration 04
 const HEDS_PLATFORM: MusicPlatform = {
   id: 'heds',
   type: MusicPlatformType['single-track-multiprint-contract'],
   name: 'Heds',
 }
-const HEDSTAPE_1: NftFactory = {
+const HEDSTAPE_1_FACTORY: NftFactory = {
   id: '0xde8a0b17d3dc0468adc65309881d9d6a6cd66372',
   startingBlock: '14193218',
   platformId: HEDS_PLATFORM.id,
@@ -92,7 +92,7 @@ const HEDSTAPE_1: NftFactory = {
   autoApprove: true,
   approved: true
 }
-const HEDSTAPE_2: NftFactory = {
+const HEDSTAPE_2_FACTORY: NftFactory = {
   id: '0x5083cf11003f2b25ca7456717e6dc980545002e5',
   platformId: HEDS_PLATFORM.id,
   startingBlock: '14373902',
@@ -101,7 +101,7 @@ const HEDSTAPE_2: NftFactory = {
   autoApprove: true,
   approved: true
 }
-const HEDSTAPE_3: NftFactory = {
+const HEDSTAPE_3_FACTORY: NftFactory = {
   id: '0x567e687c93103010962f9e9cf5730ae8dbfc6d41',
   platformId: HEDS_PLATFORM.id,
   startingBlock: '14548642',
@@ -110,7 +110,7 @@ const HEDSTAPE_3: NftFactory = {
   autoApprove: true,
   approved: true
 }
-const HEDSTAPE_4: NftFactory = {
+const HEDSTAPE_4_FACTORY: NftFactory = {
   id: '0x8045fd700946a00436923f37d08f280ade3b4af6',
   platformId: HEDS_PLATFORM.id,
   startingBlock: '14813869',
@@ -120,16 +120,16 @@ const HEDSTAPE_4: NftFactory = {
   approved: true
 }
 
-// Artist Migration 05
+// Migration 05
 const CHAOS_PLATFORM: MusicPlatform = {
   id: '0x8427e46826a520b1264b55f31fcb5ddfdc31e349',
   type: MusicPlatformType.chaos,
   name: 'Chaos',
 }
 
-const CHAOS_CONTRACT: NftFactory = {
+const CHAOS_FACTORY: NftFactory = {
   id: '0x8427e46826a520b1264b55f31fcb5ddfdc31e349',
-  platformId: '0x8427e46826a520b1264b55f31fcb5ddfdc31e349',
+  platformId: CHAOS_PLATFORM.id,
   startingBlock: '14891073',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
@@ -137,13 +137,13 @@ const CHAOS_CONTRACT: NftFactory = {
   approved: true
 }
 
-// Artist Migration 06
+// Migration 06
 const MINT_PLATFORM: MusicPlatform = {
   id: 'mintsongs',
   type: MusicPlatformType.mintsongsV2,
   name: 'Mintsongs'
 }
-const MINT_CONTRACT: NftFactory = {
+const MINT_FACTORY: NftFactory = {
   id: '0x2B5426A5B98a3E366230ebA9f95a24f09Ae4a584',
   platformId: MINT_PLATFORM.id,
   startingBlock: '14793509',
@@ -153,8 +153,8 @@ const MINT_CONTRACT: NftFactory = {
   approved: true
 };
 
-// Artist Migration 07
-const HEDSTAPE_5: NftFactory = {
+// Migration 07
+const HEDSTAPE_5_FACTORY: NftFactory = {
   id: '0x8f36eb094f7b960a234a482d4d8ffb8b37f728c6',
   platformId: HEDS_PLATFORM.id,
   startingBlock: '14986141',
@@ -164,14 +164,14 @@ const HEDSTAPE_5: NftFactory = {
   approved: true
 };
 
-// Artist Migration 08
+// Migration 08
 const ROHKI_PLATFORM: MusicPlatform = {
   id: 'rohki',
   type: MusicPlatformType['single-track-multiprint-contract'],
   name: 'RŌHKI',
 }
 
-const ROHKI_DESPERADO: NftFactory = {
+const ROHKI_DESPERADO_FACTORY: NftFactory = {
   id: '0xe8e7Eb47dD7eaFeC80c1EF7f0aE39beE6Dbce469',
   platformId: ROHKI_PLATFORM.id,
   startingBlock: '14779299',
@@ -196,10 +196,10 @@ const ROHKI_DESPERADO: NftFactory = {
   }
 };
 
-// Artist Migration 09
-const ROHKI_VROOM: NftFactory = {
+// Migration 09
+const ROHKI_VROOM_FACTORY: NftFactory = {
   id: '0x317394c6dFB5606c2917E1a0DAD4f1B70EDDC921',
-  platformId: 'rohki',
+  platformId: ROHKI_PLATFORM.id,
   startingBlock: '15112828',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
@@ -222,8 +222,8 @@ const ROHKI_VROOM: NftFactory = {
   }
 };
 
-// Artist Migration 10
-const HEDSTAPE_6: NftFactory = {
+// Migration 10
+const HEDSTAPE_6_FACTORY: NftFactory = {
   id: '0x885236535D5Cf7033BdC5bC1050CaD7fdf4970a6',
   platformId: HEDS_PLATFORM.id,
   startingBlock: '15200392',
@@ -234,18 +234,18 @@ const HEDSTAPE_6: NftFactory = {
 };
 
 
-// Artist Migration 11
-const glassHouseAddress = '0x719C6d392fc659f4fe9b0576cBC46E18939687a7';
+// Migration 11
+const danielAllanAddress = '0x719C6d392fc659f4fe9b0576cBC46E18939687a7';
 
-const GLASSHOUSE_PLATFORM: MusicPlatform = {
-  id: glassHouseAddress,
+const DANIEL_ALLAN_PLATFORM: MusicPlatform = {
+  id: danielAllanAddress,
   type: MusicPlatformType['multi-track-multiprint-contract'],
   name: 'danielallan.xyz',
 }
 
-const GLASSHOUSE_TRACK: NftFactory = {
-  id: glassHouseAddress,
-  platformId: GLASSHOUSE_PLATFORM.id,
+const DANIEL_ALLAN_GLASSHOUSE_FACTORY: NftFactory = {
+  id: danielAllanAddress,
+  platformId: DANIEL_ALLAN_PLATFORM.id,
   startingBlock: '15151004',
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
@@ -268,7 +268,7 @@ const GLASSHOUSE_TRACK: NftFactory = {
   }
 };
 
-// Artist Migration 12
+// Migration 12
 const NINA_PLATFORM: MusicPlatform = {
   id: 'nina',
   type: MusicPlatformType.nina,
@@ -283,14 +283,14 @@ const NINA_META_FACTORY: MetaFactory = {
   autoApprove: true,
 };
 
-// Artist Migration 14
+// Migration 14
 const HUME_PLATFORM: MusicPlatform = {
   id: 'hume',
   type: MusicPlatformType['single-track-multiprint-contract'],
   name: 'Hume',
 }
 
-const HUME_OTHERSIDE: NftFactory = {
+const HUME_OTHERSIDE_FACTORY: NftFactory = {
   id: '0x0301E208Ec282EC38934606EF53dBD5876ED7eB0',
   platformId: HUME_PLATFORM.id,
   startingBlock: '14886522',
@@ -314,8 +314,8 @@ const HUME_OTHERSIDE: NftFactory = {
   }
 };
 
-// Artist Migration 15
-const HUME_VIEW_FROM_THE_MOON: NftFactory = {
+// Migration 15
+const HUME_VIEW_FROM_THE_MOON_FACTORY: NftFactory = {
   id: '0x09d6e0f30cFdf2f62c1179516B1F980c5D96571E',
   platformId: HUME_PLATFORM.id,
   startingBlock: '14962984',
@@ -339,8 +339,8 @@ const HUME_VIEW_FROM_THE_MOON: NftFactory = {
   }
 };
 
-// Artist Migration 16
-const HUME_MINTED: NftFactory = {
+// Migration 16
+const HUME_MINTED_FACTORY: NftFactory = {
   id: '0x8056B7750D2A061757a0ECA13eEf78caeDD4a30F',
   platformId: HUME_PLATFORM.id,
   startingBlock: '15121180',
@@ -364,8 +364,8 @@ const HUME_MINTED: NftFactory = {
   }
 };
 
-// Artist Migration 18
-const HEDSTAPE_7: NftFactory = {
+// Migration 18
+const HEDSTAPE_7_FACTORY: NftFactory = {
   id: '0x20f2717f113d0b3815124876f3d72f8e1179341e',
   platformId: HEDS_PLATFORM.id,
   startingBlock: '15373455',
@@ -375,10 +375,10 @@ const HEDSTAPE_7: NftFactory = {
   approved: true
 };
 
-// Artist Migration 22
+// Migration 22
 const ZORA_META_FACTORY: MetaFactory = {
   id: '0xf74b146ce44cc162b601dec3be331784db111dc1',
-  platformId: ZORA_PLATFORM.id,
+  platformId: ZORA_LATEST_PLATFORM.id,
   startingBlock: '14758779',
   contractType: MetaFactoryTypeName.zoraDropCreator,
   gap: '500000',
@@ -386,8 +386,8 @@ const ZORA_META_FACTORY: MetaFactory = {
   autoApprove: false,
 }
 
-// Artist Migration 23
-const HEDS_COLLAB_NFT_FACTORY: NftFactory = {
+// Migration 23
+const HEDS_COLLAB_FACTORY: NftFactory = {
   id: '0xEeB431Caa15B526f48Ee4DB3697FE57EC8223A8e',
   platformId: HEDS_PLATFORM.id, // part of existing heds platform
   startingBlock: '15416993',
@@ -402,7 +402,7 @@ const HEDS_COLLAB_NFT_FACTORY: NftFactory = {
   }
 };
 
-// Artist Migration 24
+// Migration 24
 const jagwarTwinAddress = '0xe80c7fee3d41e311e0351244231919e04e699e56';
 
 const JAGWAR_TWIN_PLATFORM: MusicPlatform = {
@@ -438,7 +438,7 @@ const JAGWAR_TWIN_THOUGHT_FORMS_NFT_FACTORY: NftFactory = {
   }
 };
 
-// Artist Migration 25
+// Migration 25
 const JAGWAR_TWIN_ALBUM_NFT_FACTORY: NftFactory = {
   id: '0xF85c1f4aC0040e4f2369cFcbAbfccfa2F3E6899E',
   platformId: JAGWAR_TWIN_PLATFORM.id,
@@ -466,8 +466,8 @@ const JAGWAR_TWIN_ALBUM_NFT_FACTORY: NftFactory = {
   }
 };
 
-// Artist Migration 26
-const JAGWAR_TWIN_ARTIFACTS: NftFactory = {
+// Migration 26
+const JAGWAR_TWIN_ARTIFACTS_FACTORY: NftFactory = {
   id: '0x84F89f7bAcb20970073Be33F22847e58fbe78992',
   platformId: JAGWAR_TWIN_PLATFORM.id,
   startingBlock: '15316663',
@@ -494,7 +494,7 @@ const JAGWAR_TWIN_ARTIFACTS: NftFactory = {
   }
 };
 
-// Artist Migration 28
+// Migration 28
 const mighty33Address = '0x8C62dD796e13aD389aD0bfDA44BB231D317Ef6C6';
 
 const MIGHTY_33_PLATFORM: MusicPlatform = {
@@ -503,7 +503,7 @@ const MIGHTY_33_PLATFORM: MusicPlatform = {
   name: 'geniuscorp.fr',
 }
 
-const MIGHTY_33_OTHERS_DIE: NftFactory = {
+const MIGHTY_33_OTHERS_DIE_FACTORY: NftFactory = {
   id: '0x97b9f21b41041e344f5bd71e3e86b69e79dcc0a6',
   platformId: MIGHTY_33_PLATFORM.id,
   startingBlock: '10688107',
@@ -533,14 +533,14 @@ const MIGHTY_33_OTHERS_DIE: NftFactory = {
   }
 };
 
-// Artist Migration 29
+// Migration 29
 const HOLLY_PLUS_PLATFORM: MusicPlatform = {
   id: 'hollyplus',
   type: MusicPlatformType['multi-track-multiprint-contract'],
   name: 'hollyplus',
 }
 
-const HOLLY_PLUS_CONTRACT: NftFactory = {
+const HOLLY_PLUS_FACTORY: NftFactory = {
   id: '0x6688Ee4E6e17a9cF88A13Da833b011E64C2B4203',
   platformId: HOLLY_PLUS_PLATFORM.id,
   startingBlock: '13001583',
@@ -566,14 +566,14 @@ const HOLLY_PLUS_CONTRACT: NftFactory = {
   }
 };
 
-// Artist Migration 33
+// Migration 33
 const RELICS_YXZ_PLATFORM: MusicPlatform = {
   id: 'relics',
   type: MusicPlatformType['multi-track-multiprint-contract'],
   name: 'RELICS',
 }
 
-const RELICS_SEASON_1_CONTRACT: NftFactory = {
+const RELICS_SEASON_1_FACTORY: NftFactory = {
   id: '0x441C1266E6fb13C38c2752eab0D11A99905FFef4',
   platformId: RELICS_YXZ_PLATFORM.id,
   startingBlock: '14180427',
@@ -604,7 +604,7 @@ const RELICS_SEASON_1_CONTRACT: NftFactory = {
   }
 };
 
-// Artist Migration 34
+// Migration 34
 const SOUND_PROTOCOL_PLATFORM: MusicPlatform = {
   id: 'sound-protocol-v1',
   type: MusicPlatformType['multi-track-multiprint-contract'],
@@ -621,11 +621,11 @@ const SOUND_PROTOCOL_META_FACTORY: MetaFactory = {
   autoApprove: true,
 }
 
-// Artist Migration 35
-const HEDSTAPE_8: NftFactory = {
+// Migration 35
+const HEDSTAPE_8_FACTORY: NftFactory = {
   id: '0xA2acEd918E8cff703b8BB4129a30146A1Dc35675',
   startingBlock: '15642296',
-  platformId: 'heds',
+  platformId: HEDS_PLATFORM.id,
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
@@ -633,20 +633,20 @@ const HEDSTAPE_8: NftFactory = {
 };
 
 export const PLATFORMS: MusicPlatform[] = [
-  NOIZD_PLATFORM, CATALOG_PLATFORM,
+  NOIZD_PLATFORM, CATALOG_PLATFORM, NINA_PLATFORM, MINT_PLATFORM,
   SOUND_ORIGINAL_PLATFORM, SOUND_PROTOCOL_PLATFORM,
-  ZORA_ORIGINAL_PLATFORM, ZORA_PLATFORM,
-  HEDS_PLATFORM, CHAOS_PLATFORM, MINT_PLATFORM, GLASSHOUSE_PLATFORM, ROHKI_PLATFORM, NINA_PLATFORM, HUME_PLATFORM, JAGWAR_TWIN_PLATFORM, MIGHTY_33_PLATFORM, HOLLY_PLUS_PLATFORM, RELICS_YXZ_PLATFORM
+  ZORA_ORIGINAL_PLATFORM, ZORA_LATEST_PLATFORM,
+  HEDS_PLATFORM, CHAOS_PLATFORM, DANIEL_ALLAN_PLATFORM, ROHKI_PLATFORM, HUME_PLATFORM, JAGWAR_TWIN_PLATFORM, MIGHTY_33_PLATFORM, HOLLY_PLUS_PLATFORM, RELICS_YXZ_PLATFORM
 ]
 
 export const FACTORIES: NftFactory[] = [
-  NOIZD_CONTRACT, CATALOG_CONTRACT, ZORA_ORIGINAL_CONTRACT,
-  HEDSTAPE_1, HEDSTAPE_2, HEDSTAPE_3, HEDSTAPE_4, HEDSTAPE_5, HEDSTAPE_6, HEDSTAPE_7, HEDS_COLLAB_NFT_FACTORY, HEDSTAPE_8,
-  CHAOS_CONTRACT, MINT_CONTRACT, GLASSHOUSE_TRACK,
-  ROHKI_DESPERADO, ROHKI_VROOM,
-  HUME_OTHERSIDE, HUME_VIEW_FROM_THE_MOON, HUME_MINTED,
-  JAGWAR_TWIN_THOUGHT_FORMS_NFT_FACTORY, JAGWAR_TWIN_ALBUM_NFT_FACTORY, JAGWAR_TWIN_ARTIFACTS,
-  MIGHTY_33_OTHERS_DIE, HOLLY_PLUS_CONTRACT, RELICS_SEASON_1_CONTRACT,
+  NOIZD_FACTORY, CATALOG_FACTORY, ZORA_ORIGINAL_FACTORY,
+  HEDS_COLLAB_FACTORY, HEDSTAPE_1_FACTORY, HEDSTAPE_2_FACTORY, HEDSTAPE_3_FACTORY, HEDSTAPE_4_FACTORY, HEDSTAPE_5_FACTORY, HEDSTAPE_6_FACTORY, HEDSTAPE_7_FACTORY, HEDSTAPE_8_FACTORY,
+  CHAOS_FACTORY, MINT_FACTORY, DANIEL_ALLAN_GLASSHOUSE_FACTORY,
+  ROHKI_DESPERADO_FACTORY, ROHKI_VROOM_FACTORY,
+  HUME_OTHERSIDE_FACTORY, HUME_VIEW_FROM_THE_MOON_FACTORY, HUME_MINTED_FACTORY,
+  JAGWAR_TWIN_THOUGHT_FORMS_NFT_FACTORY, JAGWAR_TWIN_ALBUM_NFT_FACTORY, JAGWAR_TWIN_ARTIFACTS_FACTORY,
+  MIGHTY_33_OTHERS_DIE_FACTORY, HOLLY_PLUS_FACTORY, RELICS_SEASON_1_FACTORY,
 ]
 
 export const META_FACTORIES: MetaFactory[] = [
