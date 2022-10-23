@@ -12,16 +12,23 @@ const processorFunction = (metaFactory: MetaFactory, name: string) =>
   async ({ newCursor, items: events }: { newCursor: Cursor, items: ethers.Event[] }, clients: Clients) => {
     const metaFactoryContractTypeName = metaFactory.contractType;
     const metaFactoryContractType = MetaFactoryTypes[metaFactoryContractTypeName];
-    const eventToNftFactory = metaFactoryContractType?.creationEventToNftFactory;
+    if (!metaFactoryContractType) {
+      throw new Error(`Unexpected metaFactoryContractType: ${metaFactoryContractTypeName}`)
+    }
+    let factoryMetadata: unknown;
+    if (metaFactoryContractType.metadataAPI) {
+      factoryMetadata = await metaFactoryContractType.metadataAPI(events, clients);
+    }
+    const eventToNftFactory = metaFactoryContractType.creationEventToNftFactory;
 
     if (!eventToNftFactory) {
       throw `no eventToNftFactory specified for ${metaFactoryContractTypeName}`
     }
 
-    const newNftFactoryObjects = events.map(e => eventToNftFactory(e, metaFactory.autoApprove, metaFactory.autoApprove));
+    const newNftFactoryObjects = events.map(e => eventToNftFactory(e, metaFactory.autoApprove, factoryMetadata));
+
     await clients.db.insert(Table.nftFactories, newNftFactoryObjects);
     await clients.db.updateProcessor(name, newCursor);
-
   };
 
 export const createNftFactoryFromERC721MetaFactoryProcessor: (factoryContract: MetaFactory) =>

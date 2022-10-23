@@ -5,7 +5,7 @@ import { Table } from '../db/db';
 export enum CrdtOperation {
   UPSERT = 'upsert',
   UPDATE = 'update'
-} 
+}
 
 export type CrdtMessage = {
   id?: string;
@@ -64,13 +64,11 @@ export function getCrdtUpdateMessage<T>(table: Table, data: PartialValues<T>): C
     operation: CrdtOperation.UPDATE
   }
 }
-
-export function getCrdtUpsertMessages<T>(table: Table, id: string, data: Values<T> ): CrdtUpsertMessage {
-  const time = new Date();
+export function getCrdtUpsertMessage<T>(table: Table, data: Values<T> ): CrdtUpsertMessage {
   return {
-    timestamp: time,
+    timestamp: new Date(),
     table,
-    data: data,
+    data,
     operation: CrdtOperation.UPSERT
   }
 }

@@ -31,7 +31,7 @@ const pmRecords = [
 
 export const up = async (knex: Knex) => {
 
-  const messages: CrdtMessage[] = pmRecords.map(address => 
+  const messages: CrdtMessage[] = pmRecords.map(address =>
     getCrdtUpdateMessage<NftFactory>(Table.nftFactories, { id: address, approved: true, autoApprove: true })
   )
 
@@ -41,11 +41,5 @@ export const up = async (knex: Knex) => {
 }
 
 export const down = async (knex: Knex) => {
-  const messages: CrdtMessage[] = pmRecords.map(address => 
-    getCrdtUpdateMessage<NftFactory>(Table.nftFactories, { id: address, approved: false, autoApprove: false })
-  )
-
-  for (const message of messages){
-    await knex(Table.seeds).insert(message)
-  }
+  throw new Error('nope');
 }

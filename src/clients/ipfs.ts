@@ -1,6 +1,8 @@
 import { IPFS } from 'ipfs-core-types';
 import { create, urlSource as libUrlSource } from 'ipfs-http-client';
 
+import { cleanURL } from '../utils/sanitizers';
+
 export type IPFSClient = {
   getHTTPURL: (ipfsURL: string) => string;
   client: IPFS;
@@ -8,8 +10,7 @@ export type IPFSClient = {
 
 // replaces any problematic source urls
 export const urlSource = (url: string) => {
-  const robustUrl = url.replace('arweave.rocks', 'arweave.net');
-  return libUrlSource(robustUrl);
+  return libUrlSource(cleanURL(url));
 }
 
 export const isIPFSProtocol = (urlString: string) => {

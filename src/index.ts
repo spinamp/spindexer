@@ -13,6 +13,8 @@ import { createERC721NFTsFromTransfersProcessor } from './processors/default/cre
 import { createNftFactoryFromERC721MetaFactoryProcessor } from './processors/default/createNftFactoryFromERC721MetaFactory';
 import { createNftsFromCandyMachine } from './processors/default/createNftFromCandyMachine';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
+import { errorAndMetadataResetProcessor } from './processors/default/errorProcessor';
+import { insertSeedsIntoMempool } from './processors/default/insertSeedsIntoMempool';
 import { processMempoolInserts, processMempoolUpdates } from './processors/default/processMempool';
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
 import { runProcessors } from './runner';
@@ -30,7 +32,7 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
   //TODO: noizd here is being used both as platformId and MusicPlatformType. Need to avoid mixing them
   const apiTrackProcessors = API_PLATFORMS.map(apiPlatform => createProcessedTracksFromAPI(apiPlatform));
 
-  const crdtTables = [Table.nftFactories, Table.nfts];
+  const crdtTables = [Table.nftFactories, Table.nfts, Table.metaFactories, Table.platforms, Table.artists, Table.processedTracks];
 
   const tableInsertsMempoolProcessors = crdtTables.map(table => processMempoolInserts(table));
   const tableUpdatesMempoolProcessors = crdtTables.map(table => processMempoolUpdates(table));
@@ -38,9 +40,10 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
   const candyMachineProcessors = candyMachines.map(candyMachine => createNftsFromCandyMachine(candyMachine))
 
   return [
-    // insertSeedsIntoMempool,
-    // ...tableInsertsMempoolProcessors,
-    // ...tableUpdatesMempoolProcessors,
+    insertSeedsIntoMempool,
+    errorAndMetadataResetProcessor,
+    ...tableInsertsMempoolProcessors,
+    ...tableUpdatesMempoolProcessors,
     ...metaFactoryProcessors,
     ...candyMachineProcessors,
     // getERC721ContractFieldsProcessor,

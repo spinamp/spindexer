@@ -33,22 +33,35 @@ const getAPITrackData = async (trackIds: string[], client: TrackAPIClient) => {
   return apiTrackByTrackId;
 }
 const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clients: Clients) => {
-  console.log(`Getting ${platform.id} API tracks for ids: ${nfts.map(nft => nft.id)}`);
+  console.log(`Processing ${platform.id} tracks for ids: ${nfts.map(nft => nft.id)}`);
   const platformType = platformConfigs[platform.type];
   if (!platformType) {
     const errorNFTs = nfts.map(nft => ({
       nftId: nft.id,
       processError: `Missing platform type for platform ${platform.id}`
     }))
-    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'nftId', ['processError']);
+    await clients.db.upsert(Table.nftProcessErrors, errorNFTs, 'nftId', ['processError', 'processErrorName']);
     return;
   }
   const platformClient = (clients as any)[platform.id];
   const nftFactories = await getNFTFactories(nfts, clients.db);
   const nftsByFactoryId = _.groupBy(nfts, nft => nft.contractAddress);
+  const nftFactoriesById = _.keyBy(nftFactories, factory => factory.id);
+  const nftsForApiTracks = nfts.filter(nft => {
+    const factory = nftFactoriesById[nft.contractAddress];
+    if (!factory) {
+      throw new Error(`Unexpected nft with no factory: ${nft.id}`);
+    }
+    const type = getNFTFactoryType(factory, platformType);
+    if (type.skipApiTracks) {
+      return false;
+    }
+    return true;
+  });
   let apiTracksByNFT;
-  if (platformClient && platformClient.fetchTracksByNFT) {
-    apiTracksByNFT = await platformClient.fetchTracksByNFT(nfts);
+  if (platformClient && platformClient.fetchTracksByNFT && nftsForApiTracks.length !== 0) {
+    console.log(`Querying ${platform.id} API tracks for ids: ${nftsForApiTracks.map(nft => nft.id)}`);
+    apiTracksByNFT = await platformClient.fetchTracksByNFT(nftsForApiTracks);
   }
 
   let allNewTracks: ProcessedTrack[] = [];
@@ -85,20 +98,26 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
       inputsforNFTFactoryProcessing.push(input);
       nftsWithoutTracks?.map(nft => allErrorNFTs.push({
         nftId: nft.id,
-        processError: `Error on ${nft.id}: null id`
+        processError: `Error on ${nft.id}: null id`,
       }));
     } catch (e) {
       factoryNFTs.map(nft => allErrorNFTs.push({
         nftId: nft.id,
-        processError: `Error on ${nftFactory.id}: ${(e as Error).message}`
+        processError: e as string,
       }));
     }
   }
 
-  const allNewTrackIds: string[] = inputsforNFTFactoryProcessing.map(i => i.newTrackIds).flat().filter((id): id is string => !!id);
+  const newTrackIdsForAPI: string[] = inputsforNFTFactoryProcessing.map(i => {
+    if (i.nftFactoryType.skipApiTracks) {
+      return [];
+    } else {
+      return i.newTrackIds
+    }
+  }).flat().filter((id): id is string => !!id);
   let apiTrackData: any;
-  if (platformClient) {
-    apiTrackData = await getAPITrackData(allNewTrackIds, platformClient);
+  if (platformClient && newTrackIdsForAPI.length > 0) {
+    apiTrackData = await getAPITrackData(newTrackIdsForAPI, platformClient);
   }
 
   for (const input of inputsforNFTFactoryProcessing) {
@@ -114,7 +133,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
   const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(allNewTracks, clients.db, true);
 
   if (allErrorNFTs.length !== 0) {
-    await clients.db.upsert(Table.nftProcessErrors, allErrorNFTs, 'nftId', ['processError']);
+    await clients.db.upsert(Table.nftProcessErrors, allErrorNFTs, 'nftId', ['processError', 'processErrorName']);
   }
   if (oldIds && oldIds.length !== 0) {
     await clients.db.delete(Table.processedTracks, oldIds);
