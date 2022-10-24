@@ -6,7 +6,7 @@ import { tableNameToViewName, updateViews } from '../migration-helpers';
 export const up = async (knex: Knex) => {
   await knex.schema.dropView(tableNameToViewName(Table.crdtState));
   await knex.schema.alterTable(Table.crdtState, table => {
-    table.string('value', 1000).alter();
+    table.string('value', 20000).alter();
   })
   await updateViews(knex);
 }
