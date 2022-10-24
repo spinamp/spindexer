@@ -1,0 +1,111 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 14.5
+-- Dumped by pg_dump version 14.5 (Homebrew)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Data for Name: raw_seeds; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+SET SESSION AUTHORIZATION DEFAULT;
+
+ALTER TABLE public.raw_seeds DISABLE TRIGGER ALL;
+
+COPY public.raw_seeds (id, "timestamp", "table", data, operation) FROM stdin;
+1	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x78fb0b8d4502ae69a61c0d0321141629553472bd", "approved": true, "autoApprove": true}	update
+2	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x973aee1e38aafafb8a3c817117cf2ad43ab90ef7", "approved": true, "autoApprove": true}	update
+3	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x6bdc3155dd9535f002cd539e664c408ec42c060f", "approved": true, "autoApprove": true}	update
+4	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x3e28d99c9dff6f183e04a47ff82bdf83d6d07fbe", "approved": true, "autoApprove": true}	update
+5	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x423e2e4687a368b970c28ceec20448048b3ec8ab", "approved": true, "autoApprove": true}	update
+6	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x1495f8419c544071717375518b9dff1975d907fa", "approved": true, "autoApprove": true}	update
+7	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0xc989ac6d12ec65650dffaad88cfb4bda261cc7fb", "approved": true, "autoApprove": true}	update
+8	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x173bf29946b6beac8ceac628bb65b5f8f13b8524", "approved": true, "autoApprove": true}	update
+9	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x6026a17d359a9b721f0709c963ad948db33f56dd", "approved": true, "autoApprove": true}	update
+10	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x970eeca75562ac20080459b16ea8ac1c54d6124b", "approved": true, "autoApprove": true}	update
+11	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x092882162387eaeace2d2f9d093f4f015ed73690", "approved": true, "autoApprove": true}	update
+12	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x54dab8d172b408a14fdb7991ebe243c27c7ef702", "approved": true, "autoApprove": true}	update
+13	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x06064b039c2a2096effc638b86f632327e91da0d", "approved": true, "autoApprove": true}	update
+14	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0xa1b3920f56ac834b5d0b93b24378e609da2202af", "approved": true, "autoApprove": true}	update
+15	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x3aa59b2610ab3a94c52bd840ec753b01f6134bb1", "approved": true, "autoApprove": true}	update
+16	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x40b34c125a79c8dee404091ffb64ba2bd56348ce", "approved": true, "autoApprove": true}	update
+17	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x24271b4b616180e1a42bbeb93c75532ea34fd077", "approved": true, "autoApprove": true}	update
+18	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x4b29bbc353afa48c9d21716a3c051deb6a8145bd", "approved": true, "autoApprove": true}	update
+19	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x06ce5d865251d29b0957df602111970eb161ec6c", "approved": true, "autoApprove": true}	update
+20	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x14214694847ba90da2e9b08b6de397bd06d5a626", "approved": true, "autoApprove": true}	update
+21	2022-10-20 18:35:19.896+02	raw_nft_factories	{"id": "0x676777d784ebcc9d3ff3e28ce73757864a8333b4", "approved": true, "autoApprove": true}	update
+22	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "noizd", "name": "NOIZD", "type": "noizd"}	upsert
+23	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "catalog", "name": "Catalog", "type": "catalog"}	upsert
+24	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "nina", "name": "Nina", "type": "nina"}	upsert
+25	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "mintsongs", "name": "Mintsongs", "type": "mintsongs-v2"}	upsert
+26	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "sound", "name": "Sound.xyz", "type": "sound"}	upsert
+27	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "sound-protocol-v1", "name": "Sound Protocol", "type": "multi-track-multiprint-contract"}	upsert
+28	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "zoraOriginal", "name": "Zora", "type": "zora"}	upsert
+29	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "zora", "name": "Zora", "type": "zora"}	upsert
+30	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "heds", "name": "Heds", "type": "single-track-multiprint-contract"}	upsert
+31	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "0x8427e46826a520b1264b55f31fcb5ddfdc31e349", "name": "Chaos", "type": "chaos"}	upsert
+32	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "0x719C6d392fc659f4fe9b0576cBC46E18939687a7", "name": "danielallan.xyz", "type": "multi-track-multiprint-contract"}	upsert
+33	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "rohki", "name": "RŌHKI", "type": "single-track-multiprint-contract"}	upsert
+34	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "hume", "name": "Hume", "type": "single-track-multiprint-contract"}	upsert
+35	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "0xe80c7fee3d41e311e0351244231919e04e699e56", "name": "jagwartwin.com", "type": "single-track-multiprint-contract"}	upsert
+36	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "geniuscorp.fr", "name": "geniuscorp.fr", "type": "multi-track-multiprint-contract"}	upsert
+37	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "hollyplus", "name": "hollyplus", "type": "multi-track-multiprint-contract"}	upsert
+38	2022-10-20 18:35:20.068+02	raw_platforms	{"id": "relics", "name": "RELICS", "type": "multi-track-multiprint-contract"}	upsert
+39	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0xf5819e27b9bad9f97c177bf007c1f96f26d91ca6", "approved": true, "standard": "erc721", "platformId": "noizd", "autoApprove": true, "contractType": "default", "startingBlock": "13470560"}	upsert
+40	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x0bc2a24ce568dad89691116d5b34deb6c203f342", "approved": true, "standard": "erc721", "platformId": "catalog", "autoApprove": true, "contractType": "default", "startingBlock": "14566825"}	upsert
+41	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7", "approved": true, "standard": "erc721", "platformId": "zoraOriginal", "autoApprove": true, "contractType": "zora", "startingBlock": "11565019"}	upsert
+42	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0xEeB431Caa15B526f48Ee4DB3697FE57EC8223A8e", "approved": true, "standard": "erc721", "platformId": "heds", "autoApprove": true, "contractType": "default", "typeMetadata": {"overrides": {"type": "heds-collab"}}, "startingBlock": "15416993"}	upsert
+43	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0xde8a0b17d3dc0468adc65309881d9d6a6cd66372", "approved": true, "standard": "erc721", "platformId": "heds", "autoApprove": true, "contractType": "default", "startingBlock": "14193218"}	upsert
+44	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x5083cf11003f2b25ca7456717e6dc980545002e5", "approved": true, "standard": "erc721", "platformId": "heds", "autoApprove": true, "contractType": "default", "startingBlock": "14373902"}	upsert
+45	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x567e687c93103010962f9e9cf5730ae8dbfc6d41", "approved": true, "standard": "erc721", "platformId": "heds", "autoApprove": true, "contractType": "default", "startingBlock": "14548642"}	upsert
+46	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x8045fd700946a00436923f37d08f280ade3b4af6", "approved": true, "standard": "erc721", "platformId": "heds", "autoApprove": true, "contractType": "default", "startingBlock": "14813869"}	upsert
+47	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x8f36eb094f7b960a234a482d4d8ffb8b37f728c6", "approved": true, "standard": "erc721", "platformId": "heds", "autoApprove": true, "contractType": "default", "startingBlock": "14986141"}	upsert
+48	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x885236535D5Cf7033BdC5bC1050CaD7fdf4970a6", "approved": true, "standard": "erc721", "platformId": "heds", "autoApprove": true, "contractType": "default", "startingBlock": "15200392"}	upsert
+49	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x20f2717f113d0b3815124876f3d72f8e1179341e", "approved": true, "standard": "erc721", "platformId": "heds", "autoApprove": true, "contractType": "default", "startingBlock": "15373455"}	upsert
+50	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0xA2acEd918E8cff703b8BB4129a30146A1Dc35675", "approved": true, "standard": "erc721", "platformId": "heds", "autoApprove": true, "contractType": "default", "startingBlock": "15642296"}	upsert
+51	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x8427e46826a520b1264b55f31fcb5ddfdc31e349", "approved": true, "standard": "erc721", "platformId": "0x8427e46826a520b1264b55f31fcb5ddfdc31e349", "autoApprove": true, "contractType": "default", "startingBlock": "14891073"}	upsert
+52	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x2B5426A5B98a3E366230ebA9f95a24f09Ae4a584", "approved": true, "standard": "erc721", "platformId": "mintsongs", "autoApprove": true, "contractType": "default", "startingBlock": "14793509"}	upsert
+53	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x719C6d392fc659f4fe9b0576cBC46E18939687a7", "approved": true, "standard": "erc721", "platformId": "0x719C6d392fc659f4fe9b0576cBC46E18939687a7", "autoApprove": true, "contractType": "default", "typeMetadata": {"overrides": {"artist": {"name": "Daniel Allan", "artistId": "ethereum/0xbcefc4906b443e4db64e2b00b9af2c39e76c785c", "avatarUrl": "https://storageapi.fleek.co/catalogworks-team-bucket/prod/users/0xbcefc4906b443e4db64e2b00b9af2c39e76c785c/images/profile_picture.jpeg"}, "extractor": {"id": "useTitleExtractor", "title": "attributes.trait.track", "artistId": "useArtistIdOverride", "artistName": "useArtistNameOverride"}}}, "startingBlock": "15151004"}	upsert
+54	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0xe8e7Eb47dD7eaFeC80c1EF7f0aE39beE6Dbce469", "approved": true, "standard": "erc721", "platformId": "rohki", "autoApprove": true, "contractType": "default", "typeMetadata": {"overrides": {"track": {"title": "Desperado", "websiteUrl": "https://www.rohki.xyz/", "lossyAudioIPFSHash": "QmcnpLmiLpMNMMpcJkKjKTgwcsUyUWTstFtRZat6TYsmBV", "lossyArtworkIPFSHash": "QmZWbY9VtabJ6ZRieUo5LoetBuBBETKeJhjF5upstj29jp"}, "artist": {"name": "RŌHKI", "avatarUrl": "https://lh3.googleusercontent.com/jyOxrrZ5Nhton5vIAL10yCFexExXjLWhU_KfGYNjm7pC1conv3BzH1PUYGqyD_4cvAEskqs-gOCN5uhCbuKVdorh_MRwqitEjuWzDJs=s0", "websiteUrl": "https://www.rohki.xyz/"}}}, "startingBlock": "14779299"}	upsert
+55	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x317394c6dFB5606c2917E1a0DAD4f1B70EDDC921", "approved": true, "standard": "erc721", "platformId": "rohki", "autoApprove": true, "contractType": "default", "typeMetadata": {"overrides": {"track": {"title": "Vroom", "websiteUrl": "https://www.rohki.xyz/", "lossyAudioIPFSHash": "QmdWicgFzBY1pK2Bg9FjHTu8gvXH6bfvdS3v5XksBHPdZ8", "lossyArtworkIPFSHash": "QmcjiGuADJz9v2MYVHt92Td5kEyHUhfCMQwvJav3c6a1Dv"}, "artist": {"name": "RŌHKI", "avatarUrl": "https://lh3.googleusercontent.com/jyOxrrZ5Nhton5vIAL10yCFexExXjLWhU_KfGYNjm7pC1conv3BzH1PUYGqyD_4cvAEskqs-gOCN5uhCbuKVdorh_MRwqitEjuWzDJs=s0", "websiteUrl": "https://www.rohki.xyz/"}}}, "startingBlock": "15112828"}	upsert
+56	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x0301E208Ec282EC38934606EF53dBD5876ED7eB0", "approved": true, "standard": "erc721", "platformId": "hume", "autoApprove": true, "contractType": "default", "typeMetadata": {"overrides": {"track": {"websiteUrl": "https://www.wearehume.com/"}, "artist": {"name": "angelbaby", "artistId": "angelbaby", "avatarUrl": "https://pbs.twimg.com/profile_images/1547686210016907265/1pyVAGp7_400x400.jpg", "websiteUrl": "https://www.wearehume.com/", "platformInternalId": "angelbaby"}}}, "startingBlock": "14886522"}	upsert
+57	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x09d6e0f30cFdf2f62c1179516B1F980c5D96571E", "approved": true, "standard": "erc721", "platformId": "hume", "autoApprove": true, "contractType": "default", "typeMetadata": {"overrides": {"track": {"websiteUrl": "https://www.wearehume.com/"}, "artist": {"name": "angelbaby", "artistId": "angelbaby", "avatarUrl": "https://pbs.twimg.com/profile_images/1547686210016907265/1pyVAGp7_400x400.jpg", "websiteUrl": "https://www.wearehume.com/", "platformInternalId": "angelbaby"}}}, "startingBlock": "14962984"}	upsert
+58	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x8056B7750D2A061757a0ECA13eEf78caeDD4a30F", "approved": true, "standard": "erc721", "platformId": "hume", "autoApprove": true, "contractType": "default", "typeMetadata": {"overrides": {"track": {"websiteUrl": "https://www.wearehume.com/"}, "artist": {"name": "angelbaby", "artistId": "angelbaby", "avatarUrl": "https://web3-music-pipeline.mypinata.cloud/ipfs/Qmf5N7GzNAgrL3WyACTwyXjCcUyzpPCqxNBEZD6s6sGog3", "websiteUrl": "https://www.wearehume.com/", "platformInternalId": "angelbaby"}}}, "startingBlock": "15121180"}	upsert
+59	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x605B0E6b2Ec949235ff5Ac05bD452E22d21c702d", "approved": true, "standard": "erc721", "platformId": "0xe80c7fee3d41e311e0351244231919e04e699e56", "autoApprove": true, "contractType": "default", "typeMetadata": {"overrides": {"track": {"title": "East Is Everywhere", "websiteUrl": "https://jagwartwin.com/"}, "artist": {"name": "Jagwar Twin", "artistId": "ethereum/0xe80c7fee3d41e311e0351244231919e04e699e56", "avatarUrl": "https://web3-music-pipeline.mypinata.cloud/ipfs/QmcBb9C69vvJXasxTYFPwpo9WuZv415KkH3wTdoeBMH2hH", "websiteUrl": "https://jagwartwin.com/"}, "extractor": {"title": "metadata.name"}}}, "startingBlock": "14779895"}	upsert
+60	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0xF85c1f4aC0040e4f2369cFcbAbfccfa2F3E6899E", "approved": true, "standard": "erc721", "platformId": "0xe80c7fee3d41e311e0351244231919e04e699e56", "autoApprove": true, "contractType": "default", "typeMetadata": {"overrides": {"type": "multi-track-multiprint-contract", "artist": {"name": "Jagwar Twin", "artistId": "ethereum/0xe80c7fee3d41e311e0351244231919e04e699e56", "avatarUrl": "https://web3-music-pipeline.mypinata.cloud/ipfs/QmcBb9C69vvJXasxTYFPwpo9WuZv415KkH3wTdoeBMH2hH", "websiteUrl": "https://jagwartwin.com/"}, "extractor": {"id": "useTitleExtractor", "title": "attributes.trait.songTitle", "artistId": "useArtistIdOverride", "artistName": "useArtistNameOverride"}}}, "startingBlock": "14449703"}	upsert
+61	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x84F89f7bAcb20970073Be33F22847e58fbe78992", "approved": true, "standard": "erc721", "platformId": "0xe80c7fee3d41e311e0351244231919e04e699e56", "autoApprove": false, "contractType": "default", "typeMetadata": {"overrides": {"type": "multi-track-multiprint-contract", "artist": {"name": "Jagwar Twin", "artistId": "ethereum/0xe80c7fee3d41e311e0351244231919e04e699e56", "avatarUrl": "https://web3-music-pipeline.mypinata.cloud/ipfs/QmcBb9C69vvJXasxTYFPwpo9WuZv415KkH3wTdoeBMH2hH", "websiteUrl": "https://jagwartwin.com/"}, "extractor": {"id": "useTitleExtractor", "title": "metadata.name", "artistId": "useArtistIdOverride", "artistName": "useArtistNameOverride"}}}, "startingBlock": "15316663"}	upsert
+62	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x97b9f21b41041e344f5bd71e3e86b69e79dcc0a6", "approved": true, "standard": "erc721", "platformId": "geniuscorp.fr", "autoApprove": true, "contractType": "default", "typeMetadata": {"overrides": {"type": "multi-track-multiprint-contract", "track": {"websiteUrl": "https://geniuscorp.fr/m33"}, "artist": {"name": "Mighty33", "artistId": "ethereum/0x8c62dd796e13ad389ad0bfda44bb231d317ef6c6", "avatarUrl": "https://web3-music-pipeline.mypinata.cloud/ipfs/QmS8dBxzgmNcCL71XYM5WxCkb2MM8rhQdCqAf1as8XXCVo", "websiteUrl": "https://geniuscorp.fr/m33"}, "extractor": {"id": "useTitleExtractor", "title": "metadataNameWithoutLeadingInfo", "artistId": "useArtistIdOverride", "artistName": "useArtistNameOverride"}}}, "startingBlock": "10688107"}	upsert
+63	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x6688Ee4E6e17a9cF88A13Da833b011E64C2B4203", "approved": true, "standard": "erc721", "platformId": "hollyplus", "autoApprove": true, "contractType": "default", "typeMetadata": {"overrides": {"type": "multi-track-multiprint-contract", "artist": {"name": "hollyplus", "avatarUrl": "https://web3-music-pipeline.mypinata.cloud/ipfs/QmQ2AbbqTD5BF4Y12YwtDaosn2k9LGGS6VeXn28bapwHJY", "websiteUrl": "https://auction.holly.plus/"}, "extractor": {"id": "useTitleExtractor", "title": "metadata.name", "artistName": "useArtistNameOverride", "websiteUrl": "useTokenIdAppendedExternalUrl"}}}, "startingBlock": "13001583"}	upsert
+64	2022-10-20 18:35:20.068+02	raw_nft_factories	{"id": "0x441C1266E6fb13C38c2752eab0D11A99905FFef4", "approved": true, "standard": "erc721", "platformId": "relics", "autoApprove": true, "contractType": "default", "typeMetadata": {"overrides": {"type": "multi-track-multiprint-contract", "track": {"websiteUrl": "https://relics.xyz", "lossyArtworkURL": "https://web3-music-pipeline.mypinata.cloud/ipfs/QmSRN9HKXiziZzvkWrPG92UUHYiDKSZhfrFKf42EkniZVt"}, "artist": {"avatarUrl": "https://web3-music-pipeline.mypinata.cloud/ipfs/QmSRN9HKXiziZzvkWrPG92UUHYiDKSZhfrFKf42EkniZVt", "websiteUrl": "https://relics.xyz"}, "extractor": {"id": "useTitleExtractor", "title": "metadataNameWithoutTrailingInfo", "artistId": "usePlatformAndArtistName", "audioUrl": "attributes.trait.audio", "artistName": "attributes.trait.musician", "artworkUrl": "useArtworkUrlOverride"}}}, "startingBlock": "14180427"}	upsert
+65	2022-10-20 18:35:20.068+02	raw_meta_factories	{"id": "0x78e3adc0e811e4f93bd9f1f9389b923c9a3355c2", "gap": "500000", "standard": "erc721", "platformId": "sound", "autoApprove": true, "contractType": "soundArtistProfileCreator", "startingBlock": "13725565"}	upsert
+66	2022-10-20 18:35:20.068+02	raw_meta_factories	{"id": "0xaef3e8c8723d9c31863be8de54df2668ef7c4b89", "gap": "500000", "standard": "erc721", "platformId": "sound", "autoApprove": true, "contractType": "soundCreatorV1", "startingBlock": "15570833"}	upsert
+67	2022-10-20 18:35:20.068+02	raw_meta_factories	{"id": "ninaN2tm9vUkxoanvGcNApEeWiidLMM2TdBX8HoJuL4", "standard": "metaplex", "platformId": "nina", "autoApprove": true, "contractType": "ninaMintCreator"}	upsert
+68	2022-10-20 18:35:20.068+02	raw_meta_factories	{"id": "0xf74b146ce44cc162b601dec3be331784db111dc1", "gap": "500000", "standard": "erc721", "platformId": "zora", "autoApprove": false, "contractType": "zoraDropCreator", "startingBlock": "14758779"}	upsert
+\.
+
+
+ALTER TABLE public.raw_seeds ENABLE TRIGGER ALL;
+
+--
+-- Name: raw_seeds_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.raw_seeds_id_seq', 68, true);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
