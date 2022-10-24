@@ -247,13 +247,9 @@ const init = async () => {
     const { allMintedReleases } = await soundAPI.request(
       gql`
         {
-          allMintedReleasesPaginated {
-            edges {
-              node {
-                contract {
-                    contractAddress
-                }
-              }
+          allMintedReleases {
+            contract {
+                contractAddress
             }
           }
         }
