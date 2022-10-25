@@ -36,7 +36,8 @@ const toRecordMapper: any = {
       contractType: c.contractType,
       gap: c.gap,
       standard: c.standard,
-      autoApprove: c.autoApprove
+      autoApprove: c.autoApprove,
+      typeMetadata: c.typeMetadata
     });
   }),
   [Table.nftProcessErrors]: (nftProcessErrors: NFTProcessError[]):
@@ -87,7 +88,8 @@ const fromRecordMapper: any = {
       contractType: c.contractType,
       gap: c.gap,
       standard: c.standard,
-      autoApprove: c.autoApprove
+      autoApprove: c.autoApprove,
+      typeMetadata: c.typeMetadata
     });
   }),
   [Table.nftProcessErrors]: (errors: Record[]): NFTProcessError[] => errors.map((error: any) => {
