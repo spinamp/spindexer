@@ -1,3 +1,4 @@
+import { Metadata } from '@metaplex-foundation/js'
 import { ethers } from 'ethers'
 
 import { ethereumArtistId } from '../utils/identifiers'
@@ -5,7 +6,7 @@ import { ethereumArtistId } from '../utils/identifiers'
 import { formatAddress } from './address'
 import { Contract } from './contract'
 import { ArtistNameExtractorTypes, AvatarUrlExtractorTypes, IdExtractorTypes, TitleExtractorTypes, WebsiteUrlExtractorTypes } from './fieldExtractor'
-import { NftFactory, NFTContractTypeName, NFTStandard } from './nft'
+import { NftFactory, NFTContractTypeName, NFTStandard, TypeMetadata } from './nft'
 import { MusicPlatformType } from './platform'
 import { Clients } from './processor'
 
@@ -13,7 +14,7 @@ export enum MetaFactoryTypeName {
   soundArtistProfileCreator = 'soundArtistProfileCreator',
   ninaMintCreator = 'ninaMintCreator',
   zoraDropCreator = 'zoraDropCreator',
-  candyMachine = 'candyMachine',
+  kota = 'kota',
   soundCreatorV1 = 'soundCreatorV1'
 }
 
@@ -23,12 +24,14 @@ export type MetaFactory = Contract & {
   gap?: string
   standard: NFTStandard; // which type of factories will this metaFactory create
   autoApprove: boolean;
+  typeMetadata?: TypeMetadata;
 }
 
 export type MetaFactoryType = {
   newContractCreatedEvent: string,
   creationEventToNftFactory?: (event: ethers.Event, autoApprove: boolean, factoryMetadata?: unknown) => NftFactory
-  metadataAPI?: (events: ethers.Event[], clients: Clients) => Promise<any>
+  metadataAPI?: (events: ethers.Event[], clients: Clients) => Promise<any>,
+  metadataAccountToNftFactory?: (metadata: Metadata, metaFactory: MetaFactory) => NftFactory
 }
 
 type MetaFactoryTypes = {
@@ -118,5 +121,31 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
           }
         }
       })}
+  },
+  kota: {
+    newContractCreatedEvent: '',
+    metadataAccountToNftFactory: (metadataAccount, metaFactory) => {
+      return {
+        id: metadataAccount.mintAddress.toBase58(),
+        contractType: NFTContractTypeName.candyMachine,
+        platformId: 'kota',
+        standard: NFTStandard.METAPLEX,
+        name: metadataAccount.name,
+        symbol: metadataAccount.symbol,
+        autoApprove: true, 
+        approved: true, 
+        typeMetadata: {
+          collection: metaFactory.id,
+          ...metaFactory.typeMetadata,
+          overrides: {
+            ...metaFactory.typeMetadata?.overrides,
+            artist: {
+              ...metaFactory.typeMetadata?.overrides.artist,
+              artistId: metadataAccount.creators.find(creator => creator.verified === true)!.address.toBase58()
+            }
+          }
+        }
+      }
+    }
   }
 }
