@@ -4,7 +4,6 @@ import { NFT } from './nft';
 import catalogMappers from './platforms-types/catalog';
 import chaosMappers from './platforms-types/chaos';
 import hedsCollabMappers from './platforms-types/heds-collab';
-import kotaMappers from './platforms-types/kota';
 import mintsongsV2Mappers from './platforms-types/mintsongs-v2';
 import multiTrackMultiprintContractMappers from './platforms-types/multi-track-multiprint-contract';
 import ninaMappers from './platforms-types/nina'
@@ -91,8 +90,5 @@ export const platformConfigs: MusicPlatformTypeConfigs = {
   },
   zora: {
     mappers: singleTrackMultiprintContractMappers,
-  },
-  kota: {
-    mappers: kotaMappers
   }
 }

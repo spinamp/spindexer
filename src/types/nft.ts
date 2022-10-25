@@ -57,7 +57,8 @@ export type TypeMetadata = {
     artist?: Partial<ArtistProfile>
     type?: MusicPlatformType
     extractor?: ExtractorTypes
-  }
+  },
+  collection?: string;
 }
 
 export type NftFactory = Contract & {

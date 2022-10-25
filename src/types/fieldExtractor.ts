@@ -1,4 +1,4 @@
-import { ethereumArtistId, ethereumTrackId, slugify } from '../utils/identifiers';
+import { artistId, slugify, trackId } from '../utils/identifiers';
 import { cleanURL, dropLeadingInfo, dropTrailingInfo } from '../utils/sanitizers';
 
 import { getTrait, NFT, NftFactory } from './nft';
@@ -161,13 +161,18 @@ const idStrategy: StrategyExtractor = (contract) => {
   return extractor;
 }
 
-export const resolveEthereumTrackId: Resolver = (nft, contract) => {
+export const resolveTrackId: Resolver = (nft, contract) => {
   const extractor = idStrategy(contract)
-  const trackId = slugify(extractor(nft));
-  if (!trackId) {
+  const id = slugify(extractor(nft));
+  if (!id) {
     throw new Error(`ID not extracted correctly for nft: ${nft.id}`);
   }
-  return ethereumTrackId(nft.contractAddress, trackId);
+
+  // prefer the collection override over nft.contract address.
+  // this helps us handle dedeuplicating solana nfts (where each nft has a different contract)
+  const address = contract.typeMetadata?.collection || nft.contractAddress;
+
+  return trackId(contract, address, id);
 }
 
 export const resolveAvatarUrl: Resolver = (nft) => {
@@ -210,22 +215,21 @@ export const resolveArtistName: Resolver = (nft, contract) => {
 export const resolveArtistId: Resolver = (nft, contract) => {
   const artistIdExtractorOverride = contract.typeMetadata?.overrides?.extractor?.artistId;
   if (artistIdExtractorOverride) {
-    if (artistIdExtractorOverride === ArtistIdExtractorTypes.USE_PLATFORM_ID) {
-      return contract.platformId;
-    }
-    else if (artistIdExtractorOverride === ArtistIdExtractorTypes.USE_PLATFORM_AND_ARTIST_NAME) {
-      return `${contract.platformId}/${slugify(resolveArtistName(nft, contract))}`;
-    }
-    else if (artistIdExtractorOverride === ArtistIdExtractorTypes.USE_ARTIST_ID_OVERRIDE) {
-      const artistIdOverride = contract.typeMetadata?.overrides?.artist?.artistId;
-      if (!artistIdOverride) {
-        throw new Error('must directly provided an artist ID override, or an artist ID extractor override');
-      }
-      return artistIdOverride;
+    switch (artistIdExtractorOverride){
+      case ArtistIdExtractorTypes.USE_PLATFORM_ID:
+        return contract.platformId;
+      case ArtistIdExtractorTypes.USE_PLATFORM_AND_ARTIST_NAME:
+        return `${contract.platformId}/${slugify(resolveArtistName(nft, contract))}`;
+      case ArtistIdExtractorTypes.USE_ARTIST_ID_OVERRIDE:
+        const artistIdOverride = contract.typeMetadata?.overrides?.artist?.artistId;
+        if (!artistIdOverride) {
+          throw new Error('must directly provided an artist ID override, or an artist ID extractor override');
+        }
+        return artistIdOverride;
     }
   }
 
-  return ethereumArtistId(contract.id);
+  return artistId(contract, contract.id);
 }
 
 export const resolveWebsiteUrl: Resolver = (nft, contract) => {
