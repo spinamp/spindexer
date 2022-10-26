@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import './types/env';
 
-
 import _ from 'lodash';
 
 import { Table } from './db/db';
@@ -9,12 +8,19 @@ import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
 import { addTimestampFromMetadata } from './processors/default/addTimestampFromMetadata';
+import { addTimestampToERC721Transfers, addTimestampToERC721NFTs } from './processors/default/addTimestampToERC721NFTs';
+import { categorizeZora } from './processors/default/categorizeZora';
 import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
 import { createNftFactoryFromERC721MetaFactoryProcessor } from './processors/default/createNftFactoryFromERC721MetaFactory';
 import { createNftsFromCandyMachine } from './processors/default/createNftFromCandyMachine';
+import { createNinaNfts } from './processors/default/createNinaNftProcesor';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
-import { errorAndMetadataResetProcessor } from './processors/default/errorProcessor';
+import { errorAndMetadataResetProcessor, errorProcessor } from './processors/default/errorProcessor';
+import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
+import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
 import { insertSeedsIntoMempool } from './processors/default/insertSeedsIntoMempool';
+import { ipfsAudioUploader, ipfsArtworkUploader } from './processors/default/ipfsMediaUploader';
+import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfsPinner';
 import { processMempoolInserts, processMempoolUpdates } from './processors/default/processMempool';
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
 import { runProcessors } from './runner';
@@ -46,24 +52,23 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
     ...tableUpdatesMempoolProcessors,
     ...metaFactoryProcessors,
     ...candyMachineProcessors,
-    // getERC721ContractFieldsProcessor,
-    // erc721TransferProcessors,
-    // addTimestampToERC721Transfers,
-    // addTimestampToERC721NFTs,
-    // getERC721TokenFieldsProcessor(nftFactoriesByAddress),
+    getERC721ContractFieldsProcessor,
+    erc721TransferProcessors,
+    addTimestampToERC721Transfers,
+    addTimestampToERC721NFTs,
+    getERC721TokenFieldsProcessor(nftFactoriesByAddress),
     addMetadataIPFSHashProcessor(nftFactoriesByAddress),
     addMetadataObjectProcessor(nftFactoriesByAddress),
-    // categorizeZora,
-    // createNinaNfts,
+    categorizeZora,
+    createNinaNfts,
     addTimestampFromMetadata,
     ...platformTrackProcessors,
-    // ...apiTrackProcessors,
-    // ipfsAudioUploader,
-    // ipfsArtworkUploader,
-    // ipfsAudioPinner,
-    // ipfsArtworkPinner,
-    // errorProcessor,
-    // createMetaplexNfts
+    ...apiTrackProcessors,
+    ipfsAudioUploader,
+    ipfsArtworkUploader,
+    ipfsAudioPinner,
+    ipfsArtworkPinner,
+    errorProcessor,
   ]
 };
 
@@ -73,7 +78,8 @@ const updateDBLoop = async () => {
   
   const metafactories = await dbClient.getRecords<MetaFactory>(Table.metaFactories);
   const erc721MetaFactories = metafactories.filter(metaFactory => metaFactory.standard === NFTStandard.ERC721);
-  const candyMachines = metafactories.filter(metaFactory => metaFactory.standard === NFTStandard.METAPLEX && metaFactory.contractType === MetaFactoryTypeName.candyMachine) 
+  // TODO: find a better way of including all candy machines - maybe add another NFTStandard?
+  const candyMachines = metafactories.filter(metaFactory => metaFactory.standard === NFTStandard.METAPLEX && metaFactory.contractType === MetaFactoryTypeName.kota) 
 
   const musicPlatforms = await dbClient.getRecords<MusicPlatform>(Table.platforms);
   await runProcessors(PROCESSORS(nftFactories, erc721MetaFactories, musicPlatforms, candyMachines), dbClient);
