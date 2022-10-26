@@ -5,7 +5,7 @@ import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
 import { NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
 import { Table } from '../db';
-import { addMetaFactory, addPlatform, removeMetaFactory, removePlatform, updateViews } from '../migration-helpers';
+import { addMetaFactory, addPlatform, updateViews } from '../migration-helpers';
 
 const KOTA_PLATFORM: MusicPlatform = {
   id: 'kota',
@@ -47,6 +47,5 @@ export const up = async (knex: Knex) => {
 }
 
 export const down = async (knex: Knex) => {
-  await removeMetaFactory(knex, KOTA);
-  await removePlatform(knex, KOTA_PLATFORM);
+  throw 'not implemented'
 }
