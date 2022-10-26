@@ -60,9 +60,7 @@ const getCandyMachineCreator = async (candyMachine: PublicKey): Promise<[PublicK
 );
 
 const getMintTx = async (clients: Clients, pubkey: PublicKey, options?: { before: string }): Promise<ConfirmedSignatureInfo> => {
-  // we use a different node here because other nodes are unreliable for getSignaturesForAddress
-  const client = new web3.Connection('https://api.mainnet-beta.solana.com')
-  const txList = await client.getSignaturesForAddress(pubkey, { ...options });
+  const txList = await clients.solana.connection.getSignaturesForAddress(pubkey, { ...options });
 
   if (txList.length === 1000){
     return getMintTx(clients, pubkey, { before: txList.at(-2)!.signature })
@@ -88,7 +86,8 @@ export const newCandyMachineNfts: (metaFactory: MetaFactory) => Trigger<undefine
   const [candyMachineCreator] = (await getCandyMachineCreator(new web3.PublicKey(metaFactory.id)));
   const allMintAccounts = await getMintAddresses(clients, candyMachineCreator)
   const newMintAccounts = allMintAccounts.filter(mintAccount => !existingNFTFactories.has(mintAccount));
-  const chunks = _.chunk(newMintAccounts, 10)
+
+  const chunks = _.chunk(newMintAccounts, 100)
 
   const getMetadataAccounts = async(mintAccounts: string[]): Promise<{ metadataAccount: Metadata<JsonMetadata<string>>, mintTx: ConfirmedSignatureInfo }[]> => {
     const metadataAccounts = (
@@ -108,10 +107,8 @@ export const newCandyMachineNfts: (metaFactory: MetaFactory) => Trigger<undefine
     )
 
     return _.flatten(withMintTx);
-
   }
 
-  const metadataAccountResults = await rollPromises(chunks, getMetadataAccounts, 3, 10)
+  const metadataAccountResults = await rollPromises(chunks, getMetadataAccounts, 100, 30)
   return _.flatten(metadataAccountResults.map(result => result.response!))
-
 };
