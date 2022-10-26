@@ -17,20 +17,12 @@ export const addPlatform = async (knex: Knex, platform: MusicPlatform) => {
   await knex(Table.platforms).insert([platform]);
 }
 
-export const removePlatform = async (knex: Knex, platform: MusicPlatform) => {
-  throw 'not implemented'
-}
-
 export const addMetaFactory = async(knex: Knex, contract: MetaFactory) => {
   if (!contract.id || contract.id.length === 0) {
     throw new Error('Invalid contract address');
   }
   const dbContracts = toDBRecords(Table.metaFactories, [contract]);
   await knex(Table.metaFactories).insert(dbContracts)
-}
-
-export const removeMetaFactory = async(knex: Knex, contract: MetaFactory) => {
-  throw 'not implemented'
 }
 
 export const addNftFactory = async(knex: Knex, contract: NftFactory) => {
@@ -69,12 +61,6 @@ export const clearERC721Contract = async(knex: Knex, contractAddress: string) =>
   await knex.raw(`delete from "${Table.erc721Transfers}" where "contractAddress" ilike '${contractAddress}';`);
   await knex.raw(`delete from "${Table.nfts}" where "contractAddress" ilike '${contractAddress}'`);
 }
-
-
-export const removeNftFactory = async(knex: Knex, contract: NftFactory) => {
-  throw 'not implemented'
-}
-
 
 async function getPrimaryKeys(knex: Knex): Promise<{
   table_name: string,

@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 
 import { NFTStandard } from '../../types/nft';
-import { MusicPlatform, MusicPlatformType } from '../../types/platform';
+import { MusicPlatformType } from '../../types/platform';
 import { Table } from '../db';
 
 const INITIAL_TABLES = [
@@ -147,14 +147,6 @@ const INITIAL_TABLES = [
   }
 ];
 
-const INITIAL_PLATFORM_ENUMS: MusicPlatform[] = [
-  { id: 'noizd', type: MusicPlatformType.noizd, name: 'NOIZD' },
-  { id: 'catalog', type: MusicPlatformType.catalog, name: 'Catalog' },
-  { id: 'sound', type: MusicPlatformType.sound, name: 'Sound.xyz' },
-  { id: 'zoraOriginal', type: MusicPlatformType.zora, name: 'Zora' },
-  { id: 'zora', type: MusicPlatformType.zora, name: 'Zora' },
-]
-
 export const up = async (knex: Knex) => {
   console.log('Running initial DB bootstrap');
   const promises = INITIAL_TABLES.map(table => {
@@ -175,7 +167,6 @@ export const up = async (knex: Knex) => {
   await knex.raw(`comment on table "${Table.processors}" is '@omit';`);
   await knex.raw(`comment on table knex_migrations is '@omit';`);
   await knex.raw(`comment on table knex_migrations_lock is '@omit';`);
-  await knex(Table.platforms).insert(INITIAL_PLATFORM_ENUMS);
 };
 
 exports.down = async (knex: Knex) => {
