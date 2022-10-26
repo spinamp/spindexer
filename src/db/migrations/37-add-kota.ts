@@ -16,7 +16,7 @@ const KOTA_PLATFORM: MusicPlatform = {
 const KOTA: MetaFactory = {
   id: '2ZvRTpStD4gQ9WPoXuiA4MtFpiZze9K9fPfFtCTnzdGo',
   platformId: KOTA_PLATFORM.id,
-  contractType: MetaFactoryTypeName.kota,
+  contractType: MetaFactoryTypeName.candyMachine,
   standard: NFTStandard.METAPLEX,
   autoApprove: true,
   typeMetadata: {
@@ -29,7 +29,6 @@ const KOTA: MetaFactory = {
         title: TitleExtractorTypes.METADATA_NAME_WITHOUT_TRAILING_INFO,
         artistId: ArtistIdExtractorTypes.USE_ARTIST_ID_OVERRIDE,
         artistName: ArtistNameExtractorTypes.USE_ARTIST_NAME_OVERRIDE,
-        
       }
     }
   }
@@ -40,7 +39,6 @@ export const up = async (knex: Knex) => {
   await knex.schema.alterTable(Table.metaFactories, table => {
     table.jsonb('typeMetadata')
   })
-
 
   await addPlatform(knex, KOTA_PLATFORM);
   await addMetaFactory(knex, KOTA);

@@ -1,4 +1,4 @@
-import { Metadata } from '@metaplex-foundation/js'
+import { JsonMetadata, Metadata } from '@metaplex-foundation/js'
 import { ethers } from 'ethers'
 
 import { ethereumArtistId } from '../utils/identifiers'
@@ -14,7 +14,7 @@ export enum MetaFactoryTypeName {
   soundArtistProfileCreator = 'soundArtistProfileCreator',
   ninaMintCreator = 'ninaMintCreator',
   zoraDropCreator = 'zoraDropCreator',
-  kota = 'kota',
+  candyMachine = 'candyMachine',
   soundCreatorV1 = 'soundCreatorV1'
 }
 
@@ -36,6 +36,16 @@ export type MetaFactoryType = {
 
 type MetaFactoryTypes = {
   [type in MetaFactoryTypeName]?: MetaFactoryType
+}
+
+function candyMachineArtistId(metadataAccount: Metadata<JsonMetadata<string>>): string {
+  const artist = metadataAccount.creators.find(creator => creator.verified === true);
+
+  if (!artist){
+    throw `Can't find artist address for ${metadataAccount.address.toBase58()}`
+  }
+
+  return artist.address.toBase58();
 }
 
 export const MetaFactoryTypes: MetaFactoryTypes = {
@@ -122,13 +132,13 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
         }
       })}
   },
-  kota: {
+  candyMachine: {
     newContractCreatedEvent: '',
     metadataAccountToNftFactory: (metadataAccount, metaFactory) => {
       return {
         id: metadataAccount.mintAddress.toBase58(),
         contractType: NFTContractTypeName.candyMachine,
-        platformId: 'kota',
+        platformId: metaFactory.platformId,
         standard: NFTStandard.METAPLEX,
         name: metadataAccount.name,
         symbol: metadataAccount.symbol,
@@ -140,8 +150,8 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
           overrides: {
             ...metaFactory.typeMetadata?.overrides,
             artist: {
+              artistId: candyMachineArtistId(metadataAccount),
               ...metaFactory.typeMetadata?.overrides.artist,
-              artistId: metadataAccount.creators.find(creator => creator.verified === true)!.address.toBase58()
             }
           }
         }

@@ -78,8 +78,7 @@ const updateDBLoop = async () => {
   
   const metafactories = await dbClient.getRecords<MetaFactory>(Table.metaFactories);
   const erc721MetaFactories = metafactories.filter(metaFactory => metaFactory.standard === NFTStandard.ERC721);
-  // TODO: find a better way of including all candy machines - maybe add another NFTStandard?
-  const candyMachines = metafactories.filter(metaFactory => metaFactory.standard === NFTStandard.METAPLEX && metaFactory.contractType === MetaFactoryTypeName.kota) 
+  const candyMachines = metafactories.filter(metaFactory => metaFactory.standard === NFTStandard.METAPLEX && metaFactory.contractType === MetaFactoryTypeName.candyMachine) 
 
   const musicPlatforms = await dbClient.getRecords<MusicPlatform>(Table.platforms);
   await runProcessors(PROCESSORS(nftFactories, erc721MetaFactories, musicPlatforms, candyMachines), dbClient);
