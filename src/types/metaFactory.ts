@@ -144,10 +144,19 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
         autoApprove: true, 
         approved: true, 
         typeMetadata: {
-          collection: metaFactory.id,
           ...metaFactory.typeMetadata,
           overrides: {
             ...metaFactory.typeMetadata?.overrides,
+            extractor: {
+              id: {
+                extractor: IdExtractorTypes.USE_METAFACTORY_AND_TITLE_EXTRACTOR,
+                params: { 
+                  metaFactory: metaFactory.id,
+                  titleExtractor: metaFactory.typeMetadata?.overrides.extractor?.title
+                }
+              },
+              ...metaFactory.typeMetadata?.overrides.extractor,
+            },
             artist: {
               artistId: candyMachineArtistId(metadataAccount),
               ...metaFactory.typeMetadata?.overrides.artist,

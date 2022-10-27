@@ -58,7 +58,6 @@ export type TypeMetadata = {
     type?: MusicPlatformType
     extractor?: ExtractorTypes
   },
-  collection?: string;
 }
 
 export type NftFactory = Contract & {

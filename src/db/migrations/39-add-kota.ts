@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-import { ArtistIdExtractorTypes, ArtistNameExtractorTypes, IdExtractorTypes, TitleExtractorTypes } from '../../types/fieldExtractor';
+import { ArtistIdExtractorTypes, ArtistNameExtractorTypes, TitleExtractorTypes } from '../../types/fieldExtractor';
 import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
 import { NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
@@ -25,7 +25,6 @@ const KOTA: MetaFactory = {
         name: 'Kids of the Apocalypse'
       },
       extractor: {
-        id: IdExtractorTypes.USE_TITLE_EXTRACTOR,
         title: TitleExtractorTypes.METADATA_NAME_WITHOUT_TRAILING_INFO,
         artistId: ArtistIdExtractorTypes.USE_ARTIST_ID_OVERRIDE,
         artistName: ArtistNameExtractorTypes.USE_ARTIST_NAME_OVERRIDE,

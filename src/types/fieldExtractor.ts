@@ -1,14 +1,21 @@
-import { artistId, slugify, trackId } from '../utils/identifiers';
+
+import { artistId, slugify, solanaTrackId, trackId } from '../utils/identifiers';
 import { cleanURL, dropLeadingInfo, dropTrailingInfo } from '../utils/sanitizers';
 
 import { getTrait, NFT, NftFactory } from './nft';
 
 type Extractor = (nft: NFT) => string;
-type StrategyExtractor = (nftFactory: NftFactory) => Extractor;
+type ParameterizedExtractor = (params: any) => Extractor;
+type ParameterizedExtractorType<T> = { extractor: T, params: any }
+type StrategyExtractor = (nftFactory: NftFactory) => Extractor
 type Resolver = (nft: NFT, contract: NftFactory) => string;
 
+function isParameterizedExtractor(extractor?: string | ParameterizedExtractorType<any>) {
+  return extractor && typeof extractor !== 'string';
+}
+
 export type ExtractorTypes = {
-  id?: IdExtractorTypes
+  id?: IdExtractorTypes | ParameterizedExtractorType<IdExtractorTypes>
   title?: TitleExtractorTypes
   audioUrl?: AudioUrlExtractorTypes
   artworkUrl?: ArtworkUrlExtractorTypes
@@ -30,7 +37,8 @@ export enum TitleExtractorTypes {
 
 export enum IdExtractorTypes {
   USE_TITLE_EXTRACTOR = 'useTitleExtractor',
-  TRACK_NUMBER = 'trackNumber'
+  TRACK_NUMBER = 'trackNumber',
+  USE_METAFACTORY_AND_TITLE_EXTRACTOR = 'useMetafactoryAndTitleExtractor'
 }
 
 export enum AudioUrlExtractorTypes {
@@ -65,7 +73,7 @@ export enum ArtistIdExtractorTypes {
   USE_ARTIST_ID_OVERRIDE = 'useArtistIdOverride',
 }
 
-type IdExtractorMapping = Record<Partial<IdExtractorTypes>, Extractor>
+type IdExtractorMapping = Record<Partial<IdExtractorTypes>, Extractor | ParameterizedExtractor>
 type TitleExtractorMapping = Record<TitleExtractorTypes, Extractor>
 type AudioUrlExtractorMapping = Record<AudioUrlExtractorTypes, Extractor>
 type WebsiteUrlExtractorMapping = Record<WebsiteUrlExtractorTypes, Extractor>
@@ -79,6 +87,10 @@ const idExtractors: IdExtractorMapping = {
     }
     return `${nft.metadata.trackNumber}`
   },
+  [IdExtractorTypes.USE_METAFACTORY_AND_TITLE_EXTRACTOR]: (params: { metaFactory: string, nftFactory: NftFactory }) => (nft: NFT) => {
+    const title = titleStrategy(params.nftFactory)(nft);
+    return solanaTrackId(params.metaFactory, title);
+  }
 }
 
 const titleExtractors: TitleExtractorMapping = {
@@ -154,25 +166,32 @@ const idStrategy: StrategyExtractor = (contract) => {
   if (idExtractorOverride === IdExtractorTypes.USE_TITLE_EXTRACTOR) {
     return titleStrategy(contract);
   }
-  const extractor = idExtractors[idExtractorOverride];
+  let extractor = null;
+  if (typeof idExtractorOverride === 'string'){
+    extractor = idExtractors[idExtractorOverride];
+  }
+
   if (!extractor) {
     throw new Error('no other id extraction options yet')
   }
-  return extractor;
+  return extractor as Extractor;
 }
 
 export const resolveTrackId: Resolver = (nft, contract) => {
+  if (isParameterizedExtractor(contract.typeMetadata?.overrides.extractor?.id)){
+    const type = (contract.typeMetadata?.overrides.extractor?.id as ParameterizedExtractorType<IdExtractorTypes>)
+    const extractorType = type.extractor;
+    const extractor = idExtractors[extractorType]({ ...type.params, nftFactory: contract }) as Extractor;
+    return extractor(nft)
+  }
+
   const extractor = idStrategy(contract)
   const id = slugify(extractor(nft));
   if (!id) {
     throw new Error(`ID not extracted correctly for nft: ${nft.id}`);
   }
 
-  // prefer the collection override over nft.contract address.
-  // this helps us handle dedeuplicating solana nfts (where each nft has a different contract)
-  const address = contract.typeMetadata?.collection || nft.contractAddress;
-
-  return trackId(contract, address, id);
+  return trackId(contract, nft.contractAddress, id);
 }
 
 export const resolveAvatarUrl: Resolver = (nft) => {
