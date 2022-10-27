@@ -26,7 +26,7 @@ export const createNftsFromCandyMachine: (metaFactory: MetaFactory) => Processor
           platformId: metaFactory.platformId,
           tokenMetadataURI: metadataAccount!.uri,
           tokenURI: metadataAccount!.uri,
-          approved: true,
+          approved: metaFactory.autoApprove,
           burned: false,
           createdAtTime: new Date(mintTx.blockTime! * 1000),
         }
