@@ -28,10 +28,10 @@ import { MetaFactory, MetaFactoryTypeName } from './types/metaFactory';
 import { NftFactory, NFTStandard } from './types/nft';
 import { API_PLATFORMS, MusicPlatform } from './types/platform';
 
-const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], musicPlatforms: MusicPlatform[], candyMachines: MetaFactory[]) => {
+const PROCESSORS = (nftFactories: NftFactory[], erc721MetaFactories: MetaFactory[], musicPlatforms: MusicPlatform[], candyMachines: MetaFactory[]) => {
   const nftFactoriesByAddress = _.keyBy(nftFactories, 'id');
 
-  const metaFactoryProcessors = metaFactories.map(contract => createNftFactoryFromERC721MetaFactoryProcessor(contract));
+  const erc721MetaFactoryProcessors = erc721MetaFactories.map(contract => createNftFactoryFromERC721MetaFactoryProcessor(contract));
   const erc721TransferProcessors = createERC721NFTsFromTransfersProcessor(nftFactories);
   const platformTrackProcessors = musicPlatforms.map(musicPlatform => processPlatformTracks(musicPlatform));
 
@@ -50,7 +50,7 @@ const PROCESSORS = (nftFactories: NftFactory[], metaFactories: MetaFactory[], mu
     errorAndMetadataResetProcessor,
     ...tableInsertsMempoolProcessors,
     ...tableUpdatesMempoolProcessors,
-    ...metaFactoryProcessors,
+    ...erc721MetaFactoryProcessors,
     ...candyMachineProcessors,
     getERC721ContractFieldsProcessor,
     erc721TransferProcessors,
