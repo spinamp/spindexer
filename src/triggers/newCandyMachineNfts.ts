@@ -11,6 +11,8 @@ import { NftFactory } from '../types/nft';
 import { Trigger } from '../types/trigger';
 import { rollPromises } from '../utils/rollingPromises';
 
+const MAX_CANDY_MACHINE_CHUNK_SIZE = parseInt(process.env.MAX_CANDY_MACHINE_CHUNK_SIZE!)
+
 export const newCandyMachineNfts: (metaFactory: MetaFactory) => Trigger<undefined> =
 (metaFactory) => async (clients) => {
   const existingNFTFactories = new Set(
@@ -24,7 +26,7 @@ export const newCandyMachineNfts: (metaFactory: MetaFactory) => Trigger<undefine
   const allMintAccounts = await clients.solana.getMintAddressesForCandyMachine(new PublicKey(metaFactory.id))
   const newMintAccounts = allMintAccounts.filter(mintAccount => !existingNFTFactories.has(mintAccount));
   console.log('new candy machine nfts', newMintAccounts)
-  const chunks = _.chunk(newMintAccounts, 100)
+  const chunks = _.chunk(newMintAccounts, MAX_CANDY_MACHINE_CHUNK_SIZE)
 
   const getMetadataAccounts = async(mintAccounts: string[]): Promise<{ metadataAccount: Metadata<JsonMetadata<string>>, mintTx: ConfirmedSignatureInfo }[]> => {
     const metadataAccounts = (
@@ -46,6 +48,6 @@ export const newCandyMachineNfts: (metaFactory: MetaFactory) => Trigger<undefine
     return _.flatten(withMintTx);
   }
 
-  const metadataAccountResults = await rollPromises(chunks, getMetadataAccounts, 100, 30)
+  const metadataAccountResults = await rollPromises(chunks, getMetadataAccounts, MAX_CANDY_MACHINE_CHUNK_SIZE, 30)
   return _.flatten(metadataAccountResults.map(result => result.response!))
 };
