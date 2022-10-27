@@ -1,11 +1,12 @@
 import { Knex } from 'knex';
 
 import { ArtistIdExtractorTypes, ArtistNameExtractorTypes, TitleExtractorTypes } from '../../types/fieldExtractor';
+import { CrdtUpsertMessage, getCrdtUpsertMessage } from '../../types/message';
 import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
 import { NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
 import { Table } from '../db';
-import { addMetaFactory, addPlatform, updateViews } from '../migration-helpers';
+import { updateViews } from '../migration-helpers';
 
 const KOTA_PLATFORM: MusicPlatform = {
   id: 'kota',
@@ -39,8 +40,15 @@ export const up = async (knex: Knex) => {
     table.jsonb('typeMetadata')
   })
 
-  await addPlatform(knex, KOTA_PLATFORM);
-  await addMetaFactory(knex, KOTA);
+  const platform: CrdtUpsertMessage = 
+    getCrdtUpsertMessage<MusicPlatform>(Table.platforms, KOTA_PLATFORM)
+
+  const metaFactory: CrdtUpsertMessage =
+    getCrdtUpsertMessage<MetaFactory>(Table.metaFactories, KOTA)
+
+  await knex(Table.seeds).insert(platform)
+  await knex(Table.seeds).insert(metaFactory)
+
 
   await updateViews(knex)
 }
