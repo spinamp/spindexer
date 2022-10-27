@@ -29,9 +29,8 @@ export type MetaFactory = Contract & {
 
 export type MetaFactoryType = {
   newContractCreatedEvent?: string,
-  creationEventToNftFactory?: (event: ethers.Event, autoApprove: boolean, factoryMetadata?: unknown) => NftFactory
+  creationMetadataToNftFactory: (creationData: any, autoApprove: boolean, factoryMetadata?: unknown) => NftFactory
   metadataAPI?: (events: ethers.Event[], clients: Clients) => Promise<any>,
-  metadataAccountToNftFactory?: (metadata: Metadata, metaFactory: MetaFactory) => NftFactory
 }
 
 type MetaFactoryTypes = {
@@ -51,7 +50,7 @@ function candyMachineArtistId(metadataAccount: Metadata<JsonMetadata<string>>): 
 export const MetaFactoryTypes: MetaFactoryTypes = {
   soundArtistProfileCreator: {
     newContractCreatedEvent: 'CreatedArtist',
-    creationEventToNftFactory: (event: any, autoApprove: boolean) => ({
+    creationMetadataToNftFactory: (event: any, autoApprove: boolean) => ({
       id: formatAddress(event.args!.artistAddress),
       platformId: 'sound',
       startingBlock: event.blockNumber,
@@ -63,7 +62,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
   },
   zoraDropCreator: {
     newContractCreatedEvent: 'CreatedDrop',
-    creationEventToNftFactory: (event: any, autoApprove: boolean) => ({
+    creationMetadataToNftFactory: (event: any, autoApprove: boolean) => ({
       id: formatAddress(event.args!.editionContractAddress),
       platformId: 'zora',
       startingBlock: event.blockNumber,
@@ -99,7 +98,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       const officialEditions = new Set([...editionAddresses].filter((address) => publicAddresses.has(address)));
       return { soundPublicTimes, officialEditions };
     },
-    creationEventToNftFactory: (event: any, autoApprove: boolean, factoryMetadata: any) => {
+    creationMetadataToNftFactory: (event: any, autoApprove: boolean, factoryMetadata: any) => {
       const official = factoryMetadata.officialEditions.has(formatAddress(event.args!.soundEdition));
       const publicReleaseTimeRaw = factoryMetadata.soundPublicTimes[formatAddress(event.args!.soundEdition)];
       const publicReleaseTime = publicReleaseTimeRaw ? new Date(publicReleaseTimeRaw) : undefined;
@@ -133,7 +132,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       })}
   },
   candyMachine: {
-    metadataAccountToNftFactory: (metadataAccount, metaFactory) => {
+    creationMetadataToNftFactory: ({ metadataAccount, metaFactory }: { metadataAccount: Metadata, metaFactory: MetaFactory }, autoApprove: boolean) => {
       return {
         id: metadataAccount.mintAddress.toBase58(),
         contractType: NFTContractTypeName.candyMachine,
@@ -141,8 +140,8 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
         standard: NFTStandard.METAPLEX,
         name: metadataAccount.name,
         symbol: metadataAccount.symbol,
-        autoApprove: true, 
-        approved: true, 
+        autoApprove, 
+        approved: autoApprove, 
         typeMetadata: {
           ...metaFactory.typeMetadata,
           overrides: {

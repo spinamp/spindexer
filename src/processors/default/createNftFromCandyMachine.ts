@@ -33,14 +33,14 @@ export const createNftsFromCandyMachine: (metaFactory: MetaFactory) => Processor
         return details
       })
       
-      const metadataToNftFactory = MetaFactoryTypes[metaFactory.contractType]?.metadataAccountToNftFactory;
+      const creationMetadataToNftFactory = MetaFactoryTypes[metaFactory.contractType]?.creationMetadataToNftFactory;
 
-      if (!metadataToNftFactory){
-        throw `no metadataToNftFactory specified for ${metaFactory.contractType}`
+      if (!creationMetadataToNftFactory){
+        throw `no creationMetadataToNftFactory specified for ${metaFactory.contractType}`
       }
 
       const nftFactories: NftFactory[] = items.map(({ metadataAccount }) => {
-        return metadataToNftFactory(metadataAccount, metaFactory)
+        return creationMetadataToNftFactory({ metadataAccount, metaFactory }, metaFactory.autoApprove)
       });
     
       await clients.db.insert<Partial<NftFactory>>(Table.nftFactories, nftFactories)
