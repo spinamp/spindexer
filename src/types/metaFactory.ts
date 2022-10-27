@@ -28,7 +28,7 @@ export type MetaFactory = Contract & {
 }
 
 export type MetaFactoryType = {
-  newContractCreatedEvent: string,
+  newContractCreatedEvent?: string,
   creationEventToNftFactory?: (event: ethers.Event, autoApprove: boolean, factoryMetadata?: unknown) => NftFactory
   metadataAPI?: (events: ethers.Event[], clients: Clients) => Promise<any>,
   metadataAccountToNftFactory?: (metadata: Metadata, metaFactory: MetaFactory) => NftFactory
@@ -133,7 +133,6 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       })}
   },
   candyMachine: {
-    newContractCreatedEvent: '',
     metadataAccountToNftFactory: (metadataAccount, metaFactory) => {
       return {
         id: metadataAccount.mintAddress.toBase58(),
