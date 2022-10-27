@@ -1,7 +1,7 @@
 import * as MetaplexFoundation from '@metaplex-foundation/js';
-import { web3, AnchorProvider, Program, Wallet } from '@project-serum/anchor';
-import { Keypair } from '@solana/web3.js';
+import { web3, Program } from '@project-serum/anchor';
 import _ from 'lodash';
+
 
 import { Table } from '../db/db';
 import { MetaFactory } from '../types/metaFactory';
@@ -16,25 +16,13 @@ export const newNinaContracts: Trigger<undefined> = async clients => {
     ])
   )[0];
 
-  const endpoint = process.env.SOLANA_PROVIDER_ENDPOINT;
-
-  if (!endpoint) {
-    throw 'No solana endpoint configured';
-  }
-
   if (!factory) {
     return [];
   }
 
-  const connection = new web3.Connection(endpoint);
-  const provider = new AnchorProvider(
-    connection,
-    new Wallet(new Keypair()),
-    {},
-  );
-  const nina = await Program.at(factory.id, provider);
+  const nina = await Program.at(factory.id, clients.solana.anchorProvider);
 
-  const metaplex = new MetaplexFoundation.Metaplex(connection);
+  const metaplex = new MetaplexFoundation.Metaplex(clients.solana.connection);
 
   // Fetch all releases from Solana via Anchor
   const releases = await nina.account.release.all();
