@@ -7,6 +7,8 @@ export const authMiddleware = (
   response: Response,
   next: NextFunction,
 ) => {
+  // skip preflight requests
+  if (request.method === 'OPTIONS') { next(); return; }
 
   try {
     let signer: any;
