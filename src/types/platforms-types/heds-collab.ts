@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { ethereumTrackId, etheruemId, slugify } from '../../utils/identifiers';
+import { ethereumTrackId, ethereumId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, getTrait, NftFactory } from '../nft';
@@ -58,8 +58,8 @@ function getAvatarFromArtist(artist: string): string {
 
 function getArtistId(artist: string){
   const idByArtist: any = {
-    'OSHI': etheruemId('0x4d18f8f2ae19f1e166c97793cceeb70680a2b6d2'),
-    'CAPSHUN & CORDEROYBOI': etheruemId('0xaa86ff6eb0ac77d46de48e955402cc3435c7ab8f'),
+    'OSHI': ethereumId('0x4d18f8f2ae19f1e166c97793cceeb70680a2b6d2'),
+    'CAPSHUN & CORDEROYBOI': ethereumId('0xaa86ff6eb0ac77d46de48e955402cc3435c7ab8f'),
   }
 
   const id = idByArtist[artist.toUpperCase()];

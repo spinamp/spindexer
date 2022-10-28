@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { ethereumTrackId, etheruemId, slugify } from '../../utils/identifiers';
+import { ethereumTrackId, ethereumId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, NftFactory } from '../nft';
@@ -16,7 +16,7 @@ const extractArtistIdFromNFT = (nft: NFT) => {
   if (artistAddress.length !== 42) {
     throw new Error('Unexpected artist address length');
   }
-  return etheruemId(artistAddress);
+  return ethereumId(artistAddress);
 }
 
 const mapTrack: MapTrack = (

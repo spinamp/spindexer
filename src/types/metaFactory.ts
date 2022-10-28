@@ -1,7 +1,7 @@
 import { JsonMetadata, Metadata } from '@metaplex-foundation/js'
 import { ethers } from 'ethers'
 
-import { etheruemId } from '../utils/identifiers'
+import { ethereumId } from '../utils/identifiers'
 
 import { formatAddress } from './address'
 import { Contract } from './contract'
@@ -73,7 +73,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       typeMetadata: {
         overrides: {
           artist: {
-            artistId: etheruemId(event.args!.creator),
+            artistId: ethereumId(event.args!.creator),
             name: formatAddress(event.args!.creator),
           },
           track: {
@@ -117,7 +117,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
           overrides: {
             type: MusicPlatformType['multi-track-multiprint-contract'],
             artist: {
-              artistId: etheruemId(event.args!.deployer),
+              artistId: ethereumId(event.args!.deployer),
             },
             extractor: {
               id: IdExtractorTypes.TRACK_NUMBER,

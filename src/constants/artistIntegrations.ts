@@ -3,7 +3,7 @@ import { TitleExtractorTypes, IdExtractorTypes, ArtistIdExtractorTypes, ArtistNa
 import { MetaFactory, MetaFactoryTypeName } from '../types/metaFactory';
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../types/platform';
-import { etheruemId } from '../utils/identifiers';
+import { ethereumId } from '../utils/identifiers';
 
 // Custom artist and platform migration details extracted in preparation
 // for a fully CRDT based approach
@@ -255,7 +255,7 @@ const DANIEL_ALLAN_GLASSHOUSE_FACTORY: NftFactory = {
     overrides: {
       artist: {
         name: 'Daniel Allan',
-        artistId: etheruemId('0xbcefc4906b443e4db64e2b00b9af2c39e76c785c'),
+        artistId: ethereumId('0xbcefc4906b443e4db64e2b00b9af2c39e76c785c'),
         avatarUrl: 'https://storageapi.fleek.co/catalogworks-team-bucket/prod/users/0xbcefc4906b443e4db64e2b00b9af2c39e76c785c/images/profile_picture.jpeg'
       },
       extractor: {
@@ -427,7 +427,7 @@ const JAGWAR_TWIN_THOUGHT_FORMS_NFT_FACTORY: NftFactory = {
       },
       artist: {
         name: 'Jagwar Twin',
-        artistId: etheruemId(jagwarTwinAddress),
+        artistId: ethereumId(jagwarTwinAddress),
         avatarUrl: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmcBb9C69vvJXasxTYFPwpo9WuZv415KkH3wTdoeBMH2hH',
         websiteUrl: 'https://jagwartwin.com/'
       },
@@ -451,7 +451,7 @@ const JAGWAR_TWIN_ALBUM_NFT_FACTORY: NftFactory = {
     overrides: {
       artist: {
         name: 'Jagwar Twin',
-        artistId: etheruemId(jagwarTwinAddress),
+        artistId: ethereumId(jagwarTwinAddress),
         avatarUrl: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmcBb9C69vvJXasxTYFPwpo9WuZv415KkH3wTdoeBMH2hH',
         websiteUrl: 'https://jagwartwin.com/'
       },
@@ -479,7 +479,7 @@ const JAGWAR_TWIN_ARTIFACTS_FACTORY: NftFactory = {
     overrides: {
       artist: {
         name: 'Jagwar Twin',
-        artistId: etheruemId(jagwarTwinAddress),
+        artistId: ethereumId(jagwarTwinAddress),
         avatarUrl: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmcBb9C69vvJXasxTYFPwpo9WuZv415KkH3wTdoeBMH2hH',
         websiteUrl: 'https://jagwartwin.com/'
       },
@@ -515,7 +515,7 @@ const MIGHTY_33_OTHERS_DIE_FACTORY: NftFactory = {
     overrides: {
       artist: {
         name: 'Mighty33',
-        artistId: etheruemId(mighty33Address),
+        artistId: ethereumId(mighty33Address),
         avatarUrl: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmS8dBxzgmNcCL71XYM5WxCkb2MM8rhQdCqAf1as8XXCVo',
         websiteUrl: 'https://geniuscorp.fr/m33'
       },

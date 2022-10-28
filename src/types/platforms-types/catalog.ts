@@ -1,12 +1,12 @@
 import _ from 'lodash';
 
-import { ethereumTrackId, etheruemId, slugify } from '../../utils/identifiers';
+import { ethereumTrackId, ethereumId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { MapNFTsToTrackIds, MapTrack } from '../mapping';
 import { NFT } from '../nft';
 
 const mapAPITrackToArtistID = (apiTrack: any): string => {
-  return etheruemId(apiTrack.artist.id);
+  return ethereumId(apiTrack.artist.id);
 };
 
 const mapTrack: MapTrack = (nft, apiTrack) => {
