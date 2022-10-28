@@ -11,7 +11,7 @@ const apiVersionPrefix = `/v${process.env.SEEDS_API_VERSION || '1'}`;
 export const createSeedsAPIServer = () => {
   const app = express();
   app.use(express.json());
-  app.use(cors({ origin: true }));
+  app.use(cors({ origin: false }));
   app.use(authMiddleware);
 
   app.post(`${apiVersionPrefix}/seeds/`, async (req, res) => {
