@@ -4,7 +4,7 @@ import { extractHashFromURL } from '../../clients/ipfs';
 import { slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { FailedAudioExtractionError } from '../error';
-import { resolveArtistId, resolveArtistName, resolveArtistWebsiteUrl, resolveArtworkUrl, resolveAudioUrl, resolveAvatarUrl, resolveEthereumTrackId, resolveTitle, resolveWebsiteUrl } from '../fieldExtractor';
+import { resolveArtistId, resolveArtistName, resolveArtistWebsiteUrl, resolveArtworkUrl, resolveAudioUrl, resolveAvatarUrl, resolveTitle, resolveTrackId, resolveWebsiteUrl } from '../fieldExtractor';
 import { MapNFTsToTrackIds, MapTrack } from '../mapping';
 import { NFT, NftFactory } from '../nft';
 import { ProcessedTrack } from '../track';
@@ -14,6 +14,7 @@ const mapTrack: MapTrack = (
   apiTrack,
   contract,
 ) => {
+
   if (!contract) {
     throw new Error(`Contract missing for mapTrack for nft ${nft.id}`)
   }
@@ -83,7 +84,8 @@ const mapNFTtoTrackID = (nft: NFT, contract?: NftFactory): string | null => {
   if (!contract) {
     throw new Error('No contract provided');
   }
-  return resolveEthereumTrackId(nft, contract);
+
+  return resolveTrackId(nft, contract);
 };
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {

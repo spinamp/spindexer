@@ -41,7 +41,8 @@ export type ERC721Transfer = Record & {
 export enum NFTContractTypeName {
   default = 'default',
   zora = 'zora',
-  nina = 'nina'
+  nina = 'nina',
+  candyMachine = 'candyMachine'
 }
 
 export enum NFTStandard {
@@ -56,7 +57,7 @@ export type TypeMetadata = {
     artist?: Partial<ArtistProfile>
     type?: MusicPlatformType
     extractor?: ExtractorTypes
-  }
+  },
 }
 
 export type NftFactory = Contract & {

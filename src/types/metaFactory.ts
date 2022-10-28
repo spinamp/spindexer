@@ -1,11 +1,12 @@
+import { JsonMetadata, Metadata } from '@metaplex-foundation/js'
 import { ethers } from 'ethers'
 
-import { ethereumArtistId } from '../utils/identifiers'
+import { ethereumId } from '../utils/identifiers'
 
 import { formatAddress } from './address'
 import { Contract } from './contract'
 import { ArtistNameExtractorTypes, AvatarUrlExtractorTypes, IdExtractorTypes, TitleExtractorTypes, WebsiteUrlExtractorTypes } from './fieldExtractor'
-import { NftFactory, NFTContractTypeName, NFTStandard } from './nft'
+import { NftFactory, NFTContractTypeName, NFTStandard, TypeMetadata } from './nft'
 import { MusicPlatformType } from './platform'
 import { Clients } from './processor'
 
@@ -13,6 +14,7 @@ export enum MetaFactoryTypeName {
   soundArtistProfileCreator = 'soundArtistProfileCreator',
   ninaMintCreator = 'ninaMintCreator',
   zoraDropCreator = 'zoraDropCreator',
+  candyMachine = 'candyMachine',
   soundCreatorV1 = 'soundCreatorV1'
 }
 
@@ -22,22 +24,33 @@ export type MetaFactory = Contract & {
   gap?: string
   standard: NFTStandard; // which type of factories will this metaFactory create
   autoApprove: boolean;
+  typeMetadata?: TypeMetadata;
 }
 
 export type MetaFactoryType = {
-  newContractCreatedEvent: string,
-  creationEventToNftFactory?: (event: ethers.Event, autoApprove: boolean, factoryMetadata?: unknown) => NftFactory
-  metadataAPI?: (events: ethers.Event[], clients: Clients) => Promise<any>
+  newContractCreatedEvent?: string,
+  creationMetadataToNftFactory: (creationData: any, autoApprove: boolean, factoryMetadata?: unknown) => NftFactory
+  metadataAPI?: (events: ethers.Event[], clients: Clients) => Promise<any>,
 }
 
 type MetaFactoryTypes = {
   [type in MetaFactoryTypeName]?: MetaFactoryType
 }
 
+function candyMachineArtistId(metadataAccount: Metadata<JsonMetadata<string>>): string {
+  const artist = metadataAccount.creators.find(creator => creator.verified === true);
+
+  if (!artist){
+    throw `Can't find artist address for ${metadataAccount.address.toBase58()}`
+  }
+
+  return artist.address.toBase58();
+}
+
 export const MetaFactoryTypes: MetaFactoryTypes = {
   soundArtistProfileCreator: {
     newContractCreatedEvent: 'CreatedArtist',
-    creationEventToNftFactory: (event: any, autoApprove: boolean) => ({
+    creationMetadataToNftFactory: (event: any, autoApprove: boolean) => ({
       id: formatAddress(event.args!.artistAddress),
       platformId: 'sound',
       startingBlock: event.blockNumber,
@@ -49,7 +62,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
   },
   zoraDropCreator: {
     newContractCreatedEvent: 'CreatedDrop',
-    creationEventToNftFactory: (event: any, autoApprove: boolean) => ({
+    creationMetadataToNftFactory: (event: any, autoApprove: boolean) => ({
       id: formatAddress(event.args!.editionContractAddress),
       platformId: 'zora',
       startingBlock: event.blockNumber,
@@ -60,7 +73,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       typeMetadata: {
         overrides: {
           artist: {
-            artistId: ethereumArtistId(event.args!.creator),
+            artistId: ethereumId(event.args!.creator),
             name: formatAddress(event.args!.creator),
           },
           track: {
@@ -85,7 +98,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       const officialEditions = new Set([...editionAddresses].filter((address) => publicAddresses.has(address)));
       return { soundPublicTimes, officialEditions };
     },
-    creationEventToNftFactory: (event: any, autoApprove: boolean, factoryMetadata: any) => {
+    creationMetadataToNftFactory: (event: any, autoApprove: boolean, factoryMetadata: any) => {
       const official = factoryMetadata.officialEditions.has(formatAddress(event.args!.soundEdition));
       const publicReleaseTimeRaw = factoryMetadata.soundPublicTimes[formatAddress(event.args!.soundEdition)];
       const publicReleaseTime = publicReleaseTimeRaw ? new Date(publicReleaseTimeRaw) : undefined;
@@ -104,7 +117,7 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
           overrides: {
             type: MusicPlatformType['multi-track-multiprint-contract'],
             artist: {
-              artistId: ethereumArtistId(event.args!.deployer),
+              artistId: ethereumId(event.args!.deployer),
             },
             extractor: {
               id: IdExtractorTypes.TRACK_NUMBER,
@@ -117,5 +130,38 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
           }
         }
       })}
+  },
+  candyMachine: {
+    creationMetadataToNftFactory: ({ metadataAccount, metaFactory }: { metadataAccount: Metadata, metaFactory: MetaFactory }, autoApprove: boolean) => {
+      return {
+        id: metadataAccount.mintAddress.toBase58(),
+        contractType: NFTContractTypeName.candyMachine,
+        platformId: metaFactory.platformId,
+        standard: NFTStandard.METAPLEX,
+        name: metadataAccount.name,
+        symbol: metadataAccount.symbol,
+        autoApprove, 
+        approved: autoApprove, 
+        typeMetadata: {
+          ...metaFactory.typeMetadata,
+          overrides: {
+            ...metaFactory.typeMetadata?.overrides,
+            extractor: {
+              id: {
+                extractor: IdExtractorTypes.USE_METAFACTORY_AND_TITLE_EXTRACTOR,
+                params: { 
+                  metaFactoryId: metaFactory.id,
+                }
+              },
+              ...metaFactory.typeMetadata?.overrides.extractor,
+            },
+            artist: {
+              artistId: candyMachineArtistId(metadataAccount),
+              ...metaFactory.typeMetadata?.overrides.artist,
+            }
+          }
+        }
+      }
+    }
   }
 }

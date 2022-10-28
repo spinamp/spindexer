@@ -19,10 +19,10 @@ const processorFunction = (metaFactory: MetaFactory, name: string) =>
     if (metaFactoryContractType.metadataAPI) {
       factoryMetadata = await metaFactoryContractType.metadataAPI(events, clients);
     }
-    const eventToNftFactory = metaFactoryContractType.creationEventToNftFactory;
+    const eventToNftFactory = metaFactoryContractType.creationMetadataToNftFactory;
 
     if (!eventToNftFactory) {
-      throw `no eventToNftFactory specified for ${metaFactoryContractTypeName}`
+      throw `no creationMetadataToNftFactory specified for ${metaFactoryContractTypeName}`
     }
 
     const newNftFactoryObjects = events.map(e => eventToNftFactory(e, metaFactory.autoApprove, factoryMetadata));

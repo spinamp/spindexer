@@ -11,6 +11,7 @@ import noizdMappers from './platforms-types/noizd';
 import singleTrackMultiprintContractMappers from './platforms-types/single-track-multiprint-contract';
 import soundMappers from './platforms-types/sound';
 
+
 export const API_PLATFORMS = ['noizd'];
 
 export enum MusicPlatformType {
@@ -23,7 +24,8 @@ export enum MusicPlatformType {
   chaos = 'chaos',
   mintsongsV2 = 'mintsongs-v2',
   nina = 'nina',
-  hedsCollab = 'heds-collab'
+  hedsCollab = 'heds-collab',
+  kota = 'kota'
 }
 
 export type MusicPlatform = {
