@@ -158,7 +158,7 @@ const titleStrategy: StrategyExtractor = (contract) => {
   return titleExtractors[titleExtractorOverride];
 }
 
-const idStrategy: StrategyExtractor = (contract) => {
+const trackIdSuffixStrategy: StrategyExtractor = (contract) => {
   const idExtractorOverride = contract.typeMetadata?.overrides?.extractor?.id;
   if (!idExtractorOverride) {
     throw new Error('unknown extractor override provided')
@@ -185,7 +185,7 @@ export const resolveTrackId: Resolver = (nft, contract) => {
     return extractor(nft)
   }
 
-  const extractor = idStrategy(contract)
+  const extractor = trackIdSuffixStrategy(contract)
   const id = slugify(extractor(nft));
   if (!id) {
     throw new Error(`ID not extracted correctly for nft: ${nft.id}`);
