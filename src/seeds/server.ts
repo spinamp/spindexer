@@ -1,5 +1,6 @@
 import '../types/env';
 import 'dotenv/config';
+import cors from 'cors';
 import express from 'express';
 
 import { authMiddleware } from './middleware';
@@ -9,6 +10,11 @@ const apiVersionPrefix = `/v${process.env.SEEDS_API_VERSION || '1'}`;
 
 export const createSeedsAPIServer = () => {
   const app = express();
+  app.use(cors({
+    'origin': true,
+    'exposedHeaders': ['x-signature'],
+    'methods': ['POST'],
+  }))
   app.use(express.json());
   app.use(authMiddleware);
 

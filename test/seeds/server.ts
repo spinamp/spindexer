@@ -10,6 +10,7 @@ describe('Seeds API server', () => {
   let app: any;
   const Web3 = new web3();
   const wallet = Web3.eth.accounts.privateKeyToAccount(TEST_ADMIN_WALLET.privateKey);
+  const endpoint = '/v1/seeds'
 
   before(() => {
     app = createSeedsAPIServer();
@@ -32,11 +33,18 @@ describe('Seeds API server', () => {
         .expect(403)
         .end((err,res) => { if (err) throw err });
     })
+
+    it('allows an OPTIONS request ', () => {
+      supertest(app).options(endpoint).send({})
+        .set('Origin', 'https://app.spinamp.xyz')
+        .expect(204)
+        .expect('Access-Control-Allow-Origin', 'https://app.spinamp.xyz')
+        .expect('Access-Control-Allow-Methods', 'POST')
+        .end((err,res) => { if (err) throw err});
+    })
   })
 
   describe('authenticated', () => {
-    const endpoint = '/v1/seeds'
-
     describe('an unsupported seed entity', () => {
       it('returns an error', () => {
         const body = { entity: 'crypto-dollars', operation: 'upsert', data: { gimme: 'some' } };
@@ -344,15 +352,15 @@ describe('Seeds API server', () => {
           })
         })
 
-        describe('with a valid but incomplete payload', () => {
-          it('returns a 200', async () => {
+        describe('with a payload only containing an id', () => {
+          it('returns a 422', async () => {
             const { 'name': _remove, ...rest } = validData;
             const body = { ...validUpdate, data: rest };
             const signature = wallet.sign(JSON.stringify(body)).signature;
 
             supertest(app).post(endpoint).send(body)
               .set('x-signature', signature)
-              .expect(200)
+              .expect(422, { error: 'At least one non-id field is needed in the payload' })
               .end((err,res) => { if (err) throwDBHint(err) });
           })
           it('persists the seed');
