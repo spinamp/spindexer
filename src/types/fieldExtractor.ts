@@ -6,16 +6,16 @@ import { getTrait, NFT, NftFactory } from './nft';
 
 type Extractor = (nft: NFT) => string;
 type ParameterizedExtractor = (params: any) => Extractor;
-type ParameterizedExtractorType<T> = { extractor: T, params: any }
+type ParameterizedExtractorConfig<T> = { extractor: T, params: any }
 type StrategyExtractor = (nftFactory: NftFactory) => Extractor
 type Resolver = (nft: NFT, contract: NftFactory) => string;
 
-function isParameterizedExtractor(extractor?: string | ParameterizedExtractorType<any>) {
+function isParameterizedExtractor(extractor?: string | ParameterizedExtractorConfig<any>) {
   return extractor && typeof extractor !== 'string';
 }
 
 export type ExtractorTypes = {
-  id?: IdExtractorTypes | ParameterizedExtractorType<IdExtractorTypes>
+  id?: IdExtractorTypes | ParameterizedExtractorConfig<IdExtractorTypes>
   title?: TitleExtractorTypes
   audioUrl?: AudioUrlExtractorTypes
   artworkUrl?: ArtworkUrlExtractorTypes
@@ -179,7 +179,7 @@ const trackIdSuffixStrategy: StrategyExtractor = (contract) => {
 
 export const resolveTrackId: Resolver = (nft, contract) => {
   if (isParameterizedExtractor(contract.typeMetadata?.overrides.extractor?.id)){
-    const type = (contract.typeMetadata?.overrides.extractor?.id as ParameterizedExtractorType<IdExtractorTypes>)
+    const type = (contract.typeMetadata?.overrides.extractor?.id as ParameterizedExtractorConfig<IdExtractorTypes>)
     const extractorType = type.extractor;
     const extractor = idExtractors[extractorType]({ ...type.params, nftFactory: contract }) as Extractor;
     return extractor(nft)
