@@ -6,20 +6,20 @@ import { Chain, NftFactory, NFTStandard } from '../types/nft';
 export const slugify = (input: string) => slugifyLibrary.default(input, { lower: true, strict: true })
 
 export const artistId = (contract: NftFactory, address: string): string => {
-  return contract.standard === NFTStandard.METAPLEX ? solanaId(address) : etheruemId(address)
+  return contract.standard === NFTStandard.METAPLEX ? solanaId(address) : ethereumId(address)
 }
 
 export const trackId = (contract: NftFactory, address: string, id: string): string => {
   return contract.standard === NFTStandard.METAPLEX ? solanaTrackId(address, id) : ethereumTrackId(address, id)
 }
 
-export const etheruemId = (address: string): string => {
+export const ethereumId = (address: string): string => {
   return `${Chain.ETHEREUM}/${formatAddress(address)}`;
 }
 
 export const ethereumTrackId = (address: string, id: string): string => {
   const suffix = id !== '' ? `/${id}` : '';
-  return etheruemId(address) + suffix;
+  return ethereumId(address) + suffix;
 }
 
 export const ethereumTransferId = (blockNumber: string | number, logIndex: string | number): string => {
