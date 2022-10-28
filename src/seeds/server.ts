@@ -12,10 +12,10 @@ export const createSeedsAPIServer = () => {
   const app = express();
   app.use(express.json());
   app.use(cors({
-    "origin": false,
-    "methods": ["POST"],
+    'origin': false,
+    'methods': ['POST'],
   }));
-  
+
   app.use(authMiddleware);
 
   app.post(`${apiVersionPrefix}/seeds/`, async (req, res) => {
