@@ -151,7 +151,6 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
                 extractor: IdExtractorTypes.USE_METAFACTORY_AND_TITLE_EXTRACTOR,
                 params: { 
                   metaFactoryId: metaFactory.id,
-                  titleExtractor: metaFactory.typeMetadata?.overrides.extractor?.title
                 }
               },
               ...metaFactory.typeMetadata?.overrides.extractor,
