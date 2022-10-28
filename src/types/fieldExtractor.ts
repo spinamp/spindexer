@@ -87,9 +87,9 @@ const idExtractors: IdExtractorMapping = {
     }
     return `${nft.metadata.trackNumber}`
   },
-  [IdExtractorTypes.USE_METAFACTORY_AND_TITLE_EXTRACTOR]: (params: { metaFactory: string, nftFactory: NftFactory }) => (nft: NFT) => {
+  [IdExtractorTypes.USE_METAFACTORY_AND_TITLE_EXTRACTOR]: (params: { metaFactoryId: string, nftFactory: NftFactory }) => (nft: NFT) => {
     const title = titleStrategy(params.nftFactory)(nft);
-    return solanaTrackId(params.metaFactory, title);
+    return solanaTrackId(params.metaFactoryId, title);
   }
 }
 
