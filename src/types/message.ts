@@ -2,6 +2,8 @@
 
 import { Table } from '../db/db';
 
+import { EthereumAddress } from './ethereum';
+
 export enum CrdtOperation {
   UPSERT = 'upsert',
   UPDATE = 'update'
@@ -14,7 +16,8 @@ export type CrdtMessage = {
   data: {
     [column: string]: string
   }
-  operation: CrdtOperation
+  operation: CrdtOperation,
+  signer: EthereumAddress
 }
 
 export type CrdtUpsertMessage = CrdtMessage & {
@@ -56,19 +59,21 @@ type Values<T> = {
   id: string;
 } & T
 
-export function getCrdtUpdateMessage<T>(table: Table, data: PartialValues<T>): CrdtUpdateMessage{
+export function getCrdtUpdateMessage<T>(table: Table, data: PartialValues<T>, signer: EthereumAddress): CrdtUpdateMessage{
   return {
     timestamp: new Date(),
     table,
     data,
-    operation: CrdtOperation.UPDATE
+    operation: CrdtOperation.UPDATE,
+    signer,
   }
 }
-export function getCrdtUpsertMessage<T>(table: Table, data: Values<T> ): CrdtUpsertMessage {
+export function getCrdtUpsertMessage<T>(table: Table, data: Values<T>, signer: EthereumAddress ): CrdtUpsertMessage {
   return {
     timestamp: new Date(),
     table,
     data,
-    operation: CrdtOperation.UPSERT
+    operation: CrdtOperation.UPSERT,
+    signer,
   }
 }

@@ -47,7 +47,7 @@ describe('Seeds API server', () => {
   describe('authenticated', () => {
     describe('an unsupported seed entity', () => {
       it('returns an error', () => {
-        const body = { entity: 'crypto-dollars', operation: 'upsert', data: { gimme: 'some' } };
+        const body = { entity: 'crypto-dollars', operation: 'upsert', signer: TEST_ADMIN_WALLET.address, data: { gimme: 'some' } };
         const signature = wallet.sign(JSON.stringify(body)).signature;
 
         supertest(app).post(endpoint).send(body)
@@ -59,7 +59,7 @@ describe('Seeds API server', () => {
 
     describe('an invalid operation', () => {
       it('returns an error', () => {
-        const body = { entity: 'platforms', operation: 'delete', data: { gimme: 'some' } };
+        const body = { entity: 'platforms', operation: 'delete', signer: TEST_ADMIN_WALLET.address, data: { gimme: 'some' } };
         const signature = wallet.sign(JSON.stringify(body)).signature;
 
         supertest(app).post(endpoint).send(body)
@@ -69,11 +69,23 @@ describe('Seeds API server', () => {
       })
     })
 
+    describe('without a signer', () => {
+      it('returns an error', () => {
+        const body = { entity: 'platforms', operation: 'update', signer: '', data: { gimme: 'some' } };
+        const signature = wallet.sign(JSON.stringify(body)).signature;
+
+        supertest(app).post(endpoint).send(body)
+          .set('x-signature', signature)
+          .expect(422, { error: 'must specify a signer' })
+          .end((err,res) => { if (err) throw err });
+      })
+    })
+
     describe('platforms', () => {
       const validData = { id: 'jamboni', name: 'Jamboni Jams', type: 'sound' };
 
       describe('upsert', () => {
-        const validUpsert = { entity: 'platforms', operation: 'upsert', data: validData };
+        const validUpsert = { entity: 'platforms', operation: 'upsert', signer: TEST_ADMIN_WALLET.address, data: validData };
 
         describe('without a required field', () => {
           it('returns an error', () => {
@@ -127,7 +139,7 @@ describe('Seeds API server', () => {
       })
 
       describe('update', () => {
-        const validUpdate = { entity: 'platforms', operation: 'update', data: validData };
+        const validUpdate = { entity: 'platforms', operation: 'update', signer: TEST_ADMIN_WALLET.address, data: validData };
 
         describe('without a required field', () => {
           it('returns an error', () => {
@@ -198,7 +210,7 @@ describe('Seeds API server', () => {
     describe('nftFactories', () => {
       describe('upsert', () => {
         const validData = { id: '1', startingBlock: '123', platformId: 'jamboni', contractType: 'default', typeMetadata: {}, standard: 'erc721', autoApprove: false, approved: false };
-        const validUpsert = { entity: 'nftFactories', operation: 'upsert', data: { ...validData } };
+        const validUpsert = { entity: 'nftFactories', operation: 'upsert', data: { ...validData }, signer: TEST_ADMIN_WALLET.address };
 
         describe('without a required field', () => {
           it('returns an error', () => {
@@ -265,7 +277,7 @@ describe('Seeds API server', () => {
 
       describe('update', () => {
         const validData = { id: '1', autoApprove: false, approved: false };
-        const validUpdate = { entity: 'nftFactories', operation: 'update', data: { ...validData } };
+        const validUpdate = { entity: 'nftFactories', operation: 'update', data: { ...validData }, signer: TEST_ADMIN_WALLET.address };
 
         describe('without a required field', () => {
           it('returns an error', () => {
@@ -325,7 +337,7 @@ describe('Seeds API server', () => {
       const validData = { id: '1', name: 'Jammed Jams' };
 
       describe('update', () => {
-        const validUpdate = { entity: 'artists', operation: 'update', data: { ...validData } };
+        const validUpdate = { entity: 'artists', operation: 'update', data: { ...validData }, signer: TEST_ADMIN_WALLET.address };
 
         describe('without a required field', () => {
           it('returns an error', () => {
@@ -385,7 +397,7 @@ describe('Seeds API server', () => {
       const validData = { id: '1', title: 'Jammed Jams', description: 'Wicked jams!', websiteUrl: 'https://app.spinamp.xyz' };
 
       describe ('update',() => {
-        const validUpdate = { entity: 'processedTracks', operation: 'update', data: { ...validData } };
+        const validUpdate = { entity: 'processedTracks', operation: 'update', data: { ...validData }, signer: TEST_ADMIN_WALLET.address };
 
         describe('without required fields', () => {
           it('returns an error', () => {

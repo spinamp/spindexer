@@ -1,5 +1,6 @@
 import { Knex } from 'knex';
 
+import { defaultAdminAddress } from '../../constants/defaults';
 import { ArtistIdExtractorTypes, ArtistNameExtractorTypes, TitleExtractorTypes } from '../../types/fieldExtractor';
 import { CrdtUpsertMessage, getCrdtUpsertMessage } from '../../types/message';
 import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
@@ -40,11 +41,11 @@ export const up = async (knex: Knex) => {
     table.jsonb('typeMetadata')
   })
 
-  const platform: CrdtUpsertMessage = 
-    getCrdtUpsertMessage<MusicPlatform>(Table.platforms, KOTA_PLATFORM)
+  const platform: CrdtUpsertMessage =
+    getCrdtUpsertMessage<MusicPlatform>(Table.platforms, KOTA_PLATFORM, defaultAdminAddress())
 
   const metaFactory: CrdtUpsertMessage =
-    getCrdtUpsertMessage<MetaFactory>(Table.metaFactories, KOTA)
+    getCrdtUpsertMessage<MetaFactory>(Table.metaFactories, KOTA, defaultAdminAddress())
 
   await knex(Table.seeds).insert(platform)
   await knex(Table.seeds).insert(metaFactory)

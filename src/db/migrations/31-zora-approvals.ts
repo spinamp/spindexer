@@ -1,5 +1,6 @@
 import { Knex } from 'knex';
 
+import { defaultAdminAddress } from '../../constants/defaults';
 import { CrdtMessage, getCrdtUpdateMessage } from '../../types/message';
 import { NftFactory } from '../../types/nft';
 import { Table } from '../db';
@@ -32,7 +33,7 @@ const pmRecords = [
 export const up = async (knex: Knex) => {
 
   const messages: CrdtMessage[] = pmRecords.map(address =>
-    getCrdtUpdateMessage<NftFactory>(Table.nftFactories, { id: address, approved: true, autoApprove: true })
+    getCrdtUpdateMessage<NftFactory>(Table.nftFactories, { id: address, approved: true, autoApprove: true }, defaultAdminAddress())
   )
 
   for (const message of messages){
