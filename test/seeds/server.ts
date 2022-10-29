@@ -198,7 +198,7 @@ describe('Seeds API server', () => {
     describe('nftFactories', () => {
       describe('upsert', () => {
         const validData = { id: '1', startingBlock: '123', platformId: 'jamboni', contractType: 'default', typeMetadata: {}, standard: 'erc721', autoApprove: false, approved: false };
-        const validUpsert = { entity: 'nftFactories', operation: 'upsert', data: { ...validData }, signer: TEST_ADMIN_WALLET.address };
+        const validUpsert = { entity: 'nftFactories', operation: 'upsert', data: { ...validData } };
 
         describe('without a required field', () => {
           it('returns an error', () => {
@@ -265,7 +265,7 @@ describe('Seeds API server', () => {
 
       describe('update', () => {
         const validData = { id: '1', autoApprove: false, approved: false };
-        const validUpdate = { entity: 'nftFactories', operation: 'update', data: { ...validData }, signer: TEST_ADMIN_WALLET.address };
+        const validUpdate = { entity: 'nftFactories', operation: 'update', data: { ...validData } };
 
         describe('without a required field', () => {
           it('returns an error', () => {
@@ -325,7 +325,7 @@ describe('Seeds API server', () => {
       const validData = { id: '1', name: 'Jammed Jams' };
 
       describe('update', () => {
-        const validUpdate = { entity: 'artists', operation: 'update', data: { ...validData }, signer: TEST_ADMIN_WALLET.address };
+        const validUpdate = { entity: 'artists', operation: 'update', data: { ...validData } };
 
         describe('without a required field', () => {
           it('returns an error', () => {
@@ -385,7 +385,7 @@ describe('Seeds API server', () => {
       const validData = { id: '1', title: 'Jammed Jams', description: 'Wicked jams!', websiteUrl: 'https://app.spinamp.xyz' };
 
       describe ('update',() => {
-        const validUpdate = { entity: 'processedTracks', operation: 'update', data: { ...validData }, signer: TEST_ADMIN_WALLET.address };
+        const validUpdate = { entity: 'processedTracks', operation: 'update', data: { ...validData } };
 
         describe('without required fields', () => {
           it('returns an error', () => {
