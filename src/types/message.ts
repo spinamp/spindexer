@@ -65,7 +65,7 @@ export function getCrdtUpdateMessage<T>(table: Table, data: PartialValues<T>, si
     table,
     data,
     operation: CrdtOperation.UPDATE,
-    signer,
+    signer: signer.toLowerCase(),
   }
 }
 export function getCrdtUpsertMessage<T>(table: Table, data: Values<T>, signer: EthereumAddress ): CrdtUpsertMessage {
@@ -74,6 +74,6 @@ export function getCrdtUpsertMessage<T>(table: Table, data: Values<T>, signer: E
     table,
     data,
     operation: CrdtOperation.UPSERT,
-    signer,
+    signer: signer.toLowerCase(),
   }
 }
