@@ -4,7 +4,7 @@ import cors from 'cors';
 import express from 'express';
 
 import { authMiddleware } from './middleware';
-import { persistSeed, validateSeed } from './types';
+import { AuthRequest, persistSeed, validateSeed } from './types';
 
 const apiVersionPrefix = `/v${process.env.SEEDS_API_VERSION || '1'}`;
 
@@ -18,7 +18,7 @@ export const createSeedsAPIServer = () => {
   app.use(express.json());
   app.use(authMiddleware);
 
-  app.post(`${apiVersionPrefix}/seeds/`, async (req, res) => {
+  app.post(`${apiVersionPrefix}/seeds/`, async (req: AuthRequest, res) => {
     try {
       validateSeed(req.body)
     } catch (e: any) {
@@ -26,7 +26,7 @@ export const createSeedsAPIServer = () => {
     }
 
     try {
-      await persistSeed(req.body)
+      await persistSeed(req.body, req.signer)
       res.sendStatus(200);
     } catch (e: any) {
       console.log(e);
