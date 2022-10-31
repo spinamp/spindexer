@@ -34,5 +34,21 @@ export const createSeedsAPIServer = () => {
     }
   });
 
+  app.post(`${apiVersionPrefix}/seeds/zora_approval`, async (req: AuthRequest, res) => {
+    try {
+      validateSeed(req.body)
+    } catch (e: any) {
+      return res.status(422).send({ error: e.message });
+    }
+
+    try {
+      await persistSeed(req.body, req.signer)
+      res.sendStatus(200);
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).send({ error: e.message });
+    }
+  });
+
   return app;
 }

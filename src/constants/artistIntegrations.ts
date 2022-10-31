@@ -29,7 +29,8 @@ const ZORA_ORIGINAL_PLATFORM: MusicPlatform = {
   type: MusicPlatformType.zora,
   name: 'Zora'
 }
-const ZORA_LATEST_PLATFORM: MusicPlatform = {
+
+export const ZORA_LATEST_PLATFORM: MusicPlatform = {
   id: 'zora',
   type: MusicPlatformType.zora,
   name: 'Zora'
