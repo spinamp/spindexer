@@ -1,8 +1,6 @@
 import { Knex } from 'knex';
 
-import { defaultAdminAddress } from '../../constants/defaults';
-import { CrdtMessage, getCrdtUpdateMessage } from '../../types/message';
-import { NftFactory } from '../../types/nft';
+import { CrdtOperation } from '../../types/message';
 import { Table } from '../db';
 
 // approve zora factories from present-material
@@ -29,12 +27,13 @@ const pmRecords = [
   '0x14214694847ba90da2e9b08b6de397bd06d5a626',
   '0x676777d784ebcc9d3ff3e28ce73757864a8333b4']
 
-
 export const up = async (knex: Knex) => {
-
-  const messages: CrdtMessage[] = pmRecords.map(address =>
-    getCrdtUpdateMessage<NftFactory>(Table.nftFactories, { id: address, approved: true, autoApprove: true }, defaultAdminAddress())
-  )
+  const messages: any[] = pmRecords.map(address => ({
+    timestamp: new Date(),
+    table: Table.nftFactories,
+    data: { id: address, approved: true, autoApprove: true },
+    operation: CrdtOperation.UPDATE,
+  }))
 
   for (const message of messages){
     await knex(Table.seeds).insert(message)
