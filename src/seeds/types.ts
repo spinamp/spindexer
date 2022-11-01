@@ -150,7 +150,6 @@ export const persistMessage = async (payload: MessagePayload, signer?: EthereumA
   const message = messageFn(Table[payload.entity], payload.data as any, signer);
 
   try {
-    console.log(`Upserting ${JSON.stringify(message)}`)
     await dbClient.upsert(Table.seeds, [message])
   } catch (e: any) {
     console.error(e);
