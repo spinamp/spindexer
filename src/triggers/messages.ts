@@ -84,7 +84,7 @@ export const pendingMempoolUpdateMessages: (tables: string) => Trigger<undefined
   }
 
 export const newSeedMessages: Trigger<Cursor> = async (clients, cursor: string) => {
-  const selectSql = `select m.* from ${Table.seeds} m
+  const selectSql = `select id, "timestamp" , "table", "data" , operation from ${Table.seeds}
   where id > ${parseInt(cursor)}
   order by id
   limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
