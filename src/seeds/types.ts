@@ -12,16 +12,16 @@ export type AuthRequest = Request & {
   signer?: string;
 }
 
-enum SeedEntities {
+enum CrdtEntities {
   'platforms',
   'nftFactories',
   'artists',
   'processedTracks'
 }
-type SeedEntity = keyof typeof SeedEntities;
+type CrdtEntity = keyof typeof CrdtEntities;
 
-type SeedPayload = {
-  entity: SeedEntity,
+type MessagePayload = {
+  entity: CrdtEntity,
   operation: CrdtOperation,
   signer: EthereumAddress,
   data: any,
@@ -42,7 +42,7 @@ const NFTFactoryMinUpsertKeys = NFTFactoryValidUpsertKeys.filter((key) => !['typ
 const ArtistValidKeys = ['id', 'name'];
 const ProcessedTrackValidKeys = ['id', 'title', 'description', 'websiteUrl'];
 
-export const validateSeed = (payload: SeedPayload): void => {
+export const validateMessage = (payload: MessagePayload): void => {
   entityValidator(payload);
 
   const validatorFunctions: any = {
@@ -94,7 +94,7 @@ export const validateSeed = (payload: SeedPayload): void => {
 }
 
 // Checks that every expected key is present in the input data
-const minimumKeysPresent = (input: SeedPayload, keys: any): void => {
+const minimumKeysPresent = (input: MessagePayload, keys: any): void => {
   if (!keys.every((key: any) => input.data.hasOwnProperty(key))) {
     throw new Error(`${input.entity} entity is missing required fields`)
   }
@@ -105,28 +105,28 @@ const minimumKeysPresent = (input: SeedPayload, keys: any): void => {
 }
 
 // Checks that every key in the input data is valid
-const onlyValidKeysPresent = (input: SeedPayload, keys: any): void => {
+const onlyValidKeysPresent = (input: MessagePayload, keys: any): void => {
   if (!Object.keys(input.data).every((key: any) => keys.includes(key))) {
     throw new Error(`${input.entity} entity has unsupported fields`)
   }
 }
 
 // Checks that the given key on the input data exists and is a valid type
-const typeValidator = (input: SeedPayload, key: string, validOptions: any): void => {
+const typeValidator = (input: MessagePayload, key: string, validOptions: any): void => {
   if (!Object.values(validOptions).includes(input.data[key])) {
     throw new Error(`not a valid ${input.entity} ${key}`)
   }
 }
 
 // Checks that the given key on the input data is a valid type, if it exists
-const typeValidatorOptional = (input: SeedPayload, key: string, validOptions: any): void => {
+const typeValidatorOptional = (input: MessagePayload, key: string, validOptions: any): void => {
   if (input.data[key]) {
     typeValidator(input, key, validOptions);
   }
 }
 
-const entityValidator = (input: SeedPayload): void => {
-  if (!Object.values(SeedEntities).includes(input.entity)) {
+const entityValidator = (input: MessagePayload): void => {
+  if (!Object.values(CrdtEntities).includes(input.entity)) {
     throw new Error('unknown seed entity');
   }
   if (!Object.values(CrdtOperation).includes(input.operation)) {
@@ -134,13 +134,13 @@ const entityValidator = (input: SeedPayload): void => {
   }
 }
 
-export const persistSeed = async (payload: SeedPayload, signer?: EthereumAddress) => {
+export const persistMessage = async (payload: MessagePayload, signer?: EthereumAddress) => {
   if (!signer) {
     throw new Error('must specify a signer');
   }
 
   const dbClient = await db.init();
-  validateSeed(payload);
+  validateMessage(payload);
 
   const messageFn = crdtOperationMessageFnMap[payload.operation];
   if (!messageFn) {

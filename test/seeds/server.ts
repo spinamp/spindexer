@@ -12,13 +12,13 @@ describe('Seeds API server', () => {
   const Web3 = new web3();
   const adminWallet = Web3.eth.accounts.privateKeyToAccount(TEST_ADMIN_WALLET.privateKey);
   const publicWallet = Web3.eth.accounts.create('publicWallet');
-  const endpoint = '/v1/seeds'
+  const endpoint = '/v1/messages'
 
   before(() => {
     app = createSeedsAPIServer();
   });
 
-  describe('POST /v1/seeds', () => {
+  describe('POST /v1/messages', () => {
     it('allows an OPTIONS request ', () => {
       supertest(app).options(endpoint).send({})
         .set('Origin', 'https://app.spinamp.xyz')
