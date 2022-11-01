@@ -4,7 +4,7 @@ import cors from 'cors';
 import express from 'express';
 
 import { authMiddleware } from './middleware';
-import { AuthRequest, persistSeed, validateSeed } from './types';
+import { AuthRequest, onlyAdmin, persistSeed, validateSeed } from './types';
 
 const apiVersionPrefix = `/v${process.env.SEEDS_API_VERSION || '1'}`;
 
@@ -19,22 +19,16 @@ export const createSeedsAPIServer = () => {
   app.use(authMiddleware);
 
   app.post(`${apiVersionPrefix}/seeds/`, async (req: AuthRequest, res) => {
-    try {
-      validateSeed(req.body)
-    } catch (e: any) {
-      return res.status(422).send({ error: e.message });
+    if (req.body.operation === 'upsert' || req.body.operation === 'update') {
+      try {
+        onlyAdmin(req.signer);
+      } catch (e: any) {
+        console.log(e);
+        res.status(403).send('Authentication failed');
+        return;
+      }
     }
 
-    try {
-      await persistSeed(req.body, req.signer)
-      res.sendStatus(200);
-    } catch (e: any) {
-      console.log(e);
-      res.status(500).send({ error: e.message });
-    }
-  });
-
-  app.post(`${apiVersionPrefix}/seeds/zora_approval`, async (req: AuthRequest, res) => {
     try {
       validateSeed(req.body)
     } catch (e: any) {

@@ -1,3 +1,4 @@
+import { isValidChecksumAddress } from 'ethereumjs-util';
 import { Request } from 'express';
 
 import { Table } from '../db/db';
@@ -29,6 +30,7 @@ type SeedPayload = {
 const crdtOperationMessageFnMap = {
   [CrdtOperation.UPSERT]: getCrdtUpsertMessage,
   [CrdtOperation.UPDATE]: getCrdtUpdateMessage,
+  [CrdtOperation.CONTRACT_APPROVAL]: getCrdtUpdateMessage,
 }
 
 const PlatformValidKeys = ['id', 'name', 'type'];
@@ -156,4 +158,19 @@ export const persistSeed = async (payload: SeedPayload, signer?: EthereumAddress
   } finally {
     await dbClient.close();
   }
+}
+
+export const onlyAdmin = (signer: string | undefined): void => {
+  if ( !signer || !isValidChecksumAddress(signer) || !permittedAdminAddresses().includes(signer.toLowerCase())
+  ) {
+    throw `Invalid admin address: ${signer}`;
+  }
+}
+
+const permittedAdminAddresses = (): string[] => {
+  const addresses = process.env.PERMITTED_ADMIN_ADDRESSES?.toLowerCase();
+  if (!addresses) {
+    throw new Error('PERMITTED_ADMIN_ADDRESSES not set');
+  }
+  return addresses.split(',');
 }

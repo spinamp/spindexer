@@ -6,7 +6,8 @@ import { EthereumAddress } from './ethereum';
 
 export enum CrdtOperation {
   UPSERT = 'upsert',
-  UPDATE = 'update'
+  UPDATE = 'update',
+  CONTRACT_APPROVAL = 'contractApproval'
 }
 
 export type CrdtMessage = {
