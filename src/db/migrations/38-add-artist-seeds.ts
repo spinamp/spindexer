@@ -1,24 +1,30 @@
 import { Knex } from 'knex';
 
 import { PLATFORMS, FACTORIES, META_FACTORIES } from '../../constants/artistIntegrations';
-import { CrdtUpsertMessage, getCrdtUpsertMessage } from '../../types/message';
-import { MetaFactory } from '../../types/metaFactory';
-import { NftFactory } from '../../types/nft';
-import { MusicPlatform } from '../../types/platform';
+import { CrdtOperation } from '../../types/message';
 import { Table } from '../db';
 
 export const up = async (knex: Knex) => {
-  const platforms: CrdtUpsertMessage[] = PLATFORMS.map((platform) =>
-    getCrdtUpsertMessage<MusicPlatform>(Table.platforms, platform)
-  )
+  const platforms: any[] = PLATFORMS.map((platform) => ({
+    timestamp: new Date(),
+    table: Table.platforms,
+    data: platform,
+    operation: CrdtOperation.UPSERT,
+  }))
 
-  const factories: CrdtUpsertMessage[] = FACTORIES.map((factory) =>
-    getCrdtUpsertMessage<NftFactory>(Table.nftFactories, factory)
-  )
+  const factories: any[] = FACTORIES.map((factory) => ({
+    timestamp: new Date(),
+    table: Table.nftFactories,
+    data: factory,
+    operation: CrdtOperation.UPSERT,
+  }))
 
-  const metaFactories: CrdtUpsertMessage[] = META_FACTORIES.map((metaFactory) =>
-    getCrdtUpsertMessage<MetaFactory>(Table.metaFactories, metaFactory)
-  )
+  const metaFactories: any[] = META_FACTORIES.map((metaFactory) => ({
+    timestamp: new Date(),
+    table: Table.metaFactories,
+    data: metaFactory,
+    operation: CrdtOperation.UPSERT,
+  }))
 
   await knex(Table.seeds).insert(platforms)
   await knex(Table.seeds).insert(factories)
