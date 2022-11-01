@@ -160,8 +160,15 @@ export const persistMessage = async (payload: MessagePayload, signer?: EthereumA
   }
 }
 
-export const onlyAdmin = (signer: string | undefined): void => {
-  if ( !signer || !isValidChecksumAddress(signer) || !permittedAdminAddresses().includes(signer.toLowerCase())
+export const restrictedAccess = (payload: MessagePayload, signer?: EthereumAddress) => {
+  if (payload.operation !== 'upsert' && payload.operation !== 'update') {
+    return;
+  }
+  onlyAdmin(signer);
+}
+
+const onlyAdmin = (signer: string | undefined): void => {
+  if (!signer || !isValidChecksumAddress(signer) || !permittedAdminAddresses().includes(signer.toLowerCase())
   ) {
     throw `Invalid admin address: ${signer}`;
   }

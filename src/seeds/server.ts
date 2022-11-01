@@ -4,7 +4,7 @@ import cors from 'cors';
 import express from 'express';
 
 import { authMiddleware } from './middleware';
-import { AuthRequest, onlyAdmin, persistMessage, validateMessage } from './types';
+import { AuthRequest, persistMessage, restrictedAccess, validateMessage } from './types';
 
 const apiVersionPrefix = `/v${process.env.SEEDS_API_VERSION || '1'}`;
 
@@ -19,20 +19,18 @@ export const createSeedsAPIServer = () => {
   app.use(authMiddleware);
 
   app.post(`${apiVersionPrefix}/messages/`, async (req: AuthRequest, res) => {
-    if (req.body.operation === 'upsert' || req.body.operation === 'update') {
-      try {
-        onlyAdmin(req.signer);
-      } catch (e: any) {
-        console.log(e);
-        res.status(403).send('Authentication failed');
-        return;
-      }
-    }
-
     try {
       validateMessage(req.body)
     } catch (e: any) {
       return res.status(422).send({ error: e.message });
+    }
+
+    try {
+      restrictedAccess(req.body, req.signer);
+    } catch (e: any) {
+      console.log(e);
+      res.status(403).send({ error: 'Authentication failed' });
+      return;
     }
 
     try {
