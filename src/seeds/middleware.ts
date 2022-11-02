@@ -1,9 +1,11 @@
 import { isValidChecksumAddress } from 'ethereumjs-util'
-import { Request, Response, NextFunction } from 'express'
+import { Response, NextFunction } from 'express'
 import Web3 from 'web3';
 
+import { AuthRequest } from './types';
+
 export const authMiddleware = (
-  request: Request,
+  request: AuthRequest,
   response: Response,
   next: NextFunction,
 ) => {
@@ -11,15 +13,13 @@ export const authMiddleware = (
   if (request.method === 'OPTIONS') { next(); return; }
 
   try {
-    let signer: any;
-
     const auth = {
       message: JSON.stringify(request.body),
       signature: request.header('x-signature') || '',
     }
 
     try {
-      signer = validateSignature(auth, permittedAdminAddresses());
+      request.signer = validateSignature(auth, permittedAdminAddresses());
     } catch (e) {
       throw e;
     }

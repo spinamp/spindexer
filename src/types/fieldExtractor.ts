@@ -215,20 +215,26 @@ export const resolveArtworkUrl: Resolver = (nft, contract) => {
 
 export const resolveArtistName: Resolver = (nft, contract) => {
   const artistNameExtractorOverride = contract.typeMetadata?.overrides?.extractor?.artistName;
+  let name;
 
   if (artistNameExtractorOverride === ArtistNameExtractorTypes.ATTRIBUTES_TRAIT_MUSICIAN) {
-    return getTrait(nft, 'Musician');
+    name = getTrait(nft, 'Musician');
   } else if (artistNameExtractorOverride === ArtistNameExtractorTypes.USE_ARTIST_NAME_OVERRIDE) {
     const artistNameOverride = contract.typeMetadata?.overrides?.artist?.name;
     if (!artistNameOverride) {
       throw new Error('must directly provided an artist name override, or an artist name extractor override');
     }
-    return artistNameOverride;
+    name = artistNameOverride;
   } else if (artistNameExtractorOverride === ArtistNameExtractorTypes.METADATA_ARTIST) {
-    return nft.metadata.artist;
+    name = nft.metadata.artist;
   }
 
-  throw new Error('must specify artist name extractor');
+  if (!name){
+    name = resolveArtistId(nft, contract);
+  }
+
+  return name;
+
 }
 
 export const resolveArtistId: Resolver = (nft, contract) => {

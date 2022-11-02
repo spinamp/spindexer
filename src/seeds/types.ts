@@ -1,10 +1,15 @@
-
+import { Request } from 'express';
 
 import { Table } from '../db/db';
 import db from '../db/sql-db'
+import { EthereumAddress } from '../types/ethereum';
 import { CrdtOperation, getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
 import { NFTContractTypeName, NFTStandard } from '../types/nft';
 import { MusicPlatformType } from '../types/platform';
+
+export type AuthRequest = Request & {
+  signer?: string;
+}
 
 enum SeedEntities {
   'platforms',
@@ -17,6 +22,7 @@ type SeedEntity = keyof typeof SeedEntities;
 type SeedPayload = {
   entity: SeedEntity,
   operation: CrdtOperation,
+  signer: EthereumAddress,
   data: any,
 }
 
@@ -126,7 +132,11 @@ const entityValidator = (input: SeedPayload): void => {
   }
 }
 
-export const persistSeed = async (payload: SeedPayload) => {
+export const persistSeed = async (payload: SeedPayload, signer?: EthereumAddress) => {
+  if (!signer) {
+    throw new Error('must specify a signer');
+  }
+
   const dbClient = await db.init();
   validateSeed(payload);
 
@@ -135,7 +145,7 @@ export const persistSeed = async (payload: SeedPayload) => {
     throw new Error('must specify either `upsert` or `update` operation');
   }
 
-  const message = messageFn(Table[payload.entity], payload.data as any)
+  const message = messageFn(Table[payload.entity], payload.data as any, signer);
 
   try {
     console.log(`Upserting ${JSON.stringify(message)}`)
