@@ -29,7 +29,6 @@ const ZORA_ORIGINAL_PLATFORM: MusicPlatform = {
   type: MusicPlatformType.zora,
   name: 'Zora'
 }
-
 export const ZORA_LATEST_PLATFORM: MusicPlatform = {
   id: 'zora',
   type: MusicPlatformType.zora,
@@ -57,7 +56,7 @@ const CATALOG_FACTORY: NftFactory = {
   approved: true
 }
 
-const ZORA_ORIGINAL_FACTORY: NftFactory = {
+export const ZORA_ORIGINAL_FACTORY: NftFactory = {
   id: '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7',
   platformId: ZORA_ORIGINAL_PLATFORM.id,
   startingBlock: '11565019',
