@@ -27,6 +27,7 @@ export const validateMessage = (payload: MessagePayload): void => {
         () => onlyValidKeysPresent(payload, PlatformValidKeys),
         () => typeValidatorOptional(payload, 'type', MusicPlatformType),
       ],
+      'contractApproval': [ () => { throw new Error('Platform approval not supported') } ],
     },
     'nftFactories': {
       'upsert': [
@@ -39,24 +40,26 @@ export const validateMessage = (payload: MessagePayload): void => {
         () => minimumKeysPresent(payload, ['id']),
         () => onlyValidKeysPresent(payload, NFTFactoryValidUpdateKeys),
       ],
+      'contractApproval': [
+        () => minimumKeysPresent(payload, NFTFactoryValidUpdateKeys),
+        () => onlyValidKeysPresent(payload, NFTFactoryValidUpdateKeys),
+      ],
     },
     'artists': {
-      'upsert': [
-        () => { throw new Error('Artist upsert not supported') },
-      ],
+      'upsert': [ () => { throw new Error('Artist upsert not supported') } ],
       'update': [
         () => minimumKeysPresent(payload, ['id']),
         () => onlyValidKeysPresent(payload, ArtistValidKeys),
       ],
+      'contractApproval': [ () => { throw new Error('Artist approval not supported') } ],
     },
     'processedTracks': {
-      'upsert': [
-        () => { throw new Error('Track upsert not supported') },
-      ],
+      'upsert': [ () => { throw new Error('Track upsert not supported') } ],
       'update': [
         () => minimumKeysPresent(payload, ['id']),
         () => onlyValidKeysPresent(payload, ProcessedTrackValidKeys),
       ],
+      'contractApproval': [ () => { throw new Error('Track approval not supported') } ],
     }
   }
 

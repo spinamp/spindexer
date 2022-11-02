@@ -354,6 +354,65 @@ describe('Seeds API server', () => {
           it('persists the seed');
         })
       })
+
+      describe('contractApproval', () => {
+        const validData = { id: '1', autoApprove: true, approved: true };
+        const validContractApproval = { entity: 'nftFactories', operation: 'contractApproval', data: { ...validData } };
+
+        describe('without a required field', () => {
+          it('returns an error', () => {
+            const { 'id': remove, ...rest } = validData;
+            const body = { ...validContractApproval, data: rest };
+            const signature = adminWallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'nftFactories entity is missing required fields' })
+              .end((err,res) => { if (err) throw err });
+          })
+        })
+
+        describe('with unsupported fields', () => {
+          it('returns an error', () => {
+            const body = { ...validContractApproval, data: { ...validData, hackyou: 'boo' } };
+            const signature = adminWallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(422, { error: 'nftFactories entity has unsupported fields' })
+              .end((err,res) => { if (err) throw err });
+          })
+        })
+
+        describe('with a valid payload', () => {
+          describe('using a public wallet', () => {
+            it('returns a 200', async () => {
+              const body = validContractApproval;
+              const signature = publicWallet.sign(JSON.stringify(body)).signature;
+
+              supertest(app).post(endpoint).send(body)
+                .set('x-signature', signature)
+                .expect(200)
+                .end((err,res) => { if (err) throwDBHint(err) });
+            })
+            it('persists the seed');
+
+          })
+
+          describe('using an admin wallet', () => {
+            it('returns a 200', async () => {
+              const body = validContractApproval;
+              const signature = adminWallet.sign(JSON.stringify(body)).signature;
+
+              supertest(app).post(endpoint).send(body)
+                .set('x-signature', signature)
+                .expect(200)
+                .end((err,res) => { if (err) throwDBHint(err) });
+            })
+            it('persists the seed');
+          })
+        })
+      })
     })
 
     describe('artists', () => {
@@ -522,74 +581,5 @@ describe('Seeds API server', () => {
         })
       })
     })
-
-    // describe('POST /v1/zora_approval', () => {
-    //   describe('nftFactories', () => {
-    //     let dbClient;
-
-    //     before( async () => {
-    //       dbClient = await db.init();
-    //       await dbClient.insert(Table.platforms, [ZORA_LATEST_PLATFORM] );
-    //     })
-
-    //     describe('update', () => {
-    //       const validId = '0x78fb0b8d4502ae69a61c0d0321141629553472bd';
-    //       const validData = { id: validId, autoApprove: false, approved: false };
-    //       const validUpdate = { entity: 'nftFactories', operation: 'update', data: { ...validData } };
-
-    //       describe('without a required field', () => {
-    //         it('returns an error', () => {
-    //           const { 'id': remove, ...rest } = validData;
-    //           const body = { ...validUpdate, data: rest };
-    //           const signature = adminWallet.sign(JSON.stringify(body)).signature;
-
-    //           supertest(app).post(endpoint).send(body)
-    //             .set('x-signature', signature)
-    //             .expect(422, { error: 'nftFactories entity is missing required fields' })
-    //             .end((err,res) => { if (err) throw err });
-    //         })
-    //       })
-
-    //       describe('with unsupported fields', () => {
-    //         it('returns an error', () => {
-    //           const body = { ...validUpdate, data: { ...validData, hackyou: 'boo' } };
-    //           const signature = adminWallet.sign(JSON.stringify(body)).signature;
-
-    //           supertest(app).post(endpoint).send(body)
-    //             .set('x-signature', signature)
-    //             .expect(422, { error: 'nftFactories entity has unsupported fields' })
-    //             .end((err,res) => { if (err) throw err });
-    //         })
-    //       })
-
-    //       describe('with a valid but incomplete payload', () => {
-    //         it('returns a 200', async () => {
-    //           const { 'approved': _remove1, ...rest } = validData;
-    //           const body = { ...validUpdate, data: rest };
-    //           const signature = adminWallet.sign(JSON.stringify(body)).signature;
-
-    //           supertest(app).post(endpoint).send(body)
-    //             .set('x-signature', signature)
-    //             .expect(200)
-    //             .end((err,res) => { if (err) throwDBHint(err) });
-    //         })
-    //         it('persists the seed');
-    //       })
-
-    //       describe('with a valid payload', () => {
-    //         it('returns a 200', async () => {
-    //           const body = validUpdate;
-    //           const signature = adminWallet.sign(JSON.stringify(body)).signature;
-
-    //           supertest(app).post(endpoint).send(body)
-    //             .set('x-signature', signature)
-    //             .expect(200)
-    //             .end((err,res) => { if (err) throwDBHint(err) });
-    //         })
-    //         it('persists the seed');
-    //       })
-    //     })
-    //   })
-    // })
   })
 })
