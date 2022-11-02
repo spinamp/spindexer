@@ -16,7 +16,8 @@ export enum MetaFactoryTypeName {
   zoraDropCreator = 'zoraDropCreator',
   candyMachine = 'candyMachine',
   soundCreatorV1 = 'soundCreatorV1',
-  decent = 'decent'
+  decent = 'decent',
+  lens = 'lens'
 }
 
 export type MetaFactory = Contract & {
@@ -216,6 +217,28 @@ export const MetaFactoryTypes: MetaFactoryTypes = {
       } 
 
       return nftFactory
+    },
+  },
+  lens: {
+    newContractCreatedEvent: 'CollectNFTDeployed',
+    metadataAPI: async (events, clients) => {
+      
+      console.log('got events', events)
+
+      if (!1){
+        throw 'get metadata....'
+      }
+
+      return {}
+    },
+    creationMetadataToNftFactory(creationData, autoApprove, factoryMetadata?) {
+      
+      if (1){
+        throw 'test create nft factory'
+      }
+
+      return {} as NftFactory;
+
     },
   }
 }
