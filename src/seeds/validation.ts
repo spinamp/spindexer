@@ -1,7 +1,7 @@
 import { NFTContractTypeName, NFTStandard } from '../types/nft';
 import { MusicPlatformType } from '../types/platform';
 
-import { AllAvailableOperations, CrdtEntities, MessagePayload } from './types';
+import { AllApiOperations, CrdtEntities, MessagePayload } from './types';
 
 const PlatformValidKeys = ['id', 'name', 'type'];
 
@@ -99,7 +99,7 @@ const payloadValidator = (input: MessagePayload): void => {
   if (!Object.values(CrdtEntities).includes(input.entity)) {
     throw new Error('unknown seed entity');
   }
-  if (!Object.values(AllAvailableOperations).includes(input.operation)) {
+  if (!Object.values(AllApiOperations).includes(input.operation)) {
     throw new Error('must specify either `upsert`, `update`, or `contractApproval` operation');
   }
 }

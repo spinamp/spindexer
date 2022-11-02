@@ -2,9 +2,9 @@
 import { Table } from '../db/db';
 import db from '../db/sql-db'
 import { EthereumAddress } from '../types/ethereum';
-import { CrdtOperation, getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
+import { getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
 
-import { getCrdtContractApprovalMessage, MessagePayload, PublicOperations } from './types';
+import { AdminOperations, getCrdtContractApprovalMessage, MessagePayload, PublicOperations } from './types';
 import { validateMessage } from './validation';
 
 export const persistMessage = async (payload: MessagePayload, signer?: EthereumAddress) => {
@@ -16,8 +16,8 @@ export const persistMessage = async (payload: MessagePayload, signer?: EthereumA
   validateMessage(payload);
 
   const APIOperationMessageFnMap = {
-    [CrdtOperation.UPSERT]: getCrdtUpsertMessage,
-    [CrdtOperation.UPDATE]: getCrdtUpdateMessage,
+    [AdminOperations.UPSERT]: getCrdtUpsertMessage,
+    [AdminOperations.UPDATE]: getCrdtUpdateMessage,
     [PublicOperations.CONTRACT_APPROVAL]: getCrdtContractApprovalMessage,
   }
 

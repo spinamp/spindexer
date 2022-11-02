@@ -9,12 +9,11 @@ export type AuthRequest = Request & {
   signer?: string;
 }
 
-export enum PublicOperations {
-  CONTRACT_APPROVAL = 'contractApproval',
-}
+export const AdminOperations = CrdtOperation;
+export enum PublicOperations { CONTRACT_APPROVAL = 'contractApproval' }
 
-export const AllAvailableOperations = { ...CrdtOperation, ...PublicOperations }
-type AllowedOperations = CrdtOperation | PublicOperations;
+export const AllApiOperations = { ...AdminOperations, ...PublicOperations }
+type AllowedApiOperations = CrdtOperation | PublicOperations;
 
 export enum CrdtEntities {
   'platforms',
@@ -26,7 +25,7 @@ type CrdtEntity = keyof typeof CrdtEntities;
 
 export type MessagePayload = {
   entity: CrdtEntity,
-  operation: AllowedOperations,
+  operation: AllowedApiOperations,
   data: any,
   signer: EthereumAddress,
 }
