@@ -17,7 +17,7 @@ const DECENT: MetaFactory = {
   platformId: DECENT_PLATFORM.id,
   contractType: MetaFactoryTypeName.decent,
   standard: NFTStandard.ERC721,
-  autoApprove: true,
+  autoApprove: false,
   startingBlock: '15691421'
 }
 
