@@ -35,6 +35,7 @@ export type EthClient = {
   getEventsFrom: (fromBlock: string, toBlock: string, contractFilters: ContractFilter[]) => Promise<Events[]>;
   getBlockTimestamps: (blockHashes: string[]) => Promise<number[]>;
   getLatestBlockNumber: () => Promise<number>;
+  getContractOwner: (hash: string) => Promise<string>;
 }
 
 export type ContractFilter = {
@@ -132,6 +133,11 @@ const init = async (): Promise<EthClient> => {
         throw new Error('Failed to get all block timestamps');
       }
       return results.map(result => result.response!.timestamp);
+    },
+    getContractOwner: async(hash) => {
+      const contract = new ethers.Contract(hash, MetaABI.abi, provider);
+      const owner = await contract.owner();
+      return owner
     }
   }
 }
