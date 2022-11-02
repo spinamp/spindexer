@@ -9,7 +9,7 @@ import { Table } from '../db';
 const DECENT_PLATFORM: MusicPlatform = {
   id: 'decent',
   type: MusicPlatformType['multi-track-multiprint-contract'],
-  name: 'decent'
+  name: 'Decent'
 }
 
 const DECENT: MetaFactory = {
