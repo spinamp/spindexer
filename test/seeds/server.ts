@@ -1,14 +1,13 @@
+import assert from 'assert';
+
 import supertest from 'supertest';
 import web3 from 'web3';
 
-import { ZORA_LATEST_PLATFORM, ZORA_ORIGINAL_FACTORY } from '../../src/constants/artistIntegrations';
+import { NOIZD_PLATFORM, ZORA_LATEST_PLATFORM, ZORA_ORIGINAL_FACTORY } from '../../src/constants/artistIntegrations';
 import { DBClient, Table } from '../../src/db/db';
+import db from '../../src/db/sql-db';
 import { createSeedsAPIServer } from '../../src/seeds/server';
 import { TEST_ADMIN_WALLET } from '../pretest';
-
-import db from './../../src/db/sql-db';
-
-const throwDBHint = (err: any) => { throw new Error(`${err.message}\nHINT: tests run against dev DB. Ensure that DB running, migrated, and working as expected`) };
 
 describe('Seeds API server', () => {
   let app: any;
@@ -18,6 +17,9 @@ describe('Seeds API server', () => {
   const adminWallet = Web3.eth.accounts.privateKeyToAccount(TEST_ADMIN_WALLET.privateKey);
   const publicWallet = Web3.eth.accounts.create('publicWallet');
   const endpoint = '/v1/messages'
+  const throwDBHint = (err: any) => {
+    throw new Error(`${err.message}\nHINT: tests run against dev DB. Ensure that DB running, migrated, and working as expected`)
+  };
 
   const truncateDB = async () => {
     await dbClient.rawSQL(`TRUNCATE TABLE ${Object.values(Table).join(', ')} CASCADE;`);
@@ -373,7 +375,7 @@ describe('Seeds API server', () => {
           await dbClient.upsert(Table.nftFactories, [{ ...ZORA_ORIGINAL_FACTORY, platformId: ZORA_LATEST_PLATFORM.id, approved: false, autoApprove: false }]);
         })
 
-        const validData = { id: '1', autoApprove: true, approved: true };
+        const validData = { id: ZORA_ORIGINAL_FACTORY.id, autoApprove: true, approved: true };
         const validContractApproval = { entity: 'nftFactories', operation: 'contractApproval', data: { ...validData } };
 
         describe('without a required field', () => {
@@ -401,32 +403,61 @@ describe('Seeds API server', () => {
           })
         })
 
-        describe('with a valid payload', () => {
-          describe('using a public wallet', () => {
+        describe('with a valid payload but contract is not on zora', () => {
+          beforeEach( async () => {
+            await truncateDB();
+            await dbClient.upsert(Table.platforms, [NOIZD_PLATFORM]);
+            await dbClient.upsert(Table.nftFactories, [{ ...ZORA_ORIGINAL_FACTORY, platformId: NOIZD_PLATFORM.id, approved: false, autoApprove: false }]);
+          })
+
+          it('returns an error', async () => {
+            const body = validContractApproval;
+            const signature = adminWallet.sign(JSON.stringify(body)).signature;
+
+            const response = await supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+
+            const result = await dbClient.getRecords(Table.seeds);
+            console.log(result)
+            console.log(response.body)
+            assert(response.status === 422);
+            const numberOfSeeds = await dbClient.getNumberRecords(Table.seeds);
+            // assert(numberOfSeeds === '0');
+          })
+        })
+
+        describe('with a valid payload and when a contract on zora platform exists', () => {
+          beforeEach( async () => {
+            await truncateDB();
+            await dbClient.upsert(Table.platforms, [ZORA_LATEST_PLATFORM]);
+            await dbClient.upsert(Table.nftFactories, [{ ...ZORA_ORIGINAL_FACTORY, platformId: ZORA_LATEST_PLATFORM.id, approved: false, autoApprove: false }]);
+          })
+
+          describe('using a public wallet', async () => {
             it('returns a 200', async () => {
               const body = validContractApproval;
               const signature = publicWallet.sign(JSON.stringify(body)).signature;
 
-              supertest(app).post(endpoint).send(body)
+              const response = await supertest(app).post(endpoint).send(body)
                 .set('x-signature', signature)
-                .expect(200)
-                .end( async (err,res) => {
-                  if (err) { throwDBHint(err) }
-                  const result = await dbClient.getRecords(Table.seeds)
-                  console.log(result)
-                });
+
+              assert(response.status === 200);
+              const numberOfSeeds = await dbClient.getNumberRecords(Table.seeds);
+              assert(numberOfSeeds === '1');
             })
           })
 
-          describe('using an admin wallet', () => {
+          describe('using an admin wallet', async () => {
             it('returns a 200', async () => {
               const body = validContractApproval;
               const signature = adminWallet.sign(JSON.stringify(body)).signature;
 
-              supertest(app).post(endpoint).send(body)
+              const response = await supertest(app).post(endpoint).send(body)
                 .set('x-signature', signature)
-                .expect(200)
-                .end((err,res) => { if (err) throwDBHint(err) });
+
+              assert(response.status === 200);
+              const numberOfSeeds = await dbClient.getNumberRecords(Table.seeds);
+              assert(numberOfSeeds === '1');
             })
           })
         })

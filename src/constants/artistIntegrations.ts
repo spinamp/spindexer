@@ -9,7 +9,7 @@ import { ethereumId } from '../utils/identifiers';
 // for a fully CRDT based approach
 
 // Migration 01
-const NOIZD_PLATFORM: MusicPlatform = {
+export const NOIZD_PLATFORM: MusicPlatform = {
   id: 'noizd',
   type: MusicPlatformType.noizd,
   name: 'NOIZD'

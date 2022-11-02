@@ -13,7 +13,7 @@
     "cli": "NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem ts-node src/cli/cli.ts",
     "build": "tsc --skipLibCheck",
     "test": "source .env && NODE_ENV=test mocha",
-    "test:watch": "source .env && NODE_ENV=test mocha --watch",
+    "test-watch": "source .env && NODE_ENV=test mocha --watch",
     "bootstrap-db": "NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem ts-node db/bootstrap.ts",
     "serve": "source .env && DEBUG=graphile-build-pg NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem npx ts-node ./src/serve.ts --cors",
     "serve-seeds-api": "source .env && NODE_EXTRA_CA_CERTS=./db-ssl-certificate.pem npx ts-node ./src/serve_seeds_api.ts",
