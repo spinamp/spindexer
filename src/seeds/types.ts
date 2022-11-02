@@ -4,13 +4,20 @@ import { Request } from 'express';
 import { Table } from '../db/db';
 import db from '../db/sql-db'
 import { EthereumAddress } from '../types/ethereum';
-import { CrdtOperation, getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
+import { CrdtOperation, CrdtUpdateMessage, getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
 import { NFTContractTypeName, NFTStandard } from '../types/nft';
 import { MusicPlatformType } from '../types/platform';
 
 export type AuthRequest = Request & {
   signer?: string;
 }
+
+enum PublicOperations {
+  CONTRACT_APPROVAL = 'contractApproval',
+}
+
+const AllAvailableOperations = { ...CrdtOperation, ...PublicOperations }
+type AllowedOperations = CrdtOperation | PublicOperations;
 
 enum CrdtEntities {
   'platforms',
@@ -22,15 +29,9 @@ type CrdtEntity = keyof typeof CrdtEntities;
 
 type MessagePayload = {
   entity: CrdtEntity,
-  operation: CrdtOperation,
-  signer: EthereumAddress,
+  operation: AllowedOperations,
   data: any,
-}
-
-const crdtOperationMessageFnMap = {
-  [CrdtOperation.UPSERT]: getCrdtUpsertMessage,
-  [CrdtOperation.UPDATE]: getCrdtUpdateMessage,
-  [CrdtOperation.CONTRACT_APPROVAL]: getCrdtUpdateMessage,
+  signer: EthereumAddress,
 }
 
 const PlatformValidKeys = ['id', 'name', 'type'];
@@ -129,7 +130,7 @@ const entityValidator = (input: MessagePayload): void => {
   if (!Object.values(CrdtEntities).includes(input.entity)) {
     throw new Error('unknown seed entity');
   }
-  if (!Object.values(CrdtOperation).includes(input.operation)) {
+  if (!Object.values(AllAvailableOperations).includes(input.operation)) {
     throw new Error('must specify either `upsert` or `update` operation');
   }
 }
@@ -142,7 +143,13 @@ export const persistMessage = async (payload: MessagePayload, signer?: EthereumA
   const dbClient = await db.init();
   validateMessage(payload);
 
-  const messageFn = crdtOperationMessageFnMap[payload.operation];
+  const APIOperationMessageFnMap = {
+    [CrdtOperation.UPSERT]: getCrdtUpsertMessage,
+    [CrdtOperation.UPDATE]: getCrdtUpdateMessage,
+    [PublicOperations.CONTRACT_APPROVAL]: getCrdtContractApprovalMessage,
+  }
+
+  const messageFn = APIOperationMessageFnMap[payload.operation];
   if (!messageFn) {
     throw new Error('must specify either `upsert` or `update` operation');
   }
@@ -180,3 +187,14 @@ const permittedAdminAddresses = (): string[] => {
   }
   return addresses.split(',');
 }
+
+const getCrdtContractApprovalMessage = (_table: any, data: any, signer: EthereumAddress): CrdtUpdateMessage => {
+  return {
+    timestamp: new Date(),
+    table: Table.nftFactories,
+    data,
+    operation: CrdtOperation.UPDATE,
+    signer: signer.toLowerCase(),
+  }
+}
+
