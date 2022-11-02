@@ -55,7 +55,7 @@ describe('Seeds API server', () => {
 
         supertest(app).post(endpoint).send(body)
           .set('x-signature', signature)
-          .expect(422, { error: 'must specify either `upsert` or `update` operation' })
+          .expect(422, { error: 'must specify either `upsert`, `update`, or `contractApproval` operation' })
           .end((err,res) => { if (err) throw err });
       })
     })

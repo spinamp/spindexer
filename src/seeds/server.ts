@@ -3,8 +3,11 @@ import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
 
+import { restrictAccess } from './access';
 import { authMiddleware } from './middleware';
-import { AuthRequest, persistMessage, restrictedAccess, validateMessage } from './types';
+import { persistMessage } from './persistence';
+import { AuthRequest } from './types';
+import { validateMessage } from './validation';
 
 const apiVersionPrefix = `/v${process.env.SEEDS_API_VERSION || '1'}`;
 
@@ -26,7 +29,7 @@ export const createSeedsAPIServer = () => {
     }
 
     try {
-      restrictedAccess(req.body, req.signer);
+      restrictAccess(req.body, req.signer);
     } catch (e: any) {
       console.log(e);
       res.status(403).send({ error: 'Authentication failed' });
