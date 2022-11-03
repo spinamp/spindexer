@@ -16,7 +16,7 @@ const NFTFactoryMinUpsertKeys = NFTFactoryValidUpsertKeys.filter((key) => !['typ
 const ArtistValidKeys = ['id', 'name'];
 const ProcessedTrackValidKeys = ['id', 'title', 'description', 'websiteUrl'];
 
-export const validateMessage = (payload: MessagePayload) => {
+export const validateMessage = async (payload: MessagePayload) => {
   payloadValidator(payload);
 
   const validatorFunctions: any = {
@@ -47,7 +47,7 @@ export const validateMessage = (payload: MessagePayload) => {
       'contractApproval': [
         () => minimumKeysPresent(payload, NFTFactoryValidUpdateKeys),
         () => onlyValidKeysPresent(payload, NFTFactoryValidUpdateKeys),
-        // () => onlyZoraContract(payload),
+        () => onlyZoraContract(payload),
       ],
     },
     'artists': {
@@ -113,18 +113,19 @@ const payloadValidator = (input: MessagePayload): void => {
 }
 
 const onlyZoraContract = async (input: MessagePayload): Promise<void> => {
+  console.log('-------------------ZORA CHECK START ----------------');
   const contractId = input.data.id;
-  console.log('checking !!!!!!!!');
 
   const dbClient = await db.init();
-  console.log('checking 22222222');
-  console.log(contractId);
-  const persistedContract: any = await dbClient.getRecords<NftFactory>(Table.nftFactories, [['whereIn', [ 'id', contractId ]]])
 
-  console.log('COMPLETE');
-  console.log(persistedContract)
-  if (!!persistedContract[0] || persistedContract[0].platformId === ZORA_LATEST_PLATFORM.id) {
+  // TODO: adjust to also query for platform type
+  const persistedContract: any = await dbClient.getRecords<NftFactory>(Table.nftFactories, [['where', [ 'id', contractId ]]])
+
+  console.log(persistedContract[0].platformId);
+  if (persistedContract[0]?.platformId === ZORA_LATEST_PLATFORM.id) {
+    console.log('ALL GOOD, RETURNING');
     return;
   }
+  console.log('---------> GONNA THROW UP (but not being caught because async handling is wrong)');
   throw new Error('not a valid zora contract');
 }

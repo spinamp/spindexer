@@ -23,7 +23,7 @@ export const createSeedsAPIServer = () => {
 
   app.post(`${apiVersionPrefix}/messages/`, async (req: AuthRequest, res) => {
     try {
-      validateMessage(req.body)
+      await validateMessage(req.body)
     } catch (e: any) {
       return res.status(422).send({ error: e.message });
     }

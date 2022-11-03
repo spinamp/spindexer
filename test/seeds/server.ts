@@ -9,7 +9,7 @@ import db from '../../src/db/sql-db';
 import { createSeedsAPIServer } from '../../src/seeds/server';
 import { TEST_ADMIN_WALLET } from '../pretest';
 
-describe('Seeds API server', () => {
+describe('Seeds API server', async () => {
   let app: any;
   let dbClient: DBClient;
 
@@ -31,7 +31,7 @@ describe('Seeds API server', () => {
     await truncateDB();
   });
 
-  describe('POST /v1/messages', () => {
+  describe('POST /v1/messages', async () => {
     it('allows an OPTIONS request ', () => {
       supertest(app).options(endpoint).send({})
         .set('Origin', 'https://app.spinamp.xyz')
@@ -221,7 +221,7 @@ describe('Seeds API server', () => {
       })
     })
 
-    describe('nftFactories', () => {
+    describe('nftFactories', async () => {
       describe('upsert', () => {
         const validData = { id: '1', startingBlock: '123', platformId: 'jamboni', contractType: 'default', typeMetadata: {}, standard: 'erc721', autoApprove: false, approved: false };
         const validUpsert = { entity: 'nftFactories', operation: 'upsert', data: { ...validData } };
@@ -368,7 +368,7 @@ describe('Seeds API server', () => {
         })
       })
 
-      describe('contractApproval', () => {
+      describe('contractApproval', async () => {
         beforeEach( async () => {
           await truncateDB();
           await dbClient.upsert(Table.platforms, [ZORA_LATEST_PLATFORM]);
@@ -403,7 +403,7 @@ describe('Seeds API server', () => {
           })
         })
 
-        describe('with a valid payload but contract is not on zora', () => {
+        describe('with a valid payload but contract is not on zora', async () => {
           beforeEach( async () => {
             await truncateDB();
             await dbClient.upsert(Table.platforms, [NOIZD_PLATFORM]);
@@ -417,11 +417,8 @@ describe('Seeds API server', () => {
             const response = await supertest(app).post(endpoint).send(body)
               .set('x-signature', signature)
 
-            const result = await dbClient.getRecords(Table.seeds);
-            console.log(result)
-            console.log(response.body)
-            assert(response.status === 422);
-            const numberOfSeeds = await dbClient.getNumberRecords(Table.seeds);
+            // const result = await dbClient.getRecords(Table.seeds);
+            assert(response.status === 422, `Expected 422 but got ${response.status}`);
             // assert(numberOfSeeds === '0');
           })
         })
