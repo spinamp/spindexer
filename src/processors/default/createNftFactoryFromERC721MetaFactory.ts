@@ -25,7 +25,7 @@ const processorFunction = (metaFactory: MetaFactory, name: string) =>
       throw `no creationMetadataToNftFactory specified for ${metaFactoryContractTypeName}`
     }
 
-    const newNftFactoryObjects = events.map(e => eventToNftFactory(e, metaFactory.autoApprove, factoryMetadata));
+    const newNftFactoryObjects = events.map(e => eventToNftFactory(e, metaFactory.autoApprove, metaFactory, factoryMetadata));
 
     await clients.db.insert(Table.nftFactories, newNftFactoryObjects);
     await clients.db.updateProcessor(name, newCursor);

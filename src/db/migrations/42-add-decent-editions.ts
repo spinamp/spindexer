@@ -1,5 +1,6 @@
 import { Knex } from 'knex';
 
+import { ChainId } from '../../types/chain';
 import { getCrdtUpsertMessage } from '../../types/message';
 import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
 import { NFTStandard } from '../../types/nft';
@@ -18,7 +19,8 @@ const DECENT: MetaFactory = {
   contractType: MetaFactoryTypeName.decent,
   standard: NFTStandard.ERC721,
   autoApprove: false,
-  startingBlock: '15691421'
+  startingBlock: '15691421',
+  chainId: ChainId.ethereum
 }
 
 export const up = async (knex: Knex) => {

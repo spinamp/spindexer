@@ -23,6 +23,7 @@ export enum Table {
   processedTracks = 'raw_processed_tracks',
   processors = 'raw_processors',
   seeds = 'raw_seeds',
+  chains = 'raw_chains'
 }
 
 export type WhereFunc = 'where'

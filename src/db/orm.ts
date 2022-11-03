@@ -25,7 +25,8 @@ const toRecordMapper: any = {
       typeMetadata: c.typeMetadata,
       standard: c.standard,
       autoApprove: c.autoApprove,
-      approved: c.approved
+      approved: c.approved,
+      chainId: c.chainId
     });
   }),
   [Table.metaFactories]: (factoryContracts: MetaFactory[]): IdField[] => factoryContracts.map((c) => {
@@ -37,7 +38,8 @@ const toRecordMapper: any = {
       gap: c.gap,
       standard: c.standard,
       autoApprove: c.autoApprove,
-      typeMetadata: c.typeMetadata
+      typeMetadata: c.typeMetadata,
+      chainId: c.chainId
     });
   }),
   [Table.nftProcessErrors]: (nftProcessErrors: NFTProcessError[]):
@@ -77,7 +79,8 @@ const fromRecordMapper: any = {
       typeMetadata: c.typeMetadata,
       standard: c.standard,
       autoApprove: c.autoApprove,
-      approved: c.approved
+      approved: c.approved,
+      chainId: c.chainId
     });
   }),
   [Table.metaFactories]: (factoryContracts: Record[]): MetaFactory[] => factoryContracts.map((c: any) => {
@@ -89,7 +92,8 @@ const fromRecordMapper: any = {
       gap: c.gap,
       standard: c.standard,
       autoApprove: c.autoApprove,
-      typeMetadata: c.typeMetadata
+      typeMetadata: c.typeMetadata,
+      chainId: c.chainId
     });
   }),
   [Table.nftProcessErrors]: (errors: Record[]): NFTProcessError[] => errors.map((error: any) => {

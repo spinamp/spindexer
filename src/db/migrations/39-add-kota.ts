@@ -1,5 +1,6 @@
 import { Knex } from 'knex';
 
+import { ChainId } from '../../types/chain';
 import { ArtistIdExtractorTypes, ArtistNameExtractorTypes, TitleExtractorTypes } from '../../types/fieldExtractor';
 import { CrdtOperation } from '../../types/message';
 import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
@@ -20,6 +21,7 @@ const KOTA: MetaFactory = {
   contractType: MetaFactoryTypeName.candyMachine,
   standard: NFTStandard.METAPLEX,
   autoApprove: true,
+  chainId: ChainId.solana,
   typeMetadata: {
     overrides: {
       artist: {

@@ -1,4 +1,5 @@
 
+import { ChainId } from '../types/chain';
 import { TitleExtractorTypes, IdExtractorTypes, ArtistIdExtractorTypes, ArtistNameExtractorTypes, WebsiteUrlExtractorTypes, ArtworkUrlExtractorTypes, AudioUrlExtractorTypes } from '../types/fieldExtractor';
 import { MetaFactory, MetaFactoryTypeName } from '../types/metaFactory';
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../types/nft';
@@ -7,6 +8,9 @@ import { ethereumId } from '../utils/identifiers';
 
 // Custom artist and platform migration details extracted in preparation
 // for a fully CRDT based approach
+
+const ethereumChainId = ChainId.ethereum;
+const solanaChainId = ChainId.solana;
 
 // Migration 01
 const NOIZD_PLATFORM: MusicPlatform = {
@@ -43,7 +47,8 @@ const NOIZD_FACTORY: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
-  approved: true
+  approved: true,
+  chainId: ethereumChainId
 }
 
 const CATALOG_FACTORY: NftFactory = {
@@ -53,7 +58,8 @@ const CATALOG_FACTORY: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
-  approved: true
+  approved: true,
+  chainId: ethereumChainId
 }
 
 const ZORA_ORIGINAL_FACTORY: NftFactory = {
@@ -63,7 +69,8 @@ const ZORA_ORIGINAL_FACTORY: NftFactory = {
   contractType: NFTContractTypeName.zora,
   standard: NFTStandard.ERC721,
   autoApprove: true,
-  approved: true
+  approved: true,
+  chainId: ethereumChainId
 }
 
 // Migration 03
@@ -74,7 +81,8 @@ const SOUND_ORIGINAL_META_FACTORY: MetaFactory = {
   contractType: MetaFactoryTypeName.soundArtistProfileCreator,
   gap: '500000',
   standard: NFTStandard.ERC721,
-  autoApprove: true
+  autoApprove: true,
+  chainId: ethereumChainId
 }
 
 // Migration 04
@@ -90,7 +98,8 @@ const HEDSTAPE_1_FACTORY: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
-  approved: true
+  approved: true,
+  chainId: ethereumChainId
 }
 const HEDSTAPE_2_FACTORY: NftFactory = {
   id: '0x5083cf11003f2b25ca7456717e6dc980545002e5',
@@ -99,7 +108,8 @@ const HEDSTAPE_2_FACTORY: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
-  approved: true
+  approved: true,
+  chainId: ethereumChainId
 }
 const HEDSTAPE_3_FACTORY: NftFactory = {
   id: '0x567e687c93103010962f9e9cf5730ae8dbfc6d41',
@@ -108,7 +118,8 @@ const HEDSTAPE_3_FACTORY: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
-  approved: true
+  approved: true,
+  chainId: ethereumChainId
 }
 const HEDSTAPE_4_FACTORY: NftFactory = {
   id: '0x8045fd700946a00436923f37d08f280ade3b4af6',
@@ -117,7 +128,8 @@ const HEDSTAPE_4_FACTORY: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
-  approved: true
+  approved: true,
+  chainId: ethereumChainId
 }
 
 // Migration 05
@@ -134,7 +146,8 @@ const CHAOS_FACTORY: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
-  approved: true
+  approved: true,
+  chainId: ethereumChainId
 }
 
 // Migration 06
@@ -150,7 +163,8 @@ const MINT_FACTORY: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
-  approved: true
+  approved: true,
+  chainId: ethereumChainId
 };
 
 // Migration 07
@@ -161,7 +175,8 @@ const HEDSTAPE_5_FACTORY: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
-  approved: true
+  approved: true,
+  chainId: ethereumChainId
 };
 
 // Migration 08
@@ -175,6 +190,7 @@ const ROHKI_DESPERADO_FACTORY: NftFactory = {
   id: '0xe8e7Eb47dD7eaFeC80c1EF7f0aE39beE6Dbce469',
   platformId: ROHKI_PLATFORM.id,
   startingBlock: '14779299',
+  chainId: ethereumChainId,
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
@@ -201,6 +217,7 @@ const ROHKI_VROOM_FACTORY: NftFactory = {
   id: '0x317394c6dFB5606c2917E1a0DAD4f1B70EDDC921',
   platformId: ROHKI_PLATFORM.id,
   startingBlock: '15112828',
+  chainId: ethereumChainId,
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
@@ -227,6 +244,7 @@ const HEDSTAPE_6_FACTORY: NftFactory = {
   id: '0x885236535D5Cf7033BdC5bC1050CaD7fdf4970a6',
   platformId: HEDS_PLATFORM.id,
   startingBlock: '15200392',
+  chainId: ethereumChainId,
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
@@ -250,6 +268,7 @@ const DANIEL_ALLAN_GLASSHOUSE_FACTORY: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
+  chainId: ethereumChainId,
   approved: true,
   typeMetadata: {
     overrides: {
@@ -281,6 +300,7 @@ const NINA_META_FACTORY: MetaFactory = {
   contractType: MetaFactoryTypeName.ninaMintCreator,
   standard: NFTStandard.METAPLEX,
   autoApprove: true,
+  chainId: solanaChainId
 };
 
 // Migration 14
@@ -311,7 +331,8 @@ const HUME_OTHERSIDE_FACTORY: NftFactory = {
         websiteUrl: 'https://www.wearehume.com/',
       }
     }
-  }
+  },
+  chainId: ethereumChainId
 };
 
 // Migration 15
@@ -336,7 +357,8 @@ const HUME_VIEW_FROM_THE_MOON_FACTORY: NftFactory = {
         websiteUrl: 'https://www.wearehume.com/',
       }
     }
-  }
+  },
+  chainId: ethereumChainId
 };
 
 // Migration 16
@@ -361,7 +383,8 @@ const HUME_MINTED_FACTORY: NftFactory = {
         websiteUrl: 'https://www.wearehume.com/',
       }
     }
-  }
+  },
+  chainId: ethereumChainId
 };
 
 // Migration 18
@@ -372,7 +395,8 @@ const HEDSTAPE_7_FACTORY: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
-  approved: true
+  approved: true,
+  chainId: ethereumChainId
 };
 
 // Migration 22
@@ -384,6 +408,7 @@ const ZORA_META_FACTORY: MetaFactory = {
   gap: '500000',
   standard: NFTStandard.ERC721,
   autoApprove: false,
+  chainId: ethereumChainId
 }
 
 // Migration 23
@@ -399,7 +424,8 @@ const HEDS_COLLAB_FACTORY: NftFactory = {
     overrides: {
       type: MusicPlatformType['hedsCollab'],
     }
-  }
+  },
+  chainId: ethereumChainId
 };
 
 // Migration 24
@@ -435,7 +461,8 @@ const JAGWAR_TWIN_THOUGHT_FORMS_NFT_FACTORY: NftFactory = {
         title: TitleExtractorTypes.METADATA_NAME,
       }
     }
-  }
+  },
+  chainId: ethereumChainId
 };
 
 // Migration 25
@@ -463,7 +490,8 @@ const JAGWAR_TWIN_ALBUM_NFT_FACTORY: NftFactory = {
         artistName: ArtistNameExtractorTypes.USE_ARTIST_NAME_OVERRIDE,
       }
     }
-  }
+  },
+  chainId: ethereumChainId
 };
 
 // Migration 26
@@ -491,7 +519,8 @@ const JAGWAR_TWIN_ARTIFACTS_FACTORY: NftFactory = {
         artistName: ArtistNameExtractorTypes.USE_ARTIST_NAME_OVERRIDE,
       }
     }
-  }
+  },
+  chainId: ethereumChainId
 };
 
 // Migration 28
@@ -530,7 +559,8 @@ const MIGHTY_33_OTHERS_DIE_FACTORY: NftFactory = {
         artistName: ArtistNameExtractorTypes.USE_ARTIST_NAME_OVERRIDE,
       }
     }
-  }
+  },
+  chainId: ethereumChainId
 };
 
 // Migration 29
@@ -563,7 +593,8 @@ const HOLLY_PLUS_FACTORY: NftFactory = {
         artistName: ArtistNameExtractorTypes.USE_ARTIST_NAME_OVERRIDE,
       }
     }
-  }
+  },
+  chainId: ethereumChainId
 };
 
 // Migration 33
@@ -601,7 +632,8 @@ const RELICS_SEASON_1_FACTORY: NftFactory = {
         artistId: ArtistIdExtractorTypes.USE_PLATFORM_AND_ARTIST_NAME,
       }
     }
-  }
+  },
+  chainId: ethereumChainId
 };
 
 // Migration 34
@@ -619,6 +651,7 @@ const SOUND_PROTOCOL_META_FACTORY: MetaFactory = {
   gap: '500000',
   standard: NFTStandard.ERC721,
   autoApprove: true,
+  chainId: ethereumChainId
 }
 
 // Migration 35
@@ -629,7 +662,8 @@ const HEDSTAPE_8_FACTORY: NftFactory = {
   contractType: NFTContractTypeName.default,
   standard: NFTStandard.ERC721,
   autoApprove: true,
-  approved: true
+  approved: true,
+  chainId: ethereumChainId
 };
 
 export const PLATFORMS: MusicPlatform[] = [

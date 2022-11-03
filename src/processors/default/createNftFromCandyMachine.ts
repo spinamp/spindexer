@@ -40,7 +40,7 @@ export const createNftsFromCandyMachine: (metaFactory: MetaFactory) => Processor
       }
 
       const nftFactories: NftFactory[] = items.map(({ metadataAccount }) => {
-        return creationMetadataToNftFactory({ metadataAccount, metaFactory }, metaFactory.autoApprove)
+        return creationMetadataToNftFactory({ metadataAccount }, metaFactory.autoApprove, metaFactory)
       });
     
       await clients.db.insert<Partial<NftFactory>>(Table.nftFactories, nftFactories)
