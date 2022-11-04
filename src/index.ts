@@ -7,16 +7,12 @@ import { Table } from './db/db';
 import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
-import { addTimestampFromMetadata } from './processors/default/addTimestampFromMetadata';
-import { addTimestampToERC721Transfers, addTimestampToERC721NFTs } from './processors/default/addTimestampToERC721NFTs';
-import { categorizeZora } from './processors/default/categorizeZora';
-// import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
+import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
 import { createNftFactoryFromERC721MetaFactoryProcessor } from './processors/default/createNftFactoryFromERC721MetaFactory';
 import { createNftsFromCandyMachine } from './processors/default/createNftFromCandyMachine';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
 import { errorAndMetadataResetProcessor, errorProcessor } from './processors/default/errorProcessor';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
-import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
 import { insertSeedsIntoMempool } from './processors/default/insertSeedsIntoMempool';
 import { ipfsAudioUploader, ipfsArtworkUploader } from './processors/default/ipfsMediaUploader';
 import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfsPinner';
@@ -39,7 +35,8 @@ const PROCESSORS = (
   const erc721MetaFactoryProcessors = erc721MetaFactories.map(contract => createNftFactoryFromERC721MetaFactoryProcessor(contract));
 
   const erc721ContractFieldProcessors = Object.values(ChainId).map(chainId => getERC721ContractFieldsProcessor(chainId as any))
-  // const erc721TransferProcessors = createERC721NFTsFromTransfersProcessor(nftFactories);
+  // TODO: make scalable - maybe move contracts query to trigger like for the above processor
+  const erc721TransferProcessors = Object.values(ChainId).map(chainId => createERC721NFTsFromTransfersProcessor(chainId, nftFactories.filter(factory => factory.chainId === chainId)));
   const platformTrackProcessors = musicPlatforms.map(musicPlatform => processPlatformTracks(musicPlatform));
 
   //TODO: noizd here is being used both as platformId and MusicPlatformType. Need to avoid mixing them
@@ -58,18 +55,18 @@ const PROCESSORS = (
     ...tableInsertsMempoolProcessors,
     ...tableUpdatesMempoolProcessors,
     ...erc721MetaFactoryProcessors,
-    ...candyMachineProcessors,
+    // ...candyMachineProcessors,
     ...erc721ContractFieldProcessors,
-    // erc721TransferProcessors,
-    addTimestampToERC721Transfers,
-    addTimestampToERC721NFTs,
-    getERC721TokenFieldsProcessor(nftFactoriesByAddress),
+    ...erc721TransferProcessors,
+    // addTimestampToERC721Transfers,
+    // addTimestampToERC721NFTs,
+    // getERC721TokenFieldsProcessor(nftFactoriesByAddress),
     addMetadataIPFSHashProcessor(nftFactoriesByAddress),
     addMetadataObjectProcessor(nftFactoriesByAddress),
-    categorizeZora,
+    // categorizeZora,
     // createNinaNfts,
-    addTimestampFromMetadata,
-    ...platformTrackProcessors,
+    // addTimestampFromMetadata,
+    // ...platformTrackProcessors,
     // ...apiTrackProcessors,
     ipfsAudioUploader,
     ipfsArtworkUploader,

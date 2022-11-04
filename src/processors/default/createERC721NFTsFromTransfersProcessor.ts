@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { Table } from '../../db/db';
 import { newERC721Transfers } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
+import { ChainId } from '../../types/chain';
 import { burned, newMint } from '../../types/ethereum';
 import { NFT, ERC721Transfer, NftFactory, NFTStandard } from '../../types/nft';
 import { NFTFactoryTypes } from '../../types/nftFactory';
@@ -14,7 +15,7 @@ import { ethereumTransferId } from '../../utils/identifiers';
 
 const NAME = 'createERC721NFTsFromTransfers';
 
-const processorFunction = (contracts: NftFactory[]) =>
+const processorFunction = (chainId: ChainId, contracts: NftFactory[]) =>
   async ({ newCursor, items }: { newCursor: Cursor, items: ethers.Event[] }, clients: Clients) => {
     const contractsByAddress = _.keyBy(contracts, 'id');
     const newNFTs: Partial<NFT>[] = [];
@@ -104,15 +105,18 @@ const processorFunction = (contracts: NftFactory[]) =>
     await clients.db.updateProcessor(NAME, newCursor);
   };
 
-export const createERC721NFTsFromTransfersProcessor: (contracts: NftFactory[]) => Processor = (contracts: NftFactory[]) => {
+export const createERC721NFTsFromTransfersProcessor: (chainId: ChainId, contracts: NftFactory[]) => Processor = 
+(chainId, contracts) => {
   return {
     name: NAME,
-    trigger: newERC721Transfers(
+    trigger: 
+    newERC721Transfers(
+      chainId,
       contracts
         .filter(c => c.standard === NFTStandard.ERC721 && c.approved === true) //only include approved ERC721 contracts
         .map(c => ({ id: c.id, startingBlock: c.startingBlock! })), // map contracts to EthereumContract
       process.env.ETHEREUM_BLOCK_QUERY_GAP!
     ),
-    processorFunction: processorFunction(contracts),
+    processorFunction: processorFunction(chainId, contracts),
   }
 };
