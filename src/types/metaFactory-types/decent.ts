@@ -5,7 +5,7 @@ import { Clients } from '../processor';
 
 const type: MetaFactoryType = {
   newContractCreatedEvent: 'DeployDCNT721A',
-  metadataAPI: async (events, clients: Clients) => {
+  metadataAPI: async (events, clients: Clients, metaFactory) => {
     if (events.length === 0){
       return 
     }
@@ -13,7 +13,7 @@ const type: MetaFactoryType = {
     const results = await Promise.all(
       events.map(async event => {
         const contractAddress = event!.args!.DCNT721A;
-        const owner = await clients.eth.getContractOwner(contractAddress)
+        const owner = await clients.evmChain[metaFactory.chainId].getContractOwner(contractAddress)
         return {
           contract: contractAddress,
           owner

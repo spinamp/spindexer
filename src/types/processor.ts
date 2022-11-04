@@ -9,6 +9,7 @@ import { SolanaClient } from '../clients/solana';
 import { SoundClient } from '../clients/sound';
 import { DBClient } from '../db/db';
 
+import { ChainId } from './chain';
 import { ProcessedTrack } from './track';
 import { Cursor, Trigger } from './trigger';
 
@@ -24,7 +25,6 @@ export type TrackAPIClientWithPremints = TrackAPIClient & {
 }
 
 export type Clients = {
-  eth: EthClient,
   db: DBClient,
   blocks: BlocksClient,
   axios: Axios,
@@ -33,6 +33,7 @@ export type Clients = {
   sound: SoundClient,
   noizd: NOIZDClient
   solana: SolanaClient;
+  evmChain: { [chainId in ChainId]: EthClient };
 }
 
 export type Processor = {

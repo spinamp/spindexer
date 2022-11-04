@@ -3,6 +3,6 @@ export type Contract = {
   startingBlock?: string,
 }
 
-export type EthereumContract = Contract & {
+export type EVMContract = Contract & {
   startingBlock: string,
 }

@@ -35,14 +35,12 @@ export type MetaFactory = Contract & {
 export type MetaFactoryType = {
   newContractCreatedEvent?: string,
   creationMetadataToNftFactory: (creationData: any, autoApprove: boolean, metaFactory: MetaFactory, factoryMetadata?: any) => NftFactory
-  metadataAPI?: (events: ethers.Event[], clients: Clients) => Promise<any>,
+  metadataAPI?: (events: ethers.Event[], clients: Clients, metaFactory: MetaFactory) => Promise<any>,
 }
 
 type MetaFactoryTypes = {
   [type in MetaFactoryTypeName]?: MetaFactoryType
 }
-
-
 
 export const MetaFactoryTypes: MetaFactoryTypes = {
   soundArtistProfileCreator: soundArtistProfileCreatorType,

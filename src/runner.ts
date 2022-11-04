@@ -1,17 +1,17 @@
 import axios from './clients/axios';
 import blocks from './clients/blocks';
 import catalog from './clients/catalog';
-import ethereum from './clients/ethereum';
+import ethereum, { EthClient } from './clients/ethereum';
 import ipfs from './clients/ipfs';
 import noizd from './clients/noizd';
 import solana from './clients/solana';
 import sound from './clients/sound';
 import { DBClient, Table } from './db/db';
 import db from './db/sql-db';
+import { Chain, ChainId, ChainType } from './types/chain';
 import { Clients, Processor } from './types/processor';
 
 export const initClients = async (existingDBClient?: DBClient) => {
-  const ethClient = await ethereum.init();
   const blocksClient = await blocks.init();
   const axiosClient = await axios.init();
   const ipfsClient = await ipfs.init();
@@ -19,10 +19,18 @@ export const initClients = async (existingDBClient?: DBClient) => {
   const soundClient = await sound.init();
   const noizdClient = await noizd.init();
   const solanaClient = await solana.init();
+  const dbClient = existingDBClient || await db.init();
+
+  const evmChains = await dbClient.getRecords<Chain>(Table.chains, [['where', ['type', ChainType.evm]]])
+  const evmClients = {} as { [chainId in ChainId]: EthClient }
+
+  for await (const chain of evmChains){
+    evmClients[chain.id] = await ethereum.init(chain.rpcUrl)
+  }
 
   return {
-    eth: ethClient,
-    db: existingDBClient || await db.init(),
+    evmChain: evmClients,
+    db: dbClient,
     blocks: blocksClient,
     axios: axiosClient,
     ipfs: ipfsClient,

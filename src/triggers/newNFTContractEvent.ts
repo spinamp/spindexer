@@ -1,7 +1,8 @@
 import _ from 'lodash';
 
 import { ContractFilter } from '../clients/ethereum';
-import { EthereumContract } from '../types/contract';
+import { ChainId } from '../types/chain';
+import { EVMContract } from '../types/contract';
 import { MetaFactory, MetaFactoryTypes } from '../types/metaFactory';
 import { Clients } from '../types/processor';
 import { Cursor, Trigger, TriggerOutput } from '../types/trigger';
@@ -36,9 +37,12 @@ type ContractsEventsCursor = {
   [contractAddress: string]: string
 };
 
-export const newEthereumEvents: (contracts: EthereumContract[], contractFilters: ContractFilter[], gap?: string) => Trigger<Cursor> =
-  (contracts: EthereumContract[], contractFilters: ContractFilter[], gap: string = process.env.ETHEREUM_BLOCK_QUERY_GAP!) => {
+export const newEVMEvents: (chainId: ChainId, contracts: EVMContract[], contractFilters: ContractFilter[], gap?: string) => Trigger<Cursor> =
+  (chainId: ChainId, contracts: EVMContract[], contractFilters: ContractFilter[], gap: string = process.env.ETHEREUM_BLOCK_QUERY_GAP!) => {
     const triggerFunc = async (clients: Clients, cursorJSON = '{}'): Promise<TriggerOutput> => {
+
+      const client = clients.evmChain[chainId];
+
       const cursor: ContractsEventsCursor = JSON.parse(cursorJSON) || {};
       if (contracts.length === 0) {
         return [];
@@ -56,7 +60,7 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
       // eslint-disable-next-line prefer-const
       let { rangeStart, rangeEnd, mostStaleContracts } = calculateRange(cursor, gap);
       // Check for confirmations
-      const latestEthereumBlock = BigInt(await clients.eth.getLatestBlockNumber());
+      const latestEthereumBlock = BigInt(await client.getLatestBlockNumber());
       if (rangeEnd > latestEthereumBlock - NUMBER_OF_CONFIRMATIONS) {
         rangeEnd = latestEthereumBlock - NUMBER_OF_CONFIRMATIONS
       }
@@ -76,7 +80,7 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
       if (staleContractFilters.length === 0){
         return []
       }
-      const newEvents = await clients.eth.getEventsFrom(rangeStart.toString(), rangeEnd.toString(), staleContractFilters);
+      const newEvents = await client.getEventsFrom(rangeStart.toString(), rangeEnd.toString(), staleContractFilters);
       const newCursor = JSON.stringify(newCursorObject);
       if (newEvents.length === 0 && mostStaleContracts.length !== contracts.length) {
         console.log(`No new events found across contracts, recursing trigger with new cursor from block ${rangeEnd.toString()}`);
@@ -91,13 +95,13 @@ export const newEthereumEvents: (contracts: EthereumContract[], contractFilters:
   };
 
 
-export const newERC721Transfers: (contracts: EthereumContract[], gap?: string) => Trigger<Cursor> =
-  (contracts: EthereumContract[], gap?: string) => {
+export const newERC721Transfers: (chainId: ChainId, contracts: EVMContract[], gap?: string) => Trigger<Cursor> =
+  (chainId: ChainId, contracts: EVMContract[], gap?: string) => {
     const contractFilters = contracts.map(contract => ({
       address: contract.id,
       filter: 'Transfer'
     }));
-    return newEthereumEvents(contracts, contractFilters, gap);
+    return newEVMEvents(chainId, contracts, contractFilters, gap);
   };
 
 export const newERC721Contract: (factoryContract: MetaFactory) => Trigger<Cursor> =
@@ -109,11 +113,16 @@ export const newERC721Contract: (factoryContract: MetaFactory) => Trigger<Cursor
       throw 'no newContractCreatedEvent specified'
     }
 
-    return newEthereumEvents([{
-      id: factoryContract.id,
-      startingBlock: factoryContract.startingBlock!
-    }], [{
-      address: factoryContract.id,
-      filter: newContractCreatedEvent
-    }], factoryContract.gap ? factoryContract.gap : undefined);
+    return newEVMEvents(
+      factoryContract.chainId,
+      [{
+        id: factoryContract.id,
+        startingBlock: factoryContract.startingBlock!,
+      }],
+      [{
+        address: factoryContract.id,
+        filter: newContractCreatedEvent
+      }],
+      factoryContract.gap ? factoryContract.gap : undefined
+    );
   };
