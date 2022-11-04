@@ -1,4 +1,4 @@
-import { ValidContractNFTCallFunction } from '../clients/ethereum';
+import { ValidContractNFTCallFunction } from '../clients/evm';
 
 import { ArtistProfile } from './artist';
 import { ChainId } from './chain';

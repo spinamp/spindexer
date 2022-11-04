@@ -1,14 +1,15 @@
 
-import { EthClient, ValidContractCallFunction } from '../../clients/ethereum';
+import { EVMClient, getEVMClient, ValidContractCallFunction } from '../../clients/evm';
 import { Table } from '../../db/db';
 import { fromDBRecords } from '../../db/orm';
+import { ChainId } from '../../types/chain';
 import { NftFactory, NFTStandard } from '../../types/nft';
-import { Clients } from '../../types/processor';
+import { Clients, Processor } from '../../types/processor';
 import { Trigger } from '../../types/trigger';
 
 const name = 'getERC721ContractFields';
 
-export const getERC721ContractFields = async (contracts: NftFactory[], ethClient: EthClient) => {
+export const getERC721ContractFields = async (contracts: NftFactory[], ethClient: EVMClient) => {
   const allContractCalls = contracts.map(contract => {
     return [
       {
@@ -52,22 +53,32 @@ export const getERC721ContractFields = async (contracts: NftFactory[], ethClient
   return contractUpdates;
 };
 
-const processorFunction = async (contracts: NftFactory[], clients: Clients) => {
-  const contractUpdates = await getERC721ContractFields(contracts, clients.eth);
+const processorFunction = (chainId: ChainId) => async (contracts: NftFactory[], clients: Clients) => {
+  const client = getEVMClient(chainId, clients);
+  const contractUpdates = await getERC721ContractFields(contracts, client);
   await clients.db.update(Table.nftFactories, contractUpdates);
 };
 
-export const unprocessedContracts: Trigger<undefined> = async (clients: Clients) => {
-  // return results for ERC721 contracts that are approved and have no name or symbol
-  const contracts = (await clients.db.rawSQL(
-    `select * from "${Table.nftFactories}" where ("name" is null or "symbol" is null) and "standard" = '${NFTStandard.ERC721}' and "approved" = true;`
-  )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
-  return fromDBRecords(Table.nftFactories, contracts);
-};
+export const unprocessedContracts: (chainId: ChainId) => Trigger<undefined> = 
+(chainId) => 
+  async (clients: Clients) => {
+    // return results for ERC721 contracts that are approved and have no name or symbol
+    const contracts = (await clients.db.rawSQL(
+      `select * from "${Table.nftFactories}" 
+    where ("name" is null or "symbol" is null)
+    and "standard" = '${NFTStandard.ERC721}'
+    and "approved" = true
+    and "chainId" = '${chainId}'
+    `
+    )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+    return fromDBRecords(Table.nftFactories, contracts);
+  };
 
-export const getERC721ContractFieldsProcessor = {
-  name,
-  trigger: unprocessedContracts,
-  processorFunction: processorFunction,
-  initialCursor: undefined,
-};
+export const getERC721ContractFieldsProcessor: (chainId: ChainId) => Processor = 
+(chainId) => (
+  {
+    name,
+    trigger: unprocessedContracts(chainId),
+    processorFunction: processorFunction(chainId),
+    initialCursor: undefined,
+  })

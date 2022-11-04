@@ -1,7 +1,7 @@
 import axios from './clients/axios';
 import blocks from './clients/blocks';
 import catalog from './clients/catalog';
-import ethereum, { EthClient } from './clients/ethereum';
+import ethereum, { EVMClient } from './clients/evm';
 import ipfs from './clients/ipfs';
 import noizd from './clients/noizd';
 import solana from './clients/solana';
@@ -22,7 +22,7 @@ export const initClients = async (existingDBClient?: DBClient) => {
   const dbClient = existingDBClient || await db.init();
 
   const evmChains = await dbClient.getRecords<Chain>(Table.chains, [['where', ['type', ChainType.evm]]])
-  const evmClients = {} as { [chainId in ChainId]: EthClient }
+  const evmClients = {} as { [chainId in ChainId]: EVMClient }
 
   for await (const chain of evmChains){
     evmClients[chain.id] = await ethereum.init(chain.rpcUrl)

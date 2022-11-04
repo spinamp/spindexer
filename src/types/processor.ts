@@ -2,7 +2,7 @@ import { Axios } from 'axios';
 
 import { BlocksClient } from '../clients/blocks';
 import { CatalogClient } from '../clients/catalog';
-import { EthClient } from '../clients/ethereum';
+import { EVMClient } from '../clients/evm';
 import { IPFSClient } from '../clients/ipfs';
 import { NOIZDClient } from '../clients/noizd';
 import { SolanaClient } from '../clients/solana';
@@ -33,7 +33,7 @@ export type Clients = {
   sound: SoundClient,
   noizd: NOIZDClient
   solana: SolanaClient;
-  evmChain: { [chainId in ChainId]: EthClient };
+  evmChain: { [chainId in ChainId]: EVMClient };
 }
 
 export type Processor = {

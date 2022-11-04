@@ -1,4 +1,4 @@
-import { ValidContractNFTCallFunction } from '../clients/ethereum';
+import { ValidContractNFTCallFunction } from '../clients/evm';
 
 import { formatAddress } from './address';
 import { NFTContractTypeName, NFTContractType } from './nft';

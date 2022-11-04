@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { ContractFilter } from '../clients/ethereum';
+import { ContractFilter } from '../clients/evm';
 import { ChainId } from '../types/chain';
 import { EVMContract } from '../types/contract';
 import { MetaFactory, MetaFactoryTypes } from '../types/metaFactory';

@@ -1,12 +1,12 @@
 export enum ChainType {
-  'evm',
-  'solana'
+  'evm' = 'evm',
+  'solana' = 'solana'
 }
 
 export enum ChainId {
-  'ethereum',
-  'polygon',
-  'solana'
+  'ethereum' = 'ethereum',
+  'polygon' = 'polygon',
+  'solana' = 'solana'
 }
 
 export type Chain = {

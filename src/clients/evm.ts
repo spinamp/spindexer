@@ -4,6 +4,8 @@ import { BigNumber, ethers } from 'ethers';
 import _ from 'lodash';
 
 import MetaABI from '../abis/MetaABI.json';
+import { ChainId } from '../types/chain';
+import { Clients } from '../types/processor';
 import { rollPromises } from '../utils/rollingPromises';
 
 export enum ValidContractNFTCallFunction {
@@ -16,7 +18,7 @@ export enum ValidContractCallFunction {
   symbol = 'symbol'
 }
 
-export type EthCall = {
+export type EVMCall = {
   contractAddress: string,
   callFunction: ValidContractNFTCallFunction | ValidContractCallFunction,
   callInput?: string,
@@ -30,8 +32,18 @@ type Events = ethers.utils.LogDescription & {
   transactionHash: string;
 }
 
-export type EthClient = {
-  call: (ethCalls: EthCall[]) => Promise<unknown[]>;
+export function getEVMClient(chainId: ChainId | string, clients: Clients): EVMClient {
+  const client = clients.evmChain[chainId as ChainId];
+
+  if (!client){
+    throw `Can't find evm client for chain ${chainId}`
+  }
+
+  return client
+}
+
+export type EVMClient = {
+  call: (ethCalls: EVMCall[]) => Promise<unknown[]>;
   getEventsFrom: (fromBlock: string, toBlock: string, contractFilters: ContractFilter[]) => Promise<Events[]>;
   getBlockTimestamps: (blockHashes: string[]) => Promise<number[]>;
   getLatestBlockNumber: () => Promise<number>;
@@ -83,12 +95,12 @@ async function getLogs(provider: JsonRpcProvider, params: any, fromBlock: string
   return events
 }
 
-const init = async (providerUrl: string): Promise<EthClient> => {
+const init = async (providerUrl: string): Promise<EVMClient> => {
   const provider = new JsonRpcProvider(providerUrl);
   const ethcallProvider = new Provider();
   await ethcallProvider.init(provider);
   return {
-    call: async (ethCalls: EthCall[]) => {
+    call: async (ethCalls: EVMCall[]) => {
       const calls = ethCalls.map(ethCall => {
         const contract = new Contract(ethCall.contractAddress, MetaABI.abi);
         const call = ethCall.callInput ? contract[ethCall.callFunction](ethCall.callInput) : contract[ethCall.callFunction]();

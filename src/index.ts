@@ -10,10 +10,9 @@ import { addMetadataObjectProcessor } from './processors/default/addMetadataObje
 import { addTimestampFromMetadata } from './processors/default/addTimestampFromMetadata';
 import { addTimestampToERC721Transfers, addTimestampToERC721NFTs } from './processors/default/addTimestampToERC721NFTs';
 import { categorizeZora } from './processors/default/categorizeZora';
-import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
+// import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
 import { createNftFactoryFromERC721MetaFactoryProcessor } from './processors/default/createNftFactoryFromERC721MetaFactory';
 import { createNftsFromCandyMachine } from './processors/default/createNftFromCandyMachine';
-import { createNinaNfts } from './processors/default/createNinaNftProcesor';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
 import { errorAndMetadataResetProcessor, errorProcessor } from './processors/default/errorProcessor';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
@@ -24,15 +23,23 @@ import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfsPin
 import { processMempoolInserts, processMempoolUpdates } from './processors/default/processMempool';
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
 import { runProcessors } from './runner';
+import { ChainId } from './types/chain';
 import { MetaFactory, MetaFactoryTypeName } from './types/metaFactory';
 import { NftFactory, NFTStandard } from './types/nft';
 import { API_PLATFORMS, MusicPlatform } from './types/platform';
 
-const PROCESSORS = (nftFactories: NftFactory[], erc721MetaFactories: MetaFactory[], musicPlatforms: MusicPlatform[], candyMachines: MetaFactory[]) => {
+const PROCESSORS = (
+  nftFactories: NftFactory[],
+  erc721MetaFactories: MetaFactory[],
+  musicPlatforms: MusicPlatform[],
+  candyMachines: MetaFactory[]
+) => {
   const nftFactoriesByAddress = _.keyBy(nftFactories, 'id');
 
   const erc721MetaFactoryProcessors = erc721MetaFactories.map(contract => createNftFactoryFromERC721MetaFactoryProcessor(contract));
-  const erc721TransferProcessors = createERC721NFTsFromTransfersProcessor(nftFactories);
+
+  const erc721ContractFieldProcessors = Object.values(ChainId).map(chainId => getERC721ContractFieldsProcessor(chainId as any))
+  // const erc721TransferProcessors = createERC721NFTsFromTransfersProcessor(nftFactories);
   const platformTrackProcessors = musicPlatforms.map(musicPlatform => processPlatformTracks(musicPlatform));
 
   //TODO: noizd here is being used both as platformId and MusicPlatformType. Need to avoid mixing them
@@ -52,18 +59,18 @@ const PROCESSORS = (nftFactories: NftFactory[], erc721MetaFactories: MetaFactory
     ...tableUpdatesMempoolProcessors,
     ...erc721MetaFactoryProcessors,
     ...candyMachineProcessors,
-    getERC721ContractFieldsProcessor,
-    erc721TransferProcessors,
+    ...erc721ContractFieldProcessors,
+    // erc721TransferProcessors,
     addTimestampToERC721Transfers,
     addTimestampToERC721NFTs,
     getERC721TokenFieldsProcessor(nftFactoriesByAddress),
     addMetadataIPFSHashProcessor(nftFactoriesByAddress),
     addMetadataObjectProcessor(nftFactoriesByAddress),
     categorizeZora,
-    createNinaNfts,
+    // createNinaNfts,
     addTimestampFromMetadata,
     ...platformTrackProcessors,
-    ...apiTrackProcessors,
+    // ...apiTrackProcessors,
     ipfsAudioUploader,
     ipfsArtworkUploader,
     ipfsAudioPinner,
