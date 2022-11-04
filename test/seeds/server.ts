@@ -417,9 +417,8 @@ describe('Seeds API server', async () => {
             const response = await supertest(app).post(endpoint).send(body)
               .set('x-signature', signature)
 
-            // const result = await dbClient.getRecords(Table.seeds);
             assert(response.status === 422, `Expected 422 but got ${response.status}`);
-            // assert(numberOfSeeds === '0');
+            assert(response.body.error === 'not a valid zora contract', `Unexpected reponse error: ${response.body.error}`);
           })
         })
 
