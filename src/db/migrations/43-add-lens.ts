@@ -14,13 +14,14 @@ const LENS_PLATFORM: MusicPlatform = {
   name: 'LENS'
 }
 
-const LENS_HUB: Partial<MetaFactory> = {
+const LENS_HUB: MetaFactory = {
   id: '0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d',
   platformId: LENS_PLATFORM.id,
   contractType: MetaFactoryTypeName.lens,
   standard: NFTStandard.ERC721,
   autoApprove: false,
-  startingBlock: '28384640'
+  startingBlock: '28384640',
+  chainId: ChainId.polygon,
 }
 
 export const up = async (knex: Knex) => {
