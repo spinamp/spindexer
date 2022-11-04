@@ -2,10 +2,10 @@ import { isValidChecksumAddress } from 'ethereumjs-util';
 
 import { EthereumAddress } from '../types/ethereum';
 
-import { MessagePayload } from './types';
+import { MessagePayload, PublicOperations } from './types';
 
 export const restrictAccess = (payload: MessagePayload, signer?: EthereumAddress) => {
-  if (payload.operation !== 'upsert' && payload.operation !== 'update') {
+  if (Object.values(PublicOperations).includes(payload.operation as any)) {
     return;
   }
   onlyAdmin(signer);
