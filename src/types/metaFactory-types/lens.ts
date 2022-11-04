@@ -1,26 +1,19 @@
 import { MetaFactoryType } from '../metaFactory';
-import { NftFactory } from '../nft';
+import { NFTContractTypeName } from '../nft';
 
 const type: MetaFactoryType = {
   newContractCreatedEvent: 'CollectNFTDeployed',
-  metadataAPI: async (events, clients) => {
-      
-    console.log('got events', events)
-
-    if (!1){
-      throw 'get metadata....'
+  creationMetadataToNftFactory(event, autoApprove, metaFactory, factoryMetadata?) {
+    return {
+      approved: autoApprove,
+      autoApprove: autoApprove,
+      chainId: metaFactory.chainId,
+      contractType: NFTContractTypeName.default,
+      id: event.args.collectNFT,
+      platformId: metaFactory.platformId,
+      standard: metaFactory.standard,
+      startingBlock: `${parseInt(event.blockNumber) - 1}`,
     }
-
-    return {}
-  },
-  creationMetadataToNftFactory(creationData, autoApprove, metaFactory, factoryMetadata?) {
-      
-    if (1){
-      throw 'test create nft factory'
-    }
-
-    return {} as NftFactory;
-
   },
 }
 
