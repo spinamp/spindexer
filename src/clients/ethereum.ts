@@ -64,23 +64,27 @@ async function getLogs(provider: JsonRpcProvider, params: any, fromBlock: string
       const errorString = e.toString() as string;
       const searchString = 'this block range should work: [';
       if (!errorString.includes(searchString)){
-        throw `Can't find suggested block range`
+        console.log(`Can't find suggested range, decrease range by half`)
+        const range = BigNumber.from(end).sub(start);
+        const newRange = Math.floor(range.div(2).toNumber());
+        end = BigNumber.from(start).add(newRange).toHexString();
+      } else {
+        const suggestion = errorString.substring(errorString.indexOf(searchString), errorString.indexOf(']\\"}}",'));
+        const suggestedRanges = suggestion.substring(suggestion.indexOf('[') + 1).split(', ')
+        if (suggestedRanges.length !== 2){
+          throw `Can't find suggested block range`
+        }
+        start = suggestedRanges[0];
+        end = suggestedRanges[1];
       }
-      const suggestion = errorString.substring(errorString.indexOf(searchString), errorString.indexOf(']\\"}}",'));
-      const suggestedRanges = suggestion.substring(suggestion.indexOf('[') + 1).split(', ')
-      if (suggestedRanges.length !== 2){
-        throw `Can't find suggested block range`
-      }
-      start = suggestedRanges[0];
-      end = suggestedRanges[1];
     }
   }
 
   return events
 }
 
-const init = async (): Promise<EthClient> => {
-  const provider = new JsonRpcProvider(process.env.ETHEREUM_PROVIDER_ENDPOINT!);
+const init = async (providerUrl: string): Promise<EthClient> => {
+  const provider = new JsonRpcProvider(providerUrl);
   const ethcallProvider = new Provider();
   await ethcallProvider.init(provider);
   return {
