@@ -32,7 +32,6 @@ export const validateMessage = async (payload: MessagePayload) => {
         () => onlyValidKeysPresent(payload, PlatformValidKeys),
         () => typeValidatorOptional(payload, 'type', MusicPlatformType),
       ],
-      'contractApproval': [ () => { throw new Error('Platform approval not supported') } ],
     },
     'nftFactories': {
       'upsert': [
@@ -52,24 +51,23 @@ export const validateMessage = async (payload: MessagePayload) => {
       ],
     },
     'artists': {
-      'upsert': [ () => { throw new Error('Artist upsert not supported') } ],
       'update': [
         () => minimumKeysPresent(payload, ['id']),
         () => onlyValidKeysPresent(payload, ArtistValidKeys),
       ],
-      'contractApproval': [ () => { throw new Error('Artist approval not supported') } ],
     },
     'processedTracks': {
-      'upsert': [ () => { throw new Error('Track upsert not supported') } ],
       'update': [
         () => minimumKeysPresent(payload, ['id']),
         () => onlyValidKeysPresent(payload, ProcessedTrackValidKeys),
       ],
-      'contractApproval': [ () => { throw new Error('Track approval not supported') } ],
     }
   }
 
-  await asyncForEach(validatorFunctions[payload.entity][payload.operation], async (fn: any) => {
+  const validators = validatorFunctions[payload.entity][payload.operation]
+  if (!validators) { throw new Error(`${payload.entity} ${payload.operation} not supported`) }
+
+  await asyncForEach(validators, async (fn: any) => {
     await fn();
   })
 }

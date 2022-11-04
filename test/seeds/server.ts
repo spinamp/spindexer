@@ -538,7 +538,7 @@ describe('Seeds API server', async () => {
 
           supertest(app).post(endpoint).send(payload)
             .set('x-signature', signature)
-            .expect(422, { error: 'Artist upsert not supported' })
+            .expect(422, { error: 'artists upsert not supported' })
             .end((err,res) => { if (err) throw err });
         })
       })
@@ -621,7 +621,7 @@ describe('Seeds API server', async () => {
 
           supertest(app).post(endpoint).send(payload)
             .set('x-signature', signature)
-            .expect(422, { error: 'Track upsert not supported' })
+            .expect(422, { error: 'processedTracks upsert not supported' })
             .end((err,res) => { if (err) throw err });
         })
       })
