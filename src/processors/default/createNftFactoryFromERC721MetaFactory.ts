@@ -17,7 +17,7 @@ const processorFunction = (metaFactory: MetaFactory, name: string) =>
     }
     let factoryMetadata: unknown;
     if (metaFactoryContractType.metadataAPI) {
-      factoryMetadata = await metaFactoryContractType.metadataAPI(events, clients);
+      factoryMetadata = await metaFactoryContractType.metadataAPI(events, clients, metaFactory);
     }
     const eventToNftFactory = metaFactoryContractType.creationMetadataToNftFactory;
 
