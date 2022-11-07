@@ -1,11 +1,14 @@
 import { Table } from '../db/db';
+import { ChainId } from '../types/chain';
 import { Trigger } from '../types/trigger';
 
-export const ethereumMissingCreatedAtTime: (tableName: Table) => Trigger<undefined> = (tableName: Table) => async (clients) => {
+export const ethereumMissingCreatedAtTime: (chainId: ChainId, tableName: Table) => Trigger<undefined> = 
+(chainId: ChainId, tableName: Table) => async (clients) => {
   const nfts = (await clients.db.getRecords(tableName,
     [
       ['whereNull', ['createdAtTime']],
       ['whereNotNull', ['createdAtEthereumBlockNumber']],
+      ['andWhere', ['chainId', chainId]],
     ]
   )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return nfts;

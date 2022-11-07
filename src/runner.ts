@@ -12,7 +12,6 @@ import { Chain, ChainId, ChainType } from './types/chain';
 import { Clients, Processor } from './types/processor';
 
 export const initClients = async (existingDBClient?: DBClient) => {
-  const blocksClient = await blocks.init();
   const axiosClient = await axios.init();
   const ipfsClient = await ipfs.init();
   const catalogClient = await catalog.init();
@@ -20,13 +19,15 @@ export const initClients = async (existingDBClient?: DBClient) => {
   const noizdClient = await noizd.init();
   const solanaClient = await solana.init();
   const dbClient = existingDBClient || await db.init();
-
+  
   const evmChains = await dbClient.getRecords<Chain>(Table.chains, [['where', ['type', ChainType.evm]]])
   const evmClients = {} as { [chainId in ChainId]: EVMClient }
-
+  
   for await (const chain of evmChains){
     evmClients[chain.id] = await ethereum.init(chain.rpcUrl)
   }
+
+  const blocksClient = await blocks.init(evmClients);
 
   return {
     evmChain: evmClients,

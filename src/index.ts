@@ -7,6 +7,7 @@ import { Table } from './db/db';
 import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
+import { addTimestampToERC721Transfers } from './processors/default/addTimestampToERC721NFTs';
 import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
 import { createNftFactoryFromERC721MetaFactoryProcessor } from './processors/default/createNftFactoryFromERC721MetaFactory';
 import { createNftsFromCandyMachine } from './processors/default/createNftFromCandyMachine';
@@ -37,6 +38,7 @@ const PROCESSORS = (
   const erc721ContractFieldProcessors = Object.values(ChainId).map(chainId => getERC721ContractFieldsProcessor(chainId as any))
   // TODO: make scalable - maybe move contracts query to trigger like for the above processor
   const erc721TransferProcessors = Object.values(ChainId).map(chainId => createERC721NFTsFromTransfersProcessor(chainId, nftFactories.filter(factory => factory.chainId === chainId)));
+  const addTimestampToERC721TransfersProcessors = Object.values(ChainId).map(chainId => addTimestampToERC721Transfers(chainId))
   const platformTrackProcessors = musicPlatforms.map(musicPlatform => processPlatformTracks(musicPlatform));
 
   //TODO: noizd here is being used both as platformId and MusicPlatformType. Need to avoid mixing them
@@ -58,7 +60,7 @@ const PROCESSORS = (
     // ...candyMachineProcessors,
     ...erc721ContractFieldProcessors,
     ...erc721TransferProcessors,
-    // addTimestampToERC721Transfers,
+    ...addTimestampToERC721TransfersProcessors,
     // addTimestampToERC721NFTs,
     // getERC721TokenFieldsProcessor(nftFactoriesByAddress),
     addMetadataIPFSHashProcessor(nftFactoriesByAddress),

@@ -48,6 +48,7 @@ export type EVMClient = {
   getBlockTimestamps: (blockHashes: string[]) => Promise<number[]>;
   getLatestBlockNumber: () => Promise<number>;
   getContractOwner: (hash: string) => Promise<string>;
+  getBlockTimestampsByBlockNumber: (blockNumbers: number[]) => Promise<{ [blockNumber: number]: number }>;
 }
 
 export type ContractFilter = {
@@ -154,6 +155,19 @@ const init = async (providerUrl: string): Promise<EVMClient> => {
       const contract = new ethers.Contract(hash, MetaABI.abi, provider);
       const owner = await contract.owner();
       return owner
+    },
+    getBlockTimestampsByBlockNumber: async (blockNumbers: number[]) => {
+      const getBlock = provider.getBlock.bind(provider);
+      const results = await rollPromises(blockNumbers, getBlock);
+      const failedBlocks = results.filter(result => result.isError);
+      if (failedBlocks.length !== 0) {
+        throw new Error('Failed to get all block timestamps');
+      }
+
+      return results.reduce((prev, result) => 
+        ({ ...prev, [result.response!.number]: result.response!.timestamp }),
+      {}
+      );
     }
   }
 }

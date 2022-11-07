@@ -37,6 +37,7 @@ export type ERC721Transfer = Record & {
   tokenId: bigint
   nftId: string;
   transactionHash: string;
+  chainId: ChainId;
 };
 
 export enum NFTContractTypeName {

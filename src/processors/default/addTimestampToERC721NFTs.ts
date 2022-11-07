@@ -2,18 +2,18 @@ import _ from 'lodash';
 
 import { Table } from '../../db/db';
 import { ethereumMissingCreatedAtTime } from '../../triggers/missing';
-import { Clients } from '../../types/processor';
+import { ChainId } from '../../types/chain';
+import { Clients, Processor } from '../../types/processor';
 import { Record } from '../../types/record';
 
-const processorFunction = (table: Table) => async (items: Record, clients: Clients) => {
+const processorFunction = (chainId: ChainId, table: Table) => async (items: Record, clients: Clients) => {
   const recordsByBlockNumber = _.groupBy(items, 'createdAtEthereumBlockNumber');
   const blockNumbers = Object.keys(recordsByBlockNumber);
   console.log(`Processing until block ${blockNumbers[blockNumbers.length - 1]}`)
-  const timestampsResponse = await clients.blocks.fetchBlockTimestamps(blockNumbers);
-  const responseByBlockNumber = _.keyBy(timestampsResponse, 'number');
+  const timestampsByBlockNumber = await clients.blocks.fetchBlockTimestamps(chainId, blockNumbers);
   const recordUpdates: Partial<Record>[] = [];
   blockNumbers.forEach((blockNumber) => {
-    const timestampMillis = BigInt(responseByBlockNumber[blockNumber].timestamp) * BigInt(1000);
+    const timestampMillis = BigInt(timestampsByBlockNumber[blockNumber]) * BigInt(1000);
     const records: Record[] = recordsByBlockNumber[blockNumber] as any;
     records.forEach(record => recordUpdates.push({
       id: record.id,
@@ -23,14 +23,15 @@ const processorFunction = (table: Table) => async (items: Record, clients: Clien
   await clients.db.update(table, recordUpdates);
 };
 
-export const addTimestampToERC721NFTs = {
-  name: 'addTimestampToERC721NFTs',
-  trigger: ethereumMissingCreatedAtTime(Table.nfts),
-  processorFunction: processorFunction(Table.nfts),
-};
+// export const addTimestampToERC721NFTs = {
+//   name: 'addTimestampToERC721NFTs',
+//   trigger: ethereumMissingCreatedAtTime(Table.nfts),
+//   processorFunction: processorFunction(Table.nfts),
+// };
 
-export const addTimestampToERC721Transfers = {
+export const addTimestampToERC721Transfers: (chainId: ChainId) => Processor =
+(chainId) => ({
   name: 'addTimestampToERC721Transfers',
-  trigger: ethereumMissingCreatedAtTime(Table.erc721Transfers),
-  processorFunction: processorFunction(Table.erc721Transfers),
-};
+  trigger: ethereumMissingCreatedAtTime(chainId, Table.erc721Transfers),
+  processorFunction: processorFunction(chainId, Table.erc721Transfers),
+});

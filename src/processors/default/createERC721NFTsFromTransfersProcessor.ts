@@ -40,6 +40,7 @@ const processorFunction = (chainId: ChainId, contracts: NftFactory[]) =>
       const nftId = contractType.buildNFTId(contractAddress, tokenId);
 
       transfers.push({
+        // TODO: rename!
         id: ethereumTransferId(item.blockNumber, item.logIndex),
         contractAddress: contractAddress,
         from: fromAddress,
@@ -47,7 +48,8 @@ const processorFunction = (chainId: ChainId, contracts: NftFactory[]) =>
         tokenId,
         createdAtEthereumBlockNumber: '' + item.blockNumber,
         nftId: nftId,
-        transactionHash: item.transactionHash
+        transactionHash: item.transactionHash,
+        chainId: chainId
       });
 
       if (!newMint(fromAddress)) {
