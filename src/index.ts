@@ -77,7 +77,7 @@ const PROCESSORS = (
     // categorizeZora,
     // createNinaNfts,
     // addTimestampFromMetadata,
-    // ...platformTrackProcessors,
+    ...platformTrackProcessors,
     // ...apiTrackProcessors,
     ipfsAudioUploader,
     ipfsArtworkUploader,
