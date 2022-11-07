@@ -74,11 +74,13 @@ export const NFTsWithoutTracks: (platformId: string, limit?: number) => Trigger<
     return nfts;
   };
 
-export const unprocessedNFTs: Trigger<undefined> = async (clients) => {
+export const unprocessedNFTs: (chainId: ChainId) => Trigger<undefined> =
+(chainId) => async (clients) => {
   const nfts = (await clients.db.rawSQL(
     `select * from "${Table.nfts}"
      where "tokenURI" is null
      and approved = true
+     and "chainId" = '${chainId}'
      limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
     `
   )).rows
