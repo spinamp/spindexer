@@ -28,6 +28,7 @@ export type NFT = Record & {
   approved: boolean;
   burned: boolean;
   publicReleaseTime?: Date;
+  chainId: ChainId;
 }
 
 export type ERC721Transfer = Record & {

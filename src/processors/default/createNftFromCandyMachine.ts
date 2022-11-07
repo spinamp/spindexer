@@ -29,6 +29,7 @@ export const createNftsFromCandyMachine: (metaFactory: MetaFactory) => Processor
           approved: metaFactory.autoApprove,
           burned: false,
           createdAtTime: new Date(mintTx.blockTime! * 1000),
+          chainId: metaFactory.chainId
         }
         return details
       })

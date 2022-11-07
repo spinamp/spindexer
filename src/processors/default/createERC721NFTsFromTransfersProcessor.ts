@@ -71,7 +71,8 @@ const processorFunction = (chainId: ChainId, contracts: NftFactory[]) =>
           platformId: contract.platformId,
           owner: toAddress,
           approved: contract.autoApprove,
-          publicReleaseTime: contract.typeMetadata?.other?.publicReleaseTime || undefined
+          publicReleaseTime: contract.typeMetadata?.other?.publicReleaseTime || undefined,
+          chainId
         });
         nftsCollectorsChanges.push({ nftId: nftId, collectorId: toAddress, amount: 1 })
       }

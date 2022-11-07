@@ -45,6 +45,10 @@ export const up = async (knex: Knex) => {
     table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
   })
 
+  await knex.schema.alterTable(Table.nfts, table => {
+    table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
+  })
+
   // TODO: add @omit to chains table to hide from API
 
   // TODO: rename erc721Transfers.createdAtEthereumBlockNumber

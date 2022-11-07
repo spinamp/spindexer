@@ -23,11 +23,12 @@ const processorFunction = (chainId: ChainId, table: Table) => async (items: Reco
   await clients.db.update(table, recordUpdates);
 };
 
-// export const addTimestampToERC721NFTs = {
-//   name: 'addTimestampToERC721NFTs',
-//   trigger: ethereumMissingCreatedAtTime(Table.nfts),
-//   processorFunction: processorFunction(Table.nfts),
-// };
+export const addTimestampToERC721NFTs: (chainId: ChainId) => Processor =
+(chainId) => ({
+  name: 'addTimestampToERC721NFTs',
+  trigger: ethereumMissingCreatedAtTime(chainId, Table.nfts),
+  processorFunction: processorFunction(chainId, Table.nfts),
+});
 
 export const addTimestampToERC721Transfers: (chainId: ChainId) => Processor =
 (chainId) => ({
