@@ -53,8 +53,7 @@ describe('ipfsMediaResetter', async () => {
       await ipfsArtworkResetter.processorFunction(trackFileJoins, clients);
       const tracks: any[] = await dbClient.getRecords<ProcessedTrack>(Table.processedTracks);
       const ipfs: any[] = await dbClient.getRecords<IPFSFile>(Table.ipfsFiles);
-      assert(!!!tracks.find((e) => e['id'] === '2').lossyArtworkIPFSHash, `track IPFS was not cleared, result was ${JSON.stringify(tracks)}`);
-      assert(!!!ipfs.find((e) => e['cid'] === '2'), `ipfs file was not deleted, result was ${JSON.stringify(ipfs)}`);
+      assert(!!!tracks.find((e) => e.id === '2').lossyArtworkIPFSHash, `track IPFS was not cleared, result was ${JSON.stringify(tracks)}`);
     })
   })
 })

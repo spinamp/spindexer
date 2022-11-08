@@ -12,10 +12,6 @@ function processorFunction(resetField: 'lossyAudioIPFSHash' | 'lossyArtworkIPFSH
     const deletions: string[] = [];
 
     tracksWithIPFSFiles.forEach((trackWithFile: TrackFileJoin) => {
-      if (trackWithFile['url']) {
-        deletions.push(trackWithFile['url']);
-      }
-
       delete trackWithFile['url']
       delete trackWithFile['error'];
       delete trackWithFile['cid'];
@@ -32,10 +28,6 @@ function processorFunction(resetField: 'lossyAudioIPFSHash' | 'lossyArtworkIPFSH
 
     if (updates.length > 0) {
       await clients.db.update(Table.processedTracks, updates);
-    }
-
-    if (deletions.length > 0) {
-      await clients.db.delete(Table.ipfsFiles, deletions, 'url');
     }
   }
 }
