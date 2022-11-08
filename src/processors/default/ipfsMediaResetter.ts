@@ -30,8 +30,13 @@ function processorFunction(resetField: 'lossyAudioIPFSHash' | 'lossyArtworkIPFSH
       })
     })
 
-    await clients.db.update(Table.processedTracks, updates);
-    await clients.db.delete(Table.ipfsFiles, deletions, 'url');
+    if (updates.length > 0) {
+      await clients.db.update(Table.processedTracks, updates);
+    }
+
+    if (deletions.length > 0) {
+      await clients.db.delete(Table.ipfsFiles, deletions, 'url');
+    }
   }
 }
 

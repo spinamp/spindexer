@@ -63,11 +63,13 @@ export const artworkNotOnIpfs: Trigger<undefined> = async (clients: Clients) => 
 
 export const artworkChanged: Trigger<undefined> = async (clients: Clients) => {
   const query = `select * from "${Table.processedTracks}" as t
-      inner join "${Table.ipfsFiles}" i
-      on t."lossyArtworkIPFSHash" = i.cid
-      where t."lossyArtworkIPFSHash" is not null
-      and t."lossyArtworkURL" is not null
-      and t."lossyArtworkURL" <> i.url
+      left outer join "${Table.ipfsFiles}" i
+      on t."lossyArtworkURL" = i.url
+      where (
+        (t."lossyArtworkIPFSHash" is not null and t."lossyArtworkURL" is not null)
+        and
+        (i.url is null)
+      )
       LIMIT ${process.env.IPFS_UPLOAD_BATCH_SIZE || process.env.QUERY_TRIGGER_BATCH_SIZE!}`
 
   const tracksWithChanges = (await clients.db.rawSQL(

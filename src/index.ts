@@ -19,8 +19,9 @@ import { errorAndMetadataResetProcessor, errorProcessor } from './processors/def
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
 import { insertSeedsIntoMempool } from './processors/default/insertSeedsIntoMempool';
-import { ipfsAudioUploader, ipfsArtworkUploader } from './processors/default/ipfsMediaUploader';
-import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfsPinner';
+import { ipfsArtworkResetter } from './processors/default/ipfsMediaResetter';
+import { ipfsArtworkUploader, ipfsAudioUploader } from './processors/default/ipfsMediaUploader';
+import { ipfsArtworkPinner, ipfsAudioPinner } from './processors/default/ipfsPinner';
 import { processMempoolInserts, processMempoolUpdates } from './processors/default/processMempool';
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
 import { runProcessors } from './runner';
@@ -64,6 +65,7 @@ const PROCESSORS = (nftFactories: NftFactory[], erc721MetaFactories: MetaFactory
     addTimestampFromMetadata,
     ...platformTrackProcessors,
     ...apiTrackProcessors,
+    ipfsArtworkResetter,
     ipfsAudioUploader,
     ipfsArtworkUploader,
     ipfsAudioPinner,
@@ -75,10 +77,10 @@ const PROCESSORS = (nftFactories: NftFactory[], erc721MetaFactories: MetaFactory
 const updateDBLoop = async () => {
   const dbClient = await db.init();
   const nftFactories = await dbClient.getRecords<NftFactory>(Table.nftFactories);
-  
+
   const metafactories = await dbClient.getRecords<MetaFactory>(Table.metaFactories);
   const erc721MetaFactories = metafactories.filter(metaFactory => metaFactory.standard === NFTStandard.ERC721);
-  const candyMachines = metafactories.filter(metaFactory => metaFactory.standard === NFTStandard.METAPLEX && metaFactory.contractType === MetaFactoryTypeName.candyMachine) 
+  const candyMachines = metafactories.filter(metaFactory => metaFactory.standard === NFTStandard.METAPLEX && metaFactory.contractType === MetaFactoryTypeName.candyMachine)
 
   const musicPlatforms = await dbClient.getRecords<MusicPlatform>(Table.platforms);
   await runProcessors(PROCESSORS(nftFactories, erc721MetaFactories, musicPlatforms, candyMachines), dbClient);

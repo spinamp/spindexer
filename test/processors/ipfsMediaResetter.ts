@@ -27,17 +27,21 @@ describe('ipfsMediaResetter', async () => {
   describe('processorFunction', async () => {
     before( async () => {
       const tracks = [
-        { id: '1', lossyArtworkIPFSHash: '1', lossyArtworkURL: 'unchanged' },
-        { id: '2', lossyArtworkIPFSHash: '2', lossyArtworkURL: 'will_have_changed' }, // expecting to return only this
-        { id: '3', lossyArtworkIPFSHash: undefined, lossyArtworkURL: 'errored' },
-        { id: '4', lossyArtworkIPFSHash: undefined, lossyArtworkURL: undefined },
+        { id: '1', lossyArtworkIPFSHash: '1xx', lossyArtworkURL: 'unchanged' },
+        { id: '2', lossyArtworkIPFSHash: '2xx', lossyArtworkURL: 'no_corresponding_ipfs_file' }, // <-- this should be the only valid return!
+        { id: '3', lossyArtworkIPFSHash: '2xx', lossyArtworkURL: 'has_ipfs_file' }, // multiple cid's for different urls are possible
+        { id: '4', lossyArtworkIPFSHash: '4xx', lossyArtworkURL: 'ipfs://4xx' },
+        { id: '5', lossyArtworkIPFSHash: undefined, lossyArtworkURL: 'errored' },
+        { id: '6', lossyArtworkIPFSHash: undefined, lossyArtworkURL: undefined },
       ]
 
       const files = [
-        { cid: '1', url: 'unchanged' },
-        { cid: '2', url: 'definitely_changed_now' },
+        { cid: '1xx', url: 'unchanged' },
+        { cid: '2xx', url: 'old_one' },
+        { cid: '2xx', url: 'has_ipfs_file' },
         { cid: undefined, url: 'errored', error: 'whoops' },
-        { cid: '5', url: 'orphaned' },
+        { cid: '4xx', url: 'ipfs://4xx' },
+        { cid: '5xx', url: 'orphaned' },
       ]
 
       await dbClient.insert<Partial<ProcessedTrack>>(Table.processedTracks, tracks);
