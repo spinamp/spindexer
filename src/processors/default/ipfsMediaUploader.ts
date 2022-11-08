@@ -79,16 +79,3 @@ export const ipfsArtworkUploader: Processor = ({
   processorFunction: processorFunction('lossyArtworkURL', 'lossyArtworkIPFSHash'),
   initialCursor: undefined
 });
-
-// export const ipfsArtworkResetter: Processor = ({
-//   name: 'ipfsArtworkResetter',
-//   trigger: artworkChanged,
-//   processorFunction: async (tracks: ProcessedTrack[], clients: Clients) => {
-//     const updates = tracks.map(track => ({
-//       ...track,
-//       lossyArtworkIPFSHash: null
-//     }))
-//     await clients.db.update(Table.processedTracks, updates)
-//   },
-//   initialCursor: undefined
-// });
