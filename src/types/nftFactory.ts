@@ -22,7 +22,7 @@ export const NFTFactoryTypes: NftFactoryTypes = {
 }
 
 export function buildERC721Id(chainId: ChainId, contractAddress: string, tokenId: bigint): string {
-  // don't prefix ethereum and solana nfts to preserve backwards compatibility
+  // Ethereum and solana nfts were indexed before the chain id prefix, so to preserve backwards compatibility for old ids we skip the prefix on them. A future migration could be done to bring them in line with other chains.
   let prefix = ''
   if (![ChainId.ethereum, ChainId.solana].includes(chainId)){
     prefix = `${chainId}/`
