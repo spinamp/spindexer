@@ -17,6 +17,7 @@ const KOTA_PLATFORM: MusicPlatform = {
 
 const KOTA: MetaFactory = {
   id: '2ZvRTpStD4gQ9WPoXuiA4MtFpiZze9K9fPfFtCTnzdGo',
+  address: '2ZvRTpStD4gQ9WPoXuiA4MtFpiZze9K9fPfFtCTnzdGo',
   platformId: KOTA_PLATFORM.id,
   contractType: MetaFactoryTypeName.candyMachine,
   standard: NFTStandard.METAPLEX,
@@ -55,8 +56,8 @@ export const up = async (knex: Knex) => {
     operation: CrdtOperation.UPSERT,
   }
 
-  await knex(Table.seeds).insert(platform)
-  await knex(Table.seeds).insert(metaFactory)
+  // await knex(Table.seeds).insert(platform)
+  // await knex(Table.seeds).insert(metaFactory)
 
   await updateViews(knex)
 }

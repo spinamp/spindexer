@@ -1,4 +1,5 @@
 
+import { formatAddress } from '../types/address';
 import { ChainId } from '../types/chain';
 import { TitleExtractorTypes, IdExtractorTypes, ArtistIdExtractorTypes, ArtistNameExtractorTypes, WebsiteUrlExtractorTypes, ArtworkUrlExtractorTypes, AudioUrlExtractorTypes } from '../types/fieldExtractor';
 import { MetaFactory, MetaFactoryTypeName } from '../types/metaFactory';
@@ -82,7 +83,8 @@ const SOUND_ORIGINAL_META_FACTORY: MetaFactory = {
   gap: '500000',
   standard: NFTStandard.ERC721,
   autoApprove: true,
-  chainId: ethereumChainId
+  chainId: ethereumChainId,
+  address: formatAddress('0x78e3adc0e811e4f93bd9f1f9389b923c9a3355c2')
 }
 
 // Migration 04
@@ -300,7 +302,8 @@ const NINA_META_FACTORY: MetaFactory = {
   contractType: MetaFactoryTypeName.ninaMintCreator,
   standard: NFTStandard.METAPLEX,
   autoApprove: true,
-  chainId: solanaChainId
+  chainId: solanaChainId,
+  address: 'ninaN2tm9vUkxoanvGcNApEeWiidLMM2TdBX8HoJuL4'
 };
 
 // Migration 14
@@ -408,7 +411,8 @@ const ZORA_META_FACTORY: MetaFactory = {
   gap: '500000',
   standard: NFTStandard.ERC721,
   autoApprove: false,
-  chainId: ethereumChainId
+  chainId: ethereumChainId,
+  address: formatAddress('0xf74b146ce44cc162b601dec3be331784db111dc1')
 }
 
 // Migration 23
@@ -651,7 +655,8 @@ const SOUND_PROTOCOL_META_FACTORY: MetaFactory = {
   gap: '500000',
   standard: NFTStandard.ERC721,
   autoApprove: true,
-  chainId: ethereumChainId
+  chainId: ethereumChainId,
+  address: formatAddress('0xaef3e8c8723d9c31863be8de54df2668ef7c4b89')
 }
 
 // Migration 35

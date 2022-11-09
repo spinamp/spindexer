@@ -30,6 +30,7 @@ export type MetaFactory = Contract & {
   autoApprove: boolean;
   typeMetadata?: TypeMetadata;
   chainId: ChainId;
+  address: string;
 }
 
 export type MetaFactoryType = {

@@ -23,7 +23,7 @@ export const newCandyMachineNfts: (metaFactory: MetaFactory) => Trigger<undefine
     ])).map(nftFactory => nftFactory.id));
 
 
-  const allMintAccounts = await clients.solana.getMintAddressesForCandyMachine(new PublicKey(metaFactory.id))
+  const allMintAccounts = await clients.solana.getMintAddressesForCandyMachine(new PublicKey(metaFactory.address))
   const newMintAccounts = allMintAccounts.filter(mintAccount => !existingNFTFactories.has(mintAccount));
   console.log('new candy machine nfts', newMintAccounts)
   const chunks = _.chunk(newMintAccounts, MAX_CANDY_MACHINE_CHUNK_SIZE)

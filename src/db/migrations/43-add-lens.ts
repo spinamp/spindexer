@@ -1,5 +1,6 @@
 import { Knex } from 'knex';
 
+import { formatAddress } from '../../types/address';
 import { Chain, ChainId, ChainType } from '../../types/chain';
 import { getCrdtUpsertMessage } from '../../types/message';
 import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
@@ -22,6 +23,7 @@ const LENS_HUB: MetaFactory = {
   autoApprove: false,
   startingBlock: '28384640',
   chainId: ChainId.polygon,
+  address: formatAddress('0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d')
 }
 
 export const up = async (knex: Knex) => {
@@ -45,6 +47,7 @@ export const up = async (knex: Knex) => {
 
   await knex.schema.alterTable(Table.metaFactories, table => {
     table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
+    table.string('address').notNullable()
   })
 
   await knex.schema.alterTable(Table.erc721Transfers, table => {

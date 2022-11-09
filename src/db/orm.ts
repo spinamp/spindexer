@@ -39,7 +39,8 @@ const toRecordMapper: any = {
       standard: c.standard,
       autoApprove: c.autoApprove,
       typeMetadata: c.typeMetadata,
-      chainId: c.chainId
+      chainId: c.chainId,
+      address: c.address
     });
   }),
   [Table.nftProcessErrors]: (nftProcessErrors: NFTProcessError[]):
@@ -93,7 +94,8 @@ const fromRecordMapper: any = {
       standard: c.standard,
       autoApprove: c.autoApprove,
       typeMetadata: c.typeMetadata,
-      chainId: c.chainId
+      chainId: c.chainId,
+      address: c.address
     });
   }),
   [Table.nftProcessErrors]: (errors: Record[]): NFTProcessError[] => errors.map((error: any) => {

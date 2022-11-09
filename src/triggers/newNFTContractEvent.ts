@@ -120,7 +120,7 @@ export const newERC721Contract: (factoryContract: MetaFactory) => Trigger<Cursor
         startingBlock: factoryContract.startingBlock!,
       }],
       [{
-        address: factoryContract.id,
+        address: factoryContract.address,
         filter: newContractCreatedEvent
       }],
       factoryContract.gap ? factoryContract.gap : undefined
