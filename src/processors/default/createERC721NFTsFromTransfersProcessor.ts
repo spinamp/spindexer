@@ -11,7 +11,7 @@ import { NFTFactoryTypes } from '../../types/nftFactory';
 import { consolidate, Collector, NFTsCollectors, NFTsCollectorsChanges } from '../../types/nftsCollectors';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';
-import { ethereumTransferId } from '../../utils/identifiers';
+import { transferId } from '../../utils/identifiers';
 
 const NAME = 'createERC721NFTsFromTransfers';
 
@@ -40,8 +40,7 @@ const processorFunction = (chainId: ChainId, contracts: NftFactory[]) =>
       const nftId = contractType.buildNFTId(chainId, contractAddress, tokenId);
 
       transfers.push({
-        // TODO: rename!
-        id: ethereumTransferId(item.blockNumber, item.logIndex),
+        id: transferId(chainId, item.blockNumber, item.logIndex),
         contractAddress: contractAddress,
         from: fromAddress,
         to: toAddress,

@@ -1,4 +1,4 @@
-import { ethereumId } from '../../utils/identifiers';
+import { artistId } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { getFactoryId } from '../chain';
 import { MetaFactoryType } from '../metaFactory';
@@ -19,7 +19,7 @@ const type: MetaFactoryType = {
     typeMetadata: {
       overrides: {
         artist: {
-          artistId: ethereumId(event.args!.creator),
+          artistId: artistId(metaFactory.chainId, event.args!.creator),
           name: formatAddress(event.args!.creator),
         },
         track: {

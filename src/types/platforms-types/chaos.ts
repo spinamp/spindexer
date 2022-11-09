@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { ethereumTrackId, slugify } from '../../utils/identifiers';
+import { evmTrackId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, getTrait, NftFactory } from '../nft';
@@ -54,7 +54,7 @@ const getSong = (nft: NFT) => getTrait(nft, 'Song');
 
 const mapNFTtoTrackID = (nft: NFT): string => {
   const song = getSong(nft);
-  return ethereumTrackId(nft.contractAddress, song);
+  return evmTrackId(nft.chainId, nft.contractAddress, song);
 };
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {

@@ -9,11 +9,6 @@ import { MusicPlatformType } from './platform';
 import { Record } from './record';
 import { ProcessedTrack } from './track';
 
-export enum Chain {
-  ETHEREUM = 'ethereum',
-  SOLANA = 'solana'
-}
-
 export type NFT = Record & {
   contractAddress: string
   nftFactoryId: string

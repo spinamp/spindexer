@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import { isGif, isMP4 } from '../types/media';
 import { ProcessedTrack } from '../types/track';
-import { ethereumTrackId, slugify } from '../utils/identifiers';
+import { slugify } from '../utils/identifiers';
 
 const noizdAPI = axios.create({
   timeout: 10000,
@@ -21,7 +21,7 @@ export type NOIZDClient = {
 }
 
 const mapAPIListingToTrackID = (listing: any): string => {
-  return ethereumTrackId(listing.nft.metadata.contract, listing.id);
+  return `noizd/${listing.id}`
 };
 
 const mapAPIIDToTrackId = (apiTrackId: string): string => {

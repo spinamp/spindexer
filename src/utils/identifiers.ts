@@ -1,33 +1,35 @@
 import * as slugifyLibrary from 'slugify'
 
 import { formatAddress } from '../types/address';
-import { Chain, NftFactory, NFTStandard } from '../types/nft';
+import { ChainId } from '../types/chain';
+import { NftFactory } from '../types/nft';
 
 export const slugify = (input: string) => slugifyLibrary.default(input, { lower: true, strict: true })
 
-export const artistId = (contract: NftFactory, address: string): string => {
-  return contract.standard === NFTStandard.METAPLEX ? solanaId(address) : ethereumId(address)
+export const artistId = (chainId: ChainId, address: string): string => {
+  // hardcode evm ids to ethereum to produce consistent ids across chains
+  return chainId === ChainId.solana ? solanaId(address) : evmId(ChainId.ethereum, address)
 }
 
 export const trackId = (contract: NftFactory, address: string, id: string): string => {
-  return contract.standard === NFTStandard.METAPLEX ? solanaTrackId(address, id) : ethereumTrackId(address, id)
+  return contract.chainId === ChainId.solana ? solanaTrackId(address, id) : evmTrackId(contract.chainId, address, id)
 }
 
-export const ethereumId = (address: string): string => {
-  return `${Chain.ETHEREUM}/${formatAddress(address)}`;
+export const evmId = (chainId: ChainId, address: string): string => {
+  return `${chainId}/${formatAddress(address)}`;
 }
 
-export const ethereumTrackId = (address: string, id: string): string => {
+export const evmTrackId = (chainId: ChainId, address: string, id: string): string => {
   const suffix = id !== '' ? `/${id}` : '';
-  return ethereumId(address) + suffix;
+  return evmId(chainId, address) + suffix;
 }
 
-export const ethereumTransferId = (blockNumber: string | number, logIndex: string | number): string => {
-  return `${Chain.ETHEREUM}/${blockNumber}/${logIndex}`;
+export const transferId = (chainId: ChainId, blockNumber: string | number, logIndex: string | number): string => {
+  return `${chainId}/${blockNumber}/${logIndex}`;
 }
 
 export const solanaId = (address: string): string => {
-  return `${Chain.SOLANA}/${formatAddress(address)}`;
+  return `${ChainId.solana}/${address}`;
 }
 
 export const solanaTrackId = (address: string, id: string): string => {
