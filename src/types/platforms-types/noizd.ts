@@ -11,10 +11,10 @@ export const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }
   if (!apiTrack) {
     throw new Error('missing api track');
   }
-  let createdAtTime, createdAtEthereumBlockNumber
+  let createdAtTime, createdAtBlockNumber
   if (nft) {
     createdAtTime = nft.createdAtTime
-    createdAtEthereumBlockNumber = nft.createdAtEthereumBlockNumber
+    createdAtBlockNumber = nft.createdAtBlockNumber
   } else {
     createdAtTime = mapAPITrackTime(apiTrack)
   }
@@ -27,7 +27,7 @@ export const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }
     avatarUrl: artist.profile?.image_profile?.url,
     websiteUrl: `https://noizd.com/u/${artist.uri}`,
     createdAtTime,
-    createdAtEthereumBlockNumber
+    createdAtBlockNumber
   };
 };
 
@@ -44,7 +44,7 @@ const mapTrack: MapTrack = (nft, apiTrack) => {
     id: mapNFTtoTrackID(nft),
     lossyAudioURL: apiTrack.metadata.audio_url,
     createdAtTime: processedTrack.createdAtTime || nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    createdAtBlockNumber: nft.createdAtBlockNumber,
   };
 };
 

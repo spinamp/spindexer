@@ -7,7 +7,7 @@ import { Clients, Processor } from '../../types/processor';
 import { Record } from '../../types/record';
 
 const processorFunction = (chainId: ChainId, table: Table) => async (items: Record, clients: Clients) => {
-  const recordsByBlockNumber = _.groupBy(items, 'createdAtEthereumBlockNumber');
+  const recordsByBlockNumber = _.groupBy(items, 'createdAtBlockNumber');
   const blockNumbers = Object.keys(recordsByBlockNumber);
   console.log(`Processing until block ${blockNumbers[blockNumbers.length - 1]}`)
   const timestampsByBlockNumber = await clients.blocks.fetchBlockTimestamps(chainId, blockNumbers);

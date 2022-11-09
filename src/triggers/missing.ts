@@ -7,7 +7,7 @@ export const ethereumMissingCreatedAtTime: (chainId: ChainId, tableName: Table) 
   const nfts = (await clients.db.getRecords(tableName,
     [
       ['whereNull', ['createdAtTime']],
-      ['whereNotNull', ['createdAtEthereumBlockNumber']],
+      ['whereNotNull', ['createdAtBlockNumber']],
       ['andWhere', ['chainId', chainId]],
     ]
   )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));

@@ -24,7 +24,7 @@ const mapTrack: MapTrack = (nft, apiTrack) => {
     lossyAudioIPFSHash: apiTrack.ipfs_hash_lossy_audio,
     lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${apiTrack.ipfs_hash_lossy_audio}`,
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    createdAtBlockNumber: nft.createdAtBlockNumber,
     lossyArtworkIPFSHash: apiTrack.ipfs_hash_lossy_artwork,
     lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${apiTrack.ipfs_hash_lossy_artwork}`,
     websiteUrl:
@@ -50,7 +50,7 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): Arti
       ? `https://beta.catalog.works/${artist.handle}`
       : 'https://beta.catalog.works',
     createdAtTime: nft!.createdAtTime,
-    createdAtEthereumBlockNumber: nft!.createdAtEthereumBlockNumber
+    createdAtBlockNumber: nft!.createdAtBlockNumber
   }
 };
 

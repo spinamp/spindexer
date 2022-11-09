@@ -46,26 +46,38 @@ export const up = async (knex: Knex) => {
     table.string('address').notNullable()
   })
 
+  // TODO: backfill address on existing metafactories
+  
+  await knex.schema.alterTable(Table.metaFactories, table => {
+    table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
+    table.string('address').notNullable()
+  })
+  
+  await knex.schema.alterTable(Table.erc721Transfers, table => {
+    table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
+    table.renameColumn('createdAtEthereumBlockNumber', 'createdAtBlockNumber')
+  })
+  
   await knex.schema.alterTable(Table.nfts, table => {
+    table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
     table.renameColumn('contractAddress', 'nftFactoryId')
+    table.renameColumn('createdAtEthereumBlockNumber', 'createdAtBlockNumber')
   })
 
   await knex.schema.alterTable(Table.nfts, table => {
     table.string('contractAddress').notNullable
   })
-  // TODO: backfill address on existing metafactories
 
-  await knex.schema.alterTable(Table.metaFactories, table => {
-    table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
-    table.string('address').notNullable()
+  await knex.schema.alterTable(Table.artists, table => {
+    table.renameColumn('createdAtEthereumBlockNumber', 'createdAtBlockNumber')
   })
 
-  await knex.schema.alterTable(Table.erc721Transfers, table => {
-    table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
+  await knex.schema.alterTable(Table.artistProfiles, table => {
+    table.renameColumn('createdAtEthereumBlockNumber', 'createdAtBlockNumber')
   })
 
-  await knex.schema.alterTable(Table.nfts, table => {
-    table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
+  await knex.schema.alterTable(Table.processedTracks, table => {
+    table.renameColumn('createdAtEthereumBlockNumber', 'createdAtBlockNumber')
   })
 
   // TODO: add @omit to chains table to hide from API

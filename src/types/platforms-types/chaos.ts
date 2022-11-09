@@ -27,7 +27,7 @@ const mapTrack: MapTrack = (
     websiteUrl: 'https://www.chaos.build/',
     artistId: contract.id,
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    createdAtBlockNumber: nft.createdAtBlockNumber,
   })
 };
 
@@ -46,7 +46,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
     avatarUrl: 'https://lh3.googleusercontent.com/UMytoAeoFW6hGHO3vjIUD28qcKerddfLZP3i2R2g9FS_5IOe7aCSSPosI13VxTFIqw7PgpIOlUSMJrc5jDYf8VbC-4degSMuoXbISw=s0',
     websiteUrl: 'https://www.chaos.build/',
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber
+    createdAtBlockNumber: nft.createdAtBlockNumber
   }
 };
 

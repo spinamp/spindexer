@@ -43,7 +43,7 @@ const mapTrack: MapTrack = (
     websiteUrl: nft.metadata.external_url,
     artistId: extractArtistIdFromNFT(nft),
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    createdAtBlockNumber: nft.createdAtBlockNumber,
   })
 };
 
@@ -62,7 +62,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
     avatarUrl: `${process.env.IPFS_ENDPOINT}${extractHashFromURL(nft.metadata.image)}`,
     websiteUrl: nft.metadata.external_url,
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber
+    createdAtBlockNumber: nft.createdAtBlockNumber
   }
 };
 

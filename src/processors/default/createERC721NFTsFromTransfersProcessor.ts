@@ -45,7 +45,7 @@ const processorFunction = (chainId: ChainId, contracts: NftFactory[]) =>
         from: fromAddress,
         to: toAddress,
         tokenId,
-        createdAtEthereumBlockNumber: '' + item.blockNumber,
+        createdAtBlockNumber: '' + item.blockNumber,
         nftId: nftId,
         transactionHash: item.transactionHash,
         chainId: chainId
@@ -64,7 +64,7 @@ const processorFunction = (chainId: ChainId, contracts: NftFactory[]) =>
       } else {
         newNFTs.push({
           id: nftId,
-          createdAtEthereumBlockNumber: '' + item.blockNumber,
+          createdAtBlockNumber: '' + item.blockNumber,
           contractAddress: contractAddress,
           nftFactoryId: contract.id,
           tokenId,
