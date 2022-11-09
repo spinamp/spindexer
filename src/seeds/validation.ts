@@ -2,7 +2,6 @@ import { ZORA_LATEST_PLATFORM } from '../constants/artistIntegrations';
 import { DBClient, Table } from '../db/db';
 import { NFTContractTypeName, NftFactory, NFTStandard } from '../types/nft';
 import { MusicPlatformType } from '../types/platform';
-import { asyncForEach } from '../utils/async';
 
 import { AllApiOperations, CrdtEntities, MessagePayload } from './types';
 
@@ -66,9 +65,9 @@ export const validateMessage = async (payload: MessagePayload, dbClient: DBClien
   const validators = validatorFunctions[payload.entity][payload.operation]
   if (!validators) { throw new Error(`${payload.entity} ${payload.operation} not supported`) }
 
-  await asyncForEach(validators, async (fn: any) => {
-    await fn();
-  })
+  for (let index = 0; index < validators.length; index++) {
+    await validators[index]();
+  }
 }
 
 // Checks that every expected key is present in the input data
