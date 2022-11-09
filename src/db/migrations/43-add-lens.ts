@@ -43,7 +43,17 @@ export const up = async (knex: Knex) => {
 
   await knex.schema.alterTable(Table.nftFactories, table => {
     table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
+    table.string('address').notNullable()
   })
+
+  await knex.schema.alterTable(Table.nfts, table => {
+    table.renameColumn('contractAddress', 'nftFactoryId')
+  })
+
+  await knex.schema.alterTable(Table.nfts, table => {
+    table.string('contractAddress').notNullable
+  })
+  // TODO: backfill address on existing metafactories
 
   await knex.schema.alterTable(Table.metaFactories, table => {
     table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');

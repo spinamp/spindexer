@@ -36,5 +36,5 @@ Processor = (factoryContract: MetaFactory) => ({
   name: `${NAME}_${factoryContract.id}`,
   trigger: newERC721Contract(factoryContract),
   processorFunction: processorFunction(factoryContract, `${NAME}_${factoryContract.id}`),
-  initialCursor: JSON.stringify({ [factoryContract.id]: factoryContract.startingBlock }),
+  initialCursor: JSON.stringify({ [factoryContract.address]: factoryContract.startingBlock }),
 });

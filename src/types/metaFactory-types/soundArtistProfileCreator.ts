@@ -1,11 +1,13 @@
 import { formatAddress } from '../address';
+import { getFactoryId } from '../chain';
 import { MetaFactoryType } from '../metaFactory';
 import { NFTContractTypeName, NFTStandard } from '../nft';
 
 const metaFactoryType: MetaFactoryType = {
   newContractCreatedEvent: 'CreatedArtist',
   creationMetadataToNftFactory: (event: any, autoApprove: boolean, metaFactory) => ({
-    id: formatAddress(event.args!.artistAddress),
+    id: getFactoryId(metaFactory.chainId, event.args!.artistAddress),
+    address: formatAddress(event.args!.artistAddress),
     platformId: 'sound',
     startingBlock: event.blockNumber,
     contractType: NFTContractTypeName.default,

@@ -43,6 +43,7 @@ const ZORA_LATEST_PLATFORM: MusicPlatform = {
 // Migration 02
 const NOIZD_FACTORY: NftFactory = {
   id: '0xf5819e27b9bad9f97c177bf007c1f96f26d91ca6',
+  address: formatAddress('0xf5819e27b9bad9f97c177bf007c1f96f26d91ca6'),
   platformId: NOIZD_PLATFORM.id,
   startingBlock: '13470560',
   contractType: NFTContractTypeName.default,
@@ -54,6 +55,7 @@ const NOIZD_FACTORY: NftFactory = {
 
 const CATALOG_FACTORY: NftFactory = {
   id: '0x0bc2a24ce568dad89691116d5b34deb6c203f342',
+  address: formatAddress('0x0bc2a24ce568dad89691116d5b34deb6c203f342'),
   platformId: CATALOG_PLATFORM.id,
   startingBlock: '14566825',
   contractType: NFTContractTypeName.default,
@@ -65,6 +67,7 @@ const CATALOG_FACTORY: NftFactory = {
 
 const ZORA_ORIGINAL_FACTORY: NftFactory = {
   id: '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7',
+  address: formatAddress('0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7'),
   platformId: ZORA_ORIGINAL_PLATFORM.id,
   startingBlock: '11565019',
   contractType: NFTContractTypeName.zora,
@@ -95,6 +98,7 @@ const HEDS_PLATFORM: MusicPlatform = {
 }
 const HEDSTAPE_1_FACTORY: NftFactory = {
   id: '0xde8a0b17d3dc0468adc65309881d9d6a6cd66372',
+  address: formatAddress('0xde8a0b17d3dc0468adc65309881d9d6a6cd66372'),
   startingBlock: '14193218',
   platformId: HEDS_PLATFORM.id,
   contractType: NFTContractTypeName.default,
@@ -105,6 +109,7 @@ const HEDSTAPE_1_FACTORY: NftFactory = {
 }
 const HEDSTAPE_2_FACTORY: NftFactory = {
   id: '0x5083cf11003f2b25ca7456717e6dc980545002e5',
+  address: formatAddress('0x5083cf11003f2b25ca7456717e6dc980545002e5'),
   platformId: HEDS_PLATFORM.id,
   startingBlock: '14373902',
   contractType: NFTContractTypeName.default,
@@ -115,6 +120,7 @@ const HEDSTAPE_2_FACTORY: NftFactory = {
 }
 const HEDSTAPE_3_FACTORY: NftFactory = {
   id: '0x567e687c93103010962f9e9cf5730ae8dbfc6d41',
+  address: formatAddress('0x567e687c93103010962f9e9cf5730ae8dbfc6d41'),
   platformId: HEDS_PLATFORM.id,
   startingBlock: '14548642',
   contractType: NFTContractTypeName.default,
@@ -125,6 +131,7 @@ const HEDSTAPE_3_FACTORY: NftFactory = {
 }
 const HEDSTAPE_4_FACTORY: NftFactory = {
   id: '0x8045fd700946a00436923f37d08f280ade3b4af6',
+  address: formatAddress('0x8045fd700946a00436923f37d08f280ade3b4af6'),
   platformId: HEDS_PLATFORM.id,
   startingBlock: '14813869',
   contractType: NFTContractTypeName.default,
@@ -143,6 +150,7 @@ const CHAOS_PLATFORM: MusicPlatform = {
 
 const CHAOS_FACTORY: NftFactory = {
   id: '0x8427e46826a520b1264b55f31fcb5ddfdc31e349',
+  address: formatAddress('0x8427e46826a520b1264b55f31fcb5ddfdc31e349'),
   platformId: CHAOS_PLATFORM.id,
   startingBlock: '14891073',
   contractType: NFTContractTypeName.default,
@@ -160,6 +168,7 @@ const MINT_PLATFORM: MusicPlatform = {
 }
 const MINT_FACTORY: NftFactory = {
   id: '0x2B5426A5B98a3E366230ebA9f95a24f09Ae4a584',
+  address: formatAddress('0x2B5426A5B98a3E366230ebA9f95a24f09Ae4a584'),
   platformId: MINT_PLATFORM.id,
   startingBlock: '14793509',
   contractType: NFTContractTypeName.default,
@@ -172,6 +181,7 @@ const MINT_FACTORY: NftFactory = {
 // Migration 07
 const HEDSTAPE_5_FACTORY: NftFactory = {
   id: '0x8f36eb094f7b960a234a482d4d8ffb8b37f728c6',
+  address: formatAddress('0x8f36eb094f7b960a234a482d4d8ffb8b37f728c6'),
   platformId: HEDS_PLATFORM.id,
   startingBlock: '14986141',
   contractType: NFTContractTypeName.default,
@@ -190,6 +200,7 @@ const ROHKI_PLATFORM: MusicPlatform = {
 
 const ROHKI_DESPERADO_FACTORY: NftFactory = {
   id: '0xe8e7Eb47dD7eaFeC80c1EF7f0aE39beE6Dbce469',
+  address: formatAddress('0xe8e7Eb47dD7eaFeC80c1EF7f0aE39beE6Dbce469'),
   platformId: ROHKI_PLATFORM.id,
   startingBlock: '14779299',
   chainId: ethereumChainId,
@@ -217,6 +228,7 @@ const ROHKI_DESPERADO_FACTORY: NftFactory = {
 // Migration 09
 const ROHKI_VROOM_FACTORY: NftFactory = {
   id: '0x317394c6dFB5606c2917E1a0DAD4f1B70EDDC921',
+  address: formatAddress('0x317394c6dFB5606c2917E1a0DAD4f1B70EDDC921'),
   platformId: ROHKI_PLATFORM.id,
   startingBlock: '15112828',
   chainId: ethereumChainId,
@@ -244,6 +256,7 @@ const ROHKI_VROOM_FACTORY: NftFactory = {
 // Migration 10
 const HEDSTAPE_6_FACTORY: NftFactory = {
   id: '0x885236535D5Cf7033BdC5bC1050CaD7fdf4970a6',
+  address: formatAddress('0x885236535D5Cf7033BdC5bC1050CaD7fdf4970a6'),
   platformId: HEDS_PLATFORM.id,
   startingBlock: '15200392',
   chainId: ethereumChainId,
@@ -265,6 +278,7 @@ const DANIEL_ALLAN_PLATFORM: MusicPlatform = {
 
 const DANIEL_ALLAN_GLASSHOUSE_FACTORY: NftFactory = {
   id: danielAllanAddress,
+  address: formatAddress(danielAllanAddress),
   platformId: DANIEL_ALLAN_PLATFORM.id,
   startingBlock: '15151004',
   contractType: NFTContractTypeName.default,
@@ -315,6 +329,7 @@ const HUME_PLATFORM: MusicPlatform = {
 
 const HUME_OTHERSIDE_FACTORY: NftFactory = {
   id: '0x0301E208Ec282EC38934606EF53dBD5876ED7eB0',
+  address: formatAddress('0x0301E208Ec282EC38934606EF53dBD5876ED7eB0'),
   platformId: HUME_PLATFORM.id,
   startingBlock: '14886522',
   contractType: NFTContractTypeName.default,
@@ -341,6 +356,7 @@ const HUME_OTHERSIDE_FACTORY: NftFactory = {
 // Migration 15
 const HUME_VIEW_FROM_THE_MOON_FACTORY: NftFactory = {
   id: '0x09d6e0f30cFdf2f62c1179516B1F980c5D96571E',
+  address: formatAddress('0x09d6e0f30cFdf2f62c1179516B1F980c5D96571E'),
   platformId: HUME_PLATFORM.id,
   startingBlock: '14962984',
   contractType: NFTContractTypeName.default,
@@ -367,6 +383,7 @@ const HUME_VIEW_FROM_THE_MOON_FACTORY: NftFactory = {
 // Migration 16
 const HUME_MINTED_FACTORY: NftFactory = {
   id: '0x8056B7750D2A061757a0ECA13eEf78caeDD4a30F',
+  address: formatAddress('0x8056B7750D2A061757a0ECA13eEf78caeDD4a30F'),
   platformId: HUME_PLATFORM.id,
   startingBlock: '15121180',
   contractType: NFTContractTypeName.default,
@@ -393,6 +410,7 @@ const HUME_MINTED_FACTORY: NftFactory = {
 // Migration 18
 const HEDSTAPE_7_FACTORY: NftFactory = {
   id: '0x20f2717f113d0b3815124876f3d72f8e1179341e',
+  address: formatAddress('0x20f2717f113d0b3815124876f3d72f8e1179341e'),
   platformId: HEDS_PLATFORM.id,
   startingBlock: '15373455',
   contractType: NFTContractTypeName.default,
@@ -418,6 +436,7 @@ const ZORA_META_FACTORY: MetaFactory = {
 // Migration 23
 const HEDS_COLLAB_FACTORY: NftFactory = {
   id: '0xEeB431Caa15B526f48Ee4DB3697FE57EC8223A8e',
+  address: formatAddress('0xEeB431Caa15B526f48Ee4DB3697FE57EC8223A8e'),
   platformId: HEDS_PLATFORM.id, // part of existing heds platform
   startingBlock: '15416993',
   contractType: NFTContractTypeName.default,
@@ -443,6 +462,7 @@ const JAGWAR_TWIN_PLATFORM: MusicPlatform = {
 
 const JAGWAR_TWIN_THOUGHT_FORMS_NFT_FACTORY: NftFactory = {
   id: '0x605B0E6b2Ec949235ff5Ac05bD452E22d21c702d',
+  address: formatAddress('0x605B0E6b2Ec949235ff5Ac05bD452E22d21c702d'),
   platformId: JAGWAR_TWIN_PLATFORM.id,
   startingBlock: '14779895',
   contractType: NFTContractTypeName.default,
@@ -472,6 +492,7 @@ const JAGWAR_TWIN_THOUGHT_FORMS_NFT_FACTORY: NftFactory = {
 // Migration 25
 const JAGWAR_TWIN_ALBUM_NFT_FACTORY: NftFactory = {
   id: '0xF85c1f4aC0040e4f2369cFcbAbfccfa2F3E6899E',
+  address: formatAddress('0xF85c1f4aC0040e4f2369cFcbAbfccfa2F3E6899E'),
   platformId: JAGWAR_TWIN_PLATFORM.id,
   startingBlock: '14449703',
   contractType: NFTContractTypeName.default,
@@ -501,6 +522,7 @@ const JAGWAR_TWIN_ALBUM_NFT_FACTORY: NftFactory = {
 // Migration 26
 const JAGWAR_TWIN_ARTIFACTS_FACTORY: NftFactory = {
   id: '0x84F89f7bAcb20970073Be33F22847e58fbe78992',
+  address: formatAddress('0x84F89f7bAcb20970073Be33F22847e58fbe78992'),
   platformId: JAGWAR_TWIN_PLATFORM.id,
   startingBlock: '15316663',
   contractType: NFTContractTypeName.default,
@@ -538,6 +560,7 @@ const MIGHTY_33_PLATFORM: MusicPlatform = {
 
 const MIGHTY_33_OTHERS_DIE_FACTORY: NftFactory = {
   id: '0x97b9f21b41041e344f5bd71e3e86b69e79dcc0a6',
+  address: formatAddress('0x97b9f21b41041e344f5bd71e3e86b69e79dcc0a6'),
   platformId: MIGHTY_33_PLATFORM.id,
   startingBlock: '10688107',
   contractType: NFTContractTypeName.default,
@@ -576,6 +599,7 @@ const HOLLY_PLUS_PLATFORM: MusicPlatform = {
 
 const HOLLY_PLUS_FACTORY: NftFactory = {
   id: '0x6688Ee4E6e17a9cF88A13Da833b011E64C2B4203',
+  address: formatAddress('0x6688Ee4E6e17a9cF88A13Da833b011E64C2B4203'),
   platformId: HOLLY_PLUS_PLATFORM.id,
   startingBlock: '13001583',
   contractType: NFTContractTypeName.default,
@@ -610,6 +634,7 @@ const RELICS_YXZ_PLATFORM: MusicPlatform = {
 
 const RELICS_SEASON_1_FACTORY: NftFactory = {
   id: '0x441C1266E6fb13C38c2752eab0D11A99905FFef4',
+  address: formatAddress('0x441C1266E6fb13C38c2752eab0D11A99905FFef4'),
   platformId: RELICS_YXZ_PLATFORM.id,
   startingBlock: '14180427',
   contractType: NFTContractTypeName.default,
@@ -662,6 +687,7 @@ const SOUND_PROTOCOL_META_FACTORY: MetaFactory = {
 // Migration 35
 const HEDSTAPE_8_FACTORY: NftFactory = {
   id: '0xA2acEd918E8cff703b8BB4129a30146A1Dc35675',
+  address: formatAddress('0xA2acEd918E8cff703b8BB4129a30146A1Dc35675'),
   startingBlock: '15642296',
   platformId: HEDS_PLATFORM.id,
   contractType: NFTContractTypeName.default,

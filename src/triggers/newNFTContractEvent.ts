@@ -52,8 +52,8 @@ export const newEVMEvents: (chainId: ChainId, contracts: EVMContract[], contract
           throw new Error(`Contract ${contract.id} has no starting block`);
         }
 
-        if (!cursor[contract.id] && contract.startingBlock) {
-          cursor[contract.id] = contract.startingBlock;
+        if (!cursor[contract.address] && contract.startingBlock) {
+          cursor[contract.address] = contract.startingBlock;
         }
       });
       // not all vars are const
@@ -80,6 +80,7 @@ export const newEVMEvents: (chainId: ChainId, contracts: EVMContract[], contract
       if (staleContractFilters.length === 0){
         return []
       }
+
       const newEvents = await client.getEventsFrom(rangeStart.toString(), rangeEnd.toString(), staleContractFilters);
       const newCursor = JSON.stringify(newCursorObject);
       if (newEvents.length === 0 && mostStaleContracts.length !== contracts.length) {
@@ -98,7 +99,7 @@ export const newEVMEvents: (chainId: ChainId, contracts: EVMContract[], contract
 export const newERC721Transfers: (chainId: ChainId, contracts: EVMContract[], gap?: string) => Trigger<Cursor> =
   (chainId: ChainId, contracts: EVMContract[], gap?: string) => {
     const contractFilters = contracts.map(contract => ({
-      address: contract.id,
+      address: contract.address,
       filter: 'Transfer'
     }));
     return newEVMEvents(chainId, contracts, contractFilters, gap);
@@ -118,6 +119,7 @@ export const newERC721Contract: (factoryContract: MetaFactory) => Trigger<Cursor
       [{
         id: factoryContract.id,
         startingBlock: factoryContract.startingBlock!,
+        address: factoryContract.address
       }],
       [{
         address: factoryContract.address,

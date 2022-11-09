@@ -4,6 +4,7 @@ import { ConfirmedSignatureInfo } from '@solana/web3.js';
 
 import { Table } from '../../db/db';
 import { newCandyMachineNfts } from '../../triggers/newCandyMachineNfts';
+import { getFactoryId } from '../../types/chain';
 import { MetaFactory, MetaFactoryTypes } from '../../types/metaFactory';
 import { NFT, NftFactory } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
@@ -29,7 +30,8 @@ export const createNftsFromCandyMachine: (metaFactory: MetaFactory) => Processor
           approved: metaFactory.autoApprove,
           burned: false,
           createdAtTime: new Date(mintTx.blockTime! * 1000),
-          chainId: metaFactory.chainId
+          chainId: metaFactory.chainId,
+          nftFactoryId: getFactoryId(metaFactory.chainId, mintAddress)
         }
         return details
       })

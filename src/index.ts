@@ -45,7 +45,7 @@ const PROCESSORS = (
   // TODO: improve filtering / grouping
   const getERC721TokenFieldsProcessors = Object.values(ChainId).map(chainId => getERC721TokenFieldsProcessor(
     chainId,
-    _.keyBy(nftFactories.filter(factory => factory.chainId === chainId), 'id')
+    _.keyBy(nftFactories.filter(factory => factory.chainId === chainId), 'address')
   ))
 
   const platformTrackProcessors = musicPlatforms.map(musicPlatform => processPlatformTracks(musicPlatform));

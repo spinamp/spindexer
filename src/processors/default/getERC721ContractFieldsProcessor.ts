@@ -13,11 +13,11 @@ export const getERC721ContractFields = async (contracts: NftFactory[], ethClient
   const allContractCalls = contracts.map(contract => {
     return [
       {
-        contractAddress: contract.id,
+        contractAddress: contract.address,
         callFunction: ValidContractCallFunction.name,
       },
       {
-        contractAddress: contract.id,
+        contractAddress: contract.address,
         callFunction: ValidContractCallFunction.symbol,
       }
     ]

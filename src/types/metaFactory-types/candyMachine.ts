@@ -1,5 +1,6 @@
 import { Metadata, JsonMetadata } from '@metaplex-foundation/js';
 
+import { getFactoryId } from '../chain';
 import { IdExtractorTypes } from '../fieldExtractor';
 import { MetaFactory, MetaFactoryType } from '../metaFactory';
 import { NFTContractTypeName, NFTStandard } from '../nft';
@@ -7,7 +8,8 @@ import { NFTContractTypeName, NFTStandard } from '../nft';
 const type: MetaFactoryType = {
   creationMetadataToNftFactory: ({ metadataAccount }: { metadataAccount: Metadata }, autoApprove: boolean, metaFactory: MetaFactory) => {
     return {
-      id: metadataAccount.mintAddress.toBase58(),
+      id: getFactoryId(metaFactory.chainId, metadataAccount.mintAddress.toBase58()),
+      address: metadataAccount.mintAddress.toBase58(),
       chainId: metaFactory.chainId,
       contractType: NFTContractTypeName.candyMachine,
       platformId: metaFactory.platformId,

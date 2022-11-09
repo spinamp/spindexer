@@ -2,6 +2,8 @@ import { ethers } from 'ethers';
 import { gql, GraphQLClient } from 'graphql-request';
 import _ from 'lodash';
 
+import { formatAddress } from '../address';
+import { getFactoryId } from '../chain';
 import { ArtistIdExtractorTypes, ArtistNameExtractorTypes, IdExtractorTypes, TitleExtractorTypes } from '../fieldExtractor';
 import { MetaFactoryType } from '../metaFactory';
 import { NFTContractTypeName } from '../nft';
@@ -72,11 +74,12 @@ const type: MetaFactoryType = {
     const apiMetadata = factoryMetadata[event.args!.collectNFT];
 
     return {
+      id: getFactoryId(metaFactory.chainId, event.args.collectNFT),
+      address: formatAddress(event.args.collectNFT),
       approved: autoApprove,
       autoApprove: autoApprove,
       chainId: metaFactory.chainId,
       contractType: NFTContractTypeName.default,
-      id: event.args.collectNFT,
       platformId: metaFactory.platformId,
       standard: metaFactory.standard,
       startingBlock: `${parseInt(event.blockNumber) - 1}`,

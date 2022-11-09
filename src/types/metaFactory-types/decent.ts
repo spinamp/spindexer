@@ -1,3 +1,5 @@
+import { formatAddress } from '../address';
+import { getFactoryId } from '../chain';
 import { IdExtractorTypes, TitleExtractorTypes, ArtistIdExtractorTypes, ArtistNameExtractorTypes } from '../fieldExtractor';
 import { MetaFactoryType } from '../metaFactory';
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../nft';
@@ -31,11 +33,12 @@ const type: MetaFactoryType = {
     }
 
     const nftFactory: NftFactory = {
+      id: getFactoryId(metaFactory.chainId, event.args.DCNT721A),
+      address: formatAddress(event.args.DCNT721A),
       approved: autoApprove,
       chainId: metaFactory.chainId,
       autoApprove,
       contractType: NFTContractTypeName.default,
-      id: event.args.DCNT721A,
       platformId: 'decent',
       standard: NFTStandard.ERC721,
       startingBlock: `${parseInt(event.blockNumber) - 1}`,

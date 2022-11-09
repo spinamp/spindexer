@@ -1,5 +1,6 @@
 import { ethereumId } from '../../utils/identifiers';
 import { formatAddress } from '../address';
+import { getFactoryId } from '../chain';
 import { IdExtractorTypes, TitleExtractorTypes, ArtistNameExtractorTypes, AvatarUrlExtractorTypes, WebsiteUrlExtractorTypes } from '../fieldExtractor';
 import { MetaFactoryType } from '../metaFactory';
 import { NFTContractTypeName, NFTStandard } from '../nft';
@@ -26,7 +27,8 @@ const type: MetaFactoryType = {
     const publicReleaseTimeRaw = factoryMetadata.soundPublicTimes[formatAddress(event.args!.soundEdition)];
     const publicReleaseTime = publicReleaseTimeRaw ? new Date(publicReleaseTimeRaw) : undefined;
     return ({
-      id: formatAddress(event.args!.soundEdition),
+      id: getFactoryId(metaFactory.chainId, event.args!.soundEdition),
+      address: formatAddress(event.args!.soundEdition),
       chainId: metaFactory.chainId,
       platformId: official ? 'sound' : 'sound-protocol-v1',
       startingBlock: `${parseInt(event.blockNumber) - 1}`,

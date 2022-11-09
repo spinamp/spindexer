@@ -1,12 +1,14 @@
 import { ethereumId } from '../../utils/identifiers';
 import { formatAddress } from '../address';
+import { getFactoryId } from '../chain';
 import { MetaFactoryType } from '../metaFactory';
 import { NFTContractTypeName, NFTStandard } from '../nft';
 
 const type: MetaFactoryType = {
   newContractCreatedEvent: 'CreatedDrop',
   creationMetadataToNftFactory: (event: any, autoApprove: boolean, metaFactory) => ({
-    id: formatAddress(event.args!.editionContractAddress),
+    id: getFactoryId(metaFactory.chainId, event.args!.editionContractAddress),
+    address: formatAddress(event.args!.editionContractAddress),
     platformId: 'zora',
     chainId: metaFactory.chainId,
     startingBlock: event.blockNumber,

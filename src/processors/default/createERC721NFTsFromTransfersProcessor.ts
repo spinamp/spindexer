@@ -17,7 +17,7 @@ const NAME = 'createERC721NFTsFromTransfers';
 
 const processorFunction = (chainId: ChainId, contracts: NftFactory[]) =>
   async ({ newCursor, items }: { newCursor: Cursor, items: ethers.Event[] }, clients: Clients) => {
-    const contractsByAddress = _.keyBy(contracts, 'id');
+    const contractsByAddress = _.keyBy(contracts, 'address');
     const newNFTs: Partial<NFT>[] = [];
     const updatedNFTs: Partial<NFT>[] = [];
     const transfers: Partial<ERC721Transfer>[] = [];
@@ -35,7 +35,7 @@ const processorFunction = (chainId: ChainId, contracts: NftFactory[]) =>
 
       const toAddress = formatAddress(item.args!.to);
       const fromAddress = formatAddress(item.args!.from);
-      const contractAddress = formatAddress(contract.id);
+      const contractAddress = formatAddress(contract.address);
       const tokenId = BigInt((item.args!.tokenId as BigNumber).toString());
       const nftId = contractType.buildNFTId(contractAddress, tokenId);
 
@@ -67,12 +67,13 @@ const processorFunction = (chainId: ChainId, contracts: NftFactory[]) =>
           id: nftId,
           createdAtEthereumBlockNumber: '' + item.blockNumber,
           contractAddress: contractAddress,
+          nftFactoryId: contract.id,
           tokenId,
           platformId: contract.platformId,
           owner: toAddress,
           approved: contract.autoApprove,
           publicReleaseTime: contract.typeMetadata?.other?.publicReleaseTime || undefined,
-          chainId
+          chainId,
         });
         nftsCollectorsChanges.push({ nftId: nftId, collectorId: toAddress, amount: 1 })
       }
@@ -117,7 +118,7 @@ export const createERC721NFTsFromTransfersProcessor: (chainId: ChainId, contract
       chainId,
       contracts
         .filter(c => c.standard === NFTStandard.ERC721 && c.approved === true) //only include approved ERC721 contracts
-        .map(c => ({ id: c.id, startingBlock: c.startingBlock! })), // map contracts to EthereumContract
+        .map(c => ({ id: c.id, startingBlock: c.startingBlock!, address: c.address })), // map contracts to EthereumContract
       process.env.ETHEREUM_BLOCK_QUERY_GAP!
     ),
     processorFunction: processorFunction(chainId, contracts),
