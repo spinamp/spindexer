@@ -37,7 +37,7 @@ const processorFunction = (chainId: ChainId, contracts: NftFactory[]) =>
       const fromAddress = formatAddress(item.args!.from);
       const contractAddress = formatAddress(contract.address);
       const tokenId = BigInt((item.args!.tokenId as BigNumber).toString());
-      const nftId = contractType.buildNFTId(contractAddress, tokenId);
+      const nftId = contractType.buildNFTId(chainId, contractAddress, tokenId);
 
       transfers.push({
         // TODO: rename!

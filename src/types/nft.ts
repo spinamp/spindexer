@@ -80,7 +80,7 @@ export type NftFactory = Contract & {
 export type NFTContractType = {
   contractCalls: ValidContractNFTCallFunction[],
   contractMetadataField: ValidContractNFTCallFunction,
-  buildNFTId: (contractAddress: string, tokenId: bigint) => string,
+  buildNFTId: (chainId: ChainId, contractAddress: string, tokenId: bigint) => string,
 }
 
 export const getNFTContractCalls = (nft: NFT, contractTypeName: NFTContractTypeName) => {
