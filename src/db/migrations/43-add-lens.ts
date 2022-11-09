@@ -15,7 +15,7 @@ const LENS_PLATFORM: MusicPlatform = {
 }
 
 const LENS_HUB: MetaFactory = {
-  id: '0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d',
+  id: `${ChainId.polygon}/0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d`,
   platformId: LENS_PLATFORM.id,
   contractType: MetaFactoryTypeName.lens,
   standard: NFTStandard.ERC721,
@@ -32,6 +32,12 @@ export const up = async (knex: Knex) => {
     table.string('rpcUrl').notNullable()
     table.string('type').notNullable()
   })
+
+  // await knex.schema.createTable(Table.names, table => {
+  //   table.string('address').primary(),
+  //   table.string('ensName'),
+  //   table.string('lensHandle')
+  // })
 
   await knex.schema.alterTable(Table.nftFactories, table => {
     table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
