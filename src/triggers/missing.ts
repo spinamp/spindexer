@@ -2,7 +2,7 @@ import { Table } from '../db/db';
 import { ChainId } from '../types/chain';
 import { Trigger } from '../types/trigger';
 
-export const ethereumMissingCreatedAtTime: (chainId: ChainId, tableName: Table) => Trigger<undefined> = 
+export const evmMissingCreatedAtTime: (chainId: ChainId, tableName: Table) => Trigger<undefined> = 
 (chainId: ChainId, tableName: Table) => async (clients) => {
   const nfts = (await clients.db.getRecords(tableName,
     [

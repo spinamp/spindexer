@@ -5,7 +5,7 @@ import { Table } from '../../db/db';
 import { newERC721Transfers } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
 import { ChainId } from '../../types/chain';
-import { burned, newMint } from '../../types/ethereum';
+import { burned, newMint } from '../../types/evm';
 import { NFT, ERC721Transfer, NftFactory, NFTStandard } from '../../types/nft';
 import { NFTFactoryTypes } from '../../types/nftFactory';
 import { consolidate, Collector, NFTsCollectors, NFTsCollectorsChanges } from '../../types/nftsCollectors';

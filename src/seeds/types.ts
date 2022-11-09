@@ -2,7 +2,7 @@ import { Request } from 'express';
 
 import { Table } from '../db/db';
 import db from '../db/sql-db'
-import { EthereumAddress } from '../types/ethereum';
+import { EVMAddress } from '../types/evm';
 import { CrdtOperation, getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
 import { NFTContractTypeName, NFTStandard } from '../types/nft';
 import { MusicPlatformType } from '../types/platform';
@@ -22,7 +22,7 @@ type SeedEntity = keyof typeof SeedEntities;
 type SeedPayload = {
   entity: SeedEntity,
   operation: CrdtOperation,
-  signer: EthereumAddress,
+  signer: EVMAddress,
   data: any,
 }
 
@@ -132,7 +132,7 @@ const entityValidator = (input: SeedPayload): void => {
   }
 }
 
-export const persistSeed = async (payload: SeedPayload, signer?: EthereumAddress) => {
+export const persistSeed = async (payload: SeedPayload, signer?: EVMAddress) => {
   if (!signer) {
     throw new Error('must specify a signer');
   }

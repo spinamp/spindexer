@@ -1,10 +1,10 @@
-export type EthereumAddress = string;
+export type EVMAddress = string;
 
-export const ETHEREUM_NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
+export const EVM_NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 // source: https://etherscan.io/accounts/label/burn
-export const ETHEREUM_BURN_ADDRESSES = [
-  ETHEREUM_NULL_ADDRESS,
+export const EVM_BURN_ADDRESSES = [
+  EVM_NULL_ADDRESS,
   '0x0000000000000000000000000000000000000001',
   '0x0000000000000000000000000000000000000002',
   '0x0000000000000000000000000000000000000003',
@@ -32,10 +32,10 @@ export const ETHEREUM_BURN_ADDRESSES = [
   '0x000000000000000000000000000000000000d34d',
 ]
 
-export const newMint = (fromAddress: EthereumAddress): boolean => {
-  return fromAddress === ETHEREUM_NULL_ADDRESS;
+export const newMint = (fromAddress: EVMAddress): boolean => {
+  return fromAddress === EVM_NULL_ADDRESS;
 }
 
-export const burned = (toAddress: EthereumAddress): boolean => {
-  return ETHEREUM_BURN_ADDRESSES.includes(toAddress);
+export const burned = (toAddress: EVMAddress): boolean => {
+  return EVM_BURN_ADDRESSES.includes(toAddress);
 }

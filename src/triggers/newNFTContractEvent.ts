@@ -60,9 +60,9 @@ export const newEVMEvents: (chainId: ChainId, contracts: EVMContract[], contract
       // eslint-disable-next-line prefer-const
       let { rangeStart, rangeEnd, mostStaleContracts } = calculateRange(cursor, gap);
       // Check for confirmations
-      const latestEthereumBlock = BigInt(await client.getLatestBlockNumber());
-      if (rangeEnd > latestEthereumBlock - NUMBER_OF_CONFIRMATIONS) {
-        rangeEnd = latestEthereumBlock - NUMBER_OF_CONFIRMATIONS
+      const latestBlock = BigInt(await client.getLatestBlockNumber());
+      if (rangeEnd > latestBlock - NUMBER_OF_CONFIRMATIONS) {
+        rangeEnd = latestBlock - NUMBER_OF_CONFIRMATIONS
       }
 
       if (rangeStart > rangeEnd) {
