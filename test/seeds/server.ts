@@ -26,9 +26,9 @@ describe('Seeds API server', async () => {
   }
 
   before( async () => {
-    app = createSeedsAPIServer();
     dbClient = await db.init();
     await truncateDB();
+    app = createSeedsAPIServer(dbClient);
   });
 
   describe('POST /v1/messages', async () => {

@@ -1,19 +1,17 @@
 
-import { Table } from '../db/db';
-import db from '../db/sql-db'
+import { DBClient, Table } from '../db/db';
 import { EthereumAddress } from '../types/ethereum';
 import { getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
 
 import { AdminOperations, getCrdtContractApprovalMessage, MessagePayload, PublicOperations } from './types';
 import { validateMessage } from './validation';
 
-export const persistMessage = async (payload: MessagePayload, signer?: EthereumAddress) => {
+export const persistMessage = async (payload: MessagePayload, signer: EthereumAddress, dbClient: DBClient) => {
   if (!signer) {
     throw new Error('must specify a signer');
   }
 
-  const dbClient = await db.init();
-  validateMessage(payload);
+  validateMessage(payload, dbClient);
 
   const APIOperationMessageFnMap = {
     [AdminOperations.UPSERT]: getCrdtUpsertMessage,
@@ -33,7 +31,5 @@ export const persistMessage = async (payload: MessagePayload, signer?: EthereumA
   } catch (e: any) {
     console.error(e);
     throw new Error(e.message);
-  } finally {
-    await dbClient.close();
   }
 }

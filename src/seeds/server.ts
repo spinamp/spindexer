@@ -3,6 +3,8 @@ import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
 
+import { DBClient } from '../db/db';
+
 import { restrictAccess } from './access';
 import { authMiddleware } from './middleware';
 import { persistMessage } from './persistence';
@@ -11,7 +13,7 @@ import { validateMessage } from './validation';
 
 const apiVersionPrefix = `/v${process.env.SEEDS_API_VERSION || '1'}`;
 
-export const createSeedsAPIServer = () => {
+export const createSeedsAPIServer = (dbClient: DBClient) => {
   const app = express();
   app.use(cors({
     'origin': true,
@@ -23,7 +25,7 @@ export const createSeedsAPIServer = () => {
 
   app.post(`${apiVersionPrefix}/messages/`, async (req: AuthRequest, res) => {
     try {
-      await validateMessage(req.body)
+      await validateMessage(req.body, dbClient)
     } catch (e: any) {
       return res.status(422).send({ error: e.message });
     }
@@ -37,7 +39,7 @@ export const createSeedsAPIServer = () => {
     }
 
     try {
-      await persistMessage(req.body, req.signer)
+      await persistMessage(req.body, req.signer!, dbClient)
       res.sendStatus(200);
     } catch (e: any) {
       console.log(e);

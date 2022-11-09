@@ -1,6 +1,5 @@
-import db from '../../src/db/sql-db';
 import { ZORA_LATEST_PLATFORM } from '../constants/artistIntegrations';
-import { Table } from '../db/db';
+import { DBClient, Table } from '../db/db';
 import { NFTContractTypeName, NftFactory, NFTStandard } from '../types/nft';
 import { MusicPlatformType } from '../types/platform';
 import { asyncForEach } from '../utils/async';
@@ -17,7 +16,7 @@ const NFTFactoryMinUpsertKeys = NFTFactoryValidUpsertKeys.filter((key) => !['typ
 const ArtistValidKeys = ['id', 'name'];
 const ProcessedTrackValidKeys = ['id', 'title', 'description', 'websiteUrl'];
 
-export const validateMessage = async (payload: MessagePayload) => {
+export const validateMessage = async (payload: MessagePayload, dbClient: DBClient) => {
   payloadValidator(payload);
 
   const validatorFunctions: any = {
@@ -47,7 +46,7 @@ export const validateMessage = async (payload: MessagePayload) => {
       'contractApproval': [
         () => minimumKeysPresent(payload, NFTFactoryValidUpdateKeys),
         () => onlyValidKeysPresent(payload, NFTFactoryValidUpdateKeys),
-        () => onlyZoraContract(payload),
+        () => onlyZoraContract(payload, dbClient),
       ],
     },
     'artists': {
@@ -113,10 +112,8 @@ const payloadValidator = (input: MessagePayload): void => {
   }
 }
 
-const onlyZoraContract = async (input: MessagePayload): Promise<void> => {
+const onlyZoraContract = async (input: MessagePayload, dbClient: DBClient): Promise<void> => {
   const contractId = input.data.id;
-
-  const dbClient = await db.init();
   const persistedContract: any = await dbClient.getRecords<NftFactory>(Table.nftFactories, [
     ['where', [ 'id', contractId ], ],
     ['where', [ 'platformId', ZORA_LATEST_PLATFORM.id ], ],
