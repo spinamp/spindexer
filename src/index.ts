@@ -33,19 +33,18 @@ const PROCESSORS = (
   candyMachines: MetaFactory[]
 ) => {
   const nftFactoriesByAddress = _.keyBy(nftFactories, 'id');
+  const nftFactoriesByChain = _.groupBy(nftFactories, 'chainId')
 
   const erc721MetaFactoryProcessors = erc721MetaFactories.map(contract => createNftFactoryFromERC721MetaFactoryProcessor(contract));
 
   const erc721ContractFieldProcessors = Object.values(ChainId).map(chainId => getERC721ContractFieldsProcessor(chainId as any))
-  // TODO: make scalable - maybe move contracts query to trigger like for the above processor
-  const erc721TransferProcessors = Object.values(ChainId).map(chainId => createERC721NFTsFromTransfersProcessor(chainId, nftFactories.filter(factory => factory.chainId === chainId)));
+  const erc721TransferProcessors = Object.values(ChainId).map(chainId => createERC721NFTsFromTransfersProcessor(chainId,nftFactoriesByChain[chainId] || []));
   const addTimestampToERC721TransfersProcessors = Object.values(ChainId).map(chainId => addTimestampToERC721Transfers(chainId))
   const addTimestampToERC721NftsProcessors = Object.values(ChainId).map(chainId => addTimestampToERC721NFTs(chainId))
 
-  // TODO: improve filtering / grouping
   const getERC721TokenFieldsProcessors = Object.values(ChainId).map(chainId => getERC721TokenFieldsProcessor(
     chainId,
-    _.keyBy(nftFactories.filter(factory => factory.chainId === chainId), 'address')
+    _.keyBy(nftFactoriesByChain[chainId] || [], 'address')
   ))
 
   const platformTrackProcessors = musicPlatforms.map(musicPlatform => processPlatformTracks(musicPlatform));
