@@ -35,12 +35,6 @@ export const up = async (knex: Knex) => {
     table.string('type').notNullable()
   })
 
-  // await knex.schema.createTable(Table.names, table => {
-  //   table.string('address').primary(),
-  //   table.string('ensName'),
-  //   table.string('lensHandle')
-  // })
-
   await knex.schema.alterTable(Table.nftFactories, table => {
     table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
     table.string('address').notNullable()
@@ -79,16 +73,6 @@ export const up = async (knex: Knex) => {
   await knex.schema.alterTable(Table.processedTracks, table => {
     table.renameColumn('createdAtEthereumBlockNumber', 'createdAtBlockNumber')
   })
-
-  // TODO: add @omit to chains table to hide from API
-
-  // TODO: rename erc721Transfers.createdAtEthereumBlockNumber
-
-  // TODO: possible add chainId to NFT, erc721Transfers
-
-  // TODO: add blocks table
-
-  await updateViews(knex);
 
   
   const ETHEREUM: Chain = {
@@ -145,6 +129,8 @@ export const up = async (knex: Knex) => {
 
   await knex(Table.seeds).insert(platformMessage);
   await knex(Table.seeds).insert(metaFactoryMessage);
+
+  await updateViews(knex);
 }
 
 export const down = async (knex: Knex) => {
