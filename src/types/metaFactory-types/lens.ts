@@ -1,54 +1,52 @@
 import { ethers } from 'ethers';
-import { gql, GraphQLClient } from 'graphql-request';
 import _ from 'lodash';
 
+import { artistId } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { getFactoryId } from '../chain';
 import { ArtistIdExtractorTypes, ArtistNameExtractorTypes, IdExtractorTypes, TitleExtractorTypes } from '../fieldExtractor';
 import { MetaFactoryType } from '../metaFactory';
 import { NFTContractTypeName } from '../nft';
 
-const lensAPI = new GraphQLClient(process.env.LENS_API!);
-
 const type: MetaFactoryType = {
   newContractCreatedEvent: 'CollectNFTDeployed',
   metadataAPI: async (events, clients, metaFactory) => {
-    const profileIds = Array.from(new Set(events.map(event => ethers.BigNumber.from(event.args!.profileId).toHexString())));
-
-    if (profileIds.length === 0){
+    if (events.length === 0){
       return {}
     }
 
-    const chunks = _.chunk(profileIds, 50);
+    const maxEventBlockNumber = events.reduce((maxBlock, event) => Math.max(maxBlock, event.blockNumber), 0)
 
-    const queries = chunks.map(chunk => {
-      const query = gql`
-      {
-        profiles(request: { profileIds: ${JSON.stringify(chunk)}, limit: ${chunk.length} }) {
-          items {
-            handle
-            ownedBy
-            id
+    const profileCreatedEvents = await clients.evmChain[metaFactory.chainId]
+      .getEventsFrom(
+        metaFactory.startingBlock!,
+        maxEventBlockNumber.toString(),
+        events.map(event => {
+          const profileId = ethers.BigNumber.from(event.args!.profileId).toNumber();
+          return {
+            address: metaFactory.address,
+            filter: `ProfileCreated`,
+            filterArgs: [profileId]
           }
-        }
-      }
-      `
-      return { document: query } ;
-    })
+        }))
 
-    const result = await lensAPI.batchRequests(queries);
-
-    const profiles = _.flatten(result.map((res: any) => res.data.profiles.items))
-    const profilesById = _.keyBy(profiles, 'id')
+    const profileCreatedEventByProfileId = _.keyBy(
+      profileCreatedEvents,
+      event => event.args!.profileId!.toNumber()
+    )
 
     const profilesByCollectNft = _.keyBy(
       events.map(event => {
-        const profileId = ethers.BigNumber.from(event.args!.profileId).toHexString()
-        const profile = profilesById[profileId];
+        const profileId = ethers.BigNumber.from(event.args!.profileId).toNumber()
+        const profileCreatedEvent = profileCreatedEventByProfileId[profileId] as any;
         
         return {
           collectNFT: event.args!.collectNFT,
-          profile
+          profile: {
+            handle: profileCreatedEvent.args.handle,
+            ownedBy: profileCreatedEvent.args.to,
+            id: profileId,
+          }
         }
       }),
       'collectNFT',
@@ -93,7 +91,7 @@ const type: MetaFactoryType = {
           },
           artist: {
             name: apiMetadata.profile.handle,
-            artistId: apiMetadata.profile.ownedBy
+            artistId: artistId(metaFactory.chainId,apiMetadata.profile.ownedBy),
           }
         }
       }

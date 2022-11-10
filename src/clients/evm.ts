@@ -53,7 +53,8 @@ export type EVMClient = {
 
 export type ContractFilter = {
   address: string,
-  filter: string
+  filter: string,
+  filterArgs?: any[]
 };
 
 async function getLogs(provider: JsonRpcProvider, params: any, fromBlock: string, toBlock: string){
@@ -113,7 +114,8 @@ const init = async (providerUrl: string): Promise<EVMClient> => {
     getEventsFrom: async (fromBlock: string, toBlock: string, contractFilters: ContractFilter[]) => {
       const filters = contractFilters.map(contractFilter => {
         const contract = new ethers.Contract(contractFilter.address, MetaABI.abi, provider);
-        const filter = contract.filters[contractFilter.filter]();
+        const args = contractFilter.filterArgs || []
+        const filter = contract.filters[contractFilter.filter](...args);
         return filter.topics![0];
       });
       const contractAddresses = _.uniq(contractFilters.map(c => c.address));
