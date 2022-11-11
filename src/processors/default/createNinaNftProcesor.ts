@@ -6,6 +6,7 @@ import { TypeDef } from '@project-serum/anchor/dist/cjs/program/namespace/types'
 
 import { Table } from '../../db/db';
 import { newNinaContracts } from '../../triggers/nina';
+import { ChainId } from '../../types/chain';
 import { NFT, NFTContractTypeName, NftFactory, NFTStandard } from '../../types/nft';
 import { MusicPlatformType } from '../../types/platform';
 import { Clients, Processor } from '../../types/processor';
@@ -28,13 +29,16 @@ export const createNinaNfts: Processor = {
         platformId: MusicPlatformType.nina,
         tokenMetadataURI: metadataAccount.uri,
         tokenURI: metadataAccount.uri,
-        approved: true // all nina nfts approved by default
+        approved: true, // all nina nfts approved by default
+        chainId: ChainId.solana
       }
       return details
     })
 
     const nftFactories: NftFactory[] = items.map(({ metadataAccount, release }) => ({
       id: metadataAccount.mintAddress.toBase58(),
+      address: metadataAccount.mintAddress.toBase58(),
+      chainId: ChainId.solana,
       contractType: NFTContractTypeName.nina,
       platformId: MusicPlatformType.nina,
       standard: NFTStandard.METAPLEX,
