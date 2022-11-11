@@ -26,8 +26,30 @@ const LENS_HUB: MetaFactory = {
   address: formatAddress('0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d')
 }
 
+const ETHEREUM: Chain = {
+  id: ChainId.ethereum,
+  name: 'Ethereum',
+  type: ChainType.evm,
+  rpcUrl: process.env.ETHEREUM_PROVIDER_ENDPOINT!
+}
+
+const POLYGON: Chain = {
+  id: ChainId.polygon,
+  name: 'Polygon POS',
+  type: ChainType.evm,
+  rpcUrl: process.env.POLYGON_PROVIDER_ENDPOINT!
+}
+
+const SOLANA: Chain = {
+  id: ChainId.solana,
+  name: 'Solana',
+  type: ChainType.solana,
+  rpcUrl: process.env.SOLANA_PROVIDER_ENDPOINT!
+}
+
 export const up = async (knex: Knex) => {
 
+  // create chains
   await knex.schema.createTable(Table.chains, table => {
     table.string('id').primary(),
     table.string('name').notNullable(),
@@ -35,33 +57,104 @@ export const up = async (knex: Knex) => {
     table.string('type').notNullable()
   })
 
-  await knex.schema.alterTable(Table.nftFactories, table => {
-    table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
-    table.string('address').notNullable()
-  })
+  await knex(Table.chains).insert(ETHEREUM);
+  await knex(Table.chains).insert(POLYGON);
+  await knex(Table.chains).insert(SOLANA);
 
-  // TODO: backfill address on existing metafactories
+  // alter factories
+  await knex.schema.alterTable(Table.nftFactories, table => {
+    table.string('chainId')
+    table.string('address')
+  })
   
   await knex.schema.alterTable(Table.metaFactories, table => {
-    table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
-    table.string('address').notNullable()
+    table.string('chainId')
+    table.string('address')
+  })
+
+  // update factories
+  const nftFactoryUpdates = `
+    update ${Table.nftFactories}
+    set address=id,
+    "chainId"= 
+    case
+      when "standard" = '${NFTStandard.METAPLEX}' then 'solana'
+      else 'ethereum'
+    end
+  `
+  const metaFactoryUpdates = `
+    update ${Table.metaFactories}
+    set address=id,
+    "chainId"= 
+    case
+      when "standard" = '${NFTStandard.METAPLEX}' then 'solana'
+      else 'ethereum'
+    end
+  `
+
+  await knex.raw(nftFactoryUpdates);
+  await knex.raw(metaFactoryUpdates);
+
+  //add constraints to factories
+  await knex.schema.alterTable(Table.nftFactories, table => {
+    table.string('address').notNullable().alter()
+    table.foreign('chainId').references('id').inTable(Table.chains).onDelete('cascade');
   })
   
+  await knex.schema.alterTable(Table.metaFactories, table => {
+    table.string('address').notNullable().alter()
+    table.foreign('chainId').references('id').inTable(Table.chains).onDelete('cascade');
+  })
+
+  // alter transfers
   await knex.schema.alterTable(Table.erc721Transfers, table => {
-    table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
+    table.string('chainId')
     table.renameColumn('createdAtEthereumBlockNumber', 'createdAtBlockNumber')
   })
-  
+
+  // update transfers
+  const transfersUpdate = `
+    update ${Table.erc721Transfers}
+    set "chainId" = '${ChainId.ethereum}'
+  `
+
+  await knex.raw(transfersUpdate);
+
+  // add constraints to transfers
+  await knex.schema.alterTable(Table.erc721Transfers, table => {
+    table.foreign('chainId').references('id').inTable(Table.chains).onDelete('cascade');
+  })
+
+  // alter nfts
   await knex.schema.alterTable(Table.nfts, table => {
-    table.string('chainId').references('id').inTable(Table.chains).onDelete('cascade');
+    table.string('chainId')
     table.renameColumn('contractAddress', 'nftFactoryId')
     table.renameColumn('createdAtEthereumBlockNumber', 'createdAtBlockNumber')
   })
-
   await knex.schema.alterTable(Table.nfts, table => {
-    table.string('contractAddress').notNullable
+    table.string('contractAddress')
   })
 
+  // update nfts
+  const nftsUpdate = `
+    update ${Table.nfts}
+    set "contractAddress" = "nftFactoryId",
+    "chainId"= 
+    case
+      when "platformId" = 'nina' or "platformId" = 'kota' then 'solana'
+      else 'ethereum'
+    end
+  `
+
+  await knex.raw(nftsUpdate);
+
+  // add constraints to nfts
+  await knex.schema.alterTable(Table.nfts, table => {
+    table.foreign('chainId').references('id').inTable(Table.chains).onDelete('cascade');
+    table.string('contractAddress').notNullable().alter()
+  })
+
+  // alter other tables
   await knex.schema.alterTable(Table.artists, table => {
     table.renameColumn('createdAtEthereumBlockNumber', 'createdAtBlockNumber')
   })
@@ -74,55 +167,6 @@ export const up = async (knex: Knex) => {
     table.renameColumn('createdAtEthereumBlockNumber', 'createdAtBlockNumber')
   })
 
-  
-  const ETHEREUM: Chain = {
-    id: ChainId.ethereum,
-    name: 'Ethereum',
-    type: ChainType.evm,
-    rpcUrl: process.env.ETHEREUM_PROVIDER_ENDPOINT!
-  }
-  
-  const POLYGON: Chain = {
-    id: ChainId.polygon,
-    name: 'Polygon POS',
-    type: ChainType.evm,
-    rpcUrl: process.env.POLYGON_PROVIDER_ENDPOINT!
-  }
-  
-  const SOLANA: Chain = {
-    id: ChainId.solana,
-    name: 'Solana',
-    type: ChainType.solana,
-    rpcUrl: process.env.SOLANA_PROVIDER_ENDPOINT!
-  }
-  
-  await knex(Table.chains).insert(ETHEREUM);
-  await knex(Table.chains).insert(POLYGON);
-  await knex(Table.chains).insert(SOLANA);
-
-  await knex.raw(`
-    update ${Table.nftFactories}
-    set "chainId" = '${ChainId.ethereum}'
-    where "standard" = '${NFTStandard.ERC721}'
-  `)
-
-  await knex.raw(`
-    update ${Table.nftFactories}
-    set "chainId" = '${ChainId.solana}'
-    where "standard" = '${NFTStandard.METAPLEX}'
-  `)
-
-  await knex.raw(`
-    update ${Table.metaFactories}
-    set "chainId" = '${ChainId.ethereum}'
-    where "standard" = '${NFTStandard.ERC721}'
-  `)
-
-  await knex.raw(`
-    update ${Table.metaFactories}
-    set "chainId" = '${ChainId.solana}'
-    where "standard" = '${NFTStandard.METAPLEX}'
-  `)
   
   const platformMessage = getCrdtUpsertMessage(Table.platforms, LENS_PLATFORM, process.env.DEFAULT_ADMIN_ADDRESS! )
   const metaFactoryMessage = getCrdtUpsertMessage(Table.metaFactories, LENS_HUB as MetaFactory, process.env.DEFAULT_ADMIN_ADDRESS!)
