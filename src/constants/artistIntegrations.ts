@@ -9,7 +9,7 @@ import { ethereumId } from '../utils/identifiers';
 // for a fully CRDT based approach
 
 // Migration 01
-const NOIZD_PLATFORM: MusicPlatform = {
+export const NOIZD_PLATFORM: MusicPlatform = {
   id: 'noizd',
   type: MusicPlatformType.noizd,
   name: 'NOIZD'
@@ -29,7 +29,7 @@ const ZORA_ORIGINAL_PLATFORM: MusicPlatform = {
   type: MusicPlatformType.zora,
   name: 'Zora'
 }
-const ZORA_LATEST_PLATFORM: MusicPlatform = {
+export const ZORA_LATEST_PLATFORM: MusicPlatform = {
   id: 'zora',
   type: MusicPlatformType.zora,
   name: 'Zora'
@@ -56,7 +56,7 @@ const CATALOG_FACTORY: NftFactory = {
   approved: true
 }
 
-const ZORA_ORIGINAL_FACTORY: NftFactory = {
+export const ZORA_ORIGINAL_FACTORY: NftFactory = {
   id: '0xabefbc9fd2f806065b4f3c237d4b59d9a97bcac7',
   platformId: ZORA_ORIGINAL_PLATFORM.id,
   startingBlock: '11565019',
