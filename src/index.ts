@@ -7,10 +7,13 @@ import { Table } from './db/db';
 import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
+import { addTimestampFromMetadata } from './processors/default/addTimestampFromMetadata';
 import { addTimestampToERC721NFTs, addTimestampToERC721Transfers } from './processors/default/addTimestampToERC721NFTs';
+import { categorizeZora } from './processors/default/categorizeZora';
 import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
 import { createNftFactoryFromERC721MetaFactoryProcessor } from './processors/default/createNftFactoryFromERC721MetaFactory';
 import { createNftsFromCandyMachine } from './processors/default/createNftFromCandyMachine';
+import { createNinaNfts } from './processors/default/createNinaNftProcesor';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
 import { errorAndMetadataResetProcessor, errorProcessor } from './processors/default/errorProcessor';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
@@ -65,7 +68,7 @@ const PROCESSORS = (
     ...tableInsertsMempoolProcessors,
     ...tableUpdatesMempoolProcessors,
     ...erc721MetaFactoryProcessors,
-    // ...candyMachineProcessors,
+    ...candyMachineProcessors,
     ...erc721ContractFieldProcessors,
     ...erc721TransferProcessors,
     ...addTimestampToERC721TransfersProcessors,
@@ -73,11 +76,11 @@ const PROCESSORS = (
     ...getERC721TokenFieldsProcessors,
     addMetadataIPFSHashProcessor(nftFactoriesByAddress),
     addMetadataObjectProcessor(nftFactoriesByAddress),
-    // categorizeZora,
-    // createNinaNfts,
-    // addTimestampFromMetadata,
+    categorizeZora,
+    createNinaNfts,
+    addTimestampFromMetadata,
     ...platformTrackProcessors,
-    // ...apiTrackProcessors,
+    ...apiTrackProcessors,
     ipfsAudioUploader,
     ipfsArtworkUploader,
     ipfsAudioPinner,
