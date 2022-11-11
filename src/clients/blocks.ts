@@ -34,7 +34,7 @@ const init = async (evmClients: { [chainId in ChainId]: EVMClient }) => {
         );
         
         const responseByBlockNumber = _.keyBy(blocks, 'number');
-        const blockTimes = Object.keys(responseByBlockNumber).map(key => responseByBlockNumber[key] = responseByBlockNumber[key].timestamp)
+        const blockTimes = _.mapValues(responseByBlockNumber, response => response.timestamp)
         result = blockTimes;
       } else {
         const blockNumbersParsed: number[] = blockNumbers.map(blockNumber => parseInt(blockNumber))
