@@ -78,10 +78,15 @@ async function getLogs(provider: JsonRpcProvider, params: any, fromBlock: string
       const errorString = e.toString() as string;
       const searchString = 'this block range should work: [';
       if (!errorString.includes(searchString)){
-        console.log(`Can't find suggested range, decrease range by half`)
         const range = BigNumber.from(end).sub(start);
         const newRange = Math.floor(range.div(2).toNumber());
         end = BigNumber.from(start).add(newRange).toHexString();
+        console.log(`Can't find suggested range, decrease range by half. fromBlock:`, BigNumber.from(start).toNumber(), 'toBlock:', BigNumber.from(end).toNumber() )
+
+        if (start === end){
+          'throw error fetching logs unrelated to block range'
+        }
+
       } else {
         const suggestion = errorString.substring(errorString.indexOf(searchString), errorString.indexOf(']\\"}}",'));
         const suggestedRanges = suggestion.substring(suggestion.indexOf('[') + 1).split(', ')
@@ -116,21 +121,19 @@ const init = async (providerUrl: string): Promise<EVMClient> => {
         const contract = new ethers.Contract(contractFilter.address, MetaABI.abi, provider);
         const args = contractFilter.filterArgs || []
         const filter = contract.filters[contractFilter.filter](...args);
-        return filter.topics![0];
+        return filter.topics;
       });
       const contractAddresses = _.uniq(contractFilters.map(c => c.address));
 
-      const events = await getLogs(provider, {
+      const zippedFilters = _.zip(...filters)
+      const topics = zippedFilters.map(filter => _.uniq(filter));
+
+      const args = {
         address: contractAddresses,
-        topics: [
-          [
-            ...filters
-          ]
-        ] }
-      ,
-      fromBlock,
-      toBlock
-      )
+        topics
+      }
+
+      const events = await getLogs(provider, args, fromBlock, toBlock)
       const iface = new ethers.utils.Interface(MetaABI.abi);
       return events.map((event: ethers.Event) => ({
         ...iface.parseLog(event),
