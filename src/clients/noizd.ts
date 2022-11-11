@@ -1,8 +1,9 @@
 import axios from 'axios';
 
+import { ChainId } from '../types/chain';
 import { isGif, isMP4 } from '../types/media';
 import { ProcessedTrack } from '../types/track';
-import { slugify } from '../utils/identifiers';
+import { evmTrackId, slugify } from '../utils/identifiers';
 
 const noizdAPI = axios.create({
   timeout: 10000,
@@ -21,7 +22,7 @@ export type NOIZDClient = {
 }
 
 const mapAPIListingToTrackID = (listing: any): string => {
-  return `noizd/${listing.id}`
+  return evmTrackId(ChainId.ethereum, listing.metadata.contract, listing.id)
 };
 
 const mapAPIIDToTrackId = (apiTrackId: string): string => {
