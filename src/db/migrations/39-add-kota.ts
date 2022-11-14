@@ -56,8 +56,8 @@ export const up = async (knex: Knex) => {
     operation: CrdtOperation.UPSERT,
   }
 
-  // await knex(Table.seeds).insert(platform)
-  // await knex(Table.seeds).insert(metaFactory)
+  await knex(Table.seeds).insert(platform)
+  await knex(Table.seeds).insert(metaFactory)
 
   await updateViews(knex)
 }

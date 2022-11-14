@@ -29,8 +29,8 @@ export const up = async (knex: Knex) => {
   const platformMessage = getCrdtUpsertMessage(Table.platforms, DECENT_PLATFORM, process.env.DEFAULT_ADMIN_ADDRESS )
   const metaFactoryMessage = getCrdtUpsertMessage(Table.metaFactories, DECENT, process.env.DEFAULT_ADMIN_ADDRESS)
 
-  // await knex(Table.seeds).insert(platformMessage);
-  // await knex(Table.seeds).insert(metaFactoryMessage)
+  await knex(Table.seeds).insert(platformMessage);
+  await knex(Table.seeds).insert(metaFactoryMessage)
 }
 
 export const down = async (knex: Knex) => {
