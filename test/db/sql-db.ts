@@ -28,7 +28,5 @@ describe('DBClient', async () => {
       assert.equal(result[1].name, 'no-modify');
       assert.equal(result[1].address, 'no-modify');
     })
-
-    it('merges older records')
   })
 })
