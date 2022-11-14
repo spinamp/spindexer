@@ -14,7 +14,7 @@ export type Artist = Record & {
   name: string;
   address?: string;
   avatarUrl?: string;
-  externalLinks?: any[];
+  externalLinks?: ExternalLink[];
   theme?: any;
   spinampLayoutConfig?: any;
   slug: string;
