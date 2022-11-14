@@ -2,13 +2,21 @@ import { slugify } from '../utils/identifiers';
 
 import { Record, TimeField } from './record'
 
+enum SupportedExternalLinkTypes { 'Facebook', 'Twitter', 'Instagram', 'SoundCloud', 'Bandcamp', 'Spotify', 'iTunes', 'Deezer', 'Tidal', 'Discord', 'Telegram', 'Website' }
+
+type ExternalLink = {
+  name?: string,
+  type: SupportedExternalLinkTypes,
+  url: string,
+}
+
 export type Artist = Record & {
   name: string;
   address?: string;
   avatarUrl?: string;
-  externalLinks: any[]; // TODO: build out a TS type with name: string, type: string, link: string
-  theme: any[]; // TODO: check for an existing TS type or define one
-  spinampLayoutConfig: any[]; // TODO build out a TS type for type: string, data: string, visible: boolean
+  externalLinks?: any[];
+  theme?: any;
+  spinampLayoutConfig?: any;
   slug: string;
 }
 
@@ -21,7 +29,7 @@ export type ArtistProfile = TimeField & {
   websiteUrl?: string;
 }
 
-export const mapArtist = (artistProfile: ArtistProfile): Partial<Artist> => {
+export const mapArtist = (artistProfile: ArtistProfile): Artist => {
   return {
     id: artistProfile.artistId,
     name: artistProfile.name,
