@@ -30,7 +30,8 @@ export const createNinaNfts: Processor = {
         tokenMetadataURI: metadataAccount.uri,
         tokenURI: metadataAccount.uri,
         approved: true, // all nina nfts approved by default
-        chainId: ChainId.solana
+        chainId: ChainId.solana,
+        nftFactoryId: mintAddress
       }
       return details
     })
