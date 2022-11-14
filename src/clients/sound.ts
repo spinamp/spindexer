@@ -65,7 +65,7 @@ const init = async () => {
                 createdAt
                 title
                 titleSlug
-                description
+                behindTheMusic
                 editionId
                 contractAddress
                 coverImage {
@@ -83,7 +83,7 @@ const init = async () => {
                       }
                   }
                 }
-                tracks {
+                track {
                   id
                   title
                   trackNumber
@@ -144,7 +144,7 @@ const init = async () => {
       return !!matchedNFT;
     });
     filteredAPITracks.forEach(apiTrack => {
-      if (apiTrack.tracks.length > 1) {
+      if (apiTrack.track.length > 1) {
         return { isError: true, error: new Error('Sound release with multiple tracks not yet implemented') };
       }
     });
@@ -152,7 +152,7 @@ const init = async () => {
       return {
         ...apiTrack,
         tracks: [{
-          ...apiTrack.tracks[0],
+          ...apiTrack.track[0],
         }]
       };
     });
@@ -202,7 +202,7 @@ const init = async () => {
         gql`
             {
               releaseContract(contractAddress:"${addresses[i]}") {
-                publicListeningPartyStart
+                publicListeningParty
                 contract {
                     contractAddress
                 }
@@ -214,7 +214,7 @@ const init = async () => {
     }
 
     return (results as Array<any>).reduce((accum, release: any) => {
-      accum[release.contract.contractAddress] = release.publicListeningPartyStart;
+      accum[release.contract.contractAddress] = release.publicListeningParty;
       return accum;
     }, {});
   };

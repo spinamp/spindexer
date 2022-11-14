@@ -26,7 +26,7 @@ const mapTrack: MapTrack = (
     platformInternalId: apiTrack.id,
     title: apiTrack.title,
     slug: slugify(`${apiTrack.title} ${nft.createdAtTime.getTime()}`),
-    description: apiTrack.description,
+    description: apiTrack.behindTheMusic,
     platformId: nft.platformId,
     lossyAudioURL: nft.metadata.animation_url,
     lossyArtworkURL: apiTrack.coverImage.url,
