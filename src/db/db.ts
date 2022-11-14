@@ -45,6 +45,7 @@ export type Wheres = Where[];
 
 export type QueryOptions = {
   ignoreConflict?: string | string[];
+  replaceUndefinedOnly?: string | string[];
 }
 
 export type DBClient = {
