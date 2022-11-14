@@ -142,16 +142,12 @@ const init = async () => {
       const matchedNFT = nfts.find((nft: NFT) => nftMatchesTrack(nft, apiTrack));
       return !!matchedNFT;
     });
-    filteredAPITracks.forEach(apiTrack => {
-      if (apiTrack.track.length > 1) {
-        return { isError: true, error: new Error('Sound release with multiple tracks not yet implemented') };
-      }
-    });
+
     const audioAPITrackPromises = filteredAPITracks.map(async apiTrack => {
       return {
         ...apiTrack,
         tracks: [{
-          ...apiTrack.track[0],
+          ...apiTrack.track,
         }]
       };
     });
