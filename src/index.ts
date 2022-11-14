@@ -40,12 +40,14 @@ const PROCESSORS = (
 
   const erc721MetaFactoryProcessors = erc721MetaFactories.map(contract => createNftFactoryFromERC721MetaFactoryProcessor(contract));
 
-  const erc721ContractFieldProcessors = Object.values(ChainId).map(chainId => getERC721ContractFieldsProcessor(chainId as any))
-  const erc721TransferProcessors = Object.values(ChainId).map(chainId => createERC721NFTsFromTransfersProcessor(chainId,nftFactoriesByChain[chainId] || []));
-  const addTimestampToERC721TransfersProcessors = Object.values(ChainId).map(chainId => addTimestampToERC721Transfers(chainId))
-  const addTimestampToERC721NftsProcessors = Object.values(ChainId).map(chainId => addTimestampToERC721NFTs(chainId))
+  const evmChains = Object.values(ChainId).filter(id => id !== ChainId.solana)
 
-  const getERC721TokenFieldsProcessors = Object.values(ChainId).map(chainId => getERC721TokenFieldsProcessor(
+  const erc721ContractFieldProcessors = evmChains.map(chainId => getERC721ContractFieldsProcessor(chainId as any))
+  const erc721TransferProcessors = evmChains.map(chainId => createERC721NFTsFromTransfersProcessor(chainId,nftFactoriesByChain[chainId] || []));
+  const addTimestampToERC721TransfersProcessors = evmChains.map(chainId => addTimestampToERC721Transfers(chainId))
+  const addTimestampToERC721NftsProcessors = evmChains.map(chainId => addTimestampToERC721NFTs(chainId))
+
+  const getERC721TokenFieldsProcessors = evmChains.map(chainId => getERC721TokenFieldsProcessor(
     chainId,
     _.keyBy(nftFactoriesByChain[chainId] || [], 'address')
   ))
