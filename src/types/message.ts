@@ -6,7 +6,7 @@ import { EVMAddress } from './evm';
 
 export enum CrdtOperation {
   UPSERT = 'upsert',
-  UPDATE = 'update'
+  UPDATE = 'update',
 }
 
 export type CrdtMessage = {

@@ -3,12 +3,17 @@ import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
 
+import { DBClient } from '../db/db';
+
+import { restrictAccess } from './access';
 import { authMiddleware } from './middleware';
-import { AuthRequest, persistSeed, validateSeed } from './types';
+import { persistMessage } from './persistence';
+import { AuthRequest } from './types';
+import { validateMessage } from './validation';
 
 const apiVersionPrefix = `/v${process.env.SEEDS_API_VERSION || '1'}`;
 
-export const createSeedsAPIServer = () => {
+export const createSeedsAPIServer = (dbClient: DBClient) => {
   const app = express();
   app.use(cors({
     'origin': true,
@@ -18,15 +23,23 @@ export const createSeedsAPIServer = () => {
   app.use(express.json());
   app.use(authMiddleware);
 
-  app.post(`${apiVersionPrefix}/seeds/`, async (req: AuthRequest, res) => {
+  app.post(`${apiVersionPrefix}/messages/`, async (req: AuthRequest, res) => {
     try {
-      validateSeed(req.body)
+      await validateMessage(req.body, dbClient)
     } catch (e: any) {
       return res.status(422).send({ error: e.message });
     }
 
     try {
-      await persistSeed(req.body, req.signer)
+      restrictAccess(req.body, req.signer);
+    } catch (e: any) {
+      console.log(e);
+      res.status(403).send({ error: 'Authentication failed' });
+      return;
+    }
+
+    try {
+      await persistMessage(req.body, req.signer!, dbClient)
       res.sendStatus(200);
     } catch (e: any) {
       console.log(e);

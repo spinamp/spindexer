@@ -7,6 +7,7 @@ console.log('-------------------------------------');
 console.log('configuring tests...');
 
 process.env.PERMITTED_ADMIN_ADDRESSES = TEST_ADMIN_WALLET.address;
+process.env.POSTGRES_DATABASE = `spindexer_test`;
 
 console.log(`setting PERMITTED_ADMIN_ADDRESSES...`);
 console.log('starting tests...');
