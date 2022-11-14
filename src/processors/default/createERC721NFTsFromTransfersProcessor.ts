@@ -15,7 +15,7 @@ import { transferId } from '../../utils/identifiers';
 
 const NAME = 'createERC721NFTsFromTransfers';
 
-const processorFunction = (chainId: ChainId, contracts: NftFactory[]) =>
+const processorFunction = (chainId: ChainId, contracts: NftFactory[], name: string) =>
   async ({ newCursor, items }: { newCursor: Cursor, items: ethers.Event[] }, clients: Clients) => {
     const contractsByAddress = _.keyBy(contracts, 'address');
     const newNFTs: Partial<NFT>[] = [];
@@ -105,14 +105,16 @@ const processorFunction = (chainId: ChainId, contracts: NftFactory[]) =>
     const transfersForExistingNfts = transfers.filter(transfer => existingNfts.has(transfer.nftId!));
 
     await clients.db.insert(Table.erc721Transfers, transfersForExistingNfts);
-    await clients.db.updateProcessor(NAME, newCursor);
+    await clients.db.updateProcessor(name, newCursor);
   };
-
+  
 export const createERC721NFTsFromTransfersProcessor: (chainId: ChainId, contracts: NftFactory[]) => Processor = 
-(chainId, contracts) => {
-  return {
-    name: NAME,
-    trigger: 
+  (chainId, contracts) => {
+    const cursorName = chainId === ChainId.ethereum ? NAME : `${NAME}_${chainId}`;
+
+    return {
+      name: cursorName,
+      trigger: 
     newERC721Transfers(
       chainId,
       contracts
@@ -120,6 +122,6 @@ export const createERC721NFTsFromTransfersProcessor: (chainId: ChainId, contract
         .map(c => ({ id: c.id, startingBlock: c.startingBlock!, address: c.address })), // map contracts to EthereumContract
       process.env.ETHEREUM_BLOCK_QUERY_GAP!
     ),
-    processorFunction: processorFunction(chainId, contracts),
-  }
-};
+      processorFunction: processorFunction(chainId, contracts, cursorName),
+    }
+  };
