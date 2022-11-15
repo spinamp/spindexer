@@ -14,8 +14,10 @@ describe('identifiers', () => {
         '347N1Thc213QqfYCz3PZkjoJpNv5b14kBd', // P2SH
         'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq', // Bech32
         '8LzDMxDgTKYz9DrzqnpGee3SGa89up3a227ypMj2xrqM', // Solana
+        'noizd/22ebf011-4a64-416a-bc9f-d0aaab658d25', // Noizd pre-release
         '0x00', // too short
         '0x00000000000000000000000000000000000000000', // too long
+        undefined,
       ].concat(ETHEREUM_BURN_ADDRESSES); // burn addresses
 
       it('returns undefined', () => {

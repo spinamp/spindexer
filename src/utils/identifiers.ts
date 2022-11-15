@@ -36,10 +36,19 @@ export const solanaTrackId = (address: string, id: string): string => {
   return solanaId(address) + suffix;
 }
 
-export const controlledEthereumAddressFromId = (id: string): string | undefined => {
-  if (id.length === 42 && id.startsWith('0x') && !ETHEREUM_BURN_ADDRESSES.includes(id)) {
+export const controlledEthereumAddressFromId = (id: string | undefined): string | undefined => {
+  if (id === undefined) { return; }
+
+  if (isControlledEthereumAddress(id)) {
     return id
   }
+
   const parts = id.split('/');
-  return parts[1];
+  if (parts[1] && isControlledEthereumAddress(parts[1])) {
+    return parts[1];
+  }
+}
+
+const isControlledEthereumAddress = (address: string): boolean => {
+  return address.length === 42 && address.startsWith('0x') && !ETHEREUM_BURN_ADDRESSES.includes(address)
 }
