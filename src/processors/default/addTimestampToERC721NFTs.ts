@@ -10,7 +10,7 @@ const processorFunction = (chainId: ChainId, table: Table) => async (items: Reco
   const recordsByBlockNumber = _.groupBy(items, 'createdAtBlockNumber');
   const blockNumbers = Object.keys(recordsByBlockNumber);
   console.log(`Processing until block ${blockNumbers[blockNumbers.length - 1]}`)
-  const timestampsByBlockNumber = await clients.blocks.fetchBlockTimestamps(chainId, blockNumbers);
+  const { timestampsByBlockNumber, newBlocks } = await clients.blocks.fetchBlockTimestamps(chainId, blockNumbers);
   const recordUpdates: Partial<Record>[] = [];
   blockNumbers.forEach((blockNumber) => {
     const timestampMillis = BigInt(timestampsByBlockNumber[blockNumber]) * BigInt(1000);
@@ -21,6 +21,7 @@ const processorFunction = (chainId: ChainId, table: Table) => async (items: Reco
     }));
   })
   await clients.db.update(table, recordUpdates);
+  await clients.db.insert(Table.blocks, newBlocks)
 };
 
 export const addTimestampToERC721NFTs: (chainId: ChainId) => Processor =

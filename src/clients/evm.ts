@@ -48,7 +48,7 @@ export type EVMClient = {
   getBlockTimestamps: (blockHashes: string[]) => Promise<number[]>;
   getLatestBlockNumber: () => Promise<number>;
   getContractOwner: (hash: string) => Promise<string>;
-  getBlockTimestampsByBlockNumber: (blockNumbers: number[]) => Promise<{ [blockNumber: number]: number }>;
+  getBlockTimestampsByBlockNumber: (blockNumbers: number[]) => Promise<{ [blockNumber: string]: string }>;
 }
 
 export type ContractFilter = {
@@ -161,7 +161,7 @@ const init = async (providerUrl: string): Promise<EVMClient> => {
       const owner = await contract.owner();
       return owner
     },
-    getBlockTimestampsByBlockNumber: async (blockNumbers: number[]) => {
+    getBlockTimestampsByBlockNumber: async (blockNumbers: number[]): Promise<{ [blockNumber: string]: string }> => {
       const getBlock = provider.getBlock.bind(provider);
       const results = await rollPromises(blockNumbers, getBlock);
       const failedBlocks = results.filter(result => result.isError);
@@ -169,10 +169,11 @@ const init = async (providerUrl: string): Promise<EVMClient> => {
         throw new Error('Failed to get all block timestamps');
       }
 
-      return results.reduce((prev, result) => 
-        ({ ...prev, [result.response!.number]: result.response!.timestamp }),
-      {}
-      );
+      const timesByBlockNumber: { [blockNumber: string]: string } = {}
+      for (const block of results){
+        timesByBlockNumber[block.response!.number.toString()] = block.response!.timestamp.toString()
+      }
+      return timesByBlockNumber
     }
   }
 }
