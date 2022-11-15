@@ -1,6 +1,7 @@
 import * as slugifyLibrary from 'slugify'
 
 import { formatAddress } from '../types/address';
+import { ETHEREUM_BURN_ADDRESSES } from '../types/ethereum';
 import { Chain, NftFactory, NFTStandard } from '../types/nft';
 
 export const slugify = (input: string) => slugifyLibrary.default(input, { lower: true, strict: true })
@@ -33,4 +34,12 @@ export const solanaId = (address: string): string => {
 export const solanaTrackId = (address: string, id: string): string => {
   const suffix = id !== '' ? `/${id}` : '';
   return solanaId(address) + suffix;
+}
+
+export const controlledEthereumAddressFromId = (id: string): string | undefined => {
+  if (id.length === 42 && id.startsWith('0x') && !ETHEREUM_BURN_ADDRESSES.includes(id)) {
+    return id
+  }
+  const parts = id.split('/');
+  return parts[1];
 }

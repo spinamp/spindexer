@@ -1,4 +1,4 @@
-import { slugify } from '../utils/identifiers';
+import { controlledEthereumAddressFromId, slugify } from '../utils/identifiers';
 
 import { Record, TimeField } from './record'
 
@@ -33,7 +33,7 @@ export const mapArtist = (artistProfile: ArtistProfile): Artist => {
   return {
     id: artistProfile.artistId,
     name: artistProfile.name,
-    address: '', // TODO: resolve from earliest profile's artistId, if available
+    address: controlledEthereumAddressFromId(artistProfile.artistId),
     avatarUrl: artistProfile.avatarUrl,
     slug: slugify(`${artistProfile.name} ${artistProfile.createdAtTime.getTime()}`),
     createdAtTime: artistProfile.createdAtTime,
