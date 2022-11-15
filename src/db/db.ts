@@ -24,7 +24,8 @@ export enum Table {
   processors = 'raw_processors',
   seeds = 'raw_seeds',
   chains = 'raw_chains',
-  blocks = 'raw_blocks'
+  blocks = 'raw_blocks',
+  identities = 'raw_identities'
 }
 
 export type WhereFunc = 'where'

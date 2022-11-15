@@ -5,22 +5,14 @@ import _ from 'lodash';
 
 import { Table } from './db/db';
 import db from './db/sql-db';
-import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
-import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
-import { addTimestampFromMetadata } from './processors/default/addTimestampFromMetadata';
 import { addTimestampToERC721NFTs, addTimestampToERC721Transfers } from './processors/default/addTimestampToERC721NFTs';
-import { categorizeZora } from './processors/default/categorizeZora';
 import { createERC721NFTsFromTransfersProcessor } from './processors/default/createERC721NFTsFromTransfersProcessor';
 import { createNftFactoryFromERC721MetaFactoryProcessor } from './processors/default/createNftFactoryFromERC721MetaFactory';
 import { createNftsFromCandyMachine } from './processors/default/createNftFromCandyMachine';
-import { createNinaNfts } from './processors/default/createNinaNftProcesor';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
-import { errorAndMetadataResetProcessor, errorProcessor } from './processors/default/errorProcessor';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
-import { insertSeedsIntoMempool } from './processors/default/insertSeedsIntoMempool';
-import { ipfsAudioUploader, ipfsArtworkUploader } from './processors/default/ipfsMediaUploader';
-import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfsPinner';
+import { insertIdentities } from './processors/default/insertIdentitiesProcessor';
 import { processMempoolInserts, processMempoolUpdates } from './processors/default/processMempool';
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
 import { runProcessors } from './runner';
@@ -65,29 +57,30 @@ const PROCESSORS = (
   const candyMachineProcessors = candyMachines.map(candyMachine => createNftsFromCandyMachine(candyMachine))
 
   return [
-    insertSeedsIntoMempool,
-    errorAndMetadataResetProcessor,
-    ...tableInsertsMempoolProcessors,
-    ...tableUpdatesMempoolProcessors,
-    ...erc721MetaFactoryProcessors,
-    ...candyMachineProcessors,
-    ...erc721ContractFieldProcessors,
-    ...erc721TransferProcessors,
-    ...addTimestampToERC721TransfersProcessors,
-    ...addTimestampToERC721NftsProcessors,
-    ...getERC721TokenFieldsProcessors,
-    addMetadataIPFSHashProcessor(nftFactoriesByAddress),
-    addMetadataObjectProcessor(nftFactoriesByAddress),
-    categorizeZora,
-    createNinaNfts,
-    addTimestampFromMetadata,
-    ...platformTrackProcessors,
-    ...apiTrackProcessors,
-    ipfsAudioUploader,
-    ipfsArtworkUploader,
-    ipfsAudioPinner,
-    ipfsArtworkPinner,
-    errorProcessor,
+    // insertSeedsIntoMempool,
+    // errorAndMetadataResetProcessor,
+    // ...tableInsertsMempoolProcessors,
+    // ...tableUpdatesMempoolProcessors,
+    // ...erc721MetaFactoryProcessors,
+    // // ...candyMachineProcessors,
+    // ...erc721ContractFieldProcessors,
+    // ...erc721TransferProcessors,
+    // ...addTimestampToERC721TransfersProcessors,
+    // ...addTimestampToERC721NftsProcessors,
+    // ...getERC721TokenFieldsProcessors,
+    // addMetadataIPFSHashProcessor(nftFactoriesByAddress),
+    // addMetadataObjectProcessor(nftFactoriesByAddress),
+    // categorizeZora,
+    // createNinaNfts,
+    // addTimestampFromMetadata,
+    // ...platformTrackProcessors,
+    // ...apiTrackProcessors,
+    // // ipfsAudioUploader,
+    // // ipfsArtworkUploader,
+    // // ipfsAudioPinner,
+    // // ipfsArtworkPinner,
+    insertIdentities
+    // errorProcessor,
   ]
 };
 
