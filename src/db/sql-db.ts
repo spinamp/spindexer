@@ -82,9 +82,9 @@ const init = async (): Promise<DBClient> => {
           chunks.map(async chunk => {
             if (options?.ignoreConflict){
               await transaction.insert(chunk).into(tableName).onConflict(options.ignoreConflict as any).ignore();
-            } else if (options?.replaceUndefinedOnly){
+            } else if (options?.updateUndefinedOnConflict){
               let instruction = transaction.insert(chunk).into(tableName).toString()
-              instruction = `${instruction} ON CONFLICT (${options.replaceUndefinedOnly}) DO UPDATE`;
+              instruction = `${instruction} ON CONFLICT (${options.updateUndefinedOnConflict}) DO UPDATE`;
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               const coalesce = Object.keys(chunk[0]).map(key =>

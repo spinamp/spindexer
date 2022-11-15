@@ -2,7 +2,7 @@ import { slugify } from '../utils/identifiers';
 
 import { Record, TimeField } from './record'
 
-enum SupportedExternalLinkTypes { 'Facebook', 'Twitter', 'Instagram', 'SoundCloud', 'Bandcamp', 'Spotify', 'iTunes', 'Deezer', 'Tidal', 'Discord', 'Telegram', 'Website' }
+enum SupportedExternalLinkTypes { 'facebook', 'twitter', 'instagram', 'soundcloud', 'bandcamp', 'spotify', 'itunes', 'deezer', 'tidal', 'discord', 'telegram', 'website' }
 
 type ExternalLink = {
   name?: string,

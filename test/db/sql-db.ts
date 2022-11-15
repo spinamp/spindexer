@@ -20,7 +20,7 @@ describe('DBClient', async () => {
 
     it('only replaces previously undefined fields', async () => {
       await dbClient.insert(Table.artists, [{ id: '1', name: 'older', address: undefined }, { id: '2', name: 'no-modify', address: 'no-modify' }]);
-      await dbClient.insert(Table.artists, [{ id: '1', name: 'newer', address: 'abc' }, { id: '2', name: 'unrelated', address: undefined }], { replaceUndefinedOnly: 'id' });
+      await dbClient.insert(Table.artists, [{ id: '1', name: 'newer', address: 'abc' }, { id: '2', name: 'unrelated', address: undefined }], { updateUndefinedOnConflict: 'id' });
 
       const result = await dbClient.getRecords<Artist>(Table.artists);
       assert.equal(result[0].name, 'older');
