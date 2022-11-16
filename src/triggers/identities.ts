@@ -16,7 +16,7 @@ export const newIdentities: Trigger<undefined> = async (clients) => {
     left outer join ${Table.identities} ids 
     on ids.address = addresses.address
     where ids.address is null
-    limit 1000
+    limit 10000
     `
 
   const result = await clients.db.rawSQL(sql);

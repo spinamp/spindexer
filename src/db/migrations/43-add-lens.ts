@@ -15,7 +15,7 @@ const LENS_PLATFORM: MusicPlatform = {
   name: 'LENS'
 }
 
-const LENS_HUB: MetaFactory = {
+export const LENS_HUB: MetaFactory = {
   id: `${ChainId.polygon}/0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d`,
   platformId: LENS_PLATFORM.id,
   contractType: MetaFactoryTypeName.lens,
