@@ -12,8 +12,7 @@ import { createNftsFromCandyMachine } from './processors/default/createNftFromCa
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
-import { insertIdentities } from './processors/default/insertIdentitiesProcessor';
-import { populateLensHandle } from './processors/default/populateLensHandle';
+import { populateLensAvatar } from './processors/default/populateLensAvatar';
 import { processMempoolInserts, processMempoolUpdates } from './processors/default/processMempool';
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
 import { runProcessors } from './runner';
@@ -80,8 +79,9 @@ const PROCESSORS = (
     // // ipfsArtworkUploader,
     // // ipfsAudioPinner,
     // // ipfsArtworkPinner,
-    insertIdentities,
-    populateLensHandle
+    // insertIdentities,
+    // populateLensHandle,
+    populateLensAvatar
     // errorProcessor,
   ]
 };
