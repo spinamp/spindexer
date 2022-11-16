@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import { controlledEthereumAddressFromId, slugify } from '../utils/identifiers';
 
 import { Record, TimeField } from './record'
@@ -40,3 +42,16 @@ export const mapArtist = (artistProfile: ArtistProfile): Artist => {
     createdAtEthereumBlockNumber: artistProfile.createdAtEthereumBlockNumber
   }
 };
+
+export const distinctEarliestArtistProfiles = (artistProfiles: ArtistProfile[]): ArtistProfile[] => {
+  const [withBlock, withoutBlock] = _.partition(artistProfiles, profile => !!profile.createdAtEthereumBlockNumber);
+
+  const earliestDistinctProfiles = Object.values(
+    _.mapValues(
+      _.groupBy(withBlock, 'artistId'),
+      values => _.sortBy(values, 'createdAtEthereumBlockNumber')[0]
+    )
+  );
+
+  return _.uniqBy(earliestDistinctProfiles.concat(withoutBlock), 'artistId');
+}

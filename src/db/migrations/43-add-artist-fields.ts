@@ -24,17 +24,16 @@ export const up = async (knex: Knex) => {
       order by p."createdAtEthereumBlockNumber" desc
   `);
 
-  const updatesWithBlockNumbers = artistUpdates.rows.filter((row: any) => row.createdAtEthereumBlockNumber !== null);
-  const updatesWithoutBlockNumbers = artistUpdates.rows.filter((row: any) => row.createdAtEthereumBlockNumber === null);
+  const [withBlock, withoutBlock] = _.partition(artistUpdates.rows, row => !!row.createdAtEthereumBlockNumber);
 
   const earliestDistinctUpdate = Object.values(
     _.mapValues(
-      _.groupBy(updatesWithBlockNumbers, 'id'),
+      _.groupBy(withBlock, 'id'),
       values => _.sortBy(values, 'createdAtEthereumBlockNumber')[0]
     )
   );
 
-  const updates = earliestDistinctUpdate.concat(updatesWithoutBlockNumbers).map((row: any) => {
+  const updates = earliestDistinctUpdate.concat(withoutBlock).map((row: any) => {
     return {
       id: row.id,
       address: controlledEthereumAddressFromId(row.id),

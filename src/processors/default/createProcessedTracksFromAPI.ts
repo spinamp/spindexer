@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import { Table } from '../../db/db';
 import { newPlatformTracks } from '../../triggers/newPlatformTracks';
-import { mapArtist } from '../../types/artist';
+import { distinctEarliestArtistProfiles, mapArtist } from '../../types/artist';
 import { MusicPlatformTypeConfig, platformConfigs } from '../../types/platform';
 import { Clients, Processor, TrackAPIClientWithPremints } from '../../types/processor';
 import { Record } from '../../types/record';
@@ -27,7 +27,7 @@ const processorFunction = (platformId: string, name: string) => async (apiTracks
     return mapArtistProfile({ apiTrack });
   }), 'artistId');
 
-  const artists = artistProfiles.map(profile => mapArtist(profile));
+  const artists = distinctEarliestArtistProfiles(artistProfiles).map(profile => mapArtist(profile));
 
   // Because we assume an artist has the same ID across all profiles, we
   // don't need to worry about changing the artistId and artist{} fields in the processed

@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { DBClient, Table } from '../../../db/db';
 import { fromDBRecords } from '../../../db/orm';
 import { NFTsWithoutTracks } from '../../../triggers/missing';
-import { ArtistProfile, mapArtist } from '../../../types/artist';
+import { ArtistProfile, distinctEarliestArtistProfiles, mapArtist } from '../../../types/artist';
 import { NFTtoTrackIdsInput } from '../../../types/mapping';
 import { NFT, NftFactory } from '../../../types/nft';
 import { NFTProcessError } from '../../../types/nftProcessError';
@@ -128,7 +128,7 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
     allArtistProfiles = allArtistProfiles.concat(result.artistProfiles);
   }
 
-  const artists = allArtistProfiles.map(profile => mapArtist(profile));
+  const artists = distinctEarliestArtistProfiles(allArtistProfiles).map(profile => mapArtist(profile));
 
   const { oldIds, mergedProcessedTracks } = await mergeProcessedTracks(allNewTracks, clients.db, true);
 

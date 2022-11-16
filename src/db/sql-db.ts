@@ -83,19 +83,20 @@ const init = async (): Promise<DBClient> => {
             if (options?.ignoreConflict){
               await transaction.insert(chunk).into(tableName).onConflict(options.ignoreConflict as any).ignore();
             } else if (options?.updateUndefinedOnConflict){
-              // create custom insert statement to only update `undefined` fields, for example:
+              // create custom insert statement to only update `undefined` fields on conflict, for example:
               // INSERT ... ON CONFLICT (id) DO UPDATE
               //   SET field1 = COALESCE(field1, EXCLUDED.field),
               //       field2 = COALESCE(field2, EXCLUDED.field2);
               //
-              let instruction = transaction.insert(chunk).into(tableName).toString()
-              instruction = `${instruction} ON CONFLICT (${options.updateUndefinedOnConflict}) DO UPDATE`;
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              const undefinedOnly = Object.keys(chunk[0]).map(key =>
-                `${key} =  COALESCE(${tableName}.${key}, EXCLUDED.${key})`
-              ).join(', ');
-              instruction = `${instruction} SET ${undefinedOnly}`;
+              const setUndefinedFields = Object.keys(chunk[0] as any).map(key =>
+                `"${key}" = coalesce(${tableName}."${key}", excluded."${key}")`
+              ).join(',\n\t');
+
+              const instruction = `
+                ${transaction.insert(chunk).into(tableName).toString()}
+                  on conflict (${options.updateUndefinedOnConflict}) do update set
+                  ${setUndefinedFields}
+              `
               await transaction.raw(instruction);
             } else {
               await transaction.insert(chunk).into(tableName);
