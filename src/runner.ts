@@ -24,7 +24,11 @@ export const initClients = async (existingDBClient?: DBClient) => {
   const evmClients = {} as { [chainId in ChainId]: EVMClient }
   
   for await (const chain of evmChains){
-    evmClients[chain.id] = await evm.init(chain.rpcUrl)
+    const rpcUrl = process.env[chain.rpcUrlKey];
+    if (!rpcUrl){
+      throw `no .env value found for ${chain.rpcUrlKey}`
+    }
+    evmClients[chain.id] = await evm.init(rpcUrl)
   }
 
   const blocksClient = await blocks.init(evmClients);

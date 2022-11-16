@@ -12,7 +12,7 @@ export enum ChainId {
 export type Chain = {
   id: ChainId;
   name: string;
-  rpcUrl: string;
+  rpcUrlKey: string;
   type: ChainType
 }
 
