@@ -1,4 +1,3 @@
-import { gql, GraphQLClient } from 'graphql-request';
 import _ from 'lodash';
 
 import { DBClient, Table } from '../db/db';
@@ -7,7 +6,6 @@ import { ChainId } from '../types/chain';
 
 import { EVMClient } from './evm';
 
-const blocksAPI = new GraphQLClient(process.env.BLOCKS_SUBGRAPH_ENDPOINT!);
 
 export type BlocksClient = {
   fetchBlockTimestamps: (chainId: ChainId, blockNumbers: string[]) => Promise<{ 
@@ -40,42 +38,17 @@ const init = async (
       const missingBlockNumbers = blockNumbers.filter(blockNumber => !existingBlocksByBlockNumber[blockNumber]);
       let newBlocks: Block[] = [];
 
-      // only using the graph for Ethereum. All other EVM chains will use RPC calls
-      if (chainId === ChainId.ethereum){
-        const blockNumbersForQuery = JSON.stringify(missingBlockNumbers);
-        const { blocks } = await blocksAPI.request(
-          gql`
-          {
-            blocks(first:${blockNumbers.length}, where: {number_in: ${blockNumbersForQuery}}) {
-              number
-              timestamp
-            }
-          }
-          `,
-        );
+      const blockNumbersParsed: number[] = missingBlockNumbers.map(blockNumber => parseInt(blockNumber))
 
-        newBlocks = blocks.map((block: any) => ({
-          chainId,
-          blockNumber: block.number,
-          timestamp: new Date(block.timestamp * 1000)
-        }))
-        
-        const responseByBlockNumber = _.keyBy(blocks, 'number');
-        const blockTimes = _.mapValues(responseByBlockNumber, response => response.timestamp)
-        timestampsByBlockNumber = blockTimes;
-      } else {
-        const blockNumbersParsed: number[] = missingBlockNumbers.map(blockNumber => parseInt(blockNumber))
+      const blocks = await evmClients[chainId].getBlockTimestampsByBlockNumber(blockNumbersParsed);
 
-        const blocks = await evmClients[chainId].getBlockTimestampsByBlockNumber(blockNumbersParsed);
+      newBlocks = Object.keys(blocks).map(blockNumber => ({
+        chainId,
+        blockNumber,
+        timestamp: new Date(parseInt(blocks[blockNumber]) * 1000)
+      }))
 
-        newBlocks = Object.keys(blocks).map(blockNumber => ({
-          chainId,
-          blockNumber,
-          timestamp: new Date(parseInt(blocks[blockNumber]) * 1000)
-        }))
-
-        timestampsByBlockNumber = blocks
-      }
+      timestampsByBlockNumber = blocks
 
       for (const block of existingBlocks){
         const blockNumber = block.blockNumber.toString();
