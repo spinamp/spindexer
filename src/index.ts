@@ -12,12 +12,12 @@ import { createNftsFromCandyMachine } from './processors/default/createNftFromCa
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
+import { insertIdentities } from './processors/default/insertIdentitiesProcessor';
 import { populateLensHandle } from './processors/default/populateLensHandle';
 import { processMempoolInserts, processMempoolUpdates } from './processors/default/processMempool';
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
 import { runProcessors } from './runner';
 import { ChainId } from './types/chain';
-import { Identity } from './types/identity';
 import { MetaFactory, MetaFactoryTypeName } from './types/metaFactory';
 import { NftFactory, NFTStandard } from './types/nft';
 import { API_PLATFORMS, MusicPlatform } from './types/platform';
@@ -26,8 +26,7 @@ const PROCESSORS = (
   nftFactories: NftFactory[],
   erc721MetaFactories: MetaFactory[],
   musicPlatforms: MusicPlatform[],
-  candyMachines: MetaFactory[],
-  identities: Identity[]
+  candyMachines: MetaFactory[]
 ) => {
   const nftFactoriesByAddress = _.keyBy(nftFactories, 'id');
   const nftFactoriesByChain = _.groupBy(nftFactories, 'chainId')
@@ -81,8 +80,8 @@ const PROCESSORS = (
     // // ipfsArtworkUploader,
     // // ipfsAudioPinner,
     // // ipfsArtworkPinner,
-    // insertIdentities,
-    populateLensHandle(identities)
+    insertIdentities,
+    populateLensHandle
     // errorProcessor,
   ]
 };
@@ -95,10 +94,8 @@ const updateDBLoop = async () => {
   const erc721MetaFactories = metafactories.filter(metaFactory => metaFactory.standard === NFTStandard.ERC721);
   const candyMachines = metafactories.filter(metaFactory => metaFactory.standard === NFTStandard.METAPLEX && metaFactory.contractType === MetaFactoryTypeName.candyMachine) 
 
-  const identities = await dbClient.getRecords<Identity>(Table.identities);
-
   const musicPlatforms = await dbClient.getRecords<MusicPlatform>(Table.platforms);
-  await runProcessors(PROCESSORS(nftFactories, erc721MetaFactories, musicPlatforms, candyMachines, identities), dbClient);
+  await runProcessors(PROCESSORS(nftFactories, erc721MetaFactories, musicPlatforms, candyMachines), dbClient);
 };
 
 process.on('SIGINT', () => {
