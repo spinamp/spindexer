@@ -1,13 +1,13 @@
 import _ from 'lodash';
 
-import { evmTrackId, evmId, slugify } from '../../utils/identifiers';
+import { evmTrackId, slugify, artistId } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { ChainId } from '../chain';
 import { MapNFTsToTrackIds, MapTrack } from '../mapping';
 import { NFT } from '../nft';
 
 const mapAPITrackToArtistID = (chainId: ChainId, apiTrack: any): string => {
-  return evmId(chainId, apiTrack.artist.id);
+  return artistId(chainId, apiTrack.artist.id);
 };
 
 const mapTrack: MapTrack = (nft, apiTrack) => {
