@@ -56,7 +56,7 @@ export const newEVMEvents: (
   gap: string = process.env.ETHEREUM_BLOCK_QUERY_GAP!,
   staleFilter,
   updateCursor,
-  limit = 10
+  limit = 5000
 ) => {
   const triggerFunc = async (
     clients: Clients,
@@ -94,7 +94,6 @@ export const newEVMEvents: (
       return [];
     }
 
-    // TODO: the filters don't have to include the stale cursor items!!
     let staleContractFilters;
     if (staleFilter){
       staleContractFilters = staleFilter(contractFilters, mostStaleContracts)
@@ -126,7 +125,8 @@ export const newEVMEvents: (
       staleContractFilters,
     );
     const newCursor = JSON.stringify(newCursorObject);
-    if (newEvents.length === 0 && mostStaleContracts.length !== args.length) {
+    // if (newEvents.length === 0 && mostStaleContracts.length !== args.length) {
+    if (newEvents.length === 0 && mostStaleContracts.length !== limit) {
       console.log(
         `No new events found across contracts, recursing trigger with new cursor from block ${rangeEnd.toString()}`,
       );
