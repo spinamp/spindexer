@@ -1,4 +1,4 @@
-import { evmId } from '../../utils/identifiers';
+import { artistId } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { getFactoryId } from '../chain';
 import { IdExtractorTypes, TitleExtractorTypes, ArtistNameExtractorTypes, AvatarUrlExtractorTypes, WebsiteUrlExtractorTypes } from '../fieldExtractor';
@@ -43,7 +43,7 @@ const type: MetaFactoryType = {
         overrides: {
           type: MusicPlatformType['multi-track-multiprint-contract'],
           artist: {
-            artistId: evmId(metaFactory.chainId, event.args!.deployer),
+            artistId: artistId(metaFactory.chainId, event.args!.deployer),
           },
           extractor: {
             id: IdExtractorTypes.TRACK_NUMBER,

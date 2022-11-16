@@ -8,7 +8,7 @@ export const slugify = (input: string) => slugifyLibrary.default(input, { lower:
 
 export const artistId = (chainId: ChainId, address: string): string => {
   // hardcode evm ids to ethereum to produce consistent ids across chains
-  return chainId === ChainId.solana ? solanaId(address) : evmId(ChainId.ethereum, address)
+  return chainId === ChainId.solana ? solanaArtistId(address) : evmId(ChainId.ethereum, address)
 }
 
 export const trackId = (contract: NftFactory, address: string, id: string): string => {
@@ -26,6 +26,10 @@ export const evmTrackId = (chainId: ChainId, address: string, id: string): strin
 
 export const transferId = (chainId: ChainId, blockNumber: string | number, logIndex: string | number): string => {
   return `${chainId}/${blockNumber}/${logIndex}`;
+}
+
+export const solanaArtistId = (address: string): string => {
+  return address;
 }
 
 export const solanaId = (address: string): string => {

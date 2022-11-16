@@ -1,14 +1,14 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { evmId, slugify } from '../../utils/identifiers';
+import { artistId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { ChainId } from '../chain';
 import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, getNFTMetadataField } from '../nft';
 
 const mapAPITrackToArtistID = (chainId: ChainId, apiTrack: any): string => {
-  return evmId(chainId, apiTrack.artist.user.publicAddress);
+  return artistId(chainId, apiTrack.artist.user.publicAddress);
 };
 
 const mapTrack: MapTrack = (

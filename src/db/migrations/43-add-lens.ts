@@ -30,21 +30,21 @@ const ETHEREUM: Chain = {
   id: ChainId.ethereum,
   name: 'Ethereum',
   type: ChainType.evm,
-  rpcUrl: process.env.ETHEREUM_PROVIDER_ENDPOINT!
+  rpcUrlKey: 'ETHEREUM_PROVIDER_ENDPOINT'
 }
 
 const POLYGON: Chain = {
   id: ChainId.polygon,
   name: 'Polygon POS',
   type: ChainType.evm,
-  rpcUrl: process.env.POLYGON_PROVIDER_ENDPOINT!
+  rpcUrlKey: 'POLYGON_PROVIDER_ENDPOINT'
 }
 
 const SOLANA: Chain = {
   id: ChainId.solana,
   name: 'Solana',
   type: ChainType.solana,
-  rpcUrl: process.env.SOLANA_PROVIDER_ENDPOINT!
+  rpcUrlKey: 'SOLANA_PROVIDER_ENDPOINT'
 }
 
 export const up = async (knex: Knex) => {
@@ -53,7 +53,7 @@ export const up = async (knex: Knex) => {
   await knex.schema.createTable(Table.chains, table => {
     table.string('id').primary(),
     table.string('name').notNullable(),
-    table.string('rpcUrl').notNullable()
+    table.string('rpcUrlKey').notNullable()
     table.string('type').notNullable()
   })
 
