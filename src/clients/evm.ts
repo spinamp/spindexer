@@ -126,7 +126,14 @@ const init = async (providerUrl: string): Promise<EVMClient> => {
       const contractAddresses = _.uniq(contractFilters.map(c => c.address));
 
       const zippedFilters = _.zip(...filters)
-      const topics = zippedFilters.map(filter => _.uniq(filter));
+      const topics = zippedFilters.map(filter => {
+        return _.uniq(filter)
+      }).map(topic => {
+        if (topic.length === 1 && topic[0] === null){
+          return null
+        }  
+        return topic
+      });
 
       const args = {
         address: contractAddresses,
