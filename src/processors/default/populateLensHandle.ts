@@ -21,10 +21,10 @@ const trigger: Trigger<undefined> = async (clients, triggerCursor) => {
     from ${Table.identities}
     where "lensHandle" is null
   `
-
+  
   const result = await clients.db.rawSQL(identitiesSql);
   const identities: Identity[] = result.rows;
-
+  
   const staleFilter = (filters: ContractFilter[], staleArgIds: string[]) => {
     return filters.filter(filter => staleArgIds.includes(filter.filterArgs![2]));
   }
@@ -74,7 +74,9 @@ export const populateLensHandle: Processor =
       delete cursor[address]
       return {
         address: address,
-        lensHandle: event.args!.handle!
+        lensHandle: event.args!.handle!,
+        lensProfileId: event.args!.profileId!.toString(),
+        lensAvatar: event.args!.imageURI!
       }
     })
 

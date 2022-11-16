@@ -8,6 +8,7 @@ export const up = async (knex: Knex) => {
 
   await knex.schema.createTable(Table.identities, table => {
     table.string('address').primary();
+    table.string('lensProfileId');
     table.string('ensName');
     table.string('lensHandle');
     table.string('ensAvatar');
