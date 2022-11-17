@@ -52,6 +52,7 @@ export const validateMessage = async (payload: MessagePayload, dbClient: DBClien
       'update': [
         () => minimumKeysPresent(payload, ['id']),
         () => onlyValidKeysPresent(payload, ArtistValidKeys),
+        () => mustExist(payload, Table.artists, dbClient),
       ],
     },
     'processedTracks': {
@@ -120,4 +121,14 @@ const onlyZoraContract = async (input: MessagePayload, dbClient: DBClient): Prom
   if (persistedContract[0]) return;
 
   throw new Error('not a valid zora contract');
+}
+
+const mustExist = async (input: MessagePayload, table: Table, dbClient: DBClient): Promise<void> => {
+  const id = input.data.id;
+  const persistedRecords: any = await dbClient.getRecords(table, [
+    ['where', [ 'id', id ], ],
+  ])
+  if (persistedRecords[0]) return;
+
+  throw new Error(`${table} id does not exist`);
 }

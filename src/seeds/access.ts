@@ -48,7 +48,7 @@ export const ownerOrAdmin = (payload: MessagePayload, signer?: EthereumAddress) 
   }
 
   if (payload.data?.address !== signer) {
-    throw new Error(`only owner_OR_ADMIN or admin can ${payload.operation} ${payload.entity}`);
+    throw new Error(`only owner or admin can ${payload.operation} ${payload.entity}`);
   }
 }
 

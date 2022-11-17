@@ -461,10 +461,19 @@ describe('Seeds API server', async () => {
       })
     })
 
-    describe('artists', () => {
-      const validData = { id: '1', name: 'Jammed Jams', address: ownerWallet.address };
+    describe('artists', async () => {
+      const validData = { id: '1', name: 'Jammed Jams', address: ownerWallet.address, avatarUrl: 'https://spinamp.xyz',
+        externalLinks: [ { name: 'JammedJams', type: 'twitter', url: 'https://twitter.com/jammedjams' } ],
+        theme: { primaryColor: '#000000', secondaryColor: '#ffffff' },
+        spinampLayoutConfig: { bio: 'Hey, this is a test!' }
+      };
 
-      describe('update', () => {
+      beforeEach( async () => {
+        await truncateDB();
+        await dbClient.upsert(Table.artists, [{ id: '1', name: '-----', address: ownerWallet.address, avatarUrl: 'https://dev.spinamp.xyz', createdAtTime: new Date(), createdAtEthereumBlockNumber: 1 }]);
+      })
+
+      describe('update', async () => {
         const validUpdate = { entity: 'artists', operation: 'update', data: { ...validData } };
 
         describe('using a public wallet', () => {
@@ -516,28 +525,59 @@ describe('Seeds API server', async () => {
           it('persists the seed');
         })
 
-        describe('with a valid payload', () => {
-          describe('as an admin', () => {
-            it('returns a 200', async () => {
-              const body = validUpdate;
-              const signature = adminWallet.sign(JSON.stringify(body)).signature;
+        describe('with a valid payload', async () => {
+          describe('when the artist does not exist', async () => {
+            beforeEach( async () => {
+              await truncateDB();
+            })
 
-              supertest(app).post(endpoint).send(body)
-                .set('x-signature', signature)
-                .expect(200)
-                .end((err,res) => { if (err) throwDBHint(err) });
+            describe('as an admin', async () => {
+              it('returns a 422', async () => {
+                const body = { ...validUpdate, data: { ...validData, id: 'does-not-exist' } };
+                const signature = adminWallet.sign(JSON.stringify(body)).signature;
+
+                const response = await supertest(app).post(endpoint).send(body)
+                  .set('x-signature', signature)
+
+                assert(response.status === 422);
+                const numberOfSeeds = await dbClient.getNumberRecords(Table.seeds);
+                assert(numberOfSeeds === '0');
+              })
             })
           })
 
-          describe('as the owner of the artist wallet', () => {
-            it('returns a 200', async () => {
-              const body = validUpdate;
-              const signature = ownerWallet.sign(JSON.stringify(body)).signature;
+          describe('and the artist exists', async () => {
+            beforeEach( async () => {
+              await truncateDB();
+              await dbClient.upsert(Table.artists, [{ id: '1', name: '-', address: ownerWallet.address, avatarUrl: 'https://dev.spinamp.xyz', createdAtTime: new Date(), createdAtEthereumBlockNumber: 1 }]);
+            })
 
-              supertest(app).post(endpoint).send(body)
-                .set('x-signature', signature)
-                .expect(200)
-                .end((err,res) => { if (err) throwDBHint(err) });
+            describe('as an admin', async () => {
+              it('returns a 200', async () => {
+                const body = { ...validUpdate, data: { ...validData, address: 'someone-we-know-should-adjust-this-wallet' } };
+                const signature = adminWallet.sign(JSON.stringify(body)).signature;
+
+                const response = await supertest(app).post(endpoint).send(body)
+                  .set('x-signature', signature)
+
+                assert(response.status === 200);
+                const numberOfSeeds = await dbClient.getNumberRecords(Table.seeds);
+                assert(numberOfSeeds === '1');
+              })
+            })
+
+            describe('as the owner of the artist wallet', async () => {
+              it('returns a 200', async () => {
+                const body = validUpdate;
+                const signature = ownerWallet.sign(JSON.stringify(body)).signature;
+
+                const response = await supertest(app).post(endpoint).send(body)
+                  .set('x-signature', signature)
+
+                assert(response.status === 200);
+                const numberOfSeeds = await dbClient.getNumberRecords(Table.seeds);
+                assert(numberOfSeeds === '1');
+              })
             })
           })
         })
