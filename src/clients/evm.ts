@@ -84,14 +84,14 @@ async function getLogs(provider: JsonRpcProvider, params: any, fromBlock: string
         console.log(`Can't find suggested range, decrease range by half. fromBlock:`, BigNumber.from(start).toNumber(), 'toBlock:', BigNumber.from(end).toNumber() )
 
         if (start === end){
-          'throw error fetching logs unrelated to block range'
+          throw new Error('error fetching logs unrelated to block range')
         }
 
       } else {
         const suggestion = errorString.substring(errorString.indexOf(searchString), errorString.indexOf(']\\"}}",'));
         const suggestedRanges = suggestion.substring(suggestion.indexOf('[') + 1).split(', ')
         if (suggestedRanges.length !== 2){
-          throw `Can't find suggested block range`
+          throw new Error(`Can't find suggested block range`)
         }
         start = suggestedRanges[0];
         end = suggestedRanges[1];
