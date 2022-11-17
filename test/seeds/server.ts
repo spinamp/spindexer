@@ -15,6 +15,7 @@ describe('Seeds API server', async () => {
 
   const Web3 = new web3();
   const adminWallet = Web3.eth.accounts.privateKeyToAccount(TEST_ADMIN_WALLET.privateKey);
+  const ownerWallet = Web3.eth.accounts.create('ownerWallet');
   const publicWallet = Web3.eth.accounts.create('publicWallet');
   const endpoint = '/v1/messages'
   const throwDBHint = (err: any) => {
@@ -461,7 +462,7 @@ describe('Seeds API server', async () => {
     })
 
     describe('artists', () => {
-      const validData = { id: '1', name: 'Jammed Jams' };
+      const validData = { id: '1', name: 'Jammed Jams', address: ownerWallet.address };
 
       describe('update', () => {
         const validUpdate = { entity: 'artists', operation: 'update', data: { ...validData } };
@@ -472,7 +473,7 @@ describe('Seeds API server', async () => {
 
             supertest(app).post(endpoint).send(validUpdate)
               .set('x-signature', signature)
-              .expect(403)
+              .expect(403, { error: 'Authentication failed' })
               .end((err,res) => { if (err) throw err });
           })
         })
@@ -504,8 +505,7 @@ describe('Seeds API server', async () => {
 
         describe('with a payload only containing an id', () => {
           it('returns a 422', async () => {
-            const { 'name': _remove, ...rest } = validData;
-            const body = { ...validUpdate, data: rest };
+            const body = { ...validUpdate, data: { id: '1' } };
             const signature = adminWallet.sign(JSON.stringify(body)).signature;
 
             supertest(app).post(endpoint).send(body)
@@ -517,16 +517,29 @@ describe('Seeds API server', async () => {
         })
 
         describe('with a valid payload', () => {
-          it('returns a 200', async () => {
-            const body = validUpdate;
-            const signature = adminWallet.sign(JSON.stringify(body)).signature;
+          describe('as an admin', () => {
+            it('returns a 200', async () => {
+              const body = validUpdate;
+              const signature = adminWallet.sign(JSON.stringify(body)).signature;
 
-            supertest(app).post(endpoint).send(body)
-              .set('x-signature', signature)
-              .expect(200)
-              .end((err,res) => { if (err) throwDBHint(err) });
+              supertest(app).post(endpoint).send(body)
+                .set('x-signature', signature)
+                .expect(200)
+                .end((err,res) => { if (err) throwDBHint(err) });
+            })
           })
-          it('persists the seed');
+
+          describe('as the owner of the artist wallet', () => {
+            it('returns a 200', async () => {
+              const body = validUpdate;
+              const signature = ownerWallet.sign(JSON.stringify(body)).signature;
+
+              supertest(app).post(endpoint).send(body)
+                .set('x-signature', signature)
+                .expect(200)
+                .end((err,res) => { if (err) throwDBHint(err) });
+            })
+          })
         })
       })
 

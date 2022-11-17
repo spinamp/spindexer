@@ -12,7 +12,7 @@ const NFTFactoryValidUpdateKeys = ['id', 'autoApprove', 'approved'];
 const NFTFactoryValidUpsertKeys = ['id', 'startingBlock', 'platformId', 'contractType', 'standard', 'typeMetadata', 'autoApprove', 'approved'];
 const NFTFactoryMinUpsertKeys = NFTFactoryValidUpsertKeys.filter((key) => !['typeMetadata'].includes(key));
 
-const ArtistValidKeys = ['id', 'name'];
+const ArtistValidKeys = ['id', 'name', 'address', 'avatarUrl', 'externalLinks', 'theme', 'spinampLayoutConfig'];
 const ProcessedTrackValidKeys = ['id', 'title', 'description', 'websiteUrl'];
 
 export const validateMessage = async (payload: MessagePayload, dbClient: DBClient) => {
