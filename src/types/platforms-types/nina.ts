@@ -27,7 +27,7 @@ const mapTrack: MapTrack = (
     websiteUrl: nft.metadata.external_url,
     artistId: mapArtistProfile({ nft, contract, apiTrack }).artistId,
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    createdAtBlockNumber: nft.createdAtBlockNumber,
   };
 
   track.slug = slugify(`${track.title} ${track.createdAtTime!.getTime()}`);

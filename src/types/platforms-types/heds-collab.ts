@@ -1,7 +1,8 @@
 import _ from 'lodash';
 
-import { ethereumTrackId, ethereumId, slugify } from '../../utils/identifiers';
+import { evmTrackId, slugify, artistId } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
+import { ChainId } from '../chain';
 import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, getTrait, NftFactory } from '../nft';
 import { ProcessedTrack } from '../track';
@@ -58,8 +59,8 @@ function getAvatarFromArtist(artist: string): string {
 
 function getArtistId(artist: string){
   const idByArtist: any = {
-    'OSHI': ethereumId('0x4d18f8f2ae19f1e166c97793cceeb70680a2b6d2'),
-    'CAPSHUN & CORDEROYBOI': ethereumId('0xaa86ff6eb0ac77d46de48e955402cc3435c7ab8f'),
+    'OSHI': artistId(ChainId.ethereum, '0x4d18f8f2ae19f1e166c97793cceeb70680a2b6d2'),
+    'CAPSHUN & CORDEROYBOI': artistId(ChainId.ethereum, '0xaa86ff6eb0ac77d46de48e955402cc3435c7ab8f'),
   }
 
   const id = idByArtist[artist.toUpperCase()];
@@ -117,7 +118,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
 const mapNFTtoTrackID = (nft: NFT): string => {
   const artist = getTrait(nft, 'Artist');
   const track = getTrackNameFromArtist(artist);
-  return ethereumTrackId(nft.contractAddress, track);
+  return evmTrackId(nft.chainId, nft.contractAddress, track);
 };
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {

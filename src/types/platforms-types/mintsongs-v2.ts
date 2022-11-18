@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { ethereumTrackId, ethereumId, slugify } from '../../utils/identifiers';
+import { evmTrackId, slugify, artistId } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, NftFactory } from '../nft';
@@ -16,7 +16,7 @@ const extractArtistIdFromNFT = (nft: NFT) => {
   if (artistAddress.length !== 42) {
     throw new Error('Unexpected artist address length');
   }
-  return ethereumId(artistAddress);
+  return artistId(nft.chainId, artistAddress)
 }
 
 const mapTrack: MapTrack = (
@@ -43,7 +43,7 @@ const mapTrack: MapTrack = (
     websiteUrl: nft.metadata.external_url,
     artistId: extractArtistIdFromNFT(nft),
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    createdAtBlockNumber: nft.createdAtBlockNumber,
   })
 };
 
@@ -62,13 +62,13 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
     avatarUrl: `${process.env.IPFS_ENDPOINT}${extractHashFromURL(nft.metadata.image)}`,
     websiteUrl: nft.metadata.external_url,
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber
+    createdAtBlockNumber: nft.createdAtBlockNumber
   }
 };
 
 const mapNFTtoLatestTrackID = (nft: NFT, dupNFTs: NFT[]): string => {
   const primaryNFT = selectPrimaryNFTForTrackMapper(dupNFTs);
-  return ethereumTrackId(primaryNFT.contractAddress, primaryNFT.tokenId.toString());
+  return evmTrackId(nft.chainId, primaryNFT.contractAddress, primaryNFT.tokenId.toString());
 };
 
 const selectPrimaryNFTForTrackMapper = (nfts: NFT[]) => {

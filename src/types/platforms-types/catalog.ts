@@ -1,12 +1,13 @@
 import _ from 'lodash';
 
-import { ethereumTrackId, ethereumId, slugify } from '../../utils/identifiers';
+import { evmTrackId, slugify, artistId } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
+import { ChainId } from '../chain';
 import { MapNFTsToTrackIds, MapTrack } from '../mapping';
 import { NFT } from '../nft';
 
-const mapAPITrackToArtistID = (apiTrack: any): string => {
-  return ethereumId(apiTrack.artist.id);
+const mapAPITrackToArtistID = (chainId: ChainId, apiTrack: any): string => {
+  return artistId(chainId, apiTrack.artist.id);
 };
 
 const mapTrack: MapTrack = (nft, apiTrack) => {
@@ -23,14 +24,14 @@ const mapTrack: MapTrack = (nft, apiTrack) => {
     lossyAudioIPFSHash: apiTrack.ipfs_hash_lossy_audio,
     lossyAudioURL: `https://catalogworks.b-cdn.net/ipfs/${apiTrack.ipfs_hash_lossy_audio}`,
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    createdAtBlockNumber: nft.createdAtBlockNumber,
     lossyArtworkIPFSHash: apiTrack.ipfs_hash_lossy_artwork,
     lossyArtworkURL: `https://catalogworks.b-cdn.net/ipfs/${apiTrack.ipfs_hash_lossy_artwork}`,
     websiteUrl:
     apiTrack.artist.handle && apiTrack.short_url
       ? `https://beta.catalog.works/${apiTrack.artist.handle}/${apiTrack.short_url}`
       : 'https://beta.catalog.works',
-    artistId: mapAPITrackToArtistID(apiTrack),
+    artistId: mapAPITrackToArtistID(nft.chainId, apiTrack),
   }
 };
 
@@ -41,7 +42,7 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): Arti
   const artist = apiTrack.artist;
   return {
     name: artist.name,
-    artistId: mapAPITrackToArtistID(apiTrack),
+    artistId: mapAPITrackToArtistID(nft!.chainId, apiTrack),
     platformInternalId: artist.id,
     platformId: nft!.platformId,
     avatarUrl: artist.picture_uri,
@@ -49,13 +50,13 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): Arti
       ? `https://beta.catalog.works/${artist.handle}`
       : 'https://beta.catalog.works',
     createdAtTime: nft!.createdAtTime,
-    createdAtEthereumBlockNumber: nft!.createdAtEthereumBlockNumber
+    createdAtBlockNumber: nft!.createdAtBlockNumber
   }
 };
 
 const mapNFTtoTrackID = (nft: NFT): string => {
   const [contractAddress, nftId] = nft.id.split('/');
-  return ethereumTrackId(contractAddress, nftId);
+  return evmTrackId(nft.chainId, contractAddress, nftId);
 }
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {

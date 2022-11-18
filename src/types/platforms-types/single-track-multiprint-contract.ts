@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { ethereumTrackId, slugify } from '../../utils/identifiers';
+import { evmTrackId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, NftFactory } from '../nft';
@@ -43,7 +43,7 @@ export const mapTrack: MapTrack = (
     websiteUrl: nft.metadata.external_url,
     artistId: mapArtistProfile({ apiTrack, contract, nft }).artistId,
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    createdAtBlockNumber: nft.createdAtBlockNumber,
     ...contract.typeMetadata?.overrides?.track
   };
 
@@ -67,13 +67,13 @@ export const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, n
     avatarUrl: undefined,
     websiteUrl: nft.metadata.external_url,
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    createdAtBlockNumber: nft.createdAtBlockNumber,
     ...contract.typeMetadata?.overrides?.artist
   }
 };
 
 const mapNFTtoTrackID = (nft: NFT): string => {
-  return ethereumTrackId(nft.contractAddress, '');
+  return evmTrackId(nft.chainId, nft.contractAddress, '');
 };
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {

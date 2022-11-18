@@ -1,5 +1,6 @@
 import { Knex } from 'knex';
 
+import { ChainId } from '../../types/chain';
 import { ArtistIdExtractorTypes, ArtistNameExtractorTypes, TitleExtractorTypes } from '../../types/fieldExtractor';
 import { CrdtOperation } from '../../types/message';
 import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
@@ -16,10 +17,12 @@ const KOTA_PLATFORM: MusicPlatform = {
 
 const KOTA: MetaFactory = {
   id: '2ZvRTpStD4gQ9WPoXuiA4MtFpiZze9K9fPfFtCTnzdGo',
+  address: '2ZvRTpStD4gQ9WPoXuiA4MtFpiZze9K9fPfFtCTnzdGo',
   platformId: KOTA_PLATFORM.id,
   contractType: MetaFactoryTypeName.candyMachine,
   standard: NFTStandard.METAPLEX,
   autoApprove: true,
+  chainId: ChainId.solana,
   typeMetadata: {
     overrides: {
       artist: {

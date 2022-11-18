@@ -4,6 +4,8 @@ import { BigNumber, ethers } from 'ethers';
 import _ from 'lodash';
 
 import MetaABI from '../abis/MetaABI.json';
+import { ChainId } from '../types/chain';
+import { Clients } from '../types/processor';
 import { rollPromises } from '../utils/rollingPromises';
 
 export enum ValidContractNFTCallFunction {
@@ -16,7 +18,7 @@ export enum ValidContractCallFunction {
   symbol = 'symbol'
 }
 
-export type EthCall = {
+export type EVMCall = {
   contractAddress: string,
   callFunction: ValidContractNFTCallFunction | ValidContractCallFunction,
   callInput?: string,
@@ -30,17 +32,29 @@ type Events = ethers.utils.LogDescription & {
   transactionHash: string;
 }
 
-export type EthClient = {
-  call: (ethCalls: EthCall[]) => Promise<unknown[]>;
+export function getEVMClient(chainId: ChainId | string, clients: Clients): EVMClient {
+  const client = clients.evmChain[chainId as ChainId];
+
+  if (!client){
+    throw `Can't find evm client for chain ${chainId}`
+  }
+
+  return client
+}
+
+export type EVMClient = {
+  call: (ethCalls: EVMCall[]) => Promise<unknown[]>;
   getEventsFrom: (fromBlock: string, toBlock: string, contractFilters: ContractFilter[]) => Promise<Events[]>;
   getBlockTimestamps: (blockHashes: string[]) => Promise<number[]>;
   getLatestBlockNumber: () => Promise<number>;
   getContractOwner: (hash: string) => Promise<string>;
+  getBlockTimestampsByBlockNumber: (blockNumbers: number[]) => Promise<{ [blockNumber: number]: number }>;
 }
 
 export type ContractFilter = {
   address: string,
-  filter: string
+  filter: string,
+  filterArgs?: any[]
 };
 
 async function getLogs(provider: JsonRpcProvider, params: any, fromBlock: string, toBlock: string){
@@ -64,27 +78,36 @@ async function getLogs(provider: JsonRpcProvider, params: any, fromBlock: string
       const errorString = e.toString() as string;
       const searchString = 'this block range should work: [';
       if (!errorString.includes(searchString)){
-        throw `Can't find suggested block range`
+        const range = BigNumber.from(end).sub(start);
+        const newRange = Math.floor(range.div(2).toNumber());
+        end = BigNumber.from(start).add(newRange).toHexString();
+        console.log(`Can't find suggested range, decrease range by half. fromBlock:`, BigNumber.from(start).toNumber(), 'toBlock:', BigNumber.from(end).toNumber() )
+
+        if (start === end){
+          throw new Error('error fetching logs unrelated to block range')
+        }
+
+      } else {
+        const suggestion = errorString.substring(errorString.indexOf(searchString), errorString.indexOf(']\\"}}",'));
+        const suggestedRanges = suggestion.substring(suggestion.indexOf('[') + 1).split(', ')
+        if (suggestedRanges.length !== 2){
+          throw new Error(`Can't find suggested block range`)
+        }
+        start = suggestedRanges[0];
+        end = suggestedRanges[1];
       }
-      const suggestion = errorString.substring(errorString.indexOf(searchString), errorString.indexOf(']\\"}}",'));
-      const suggestedRanges = suggestion.substring(suggestion.indexOf('[') + 1).split(', ')
-      if (suggestedRanges.length !== 2){
-        throw `Can't find suggested block range`
-      }
-      start = suggestedRanges[0];
-      end = suggestedRanges[1];
     }
   }
 
   return events
 }
 
-const init = async (): Promise<EthClient> => {
-  const provider = new JsonRpcProvider(process.env.ETHEREUM_PROVIDER_ENDPOINT!);
+const init = async (providerUrl: string): Promise<EVMClient> => {
+  const provider = new JsonRpcProvider(providerUrl);
   const ethcallProvider = new Provider();
   await ethcallProvider.init(provider);
   return {
-    call: async (ethCalls: EthCall[]) => {
+    call: async (ethCalls: EVMCall[]) => {
       const calls = ethCalls.map(ethCall => {
         const contract = new Contract(ethCall.contractAddress, MetaABI.abi);
         const call = ethCall.callInput ? contract[ethCall.callFunction](ethCall.callInput) : contract[ethCall.callFunction]();
@@ -96,22 +119,21 @@ const init = async (): Promise<EthClient> => {
     getEventsFrom: async (fromBlock: string, toBlock: string, contractFilters: ContractFilter[]) => {
       const filters = contractFilters.map(contractFilter => {
         const contract = new ethers.Contract(contractFilter.address, MetaABI.abi, provider);
-        const filter = contract.filters[contractFilter.filter]();
-        return filter.topics![0];
+        const args = contractFilter.filterArgs || []
+        const filter = contract.filters[contractFilter.filter](...args);
+        return filter.topics;
       });
       const contractAddresses = _.uniq(contractFilters.map(c => c.address));
 
-      const events = await getLogs(provider, {
+      const zippedFilters = _.zip(...filters)
+      const topics = zippedFilters.map(filter => _.uniq(filter));
+
+      const args = {
         address: contractAddresses,
-        topics: [
-          [
-            ...filters
-          ]
-        ] }
-      ,
-      fromBlock,
-      toBlock
-      )
+        topics
+      }
+
+      const events = await getLogs(provider, args, fromBlock, toBlock)
       const iface = new ethers.utils.Interface(MetaABI.abi);
       return events.map((event: ethers.Event) => ({
         ...iface.parseLog(event),
@@ -138,6 +160,19 @@ const init = async (): Promise<EthClient> => {
       const contract = new ethers.Contract(hash, MetaABI.abi, provider);
       const owner = await contract.owner();
       return owner
+    },
+    getBlockTimestampsByBlockNumber: async (blockNumbers: number[]) => {
+      const getBlock = provider.getBlock.bind(provider);
+      const results = await rollPromises(blockNumbers, getBlock);
+      const failedBlocks = results.filter(result => result.isError);
+      if (failedBlocks.length !== 0) {
+        throw new Error('Failed to get all block timestamps');
+      }
+
+      return results.reduce((prev, result) => 
+        ({ ...prev, [result.response!.number]: result.response!.timestamp }),
+      {}
+      );
     }
   }
 }

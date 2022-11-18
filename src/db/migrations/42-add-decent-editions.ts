@@ -1,5 +1,7 @@
 import { Knex } from 'knex';
 
+import { formatAddress } from '../../types/address';
+import { ChainId } from '../../types/chain';
 import { getCrdtUpsertMessage } from '../../types/message';
 import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
 import { NFTStandard } from '../../types/nft';
@@ -14,11 +16,13 @@ const DECENT_PLATFORM: MusicPlatform = {
 
 const DECENT: MetaFactory = {
   id: '0x327793Fa255bdD63C20a4aAD11c3A944A1EA62d6',
+  address: formatAddress('0x327793Fa255bdD63C20a4aAD11c3A944A1EA62d6'),
   platformId: DECENT_PLATFORM.id,
   contractType: MetaFactoryTypeName.decent,
   standard: NFTStandard.ERC721,
   autoApprove: false,
-  startingBlock: '15691421'
+  startingBlock: '15691421',
+  chainId: ChainId.ethereum
 }
 
 export const up = async (knex: Knex) => {

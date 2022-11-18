@@ -4,19 +4,20 @@ import _ from 'lodash';
 import { Table } from '../../db/db';
 import { newERC721Transfers } from '../../triggers/newNFTContractEvent';
 import { formatAddress } from '../../types/address';
-import { burned, newMint } from '../../types/ethereum';
+import { ChainId } from '../../types/chain';
+import { burned, newMint } from '../../types/evm';
 import { NFT, ERC721Transfer, NftFactory, NFTStandard } from '../../types/nft';
 import { NFTFactoryTypes } from '../../types/nftFactory';
 import { consolidate, Collector, NFTsCollectors, NFTsCollectorsChanges } from '../../types/nftsCollectors';
 import { Clients, Processor } from '../../types/processor';
 import { Cursor } from '../../types/trigger';
-import { ethereumTransferId } from '../../utils/identifiers';
+import { transferId } from '../../utils/identifiers';
 
 const NAME = 'createERC721NFTsFromTransfers';
 
-const processorFunction = (contracts: NftFactory[]) =>
+const processorFunction = (chainId: ChainId, contracts: NftFactory[], name: string) =>
   async ({ newCursor, items }: { newCursor: Cursor, items: ethers.Event[] }, clients: Clients) => {
-    const contractsByAddress = _.keyBy(contracts, 'id');
+    const contractsByAddress = _.keyBy(contracts, 'address');
     const newNFTs: Partial<NFT>[] = [];
     const updatedNFTs: Partial<NFT>[] = [];
     const transfers: Partial<ERC721Transfer>[] = [];
@@ -34,19 +35,20 @@ const processorFunction = (contracts: NftFactory[]) =>
 
       const toAddress = formatAddress(item.args!.to);
       const fromAddress = formatAddress(item.args!.from);
-      const contractAddress = formatAddress(contract.id);
+      const contractAddress = formatAddress(contract.address);
       const tokenId = BigInt((item.args!.tokenId as BigNumber).toString());
-      const nftId = contractType.buildNFTId(contractAddress, tokenId);
+      const nftId = contractType.buildNFTId(chainId, contractAddress, tokenId);
 
       transfers.push({
-        id: ethereumTransferId(item.blockNumber, item.logIndex),
+        id: transferId(chainId, item.blockNumber, item.logIndex),
         contractAddress: contractAddress,
         from: fromAddress,
         to: toAddress,
         tokenId,
-        createdAtEthereumBlockNumber: '' + item.blockNumber,
+        createdAtBlockNumber: '' + item.blockNumber,
         nftId: nftId,
-        transactionHash: item.transactionHash
+        transactionHash: item.transactionHash,
+        chainId: chainId
       });
 
       if (!newMint(fromAddress)) {
@@ -62,13 +64,15 @@ const processorFunction = (contracts: NftFactory[]) =>
       } else {
         newNFTs.push({
           id: nftId,
-          createdAtEthereumBlockNumber: '' + item.blockNumber,
+          createdAtBlockNumber: '' + item.blockNumber,
           contractAddress: contractAddress,
+          nftFactoryId: contract.id,
           tokenId,
           platformId: contract.platformId,
           owner: toAddress,
           approved: contract.autoApprove,
-          publicReleaseTime: contract.typeMetadata?.other?.publicReleaseTime || undefined
+          publicReleaseTime: contract.typeMetadata?.other?.publicReleaseTime || undefined,
+          chainId,
         });
         nftsCollectorsChanges.push({ nftId: nftId, collectorId: toAddress, amount: 1 })
       }
@@ -101,18 +105,23 @@ const processorFunction = (contracts: NftFactory[]) =>
     const transfersForExistingNfts = transfers.filter(transfer => existingNfts.has(transfer.nftId!));
 
     await clients.db.insert(Table.erc721Transfers, transfersForExistingNfts);
-    await clients.db.updateProcessor(NAME, newCursor);
+    await clients.db.updateProcessor(name, newCursor);
   };
+  
+export const createERC721NFTsFromTransfersProcessor: (chainId: ChainId, contracts: NftFactory[]) => Processor = 
+  (chainId, contracts) => {
+    const cursorName = chainId === ChainId.ethereum ? NAME : `${NAME}_${chainId}`;
 
-export const createERC721NFTsFromTransfersProcessor: (contracts: NftFactory[]) => Processor = (contracts: NftFactory[]) => {
-  return {
-    name: NAME,
-    trigger: newERC721Transfers(
+    return {
+      name: cursorName,
+      trigger: 
+    newERC721Transfers(
+      chainId,
       contracts
         .filter(c => c.standard === NFTStandard.ERC721 && c.approved === true) //only include approved ERC721 contracts
-        .map(c => ({ id: c.id, startingBlock: c.startingBlock! })), // map contracts to EthereumContract
+        .map(c => ({ id: c.id, startingBlock: c.startingBlock!, address: c.address })), // map contracts to EthereumContract
       process.env.ETHEREUM_BLOCK_QUERY_GAP!
     ),
-    processorFunction: processorFunction(contracts),
-  }
-};
+      processorFunction: processorFunction(chainId, contracts, cursorName),
+    }
+  };

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { ethereumTrackId, slugify } from '../../utils/identifiers';
+import { evmTrackId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
 import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, getTrait, NftFactory } from '../nft';
@@ -27,7 +27,7 @@ const mapTrack: MapTrack = (
     websiteUrl: 'https://www.chaos.build/',
     artistId: contract.id,
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    createdAtBlockNumber: nft.createdAtBlockNumber,
   })
 };
 
@@ -46,7 +46,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
     avatarUrl: 'https://lh3.googleusercontent.com/UMytoAeoFW6hGHO3vjIUD28qcKerddfLZP3i2R2g9FS_5IOe7aCSSPosI13VxTFIqw7PgpIOlUSMJrc5jDYf8VbC-4degSMuoXbISw=s0',
     websiteUrl: 'https://www.chaos.build/',
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber
+    createdAtBlockNumber: nft.createdAtBlockNumber
   }
 };
 
@@ -54,7 +54,7 @@ const getSong = (nft: NFT) => getTrait(nft, 'Song');
 
 const mapNFTtoTrackID = (nft: NFT): string => {
   const song = getSong(nft);
-  return ethereumTrackId(nft.contractAddress, song);
+  return evmTrackId(nft.chainId, nft.contractAddress, song);
 };
 
 const mapNFTsToTrackIds: MapNFTsToTrackIds = (input) => {

@@ -22,6 +22,6 @@ export const mapArtist = (artistProfile: ArtistProfile): Artist => {
     slug: slugify(`${artistProfile.name} ${artistProfile.createdAtTime.getTime()}`),
     id: artistProfile.artistId,
     createdAtTime: artistProfile.createdAtTime,
-    createdAtEthereumBlockNumber: artistProfile.createdAtEthereumBlockNumber
+    createdAtBlockNumber: artistProfile.createdAtBlockNumber
   }
 };

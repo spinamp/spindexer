@@ -1,8 +1,9 @@
 import { gql, GraphQLClient } from 'graphql-request';
 
 import { formatAddress } from '../types/address';
+import { ChainId } from '../types/chain';
 import { getTraitType, NFT } from '../types/nft';
-import { ethereumTrackId } from '../utils/identifiers';
+import { evmTrackId } from '../utils/identifiers';
 
 const clientKey = process.env.SOUND_XYZ_KEY;
 if (!clientKey) {
@@ -24,7 +25,7 @@ const mapAPITrackToTrackID = (apiTrack: any): string => {
   if (!apiTrack.editionId) {
     throw new Error('Missing sound.xyz api track editionId');
   }
-  return ethereumTrackId(apiTrack.contractAddress, apiTrack.editionId);
+  return evmTrackId(ChainId.ethereum, apiTrack.contractAddress, apiTrack.editionId);
 };
 
 export type SoundClient = {
