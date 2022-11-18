@@ -12,7 +12,7 @@ import { updateViews } from '../migration-helpers';
 const LENS_PLATFORM: MusicPlatform = {
   id: 'lens',
   type: MusicPlatformType['multi-track-multiprint-contract'],
-  name: 'LENS'
+  name: 'Lens'
 }
 
 const LENS_HUB: MetaFactory = {
