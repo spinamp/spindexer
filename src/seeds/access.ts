@@ -1,5 +1,6 @@
 import { isValidChecksumAddress } from 'ethereumjs-util';
 
+import { DBClient, Table } from '../db/db';
 import { EthereumAddress } from '../types/ethereum';
 
 import { MessagePayload } from './types';
@@ -20,7 +21,7 @@ const authorizationRules: any = {
   }
 }
 
-export const restrictAccess = (payload: MessagePayload, signer?: EthereumAddress) => {
+export const restrictAccess = async (payload: MessagePayload, signer: EthereumAddress, dbClient: DBClient) => {
   const { entity, operation } = payload;
   const accessLevel = authorizationRules[entity]?.[operation] || AccessLevel.ADMIN;
 
@@ -28,7 +29,7 @@ export const restrictAccess = (payload: MessagePayload, signer?: EthereumAddress
     case AccessLevel.PUBLIC:
       break;
     case AccessLevel.OWNER_OR_ADMIN:
-      ownerOrAdmin(payload, signer);
+      await ownerOrAdmin(payload, signer, dbClient);
       break;
     case AccessLevel.ADMIN:
       onlyAdmin(signer);
@@ -38,17 +39,30 @@ export const restrictAccess = (payload: MessagePayload, signer?: EthereumAddress
   }
 }
 
-export const ownerOrAdmin = (payload: MessagePayload, signer?: EthereumAddress) => {
+export const ownerOrAdmin = async (payload: MessagePayload, signer: EthereumAddress, dbClient: DBClient) => {
   if (!signer) {
     throw new Error('must specify a signer');
   }
 
   if (!notAdminAddress(signer)) {
+    const persistedRecords: any = await dbClient.getRecords(payload.entity as Table, [
+      ['where', [ 'id', payload.data.id ], ],
+    ])
+    if (!persistedRecords[0]) {
+      // throw new Error(`${payload.entity} with id ${payload.data.id} does not exist`, { cause: 'does not exist' });
+      throw new Error('not found');
+    }
     return;
   }
 
-  if (payload.data?.address !== signer) {
-    throw new Error(`only owner or admin can ${payload.operation} ${payload.entity}`);
+  const persistedRecords: any = await dbClient.getRecords(payload.entity as Table, [
+    ['where', [ 'id', payload.data.id ], ],
+    ['where', [ 'address', payload.data.address ], ],
+  ])
+
+  if (!persistedRecords[0] || payload.data?.address !== signer) {
+    // throw new Error(`only owner or admin can ${payload.operation} ${payload.entity}`);
+    throw new Error('not found');
   }
 }
 

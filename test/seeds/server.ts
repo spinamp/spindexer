@@ -477,12 +477,23 @@ describe('Seeds API server', async () => {
         const validUpdate = { entity: 'artists', operation: 'update', data: { ...validData } };
 
         describe('using a public wallet', () => {
-          it('returns an error', () => {
-            const signature = publicWallet.sign(JSON.stringify(validUpdate)).signature;
+          it('claiming the address as your own returns an error', () => {
+            const body = { ...validUpdate, data: { ...validData, address: publicWallet.address } };
+            const signature = publicWallet.sign(JSON.stringify(body)).signature;
 
-            supertest(app).post(endpoint).send(validUpdate)
+            supertest(app).post(endpoint).send(body)
               .set('x-signature', signature)
-              .expect(403, { error: 'Authentication failed' })
+              .expect(404, { error: 'not found' })
+              .end((err,res) => { if (err) throw err });
+          })
+
+          it('modifying an artist you do not own returns an error', () => {
+            const body = { ...validUpdate, data: { ...validData } };
+            const signature = publicWallet.sign(JSON.stringify(body)).signature;
+
+            supertest(app).post(endpoint).send(body)
+              .set('x-signature', signature)
+              .expect(404, { error: 'not found' })
               .end((err,res) => { if (err) throw err });
           })
         })
@@ -532,14 +543,15 @@ describe('Seeds API server', async () => {
             })
 
             describe('as an admin', async () => {
-              it('returns a 422', async () => {
+              it('returns a 404', async () => {
                 const body = { ...validUpdate, data: { ...validData, id: 'does-not-exist' } };
                 const signature = adminWallet.sign(JSON.stringify(body)).signature;
 
                 const response = await supertest(app).post(endpoint).send(body)
                   .set('x-signature', signature)
 
-                assert(response.status === 422);
+                console.log(response.body)
+                assert(response.status === 404);
                 const numberOfSeeds = await dbClient.getNumberRecords(Table.seeds);
                 assert(numberOfSeeds === '0');
               })

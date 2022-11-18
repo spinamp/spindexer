@@ -52,7 +52,7 @@ export const validateMessage = async (payload: MessagePayload, dbClient: DBClien
       'update': [
         () => minimumKeysPresent(payload, ['id']),
         () => onlyValidKeysPresent(payload, ArtistValidKeys),
-        () => mustExist(payload, Table.artists, dbClient),
+        // () => mustExist(payload, Table.artists, dbClient),
       ],
     },
     'processedTracks': {
@@ -123,12 +123,14 @@ const onlyZoraContract = async (input: MessagePayload, dbClient: DBClient): Prom
   throw new Error('not a valid zora contract');
 }
 
-const mustExist = async (input: MessagePayload, table: Table, dbClient: DBClient): Promise<void> => {
-  const id = input.data.id;
-  const persistedRecords: any = await dbClient.getRecords(table, [
-    ['where', [ 'id', id ], ],
-  ])
-  if (persistedRecords[0]) return;
+// const mustExist = async (input: MessagePayload, table: Table, dbClient: DBClient): Promise<void> => {
+//   const id = input.data.id;
+//   const address = input.data.address;
+//   const persistedRecords: any = await dbClient.getRecords(table, [
+//     ['where', [ 'id', id ], ],
+//     ['where', [ 'address', address ], ],
+//   ])
+//   if (persistedRecords[0]) return;
 
-  throw new Error(`${table} id does not exist`);
-}
+//   throw new Error(`${table} id ${id} for address ${address} does not exist`);
+// }

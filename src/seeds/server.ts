@@ -31,9 +31,13 @@ export const createSeedsAPIServer = (dbClient: DBClient) => {
     }
 
     try {
-      restrictAccess(req.body, req.signer);
+      await restrictAccess(req.body, req.signer!, dbClient);
     } catch (e: any) {
       console.log(e);
+      if (e.message === 'not found') {
+        res.status(404).send({ error: e.message });
+        return;
+      }
       res.status(403).send({ error: 'Authentication failed' });
       return;
     }
