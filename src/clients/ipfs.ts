@@ -52,11 +52,13 @@ export const extractHashFromURL = (urlString: string) => {
   }
 }
 
+export const getHTTPURL = (ipfsHash: string) => {
+  return `${process.env.IPFS_ENDPOINT}${ipfsHash}`;
+}
+
 const init = async () => {
   return {
-    getHTTPURL: (ipfsHash: string) => {
-      return `${process.env.IPFS_ENDPOINT}${ipfsHash}`;
-    },
+    getHTTPURL,
     client: create({
       url: process.env.IPFS_NODE_HTTP_API
     })
