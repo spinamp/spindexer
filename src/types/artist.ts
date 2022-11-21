@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { controlledEthereumAddressFromId, slugify } from '../utils/identifiers';
+import { ethereumAddressFromId, slugify } from '../utils/identifiers';
 
 import { Record, TimeField } from './record'
 
@@ -35,7 +35,7 @@ export const mapArtist = (artistProfile: ArtistProfile): Artist => {
   return {
     id: artistProfile.artistId,
     name: artistProfile.name,
-    address: controlledEthereumAddressFromId(artistProfile.artistId),
+    address: ethereumAddressFromId(artistProfile.artistId),
     avatarUrl: artistProfile.avatarUrl,
     slug: slugify(`${artistProfile.name} ${artistProfile.createdAtTime.getTime()}`),
     createdAtTime: artistProfile.createdAtTime,

@@ -1,11 +1,10 @@
 import assert from 'assert';
 
-import { EVM_BURN_ADDRESSES } from '../../src/types/evm';
-import { controlledEthereumAddressFromId } from '../../src/utils/identifiers';
+import { ethereumAddressFromId } from '../../src/utils/identifiers';
 import { TEST_ADMIN_WALLET } from '../pretest';
 
 describe('identifiers', () => {
-  describe('controlledEthereumAddressFromId', () => {
+  describe('ethereumAddressFromId', () => {
     const address = TEST_ADMIN_WALLET.address;
 
     describe('with invalid ids', () => {
@@ -18,11 +17,11 @@ describe('identifiers', () => {
         '0x00', // too short
         '0x00000000000000000000000000000000000000000', // too long
         undefined,
-      ].concat(EVM_BURN_ADDRESSES); // burn addresses
+      ]
 
       it('returns undefined', () => {
         invalidIds.forEach((input) => {
-          assert.equal(controlledEthereumAddressFromId(input), undefined, `controlledEthereumAddressFromId(${input}) should return undefined, not '${controlledEthereumAddressFromId(input)}'`);
+          assert.equal(ethereumAddressFromId(input as any), undefined, `ethereumAddressFromId(${input}) should return undefined, not '${ethereumAddressFromId(input as any)}'`);
         })
       })
     });
@@ -36,7 +35,7 @@ describe('identifiers', () => {
 
       it('returns the address ', () => {
         resolvableIds.forEach((input) => {
-          assert.equal(controlledEthereumAddressFromId(input), address, `controlledEthereumAddressFromId(${input}) should return '${address}', not '${controlledEthereumAddressFromId(input)}'`);
+          assert.equal(ethereumAddressFromId(input), address, `ethereumAddressFromId(${input}) should return '${address}', not '${ethereumAddressFromId(input)}'`);
         })
       })
     });

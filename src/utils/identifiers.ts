@@ -1,8 +1,8 @@
+import { isAddress } from 'ethers/lib/utils';
 import * as slugifyLibrary from 'slugify'
 
 import { formatAddress } from '../types/address';
 import { ChainId } from '../types/chain';
-import { EVM_BURN_ADDRESSES } from '../types/evm';
 import { NftFactory } from '../types/nft';
 
 export const slugify = (input: string) => slugifyLibrary.default(input, { lower: true, strict: true })
@@ -42,19 +42,15 @@ export const solanaTrackId = (address: string, id: string): string => {
   return solanaId(address) + suffix;
 }
 
-export const controlledEthereumAddressFromId = (id: string | undefined): string | undefined => {
+export const ethereumAddressFromId = (id: string): string | undefined => {
   if (id === undefined) { return; }
 
-  if (isControlledEthereumAddress(id)) {
+  if (isAddress(id)) {
     return id
   }
 
   const parts = id.split('/');
-  if (parts[1] && isControlledEthereumAddress(parts[1])) {
+  if (parts[1] && isAddress(parts[1])) {
     return parts[1];
   }
-}
-
-const isControlledEthereumAddress = (address: string): boolean => {
-  return address.length === 42 && address.startsWith('0x') && !EVM_BURN_ADDRESSES.includes(address)
 }

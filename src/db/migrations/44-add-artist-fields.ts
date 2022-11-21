@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import _ from 'lodash';
 
-import { controlledEthereumAddressFromId } from '../../utils/identifiers';
+import { ethereumAddressFromId } from '../../utils/identifiers';
 import { Table } from '../db';
 import { tableNameToViewName, updateViews } from '../migration-helpers';
 
@@ -37,7 +37,7 @@ export const up = async (knex: Knex) => {
     const updates = earliestDistinctUpdate.concat(withoutBlock).map((row: any) => {
       return {
         id: row.id,
-        address: controlledEthereumAddressFromId(row.id),
+        address: ethereumAddressFromId(row.id),
         avatarUrl: row.avatarUrl,
       }
     })
