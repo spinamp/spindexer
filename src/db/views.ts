@@ -15,3 +15,11 @@ export const overrides: {
     and "lossyAudioIPFSHash" is not null
     `
 }
+
+export const tablesExcludedFromViews = [
+  Table.nftProcessErrors,
+  Table.processors,
+  Table.chains,
+  'knex_migrations',
+  'knex_migrations_lock'
+]

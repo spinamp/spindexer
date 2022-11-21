@@ -1,7 +1,7 @@
 import { Request } from 'express';
 
 import { Table } from '../db/db';
-import { EthereumAddress } from '../types/ethereum';
+import { EVMAddress } from '../types/evm';
 import { CrdtOperation, CrdtUpdateMessage } from '../types/message'
 
 
@@ -27,10 +27,10 @@ export type MessagePayload = {
   entity: CrdtEntity,
   operation: AllowedApiOperations,
   data: any,
-  signer: EthereumAddress,
+  signer: EVMAddress,
 }
 
-export const getCrdtContractApprovalMessage = (_table: any, data: any, signer: EthereumAddress): CrdtUpdateMessage => {
+export const getCrdtContractApprovalMessage = (_table: any, data: any, signer: EVMAddress): CrdtUpdateMessage => {
   return {
     timestamp: new Date(),
     table: Table.nftFactories,

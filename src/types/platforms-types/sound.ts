@@ -1,13 +1,14 @@
 import _ from 'lodash';
 
 import { extractHashFromURL } from '../../clients/ipfs';
-import { ethereumId, slugify } from '../../utils/identifiers';
+import { artistId, slugify } from '../../utils/identifiers';
 import { ArtistProfile } from '../artist';
+import { ChainId } from '../chain';
 import { MapTrack, MapNFTsToTrackIds } from '../mapping';
 import { NFT, getNFTMetadataField } from '../nft';
 
-const mapAPITrackToArtistID = (apiTrack: any): string => {
-  return ethereumId(apiTrack.artist.user.publicAddress);
+const mapAPITrackToArtistID = (chainId: ChainId, apiTrack: any): string => {
+  return artistId(chainId, apiTrack.artist.user.publicAddress);
 };
 
 const mapTrack: MapTrack = (
@@ -32,12 +33,12 @@ const mapTrack: MapTrack = (
     lossyAudioIPFSHash: extractHashFromURL(getNFTMetadataField(nft, 'animation_url'))!,
     lossyArtworkIPFSHash: extractHashFromURL(getNFTMetadataField(nft, 'image'))!,
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    createdAtBlockNumber: nft.createdAtBlockNumber,
     websiteUrl:
       apiTrack.artist.soundHandle && apiTrack.titleSlug
         ? `https://www.sound.xyz/${apiTrack.artist.soundHandle}/${apiTrack.titleSlug}`
         : 'https://www.sound.xyz',
-    artistId: mapAPITrackToArtistID(apiTrack),
+    artistId: mapAPITrackToArtistID(nft.chainId, apiTrack),
   })
 };
 
@@ -48,7 +49,7 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): Arti
   const artist = apiTrack.artist
   return {
     name: artist.name,
-    artistId: mapAPITrackToArtistID(apiTrack),
+    artistId: mapAPITrackToArtistID(nft!.chainId, apiTrack),
     platformInternalId: artist.id,
     platformId: nft!.platformId,
     avatarUrl: artist.user.avatar.url,
@@ -56,7 +57,7 @@ const mapArtistProfile = ({ apiTrack, nft }: { apiTrack: any, nft?: NFT }): Arti
       `https://www.sound.xyz/${artist.soundHandle}`
       : 'https://www.sound.xyz',
     createdAtTime: nft!.createdAtTime,
-    createdAtEthereumBlockNumber: nft!.createdAtEthereumBlockNumber
+    createdAtBlockNumber: nft!.createdAtBlockNumber
   }
 };
 

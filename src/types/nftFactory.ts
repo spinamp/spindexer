@@ -1,6 +1,7 @@
-import { ValidContractNFTCallFunction } from '../clients/ethereum';
+import { ValidContractNFTCallFunction } from '../clients/evm';
 
 import { formatAddress } from './address';
+import { ChainId } from './chain';
 import { NFTContractTypeName, NFTContractType } from './nft';
 
 type NftFactoryTypes = {
@@ -20,6 +21,12 @@ export const NFTFactoryTypes: NftFactoryTypes = {
   }
 }
 
-export function buildERC721Id(contractAddress: string, tokenId: bigint): string {
-  return `${formatAddress(contractAddress)}/${tokenId.toString()}`;
+export function buildERC721Id(chainId: ChainId, contractAddress: string, tokenId: bigint): string {
+  // Ethereum and solana nfts were indexed before the chain id prefix, so to preserve backwards compatibility for old ids we skip the prefix on them. A future migration could be done to bring them in line with other chains.
+  let prefix = ''
+  if (![ChainId.ethereum, ChainId.solana].includes(chainId)){
+    prefix = `${chainId}/`
+  }
+
+  return `${prefix}${formatAddress(contractAddress)}/${tokenId.toString()}`;
 }

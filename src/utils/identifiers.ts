@@ -1,34 +1,40 @@
 import * as slugifyLibrary from 'slugify'
 
 import { formatAddress } from '../types/address';
-import { ETHEREUM_BURN_ADDRESSES } from '../types/ethereum';
-import { Chain, NftFactory, NFTStandard } from '../types/nft';
+import { ChainId } from '../types/chain';
+import { EVM_BURN_ADDRESSES } from '../types/evm';
+import { NftFactory } from '../types/nft';
 
 export const slugify = (input: string) => slugifyLibrary.default(input, { lower: true, strict: true })
 
-export const artistId = (contract: NftFactory, address: string): string => {
-  return contract.standard === NFTStandard.METAPLEX ? solanaId(address) : ethereumId(address)
+export const artistId = (chainId: ChainId, address: string): string => {
+  // hardcode evm ids to ethereum to produce consistent ids across chains
+  return chainId === ChainId.solana ? solanaArtistId(address) : evmId(ChainId.ethereum, address)
 }
 
 export const trackId = (contract: NftFactory, address: string, id: string): string => {
-  return contract.standard === NFTStandard.METAPLEX ? solanaTrackId(address, id) : ethereumTrackId(address, id)
+  return contract.chainId === ChainId.solana ? solanaTrackId(address, id) : evmTrackId(contract.chainId, address, id)
 }
 
-export const ethereumId = (address: string): string => {
-  return `${Chain.ETHEREUM}/${formatAddress(address)}`;
+export const evmId = (chainId: ChainId, address: string): string => {
+  return `${chainId}/${formatAddress(address)}`;
 }
 
-export const ethereumTrackId = (address: string, id: string): string => {
+export const evmTrackId = (chainId: ChainId, address: string, id: string): string => {
   const suffix = id !== '' ? `/${id}` : '';
-  return ethereumId(address) + suffix;
+  return evmId(chainId, address) + suffix;
 }
 
-export const ethereumTransferId = (blockNumber: string | number, logIndex: string | number): string => {
-  return `${Chain.ETHEREUM}/${blockNumber}/${logIndex}`;
+export const transferId = (chainId: ChainId, blockNumber: string | number, logIndex: string | number): string => {
+  return `${chainId}/${blockNumber}/${logIndex}`;
+}
+
+export const solanaArtistId = (address: string): string => {
+  return address;
 }
 
 export const solanaId = (address: string): string => {
-  return `${Chain.SOLANA}/${formatAddress(address)}`;
+  return `${ChainId.solana}/${address}`;
 }
 
 export const solanaTrackId = (address: string, id: string): string => {
@@ -50,5 +56,5 @@ export const controlledEthereumAddressFromId = (id: string | undefined): string 
 }
 
 const isControlledEthereumAddress = (address: string): boolean => {
-  return address.length === 42 && address.startsWith('0x') && !ETHEREUM_BURN_ADDRESSES.includes(address)
+  return address.length === 42 && address.startsWith('0x') && !EVM_BURN_ADDRESSES.includes(address)
 }

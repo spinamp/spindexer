@@ -16,32 +16,34 @@ export const up = async (knex: Knex) => {
   await updateViews(knex);
 
   const artistUpdates = await knex.raw(`
-    select a.id, a.address, p."avatarUrl", p."createdAtEthereumBlockNumber" from raw_artists as a
+    select a.id, a.address, p."avatarUrl", p."createdAtBlockNumber" from raw_artists as a
       inner join raw_artist_profiles as p
       on a."id" = p."artistId"
       where a."address" is null
       and p."avatarUrl" is not null
-      order by p."createdAtEthereumBlockNumber" desc
+      order by p."createdAtBlockNumber" desc
   `);
 
-  const [withBlock, withoutBlock] = _.partition(artistUpdates.rows, row => !!row.createdAtEthereumBlockNumber);
+  if (artistUpdates.rows.length > 0) {
+    const [withBlock, withoutBlock] = _.partition(artistUpdates.rows, row => !!row.createdAtBlockNumber);
 
-  const earliestDistinctUpdate = Object.values(
-    _.mapValues(
-      _.groupBy(withBlock, 'id'),
-      values => _.sortBy(values, 'createdAtEthereumBlockNumber')[0]
-    )
-  );
+    const earliestDistinctUpdate = Object.values(
+      _.mapValues(
+        _.groupBy(withBlock, 'id'),
+        values => _.sortBy(values, 'createdAtBlockNumber')[0]
+      )
+    );
 
-  const updates = earliestDistinctUpdate.concat(withoutBlock).map((row: any) => {
-    return {
-      id: row.id,
-      address: controlledEthereumAddressFromId(row.id),
-      avatarUrl: row.avatarUrl,
-    }
-  })
+    const updates = earliestDistinctUpdate.concat(withoutBlock).map((row: any) => {
+      return {
+        id: row.id,
+        address: controlledEthereumAddressFromId(row.id),
+        avatarUrl: row.avatarUrl,
+      }
+    })
 
-  await knex(Table.artists).insert(updates).onConflict('id').merge();
+    await knex(Table.artists).insert(updates).onConflict('id').merge();
+  }
 }
 
 export const down = async (knex: Knex) => {

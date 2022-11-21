@@ -254,7 +254,7 @@ export const resolveArtistId: Resolver = (nft, contract) => {
     }
   }
 
-  return artistId(contract, contract.id);
+  return artistId(contract.chainId, contract.address);
 }
 
 export const resolveWebsiteUrl: Resolver = (nft, contract) => {

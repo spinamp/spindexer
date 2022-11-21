@@ -1,12 +1,12 @@
-export type EthereumBlockNumberField = {
-  createdAtEthereumBlockNumber?: string;
+export type EVMBlockNumberField = {
+  createdAtBlockNumber?: string;
 }
 
 export type DateTimeField = {
   createdAtTime: Date;
 }
 
-export type TimeField = EthereumBlockNumberField & DateTimeField;
+export type TimeField = EVMBlockNumberField & DateTimeField;
 
 export type IdField = {
   id: string

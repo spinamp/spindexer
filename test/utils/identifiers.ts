@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { ETHEREUM_BURN_ADDRESSES } from '../../src/types/ethereum';
+import { EVM_BURN_ADDRESSES } from '../../src/types/evm';
 import { controlledEthereumAddressFromId } from '../../src/utils/identifiers';
 import { TEST_ADMIN_WALLET } from '../pretest';
 
@@ -18,7 +18,7 @@ describe('identifiers', () => {
         '0x00', // too short
         '0x00000000000000000000000000000000000000000', // too long
         undefined,
-      ].concat(ETHEREUM_BURN_ADDRESSES); // burn addresses
+      ].concat(EVM_BURN_ADDRESSES); // burn addresses
 
       it('returns undefined', () => {
         invalidIds.forEach((input) => {

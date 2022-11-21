@@ -18,9 +18,9 @@ const getNFTFactories = async (nfts: NFT[], dbClient: DBClient) => {
   if (nfts.length === 0) {
     throw new Error('Unexpected empty NFT array');
   }
-  const nftFactoryAddresses = _.uniq(nfts.map((n: NFT) => n.contractAddress));
-  const nftFactoryAddressesString = JSON.stringify(nftFactoryAddresses).replace(/\"/g, "'").replace('[', '(').replace(']', ')');
-  const query = `select * from "${Table.nftFactories}" where id in ${nftFactoryAddressesString}`
+  const nftFactoryIds = _.uniq(nfts.map((n: NFT) => n.nftFactoryId));
+  const nftFactoryIdsString = JSON.stringify(nftFactoryIds).replace(/\"/g, "'").replace('[', '(').replace(']', ')');
+  const query = `select * from "${Table.nftFactories}" where id in ${nftFactoryIdsString}`
   const nftFactories: NftFactory[] = fromDBRecords(Table.nftFactories, (await dbClient.rawSQL(
     query
   )).rows);
@@ -45,10 +45,10 @@ const processorFunction = (platform: MusicPlatform) => async (nfts: NFT[], clien
   }
   const platformClient = (clients as any)[platform.id];
   const nftFactories = await getNFTFactories(nfts, clients.db);
-  const nftsByFactoryId = _.groupBy(nfts, nft => nft.contractAddress);
+  const nftsByFactoryId = _.groupBy(nfts, nft => nft.nftFactoryId);
   const nftFactoriesById = _.keyBy(nftFactories, factory => factory.id);
   const nftsForApiTracks = nfts.filter(nft => {
-    const factory = nftFactoriesById[nft.contractAddress];
+    const factory = nftFactoriesById[nft.nftFactoryId];
     if (!factory) {
       throw new Error(`Unexpected nft with no factory: ${nft.id}`);
     }

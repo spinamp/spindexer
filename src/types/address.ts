@@ -1,5 +1,5 @@
-import { EthereumAddress } from './ethereum';
+import { EVMAddress } from './evm';
 
-export const formatAddress = (address: EthereumAddress) => {
+export const formatAddress = (address: EVMAddress) => {
   return address.toLowerCase();
 }

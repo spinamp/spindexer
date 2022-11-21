@@ -2,20 +2,17 @@ import assert from 'assert';
 
 import { DBClient, Table } from '../../src/db/db';
 import { Artist } from '../../src/types/artist';
+import { truncateDB } from '../helpers';
 
 import db from './../../src/db/sql-db';
 
 describe('DBClient', async () => {
   let dbClient: DBClient;
 
-  const truncateDB = async () => {
-    await dbClient.rawSQL(`TRUNCATE TABLE ${Object.values(Table).join(', ')} CASCADE;`);
-  }
-
   describe('insert with options to merge', async () => {
     before( async () => {
       dbClient = await db.init();
-      await truncateDB();
+      await truncateDB(dbClient);
     });
 
     it('only replaces previously undefined fields', async () => {

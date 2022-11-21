@@ -50,7 +50,7 @@ const mapTrack: MapTrack = (
     websiteUrl: resolveWebsiteUrl(nft, contract),
     artistId: mapArtistProfile({ apiTrack: apiTrack, nft: nft, contract: contract }).artistId,
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    createdAtBlockNumber: nft.createdAtBlockNumber,
     ...contract.typeMetadata?.overrides?.track
   };
 
@@ -75,7 +75,7 @@ const mapArtistProfile = ({ apiTrack, nft, contract }: { apiTrack: any, nft?: NF
     avatarUrl: resolveAvatarUrl(nft,contract),
     websiteUrl: resolveArtistWebsiteUrl(nft, contract),
     createdAtTime: nft.createdAtTime,
-    createdAtEthereumBlockNumber: nft.createdAtEthereumBlockNumber,
+    createdAtBlockNumber: nft.createdAtBlockNumber,
     ...contract.typeMetadata?.overrides?.artist
   }
 };

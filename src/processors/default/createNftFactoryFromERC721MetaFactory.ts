@@ -17,7 +17,7 @@ const processorFunction = (metaFactory: MetaFactory, name: string) =>
     }
     let factoryMetadata: unknown;
     if (metaFactoryContractType.metadataAPI) {
-      factoryMetadata = await metaFactoryContractType.metadataAPI(events, clients);
+      factoryMetadata = await metaFactoryContractType.metadataAPI(events, clients, metaFactory);
     }
     const eventToNftFactory = metaFactoryContractType.creationMetadataToNftFactory;
 
@@ -25,7 +25,7 @@ const processorFunction = (metaFactory: MetaFactory, name: string) =>
       throw `no creationMetadataToNftFactory specified for ${metaFactoryContractTypeName}`
     }
 
-    const newNftFactoryObjects = events.map(e => eventToNftFactory(e, metaFactory.autoApprove, factoryMetadata));
+    const newNftFactoryObjects = events.map(e => eventToNftFactory(e, metaFactory.autoApprove, metaFactory, factoryMetadata));
 
     await clients.db.insert(Table.nftFactories, newNftFactoryObjects);
     await clients.db.updateProcessor(name, newCursor);
@@ -36,5 +36,5 @@ Processor = (factoryContract: MetaFactory) => ({
   name: `${NAME}_${factoryContract.id}`,
   trigger: newERC721Contract(factoryContract),
   processorFunction: processorFunction(factoryContract, `${NAME}_${factoryContract.id}`),
-  initialCursor: JSON.stringify({ [factoryContract.id]: factoryContract.startingBlock }),
+  initialCursor: JSON.stringify({ [factoryContract.address]: factoryContract.startingBlock }),
 });

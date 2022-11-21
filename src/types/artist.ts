@@ -39,17 +39,17 @@ export const mapArtist = (artistProfile: ArtistProfile): Artist => {
     avatarUrl: artistProfile.avatarUrl,
     slug: slugify(`${artistProfile.name} ${artistProfile.createdAtTime.getTime()}`),
     createdAtTime: artistProfile.createdAtTime,
-    createdAtEthereumBlockNumber: artistProfile.createdAtEthereumBlockNumber
+    createdAtBlockNumber: artistProfile.createdAtBlockNumber
   }
 };
 
 export const distinctEarliestArtistProfiles = (artistProfiles: ArtistProfile[]): ArtistProfile[] => {
-  const [withBlock, withoutBlock] = _.partition(artistProfiles, profile => !!profile.createdAtEthereumBlockNumber);
+  const [withBlock, withoutBlock] = _.partition(artistProfiles, profile => !!profile.createdAtBlockNumber);
 
   const earliestDistinctProfiles = Object.values(
     _.mapValues(
       _.groupBy(withBlock, 'artistId'),
-      values => _.sortBy(values, 'createdAtEthereumBlockNumber')[0]
+      values => _.sortBy(values, 'createdAtBlockNumber')[0]
     )
   );
 

@@ -1,11 +1,14 @@
 import { Table } from '../db/db';
+import { ChainId } from '../types/chain';
 import { Trigger } from '../types/trigger';
 
-export const ethereumMissingCreatedAtTime: (tableName: Table) => Trigger<undefined> = (tableName: Table) => async (clients) => {
+export const evmMissingCreatedAtTime: (chainId: ChainId, tableName: Table) => Trigger<undefined> = 
+(chainId: ChainId, tableName: Table) => async (clients) => {
   const nfts = (await clients.db.getRecords(tableName,
     [
       ['whereNull', ['createdAtTime']],
-      ['whereNotNull', ['createdAtEthereumBlockNumber']],
+      ['whereNotNull', ['createdAtBlockNumber']],
+      ['andWhere', ['chainId', chainId]],
     ]
   )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return nfts;
@@ -71,11 +74,13 @@ export const NFTsWithoutTracks: (platformId: string, limit?: number) => Trigger<
     return nfts;
   };
 
-export const unprocessedNFTs: Trigger<undefined> = async (clients) => {
+export const unprocessedNFTs: (chainId: ChainId) => Trigger<undefined> =
+(chainId) => async (clients) => {
   const nfts = (await clients.db.rawSQL(
     `select * from "${Table.nfts}"
      where "tokenURI" is null
      and approved = true
+     and "chainId" = '${chainId}'
      limit ${parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)}
     `
   )).rows

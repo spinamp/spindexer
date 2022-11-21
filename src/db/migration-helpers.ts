@@ -6,7 +6,7 @@ import { MusicPlatform, MusicPlatformType } from '../types/platform';
 
 import { Table } from './db';
 import { toDBRecords } from './orm';
-import { overrides } from './views';
+import { overrides, tablesExcludedFromViews } from './views';
 
 export const addPlatform = async (knex: Knex, platform: MusicPlatform) => {
   const platformTypeCheckConstraintName = `${Table.platforms}_type_check`
@@ -133,10 +133,18 @@ export function tableNameToViewName(tableName: string): string {
 }
 
 export async function updateViews(knex: Knex){
-  const tables = Object.values(Table);
+  const tables = Object.values(Table).filter(table => !tablesExcludedFromViews.includes(table));
   const foreignKeys = await getForeignKeys(knex);
   const primaryKeys = await getPrimaryKeys(knex);
   const views = await getViews(knex);
+
+  // omit excluded tables
+  for (const table of tablesExcludedFromViews){
+    const hasTable = await knex.schema.hasTable(table);
+    if (hasTable){
+      await knex.raw(`comment on table ${table} is '@omit'`)
+    }
+  }
 
   // drop existing views
   for (const { view_name } of views){
@@ -169,7 +177,7 @@ export async function updateViews(knex: Knex){
     if (hasTable){
       const viewName = tableNameToViewName(table);
 
-      const foreigns = foreignKeys.filter(fk => fk.table_name === table)
+      const foreigns = foreignKeys.filter(fk => fk.table_name === table && !tablesExcludedFromViews.includes(fk.foreign_table_name))
       const foreignComments = foreigns.map(foreign => {
         return `@foreignKey ("${foreign.column_name}") references "${tableNameToViewName(foreign.foreign_table_name!)}" ("${foreign.foreign_column_name}")`
       })
