@@ -93,7 +93,11 @@ const type: MetaFactoryType = {
           artist: {
             name: apiMetadata.profile.handle,
             artistId: artistId(metaFactory.chainId,apiMetadata.profile.ownedBy),
+            websiteUrl: `https://lenster.xyz/u/${apiMetadata.profile.handle}`
           },
+          track: {
+            websiteUrl: `https://lenster.xyz/posts/${event.args!.profileId.toHexString()}-${event.args!.pubId.toHexString()}`
+          }
         }
       }
     }
