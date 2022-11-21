@@ -2,7 +2,8 @@
 import { artistId, slugify, solanaTrackId, trackId } from '../utils/identifiers';
 import { cleanURL, dropLeadingInfo, dropTrailingInfo } from '../utils/sanitizers';
 
-import { getTrait, NFT, NftFactory } from './nft';
+import { MimeEnum } from './media';
+import { getMedia, getTrait, NFT, NftFactory } from './nft';
 
 type Extractor = (nft: NFT) => string;
 type ParameterizedExtractor = (params: any) => Extractor;
@@ -44,6 +45,7 @@ export enum IdExtractorTypes {
 export enum AudioUrlExtractorTypes {
   METADATA_ANIMATION_URL = 'metadata.animation_url',
   ATTRIBUTES_TRAIT_AUDIO = 'attributes.trait.audio',
+  FIND_AUDIO_MEDIA = 'attributes.trait.get_media'
 }
 
 export enum ArtworkUrlExtractorTypes {
@@ -105,6 +107,7 @@ const titleExtractors: TitleExtractorMapping = {
 const audioUrlExtractors: AudioUrlExtractorMapping = {
   [AudioUrlExtractorTypes.METADATA_ANIMATION_URL]: (nft: NFT) => cleanURL(nft.metadata.animation_url),
   [AudioUrlExtractorTypes.ATTRIBUTES_TRAIT_AUDIO]: (nft: NFT) => cleanURL( getTrait(nft, 'Audio')),
+  [AudioUrlExtractorTypes.FIND_AUDIO_MEDIA]: (nft: NFT) => cleanURL(getMedia(nft, [MimeEnum.mp3, MimeEnum.wav, MimeEnum.xWav, MimeEnum.mp4, MimeEnum.quicktime]))
 }
 
 const websiteUrlExtractors: WebsiteUrlExtractorMapping = {

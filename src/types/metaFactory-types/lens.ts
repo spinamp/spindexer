@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { artistId } from '../../utils/identifiers';
 import { formatAddress } from '../address';
 import { getFactoryId } from '../chain';
-import { ArtistIdExtractorTypes, ArtistNameExtractorTypes, IdExtractorTypes, TitleExtractorTypes } from '../fieldExtractor';
+import { ArtistIdExtractorTypes, ArtistNameExtractorTypes, AudioUrlExtractorTypes, IdExtractorTypes, TitleExtractorTypes } from '../fieldExtractor';
 import { MetaFactoryType } from '../metaFactory';
 import { NFTContractTypeName } from '../nft';
 
@@ -88,11 +88,12 @@ const type: MetaFactoryType = {
             title: TitleExtractorTypes.METADATA_NAME,
             artistName: ArtistNameExtractorTypes.USE_ARTIST_NAME_OVERRIDE,
             artistId: ArtistIdExtractorTypes.USE_ARTIST_ID_OVERRIDE,
+            audioUrl: AudioUrlExtractorTypes.FIND_AUDIO_MEDIA
           },
           artist: {
             name: apiMetadata.profile.handle,
             artistId: artistId(metaFactory.chainId,apiMetadata.profile.ownedBy),
-          }
+          },
         }
       }
     }
