@@ -10,7 +10,7 @@ export enum MimeEnum {
   quicktime = 'video/quicktime'
 }
 
-export type MediaMetadata = {
+export type LensMediaMetadata = {
   item: string;
   type: MimeEnum;
   altTag?: string;
