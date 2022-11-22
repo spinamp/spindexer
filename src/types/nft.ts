@@ -147,7 +147,7 @@ export const getTraitType = (nft: NFT, value: string) => {
   return traitAttribute.trait_type;
 };
 
-export const getMedia = (nft: NFT, mimeTypes: MimeEnum[]) => {
+export const getLensMedia = (nft: NFT, mimeTypes: MimeEnum[]) => {
   if (!nft.metadata) {
     console.error({ nft })
     throw new Error('Missing nft metadata');
