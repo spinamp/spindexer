@@ -26,8 +26,6 @@ const init = async (
       timestampsByBlockNumber: { [blockNumber: string]: string },
       newBlocks: Block[] 
     }> => {
-      let timestampsByBlockNumber: { [blockNumber: string]: string } = {};
-
       const existingBlocks = await dbClient.getRecords<Block>(Table.blocks, [
         ['where', ['chainId', chainId]],
         ['whereIn', ['blockNumber', blockNumbers]]
@@ -40,15 +38,15 @@ const init = async (
 
       const blockNumbersParsed: number[] = missingBlockNumbers.map(blockNumber => parseInt(blockNumber))
 
-      const blocks = await evmClients[chainId].getBlockTimestampsByBlockNumber(blockNumbersParsed);
+      const newBlockTimestampsByBlockNumber = await evmClients[chainId].getBlockTimestampsByBlockNumber(blockNumbersParsed);
 
-      newBlocks = Object.keys(blocks).map(blockNumber => ({
+      newBlocks = Object.keys(newBlockTimestampsByBlockNumber).map(blockNumber => ({
         chainId,
         blockNumber,
-        timestamp: new Date(parseInt(blocks[blockNumber]) * 1000)
+        timestamp: new Date(parseInt(newBlockTimestampsByBlockNumber[blockNumber]) * 1000)
       }))
 
-      timestampsByBlockNumber = blocks
+      const timestampsByBlockNumber = newBlockTimestampsByBlockNumber
 
       for (const block of existingBlocks){
         const blockNumber = block.blockNumber.toString();
