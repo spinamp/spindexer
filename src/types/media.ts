@@ -10,6 +10,8 @@ export enum MimeEnum {
   quicktime = 'video/quicktime'
 }
 
+export const AudioAndVideoTypes = [MimeEnum.mp3, MimeEnum.wav, MimeEnum.xWav, MimeEnum.mp4, MimeEnum.quicktime]
+
 export type LensMediaMetadata = {
   item: string;
   type: MimeEnum;
