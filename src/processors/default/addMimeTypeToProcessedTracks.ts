@@ -1,5 +1,5 @@
 import { Table } from '../../db/db';
-import { missingMimeType } from '../../triggers/nonAudio';
+import { missingMimeType } from '../../triggers/missing';
 import { Clients, Processor } from '../../types/processor';
 import { ProcessedTrack, SourceIPFS } from '../../types/track';
 import { rollPromises } from '../../utils/rollingPromises';
@@ -14,7 +14,7 @@ export const addMimeTypeToProcessedTracks: (source: SourceIPFS) => Processor =
       const updatedMimeTypes = async (processedTrack: any) => {
         const id = processedTrack.id;
         const ipfsHash = processedTrack[`lossy${source}IPFSHash`];
-        const response = await clients.axios.head(`${process.env.IPFS_ENDPOINT}${ipfsHash}`, { timeout: 7000 })
+        const response = await clients.axios.head(`${process.env.IPFS_ENDPOINT}${ipfsHash}`, { timeout: parseInt(process.env.METADATA_REQUEST_TIMEOUT!) })
 
         const result: any = { id: id }
         result[`lossy${source}MimeType`] = response.headers['content-type'];
