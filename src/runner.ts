@@ -31,7 +31,7 @@ export const initClients = async (existingDBClient?: DBClient) => {
     evmClients[chain.id] = await evm.init(rpcUrl)
   }
 
-  const blocksClient = await blocks.init(evmClients);
+  const blocksClient = await blocks.init(evmClients, dbClient);
 
   return {
     evmChain: evmClients,
