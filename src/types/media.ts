@@ -7,6 +7,15 @@ export enum MimeEnum {
   jpeg = 'image/jpeg',
   png = 'image/png',
   pdf = 'application/pdf',
+  quicktime = 'video/quicktime'
+}
+
+export const AudioAndVideoTypes = [MimeEnum.mp3, MimeEnum.wav, MimeEnum.xWav, MimeEnum.mp4, MimeEnum.quicktime]
+
+export type LensMediaMetadata = {
+  item: string;
+  type: MimeEnum;
+  altTag?: string;
 }
 
 export const isMP4 = (mimeType?: MimeEnum) => {

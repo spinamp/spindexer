@@ -4,6 +4,7 @@ import { ArtistProfile } from './artist';
 import { ChainId } from './chain';
 import { Contract } from './contract';
 import { ExtractorTypes } from './fieldExtractor';
+import { LensMediaMetadata, MimeEnum } from './media';
 import { NFTFactoryTypes } from './nftFactory';
 import { MusicPlatformType } from './platform';
 import { Record } from './record';
@@ -144,4 +145,26 @@ export const getTraitType = (nft: NFT, value: string) => {
     throw new Error(`Trait value not found: ${value}`);
   }
   return traitAttribute.trait_type;
+};
+
+export const getLensMedia = (nft: NFT, mimeTypes: MimeEnum[]) => {
+  if (!nft.metadata) {
+    console.error({ nft })
+    throw new Error('Missing nft metadata');
+  }
+  if (!nft.metadata.media) {
+    console.error({ nft })
+    throw new Error('Missing media');
+  }
+  const traitAttribute = (nft.metadata.media as LensMediaMetadata[]).find((media: LensMediaMetadata) => {
+    if (!media || !media.type) {
+      console.dir({ nft, mimeTypes }, { depth: null })
+      throw new Error('Unknown media type');
+    }
+    return mimeTypes.map(mimeType => mimeType.toLowerCase()).includes(media.type.toLowerCase())
+  });
+  if (!traitAttribute) {
+    throw new Error(`Media not found: ${mimeTypes}`);
+  }
+  return traitAttribute.item;
 };
