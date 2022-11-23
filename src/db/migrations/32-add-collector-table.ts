@@ -3,6 +3,7 @@ import { Knex } from 'knex';
 
 import { Table } from '../db';
 import { tableNameToViewName, updateViews } from '../migration-helpers';
+import { overridesV1 } from '../views';
 
 export const up = async (knex: Knex) => {
   await knex.schema.createTable(Table.collectors, table => {
@@ -25,7 +26,7 @@ export const up = async (knex: Knex) => {
   await knex.raw(`GRANT SELECT ON "${Table.collectors}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
   await knex.raw(`GRANT SELECT ON "${Table.nftsCollectors}" TO ${process.env.POSTGRES_USERNAME_OPEN}`);
 
-  await updateViews(knex);
+  await updateViews(knex, overridesV1);
 }
 
 export const down = async (knex: Knex) => {
@@ -49,5 +50,5 @@ export const down = async (knex: Knex) => {
     table.dropColumn('burned');
   });
 
-  await updateViews(knex);
+  await updateViews(knex, overridesV1);
 }

@@ -6,7 +6,7 @@ import { MusicPlatform, MusicPlatformType } from '../types/platform';
 
 import { Table } from './db';
 import { toDBRecords } from './orm';
-import { overrides, tablesExcludedFromViews } from './views';
+import { tablesExcludedFromViews } from './views';
 
 export const addPlatform = async (knex: Knex, platform: MusicPlatform) => {
   const platformTypeCheckConstraintName = `${Table.platforms}_type_check`
@@ -132,7 +132,7 @@ export function tableNameToViewName(tableName: string): string {
   return tableName.substring(4)
 }
 
-export async function updateViews(knex: Knex){
+export async function updateViews(knex: Knex, overrides: { [table in Table]?: string; }){
   const tables = Object.values(Table).filter(table => !tablesExcludedFromViews.includes(table));
   const foreignKeys = await getForeignKeys(knex);
   const primaryKeys = await getPrimaryKeys(knex);

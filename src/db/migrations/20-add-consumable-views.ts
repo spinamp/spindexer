@@ -3,6 +3,7 @@ import { Knex } from 'knex';
 
 import { Table } from '../db';
 import { updateViews } from '../migration-helpers';
+import { overridesV1 } from '../views';
 
 enum oldTables {
   platforms = 'platforms',
@@ -43,7 +44,7 @@ export const up = async (knex: Knex) => {
     table.dropColumn('status')
   })
 
-  await updateViews(knex);
+  await updateViews(knex, overridesV1);
 }
 
 export const down = async (knex: Knex) => {
