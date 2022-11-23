@@ -16,7 +16,13 @@ http
       'public',
       {
         ownerConnectionString,
-        appendPlugins: [require('postgraphile-plugin-connection-filter')],
+        appendPlugins: [
+          require('postgraphile-plugin-connection-filter'),
+          require('@graphile-contrib/pg-order-by-related')
+        ],
+        graphileBuildOptions: {
+          connectionFilterRelations: true,
+        },
         watchPg: false,
         graphiql: true,
         enhanceGraphiql: true,
