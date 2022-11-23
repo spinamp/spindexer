@@ -13,8 +13,8 @@ export const up = async (knex: Knex) => {
 }
 
 export const down = async (knex: Knex) => {
-  await knex.schema.dropViewIfExists(tableNameToViewName(Table.mempool));
-  await knex.schema.alterTable(Table.mempool, table => {
+  await knex.schema.dropViewIfExists(tableNameToViewName(Table.processedTracks));
+  await knex.schema.alterTable(Table.processedTracks, table => {
     table.dropColumn('lossyArtworkMimeType');
     table.dropColumn('lossyAudioMimeType');
   });

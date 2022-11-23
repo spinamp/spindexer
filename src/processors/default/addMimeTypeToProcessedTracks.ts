@@ -1,8 +1,28 @@
 import { Table } from '../../db/db';
-import { missingMimeType } from '../../triggers/missing';
 import { Clients, Processor } from '../../types/processor';
-import { ProcessedTrack, SourceIPFS } from '../../types/track';
+import { ProcessedTrack } from '../../types/track';
+import { Trigger } from '../../types/trigger';
 import { rollPromises } from '../../utils/rollingPromises';
+
+export enum SourceIPFS {
+  AUDIO = 'Audio',
+  ARTWORK = 'Artwork'
+}
+
+export const missingMimeType: (source: SourceIPFS) => Trigger<undefined> = (source) => {
+  return async (clients) => {
+    const processedTracksQuery = `
+        select *
+        from "${Table.processedTracks}"
+        where "lossy${source}MimeType" is null
+        and "lossy${source}IPFSHash" is not null
+        limit ${process.env.QUERY_TRIGGER_BATCH_SIZE}
+    `;
+
+    const processedTracks = (await clients.db.rawSQL(processedTracksQuery)).rows;
+    return processedTracks;
+  }
+}
 
 export const addMimeTypeToProcessedTracks: (source: SourceIPFS) => Processor =
   (source) => ({

@@ -1,6 +1,5 @@
 import { Table } from '../db/db';
 import { ChainId } from '../types/chain';
-import { SourceIPFS } from '../types/track';
 import { Trigger } from '../types/trigger';
 
 export const evmMissingCreatedAtTime: (chainId: ChainId, tableName: Table) => Trigger<undefined> =
@@ -42,21 +41,6 @@ export const missingMetadataIPFSHash: Trigger<undefined> = async (clients) => {
   const nfts = (await clients.db.rawSQL(nftQuery)).rows
   return nfts;
 };
-
-export const missingMimeType: (source: SourceIPFS) => Trigger<undefined> = (source) => {
-  return async (clients) => {
-    const processedTracksQuery = `
-        select *
-        from "${Table.processedTracks}"
-        where "lossy${source}MimeType" is null
-        and "lossy${source}IPFSHash" is not null
-        limit ${process.env.QUERY_TRIGGER_BATCH_SIZE}
-    `;
-
-    const processedTracks = (await clients.db.rawSQL(processedTracksQuery)).rows;
-    return processedTracks;
-  }
-}
 
 export const NFTsWithoutTracks: (platformId: string, limit?: number) => Trigger<undefined> =
   (platformId: string, limit: number = parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)) => async (clients) => {
