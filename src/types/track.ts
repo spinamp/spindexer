@@ -13,6 +13,11 @@ export type NFTTrackJoin = {
   processedTrackId: string;
 }
 
+export enum SourceIPFS {
+  AUDIO = 'Audio',
+  ARTWORK = 'Artwork'
+}
+
 export type ProcessedTrackAudio = { lossyAudioURL: string } | { lossyAudioIPFSHash: string };
 export type ProcessedTrackArtwork = { lossyArtworkURL: string } | { lossyArtworkIPFSHash: string };
 

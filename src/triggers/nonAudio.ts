@@ -1,4 +1,5 @@
 import { Table } from '../db/db';
+import { SourceIPFS } from '../types/track';
 import { Trigger } from '../types/trigger';
 
 export const nonAudioMetadata: Trigger<undefined> = async (clients) => {
@@ -31,29 +32,19 @@ export const nonAudioMetadata: Trigger<undefined> = async (clients) => {
   return nfts;
 };
 
-export const missingLossyArtworkMimeType: Trigger<undefined> = async clients => {
-  const processedTracksQuery = `
-    select *
-    from "${Table.processedTracks}"
-    where "lossyArtworkMimeType" is null
-    and "lossyArtworkIPFSHash" is not null
-    limit ${process.env.QUERY_TRIGGER_BATCH_SIZE}
-`;
+export const missingMimeType: (source: SourceIPFS) => Trigger<undefined> = (source) =>
+{
+  return async (clients) => {
+    const processedTracksQuery = `
+        select *
+        from "${Table.processedTracks}"
+        where "lossy${source}MimeType" is null
+        and "lossy${source}IPFSHash" is not null
+        limit ${process.env.QUERY_TRIGGER_BATCH_SIZE}
+    `;
 
-  const processedTracks = (await clients.db.rawSQL(processedTracksQuery)).rows;
-  return processedTracks;
-};
+    const processedTracks = (await clients.db.rawSQL(processedTracksQuery)).rows;
+    return processedTracks;
 
-// TODO
-export const missingLossyAudioMimeType: Trigger<undefined> = async clients => {
-  const processedTracksQuery = `
-    select *
-    from "${Table.processedTracks}"
-    where "lossyAudioMimeType" is null
-    and "lossyAudioIPFSHash" is not null
-    limit ${process.env.QUERY_TRIGGER_BATCH_SIZE}
-`;
-
-  const processedTracks = (await clients.db.rawSQL(processedTracksQuery)).rows;
-  return processedTracks;
-};
+  }
+}

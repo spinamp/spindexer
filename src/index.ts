@@ -7,7 +7,7 @@ import { Table } from './db/db';
 import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
-import { addLossyArtworkMimeTypeToProcessedTracks, addLossyAudioMimeTypeToProcessedTracks } from './processors/default/addMimeTypeToProcessedTracks';
+import { addMimeTypeToProcessedTracks } from './processors/default/addMimeTypeToProcessedTracks';
 import { addTimestampFromMetadata } from './processors/default/addTimestampFromMetadata';
 import { addTimestampToERC721NFTs, addTimestampToERC721Transfers } from './processors/default/addTimestampToERC721NFTs';
 import { categorizeZora } from './processors/default/categorizeZora';
@@ -29,6 +29,7 @@ import { ChainId } from './types/chain';
 import { MetaFactory, MetaFactoryTypeName } from './types/metaFactory';
 import { NftFactory, NFTStandard } from './types/nft';
 import { API_PLATFORMS, MusicPlatform } from './types/platform';
+import { SourceIPFS } from './types/track';
 
 const PROCESSORS = (
   nftFactories: NftFactory[],
@@ -88,8 +89,8 @@ const PROCESSORS = (
     ipfsArtworkUploader,
     ipfsAudioPinner,
     ipfsArtworkPinner,
-    addLossyArtworkMimeTypeToProcessedTracks,
-    addLossyAudioMimeTypeToProcessedTracks,
+    addMimeTypeToProcessedTracks(SourceIPFS.ARTWORK),
+    addMimeTypeToProcessedTracks(SourceIPFS.AUDIO),
     errorProcessor,
   ]
 };
