@@ -45,6 +45,5 @@ export const missingMimeType: (source: SourceIPFS) => Trigger<undefined> = (sour
 
     const processedTracks = (await clients.db.rawSQL(processedTracksQuery)).rows;
     return processedTracks;
-
   }
 }

@@ -29,6 +29,8 @@ export type ProcessedTrack = Record & {
   description?: string;
   websiteUrl?: string;
   artistId: string;
+  lossyAudioMimeType?: string;
+  lossyArtworkMimeType?: string;
 } & ProcessedTrackAudio & ProcessedTrackArtwork;
 
 export const mergeProcessedTracks = async (newProcessedTracks: ProcessedTrack[], dbClient: DBClient, prioritizeNew: boolean) => {

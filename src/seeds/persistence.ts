@@ -1,12 +1,12 @@
 
 import { DBClient, Table } from '../db/db';
-import { EthereumAddress } from '../types/ethereum';
+import { EVMAddress } from '../types/evm';
 import { getCrdtUpdateMessage, getCrdtUpsertMessage } from '../types/message'
 
 import { AdminOperations, getCrdtContractApprovalMessage, MessagePayload, PublicOperations } from './types';
 import { validateMessage } from './validation';
 
-export const persistMessage = async (payload: MessagePayload, signer: EthereumAddress, dbClient: DBClient) => {
+export const persistMessage = async (payload: MessagePayload, signer: EVMAddress, dbClient: DBClient) => {
   if (!signer) {
     throw new Error('must specify a signer');
   }
