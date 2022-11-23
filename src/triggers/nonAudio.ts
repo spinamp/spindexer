@@ -30,3 +30,30 @@ export const nonAudioMetadata: Trigger<undefined> = async (clients) => {
   )).slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
   return nfts;
 };
+
+export const missingLossyArtworkMimeType: Trigger<undefined> = async clients => {
+  const processedTracksQuery = `
+    select *
+    from "${Table.processedTracks}"
+    where "lossyArtworkMimeType" is null
+    and "lossyArtworkIPFSHash" is not null
+    limit ${process.env.QUERY_TRIGGER_BATCH_SIZE}
+`;
+
+  const processedTracks = (await clients.db.rawSQL(processedTracksQuery)).rows;
+  return processedTracks;
+};
+
+// TODO
+export const missingLossyAudioMimeType: Trigger<undefined> = async clients => {
+  const processedTracksQuery = `
+    select *
+    from "${Table.processedTracks}"
+    where "lossyAudioMimeType" is null
+    and "lossyAudioIPFSHash" is not null
+    limit ${process.env.QUERY_TRIGGER_BATCH_SIZE}
+`;
+
+  const processedTracks = (await clients.db.rawSQL(processedTracksQuery)).rows;
+  return processedTracks;
+};

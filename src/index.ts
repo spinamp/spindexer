@@ -7,6 +7,7 @@ import { Table } from './db/db';
 import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
+import { addLossyArtworkMimeTypeToProcessedTracks, addLossyAudioMimeTypeToProcessedTracks } from './processors/default/addMimeTypeToProcessedTracks';
 import { addTimestampFromMetadata } from './processors/default/addTimestampFromMetadata';
 import { addTimestampToERC721NFTs, addTimestampToERC721Transfers } from './processors/default/addTimestampToERC721NFTs';
 import { categorizeZora } from './processors/default/categorizeZora';
@@ -87,6 +88,8 @@ const PROCESSORS = (
     ipfsArtworkUploader,
     ipfsAudioPinner,
     ipfsArtworkPinner,
+    addLossyArtworkMimeTypeToProcessedTracks,
+    addLossyAudioMimeTypeToProcessedTracks,
     errorProcessor,
   ]
 };
@@ -94,10 +97,10 @@ const PROCESSORS = (
 const updateDBLoop = async () => {
   const dbClient = await db.init();
   const nftFactories = await dbClient.getRecords<NftFactory>(Table.nftFactories);
-  
+
   const metafactories = await dbClient.getRecords<MetaFactory>(Table.metaFactories);
   const erc721MetaFactories = metafactories.filter(metaFactory => metaFactory.standard === NFTStandard.ERC721);
-  const candyMachines = metafactories.filter(metaFactory => metaFactory.standard === NFTStandard.METAPLEX && metaFactory.contractType === MetaFactoryTypeName.candyMachine) 
+  const candyMachines = metafactories.filter(metaFactory => metaFactory.standard === NFTStandard.METAPLEX && metaFactory.contractType === MetaFactoryTypeName.candyMachine)
 
   const musicPlatforms = await dbClient.getRecords<MusicPlatform>(Table.platforms);
   await runProcessors(PROCESSORS(nftFactories, erc721MetaFactories, musicPlatforms, candyMachines), dbClient);
