@@ -1,13 +1,12 @@
 import { Knex } from 'knex';
 
-import { overrides } from '../db/views';
 import { MetaFactory } from '../types/metaFactory';
 import { NftFactory } from '../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../types/platform';
 
 import { Table } from './db';
 import { toDBRecords } from './orm';
-import { tablesExcludedFromViews } from './views';
+import { overrides, tablesExcludedFromViews } from './views';
 
 export const addPlatform = async (knex: Knex, platform: MusicPlatform) => {
   const platformTypeCheckConstraintName = `${Table.platforms}_type_check`
