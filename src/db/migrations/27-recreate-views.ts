@@ -1,11 +1,9 @@
 
 import { Knex } from 'knex'
 
-import { updateViews } from '../migration-helpers'
-import { overridesV1 } from '../views';
 
 export const up = async (knex: Knex) => {
-  await updateViews(knex, overridesV1);
+  // old code recreated views
 }
 
 export const down = async (knex: Knex) => {

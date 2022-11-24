@@ -7,8 +7,6 @@ import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
 import { NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
 import { Table } from '../db';
-import { updateViews } from '../migration-helpers';
-import { overridesV1 } from '../views';
 
 const LENS_PLATFORM: MusicPlatform = {
   id: 'lens',
@@ -174,8 +172,6 @@ export const up = async (knex: Knex) => {
 
   await knex(Table.seeds).insert(platformMessage);
   await knex(Table.seeds).insert(metaFactoryMessage);
-
-  await updateViews(knex, overridesV1);
 }
 
 export const down = async (knex: Knex) => {

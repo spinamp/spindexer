@@ -1,5 +1,6 @@
 import { Knex } from 'knex';
 
+import { overrides } from '../db/views';
 import { MetaFactory } from '../types/metaFactory';
 import { NftFactory } from '../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../types/platform';
@@ -132,7 +133,7 @@ export function tableNameToViewName(tableName: string): string {
   return tableName.substring(4)
 }
 
-export async function updateViews(knex: Knex, overrides: { [table in Table]?: string; }){
+export async function updateViews(knex: Knex){
   const tables = Object.values(Table).filter(table => !tablesExcludedFromViews.includes(table));
   const foreignKeys = await getForeignKeys(knex);
   const primaryKeys = await getPrimaryKeys(knex);
