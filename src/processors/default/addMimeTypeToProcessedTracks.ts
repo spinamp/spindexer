@@ -10,12 +10,12 @@ export enum SourceIPFS {
   ARTWORK = 'Artwork'
 }
 
-type TrackNftJoin = ProcessedTrack & Partial<NFT>;
+export type TrackNftJoin = ProcessedTrack & Partial<NFT>;
 
 const TIMEOUT = parseInt(process.env.METADATA_REQUEST_TIMEOUT!)
 const QUERY_LIMIT = process.env.QUERY_TRIGGER_BATCH_SIZE
 
-export const missingMimeType: (source: SourceIPFS) => Trigger<undefined> = (source) => {
+const missingMimeType: (source: SourceIPFS) => Trigger<undefined> = (source) => {
   return async (clients) => {
     // find approved tracks (and the nftID) which are missing a mimeType; skipping any which have had errors
     const query = `select p.*, n.id as "nftId"
@@ -55,8 +55,10 @@ export const addMimeTypeToProcessedTracks: (source: SourceIPFS) => Processor =
         try {
           response = await clients.axios.head(`${process.env.IPFS_ENDPOINT}${ipfsHash}`, { timeout: TIMEOUT })
         } catch {
-
+          // TODO: error when request fails
         }
+
+        // TODO: error when bad response
 
         // TODO: error when content type is not MimeEnum
         const result: any = { id: id }
@@ -71,6 +73,7 @@ export const addMimeTypeToProcessedTracks: (source: SourceIPFS) => Processor =
       const updates = results.map(result => result.response)
 
       await clients.db.update(Table.processedTracks, updates);
+      // TODO: add errors to db
       // await clients.db.upsert(Table.nftProcessErrors, metadataErrors, 'nftId', ['metadataError']);
     },
     initialCursor: undefined
