@@ -83,6 +83,36 @@ describe('addMimeTypeToProcessedTracks', async () => {
         await setupFixtures();
       })
 
+      it('errors when a timeout happens', async () => {
+        const mock = new MockAdapter(clients.axios as any);
+        mock.onHead(/\/1xx/).timeout();
+
+        const triggerItems = await addMimeTypeToProcessedTracks(SourceIPFS.ARTWORK).trigger(clients, undefined);
+        await addMimeTypeToProcessedTracks(SourceIPFS.ARTWORK).processorFunction(triggerItems, clients);
+
+        const track: any = await dbClient.getRecords(Table.processedTracks, [['where', [ 'id', '11' ],]]);
+        assert(track[0].id === '11', `incorrect row returned, track was ${JSON.stringify(track[0])}`);
+        assert(track[0].lossyArtworkMimeType === null, `data should not be set on track: ${JSON.stringify(track[0])}`);
+
+        const savedErrors: any = await dbClient.getRecords(Table.nftProcessErrors, [['where', ['nftId', '1'],]]);
+        assert(savedErrors[0].metadataError === 'Error: failed to fetch Artwork mime type for ipfs hash: 1xx with error: timeout of 10000ms exceeded', `incorrect data was set on track: ${JSON.stringify(savedErrors[0])}`);
+      });
+
+      it('errors when returning a 400', async () => {
+        const mock = new MockAdapter(clients.axios as any);
+        mock.onHead(/\/1xx/).reply(400);
+
+        const triggerItems = await addMimeTypeToProcessedTracks(SourceIPFS.ARTWORK).trigger(clients, undefined);
+        await addMimeTypeToProcessedTracks(SourceIPFS.ARTWORK).processorFunction(triggerItems, clients);
+
+        const track: any = await dbClient.getRecords(Table.processedTracks, [['where', [ 'id', '11' ],]]);
+        assert(track[0].id === '11', `incorrect row returned, track was ${JSON.stringify(track[0])}`);
+        assert(track[0].lossyArtworkMimeType === null, `data should not be set on track: ${JSON.stringify(track[0])}`);
+
+        const savedErrors: any = await dbClient.getRecords(Table.nftProcessErrors, [['where', ['nftId', '1'],]]);
+        assert(savedErrors[0].metadataError === 'Error: failed to fetch Artwork mime type for ipfs hash: 1xx with error: Request failed with status code 400', `incorrect data was set on track: ${JSON.stringify(savedErrors[0])}`);
+      });
+
       it('errors when mime type is not valid', async () => {
         const mock = new MockAdapter(clients.axios as any);
         mock.onHead(/\/1xx/).reply(200, {}, { 'content-type': 'application/pdf' });
@@ -95,7 +125,7 @@ describe('addMimeTypeToProcessedTracks', async () => {
         assert(track[0].lossyArtworkMimeType === null, `data should not be set on track: ${JSON.stringify(track[0])}`);
 
         const savedErrors: any = await dbClient.getRecords(Table.nftProcessErrors, [['where', ['nftId', '1'],]]);
-        assert(savedErrors[0].metadataError === 'Invalid Artwork mime type: application/pdf', `incorrect data was set on track: ${JSON.stringify(savedErrors[0])}`);
+        assert(savedErrors[0].metadataError === 'Error: invalid Artwork mime type: application/pdf', `incorrect data was set on track: ${JSON.stringify(savedErrors[0])}`);
       });
 
       it('adds mime type to track when response is valid', async () => {

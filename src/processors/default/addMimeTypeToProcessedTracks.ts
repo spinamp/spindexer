@@ -48,27 +48,27 @@ export const addMimeTypeToProcessedTracks: (source: SourceIPFS) => Processor =
     processorFunction: async (input: TrackNftJoin[], clients: Clients) => {
       console.log(`Fetching processed track ${source} mime types`);
 
-      const metadataErrors: { metadataError: string, nftId: string }[] = [];
-
       const updatedMimeTypes = async (trackNftJoin: any) => {
         const ipfsHash = trackNftJoin[`lossy${source}IPFSHash`];
         let response: any;
+        let errorMsg: string | undefined = undefined;
+        let contentType: any = '';
 
         try {
           response = await clients.axios.head(`${process.env.IPFS_ENDPOINT}${ipfsHash}`, { timeout: TIMEOUT })
-        } catch {
-          // TODO: error when request fails
+          contentType = response.headers['content-type']
+        } catch (e: any) {
+          errorMsg = `Error: failed to fetch ${source} mime type for ipfs hash: ${ipfsHash} with error: ${e.message}`;
         }
 
-        const contentType = response.headers['content-type']
 
-        const result: any = { id: trackNftJoin.id, nftId: trackNftJoin.nftId, metadataError: undefined }
-
-        if (contentType && ArtworkTypes.includes(contentType)) {
-          result[`lossy${source}MimeType`] = contentType
-        } else {
-          result.metadataError = `Invalid ${source} mime type: ${contentType}`
+        if (contentType && !ArtworkTypes.includes(contentType)) {
+          errorMsg = `Error: invalid ${source} mime type: ${contentType}`
         }
+
+        const result: any = { id: trackNftJoin.id, nftId: trackNftJoin.nftId }
+        result.metadataError = errorMsg
+        result[`lossy${source}MimeType`] = contentType
 
         return result;
       }
