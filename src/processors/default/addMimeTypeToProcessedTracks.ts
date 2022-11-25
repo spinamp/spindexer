@@ -56,7 +56,7 @@ export const addMimeTypeToProcessedTracks: (source: SourceIPFS) => Processor =
 
         try {
           response = await clients.axios.head(`${process.env.IPFS_ENDPOINT}${ipfsHash}`, { timeout: TIMEOUT })
-          contentType = response.headers['content-type']
+          contentType = response.headers['content-type']?.toLowerCase();
         } catch (e: any) {
           errorMsg = `Error: failed to fetch ${source} mime type for ipfs hash: ${ipfsHash} with error: ${e.message}`;
         }
