@@ -1,18 +1,32 @@
+import _ from 'lodash';
+
 export enum MimeEnum {
+  // audio formats
   mp3 = 'audio/mpeg',
-  mp4 = 'video/mp4',
   wav = 'audio/wav',
   xWav = 'audio/x-wav',
+  // image formats
   gif = 'image/gif',
   jpeg = 'image/jpeg',
   jpg = 'image/jpg',
   png = 'image/png',
   pdf = 'application/pdf',
-  quicktime = 'video/quicktime'
+  // video formats
+  mp4 = 'video/mp4',
+  quicktime = 'video/quicktime',
+  m3u8 = 'application/x-mpegURL',
+  ts = 'video/MP2T',
+  m2ts = 'video/MP2T',
+  mts = 'video/MP2T',
+  mov = 'video/quicktime',
+  mkv = 'video/x-matroska',
+  mpd = 'application/dash+xml',
+  ogv = 'video/ogg',
+  webm = 'video/webm',
+  wmv = 'video/x-ms-wmv',
 }
 
-export const AudioAndVideoTypes = [MimeEnum.mp3, MimeEnum.wav, MimeEnum.xWav, MimeEnum.mp4, MimeEnum.quicktime]
-export const ArtworkTypes = [MimeEnum.gif, MimeEnum.jpeg, MimeEnum.png, MimeEnum.jpg, MimeEnum.mp4, MimeEnum.quicktime]
+export const AudioAndVideoTypes = _.uniq([MimeEnum.mp3, MimeEnum.wav, MimeEnum.xWav, MimeEnum.mp4, MimeEnum.quicktime, MimeEnum.m3u8, MimeEnum.ts, MimeEnum.m2ts, MimeEnum.mts, MimeEnum.mov, MimeEnum.mpd, MimeEnum.ogv, MimeEnum.webm, MimeEnum.wmv]);
 
 export type LensMediaMetadata = {
   item: string;

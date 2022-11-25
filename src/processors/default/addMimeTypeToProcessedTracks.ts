@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { Table } from '../../db/db';
-import { ArtworkTypes } from '../../types/media';
+import { MimeEnum } from '../../types/media';
 import { NFT } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 import { ProcessedTrack } from '../../types/track';
@@ -61,7 +61,7 @@ export const addMimeTypeToProcessedTracks: (source: SourceIPFS) => Processor =
           errorMsg = `Error: failed to fetch ${source} mime type for ipfs hash: ${ipfsHash} with error: ${e.message}`;
         }
 
-        if (contentType && !ArtworkTypes.includes(contentType)) {
+        if (contentType && !Object.values(MimeEnum).includes(contentType)) {
           errorMsg = `Error: invalid ${source} mime type: ${contentType} for ipfs hash: ${ipfsHash}`;
         }
 
