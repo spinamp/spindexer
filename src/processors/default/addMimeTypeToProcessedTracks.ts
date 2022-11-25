@@ -1,4 +1,7 @@
+import _ from 'lodash';
+
 import { Table } from '../../db/db';
+import { ArtworkTypes } from '../../types/media';
 import { NFT } from '../../types/nft';
 import { Clients, Processor } from '../../types/processor';
 import { ProcessedTrack } from '../../types/track';
@@ -42,14 +45,13 @@ export const addMimeTypeToProcessedTracks: (source: SourceIPFS) => Processor =
   (source) => ({
     name: `addLossy${source}MimeTypeToProcessedTracks`,
     trigger: missingMimeType(source),
-    processorFunction: async (processedTracks: TrackNftJoin[], clients: Clients) => {
+    processorFunction: async (input: TrackNftJoin[], clients: Clients) => {
       console.log(`Fetching processed track ${source} mime types`);
 
       const metadataErrors: { metadataError: string, nftId: string }[] = [];
 
-      const updatedMimeTypes = async (processedTrack: any) => {
-        const id = processedTrack.id;
-        const ipfsHash = processedTrack[`lossy${source}IPFSHash`];
+      const updatedMimeTypes = async (trackNftJoin: any) => {
+        const ipfsHash = trackNftJoin[`lossy${source}IPFSHash`];
         let response: any;
 
         try {
@@ -58,23 +60,38 @@ export const addMimeTypeToProcessedTracks: (source: SourceIPFS) => Processor =
           // TODO: error when request fails
         }
 
-        // TODO: error when bad response
+        const contentType = response.headers['content-type']
 
-        // TODO: error when content type is not MimeEnum
-        const result: any = { id: id }
-        result[`lossy${source}MimeType`] = response.headers['content-type'];
+        const result: any = { id: trackNftJoin.id, nftId: trackNftJoin.nftId, metadataError: undefined }
+
+        if (contentType && ArtworkTypes.includes(contentType)) {
+          result[`lossy${source}MimeType`] = contentType
+        } else {
+          result.metadataError = `Invalid ${source} mime type: ${contentType}`
+        }
+
         return result;
       }
 
       const results = await rollPromises<TrackNftJoin, any, void>(
-        processedTracks,
+        input,
         updatedMimeTypes,
       );
-      const updates = results.map(result => result.response)
+      // console.log(results);
 
-      await clients.db.update(Table.processedTracks, updates);
-      // TODO: add errors to db
-      // await clients.db.upsert(Table.nftProcessErrors, metadataErrors, 'nftId', ['metadataError']);
+      const [valid, invalid] = _.partition(results.map(result => result.response), el => el.metadataError === undefined);
+      const updates = valid.map(update => _.pick(update, ['id', `lossy${source}MimeType`]))
+      const errors = invalid.map(error => _.pick(error, ['nftId', 'metadataError']))
+
+      // console.log(updates)
+      // console.log(errors)
+
+      if (updates.length > 0) {
+        await clients.db.update(Table.processedTracks, updates);
+      }
+      if (errors.length > 0) {
+        await clients.db.upsert(Table.nftProcessErrors, errors, 'nftId');
+      }
     },
     initialCursor: undefined
   })

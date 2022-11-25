@@ -55,24 +55,49 @@ describe('addMimeTypeToProcessedTracks', async () => {
       { nftId: '5', processError: 'error' },
     ]
 
-    before( async () => {
+    const setupFixtures = async () => {
       await dbClient.insert<Partial<NFT>>(Table.nfts, nfts);
       await dbClient.insert<Partial<ProcessedTrack>>(Table.processedTracks, processedTracks);
       await dbClient.insert<Partial<NFTProcessError>>(Table.nftProcessErrors, errors);
       await dbClient.insert(Table.nfts_processedTracks, nftsProcessedTracks);
-    });
+    };
 
     describe('trigger', async () => {
+      before( async () => {
+        await truncateDB(dbClient);
+        await setupFixtures();
+      })
+
       it('trigger returns valid tracks without a mime type', async () => {
         const result: any = await addMimeTypeToProcessedTracks(SourceIPFS.ARTWORK).trigger(clients, undefined);
 
         assert(result.length === 1, `should only return 1 track based on test data, instead returned ids: ${ result ? result.map((t: any) => t.id) : 'none' }`);
-        assert(result[0].id === '11', `incorrect row returned, result was ${result[0]}`);
-        assert(result[0].nftId === '1', `incorrect row returned, result was ${result[0]}`);
+        assert(result[0].id === '11', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
+        assert(result[0].nftId === '1', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
       });
     });
 
     describe('processor', async () => {
+      beforeEach( async () => {
+        await truncateDB(dbClient);
+        await setupFixtures();
+      })
+
+      it('errors when mime type is not valid', async () => {
+        const mock = new MockAdapter(clients.axios as any);
+        mock.onHead(/\/1xx/).reply(200, {}, { 'content-type': 'application/pdf' });
+
+        const triggerItems = await addMimeTypeToProcessedTracks(SourceIPFS.ARTWORK).trigger(clients, undefined);
+        await addMimeTypeToProcessedTracks(SourceIPFS.ARTWORK).processorFunction(triggerItems, clients);
+
+        const track: any = await dbClient.getRecords(Table.processedTracks, [['where', [ 'id', '11' ],]]);
+        assert(track[0].id === '11', `incorrect row returned, track was ${JSON.stringify(track[0])}`);
+        assert(track[0].lossyArtworkMimeType === null, `data should not be set on track: ${JSON.stringify(track[0])}`);
+
+        const savedErrors: any = await dbClient.getRecords(Table.nftProcessErrors, [['where', ['nftId', '1'],]]);
+        assert(savedErrors[0].metadataError === 'Invalid Artwork mime type: application/pdf', `incorrect data was set on track: ${JSON.stringify(savedErrors[0])}`);
+      });
+
       it('adds mime type to track when response is valid', async () => {
         const mock = new MockAdapter(clients.axios as any);
         mock.onHead(/\/1xx/).reply(200, {}, { 'content-type': 'image/jpeg' });
@@ -82,8 +107,8 @@ describe('addMimeTypeToProcessedTracks', async () => {
 
         const result: any = await dbClient.getRecords(Table.processedTracks, [['where', [ 'id', '11' ],]]);
         assert(result.length === 1, `should only return 1 track based on test data, instead returned ids: ${ result ? result.map((t: any) => t.id) : 'none' }`);
-        assert(result[0].id === '11', `incorrect row returned, result was ${result[0]}`);
-        assert(result[0].lossyArtworkMimeType === 'image/jpeg', `incorrect row returned, result was ${result[0]}`);
+        assert(result[0].id === '11', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
+        assert(result[0].lossyArtworkMimeType === 'image/jpeg', `incorrect data was set on track: ${JSON.stringify(result[0])}`);
       });
     });
   })
