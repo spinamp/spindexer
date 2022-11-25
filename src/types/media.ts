@@ -5,12 +5,14 @@ export enum MimeEnum {
   xWav = 'audio/x-wav',
   gif = 'image/gif',
   jpeg = 'image/jpeg',
+  jpg = 'image/jpg',
   png = 'image/png',
   pdf = 'application/pdf',
   quicktime = 'video/quicktime'
 }
 
 export const AudioAndVideoTypes = [MimeEnum.mp3, MimeEnum.wav, MimeEnum.xWav, MimeEnum.mp4, MimeEnum.quicktime]
+export const ArtworkTypes = [MimeEnum.gif, MimeEnum.jpeg, MimeEnum.png, MimeEnum.jpg, MimeEnum.mp4, MimeEnum.quicktime]
 
 export type LensMediaMetadata = {
   item: string;
