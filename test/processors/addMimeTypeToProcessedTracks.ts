@@ -125,7 +125,7 @@ describe('addMimeTypeToProcessedTracks', async () => {
         assert(track[0].lossyArtworkMimeType === null, `data should not be set on track: ${JSON.stringify(track[0])}`);
 
         const savedErrors: any = await dbClient.getRecords(Table.nftProcessErrors, [['where', ['nftId', '1'],]]);
-        assert(savedErrors[0].metadataError === 'Error: invalid Artwork mime type: application/pdf', `incorrect data was set on track: ${JSON.stringify(savedErrors[0])}`);
+        assert(savedErrors[0].metadataError === 'Error: invalid Artwork mime type: application/pdf for ipfs hash: 1xx', `incorrect data was set on track: ${JSON.stringify(savedErrors[0])}`);
       });
 
       it('adds mime type to track when response is valid', async () => {

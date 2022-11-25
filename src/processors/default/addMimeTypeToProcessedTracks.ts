@@ -61,9 +61,8 @@ export const addMimeTypeToProcessedTracks: (source: SourceIPFS) => Processor =
           errorMsg = `Error: failed to fetch ${source} mime type for ipfs hash: ${ipfsHash} with error: ${e.message}`;
         }
 
-
         if (contentType && !ArtworkTypes.includes(contentType)) {
-          errorMsg = `Error: invalid ${source} mime type: ${contentType}`
+          errorMsg = `Error: invalid ${source} mime type: ${contentType} for ipfs hash: ${ipfsHash}`;
         }
 
         const result: any = { id: trackNftJoin.id, nftId: trackNftJoin.nftId }
@@ -77,14 +76,10 @@ export const addMimeTypeToProcessedTracks: (source: SourceIPFS) => Processor =
         input,
         updatedMimeTypes,
       );
-      // console.log(results);
 
       const [valid, invalid] = _.partition(results.map(result => result.response), el => el.metadataError === undefined);
       const updates = valid.map(update => _.pick(update, ['id', `lossy${source}MimeType`]))
       const errors = invalid.map(error => _.pick(error, ['nftId', 'metadataError']))
-
-      // console.log(updates)
-      // console.log(errors)
 
       if (updates.length > 0) {
         await clients.db.update(Table.processedTracks, updates);
