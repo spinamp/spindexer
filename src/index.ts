@@ -21,6 +21,7 @@ import { getERC721ContractFieldsProcessor } from './processors/default/getERC721
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
 import { insertSeedsIntoMempool } from './processors/default/insertSeedsIntoMempool';
 import { ipfsAudioUploader, ipfsArtworkUploader } from './processors/default/ipfsMediaUploader';
+import { ipfsMimeTypeProcessor } from './processors/default/ipfsMimeTypeProcessor';
 import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfsPinner';
 import { processMempoolInserts, processMempoolUpdates } from './processors/default/processMempool';
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
@@ -88,6 +89,7 @@ const PROCESSORS = (
     ipfsArtworkUploader,
     ipfsAudioPinner,
     ipfsArtworkPinner,
+    ipfsMimeTypeProcessor,
     addMimeTypeToProcessedTracks(SourceIPFS.ARTWORK),
     addMimeTypeToProcessedTracks(SourceIPFS.AUDIO),
     errorProcessor,
