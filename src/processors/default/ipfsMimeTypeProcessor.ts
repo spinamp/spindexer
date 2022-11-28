@@ -1,6 +1,6 @@
 
 import { Table } from '../../db/db';
-import { IPFSFile } from '../../types/ipfsFIle';
+import { IPFSFile } from '../../types/ipfsFile';
 import { MimeEnum } from '../../types/media';
 import { Clients, Processor } from '../../types/processor';
 import { Trigger } from '../../types/trigger';

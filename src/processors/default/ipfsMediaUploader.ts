@@ -1,7 +1,7 @@
 import { urlSource } from '../../clients/ipfs';
 import { Table } from '../../db/db';
 import { artworkNotOnIpfs, audioNotOnIpfs } from '../../triggers/ipfs';
-import { IPFSFile } from '../../types/ipfsFIle';
+import { IPFSFile } from '../../types/ipfsFile';
 import { Clients, Processor } from '../../types/processor';
 import { ProcessedTrack } from '../../types/track';
 import { rollPromises } from '../../utils/rollingPromises';
