@@ -12,9 +12,7 @@ export const overrides: {
     join "${Table.ipfsPins}" p1
     on t."lossyArtworkIPFSHash" = p1.id
     where "lossyArtworkIPFSHash" is not null
-    and "lossyArtworkMimeType" is not null
     and "lossyAudioIPFSHash" is not null
-    and "lossyAudioMimeType" is not null
     `
 }
 

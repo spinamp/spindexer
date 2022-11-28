@@ -7,7 +7,6 @@ import { Table } from './db/db';
 import db from './db/sql-db';
 import { addMetadataIPFSHashProcessor } from './processors/default/addMetadataIPFSHash';
 import { addMetadataObjectProcessor } from './processors/default/addMetadataObject';
-import { addMimeTypeToProcessedTracks, SourceIPFS } from './processors/default/addMimeTypeToProcessedTracks';
 import { addTimestampFromMetadata } from './processors/default/addTimestampFromMetadata';
 import { addTimestampToERC721NFTs, addTimestampToERC721Transfers } from './processors/default/addTimestampToERC721NFTs';
 import { categorizeZora } from './processors/default/categorizeZora';
@@ -90,8 +89,6 @@ const PROCESSORS = (
     ipfsAudioPinner,
     ipfsArtworkPinner,
     ipfsMimeTypeProcessor,
-    addMimeTypeToProcessedTracks(SourceIPFS.ARTWORK),
-    addMimeTypeToProcessedTracks(SourceIPFS.AUDIO),
     errorProcessor,
   ]
 };
