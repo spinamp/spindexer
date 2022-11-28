@@ -3,8 +3,8 @@ import { errorRetry, soundPremintErrors } from '../../triggers/errors';
 import { NFTProcessError } from '../../types/nftProcessError';
 import { Clients, Processor } from '../../types/processor';
 
-export const errorProcessor: Processor = {
-  name: 'errorProcessor',
+export const nftErrorProcessor: Processor = {
+  name: 'nftErrorProcessor',
   trigger: errorRetry,
   processorFunction: async (nftErrors: NFTProcessError[], clients: Clients) => {
     const errorUpdates: NFTProcessError[] = nftErrors.map((n) => ({

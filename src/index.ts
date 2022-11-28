@@ -15,15 +15,16 @@ import { createNftFactoryFromERC721MetaFactoryProcessor } from './processors/def
 import { createNftsFromCandyMachine } from './processors/default/createNftFromCandyMachine';
 import { createNinaNfts } from './processors/default/createNinaNftProcesor';
 import { createProcessedTracksFromAPI } from './processors/default/createProcessedTracksFromAPI';
-import { errorAndMetadataResetProcessor, errorProcessor } from './processors/default/errorProcessor';
+import { errorAndMetadataResetProcessor, nftErrorProcessor } from './processors/default/errorProcessor';
 import { getERC721ContractFieldsProcessor } from './processors/default/getERC721ContractFieldsProcessor';
 import { getERC721TokenFieldsProcessor } from './processors/default/getERC721TokenFieldsProcessor';
 import { insertSeedsIntoMempool } from './processors/default/insertSeedsIntoMempool';
 import { ipfsAudioUploader, ipfsArtworkUploader } from './processors/default/ipfsMediaUploader';
-import { ipfsMimeTypeProcessor } from './processors/default/ipfsMimeTypeProcessor';
 import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfsPinner';
 import { processMempoolInserts, processMempoolUpdates } from './processors/default/processMempool';
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
+import { ipfsFileErrorRetry } from './processors/ipfsFile/errorProcessor';
+import { ipfsMimeTypeProcessor } from './processors/ipfsFile/mimeTypeProcessor';
 import { runProcessors } from './runner';
 import { ChainId } from './types/chain';
 import { MetaFactory, MetaFactoryTypeName } from './types/metaFactory';
@@ -88,8 +89,9 @@ const PROCESSORS = (
     ipfsArtworkUploader,
     ipfsAudioPinner,
     ipfsArtworkPinner,
+    ipfsFileErrorRetry,
     ipfsMimeTypeProcessor,
-    errorProcessor,
+    nftErrorProcessor,
   ]
 };
 

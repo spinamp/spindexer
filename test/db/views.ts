@@ -34,7 +34,7 @@ describe('views', async () => {
     { id: 'noAudioMimeType', requestId: '9' },
   ]
 
-  const processedTracks = [
+  const processedTracks: Partial<ProcessedTrack>[] = [
     { id: '11', lossyArtworkIPFSHash: '1xx', lossyAudioIPFSHash: '3xx' },
     { id: '22', lossyArtworkIPFSHash: '4xx', lossyAudioIPFSHash: undefined }, // skips undefined
     { id: '33', lossyArtworkIPFSHash: undefined, lossyAudioIPFSHash: '5xx' }, // skips undefined

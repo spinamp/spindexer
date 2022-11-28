@@ -3,7 +3,7 @@ import assert from 'assert';
 import MockAdapter from 'axios-mock-adapter';
 
 import { DBClient, Table } from '../../src/db/db';
-import { ipfsMimeTypeProcessor } from '../../src/processors/default/ipfsMimeTypeProcessor';
+import { ipfsMimeTypeProcessor } from '../../src/processors/ipfsFile/mimeTypeProcessor';
 import { initClients } from '../../src/runner';
 import { IPFSFile } from '../../src/types/ipfsFile';
 import { Clients } from '../../src/types/processor';

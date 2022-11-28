@@ -3,4 +3,6 @@ export type IPFSFile = {
   cid?: string;
   mimeType?: string;
   error?: string;
+  numberOfRetries?: number;
+  lastRetry?: Date;
 }
