@@ -1,4 +1,8 @@
+
+import axios from 'axios';
 import _ from 'lodash';
+
+import { IPFSFile } from './ipfsFile';
 
 export enum MimeEnum {
   // audio formats
@@ -53,3 +57,41 @@ export const isGif = (mimeType?: MimeEnum) => {
 
   return mimeType === MimeEnum.gif;
 };
+
+// perform HEAD request on IPFS file CID to resolve `mimeType`, along with `isAudio`, `isVideo`, `isImage` flags
+export const updateMimeTypes = async (ipfsFile: IPFSFile) => {
+  const ipfsHash = ipfsFile.cid;
+  let response: any;
+  let errorMsg: string | undefined = undefined;
+  let contentType: any = '';
+
+  try {
+    response = await axios.head(`${process.env.IPFS_ENDPOINT}${ipfsHash}`, { timeout: parseInt(process.env.METADATA_REQUEST_TIMEOUT!) })
+    contentType = response.headers['content-type']?.toLowerCase();
+  } catch (e: any) {
+    errorMsg = `Error: failed to fetch mime type for ipfs hash: ${ipfsHash} with error: ${e.message}`;
+  }
+
+  if (contentType && !Object.values(MimeEnum).includes(contentType)) {
+    errorMsg = `Error: unsupported mime type '${contentType}' for ipfs hash: ${ipfsHash}`;
+  }
+
+  const updated = ipfsFile;
+
+  if (errorMsg) {
+    updated.error = errorMsg;
+  } else {
+    updated.mimeType = contentType;
+    if (AudioTypes.includes(contentType)) {
+      updated.isAudio = true;
+    }
+    if (VideoTypes.includes(contentType)) {
+      updated.isVideo = true;
+    }
+    if (ImageTypes.includes(contentType)) {
+      updated.isImage = true;
+    }
+  }
+
+  return updated;
+}
