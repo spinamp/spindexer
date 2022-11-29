@@ -11,11 +11,11 @@ export enum MimeEnum {
   aiff = 'audio/aiff',
   flac = 'audio/flac',
   m4a = 'audio/m4a',
-  ogg = 'audio/ogg',
-  opus = 'audio/opus',
   mpeg = 'audio/mpeg',
   mpeg3 = 'audio/mpeg3',
   mp3 = 'audio/mpeg',
+  ogg = 'audio/ogg',
+  opus = 'audio/opus',
   wav = 'audio/wav',
   xAac = 'audio/x-aac',
   xAiff = 'audio/x-aiff',
@@ -44,7 +44,7 @@ export enum MimeEnum {
   wmv = 'video/x-ms-wmv',
 }
 
-export const AudioTypes = [MimeEnum.aac, MimeEnum.aiff, MimeEnum.flac, MimeEnum.m4a, MimeEnum.ogg, MimeEnum.opus, MimeEnum.mpeg, MimeEnum.mpeg3, MimeEnum.mp3, MimeEnum.wav, MimeEnum.xAac, MimeEnum.xAiff, MimeEnum.xMpeg, MimeEnum.xWav]
+export const AudioTypes = _.uniq([MimeEnum.aac, MimeEnum.aiff, MimeEnum.flac, MimeEnum.m4a, MimeEnum.ogg, MimeEnum.opus, MimeEnum.mpeg, MimeEnum.mpeg3, MimeEnum.mp3, MimeEnum.wav, MimeEnum.xAac, MimeEnum.xAiff, MimeEnum.xMpeg, MimeEnum.xWav]);
 export const ImageTypes = [MimeEnum.gif, MimeEnum.jpeg, MimeEnum.jpg, MimeEnum.png, MimeEnum.pdf];
 export const VideoTypes = _.uniq([MimeEnum.mp4, MimeEnum.quicktime, MimeEnum.m3u8, MimeEnum.ts, MimeEnum.m2ts, MimeEnum.m4v, MimeEnum.mts, MimeEnum.mov, MimeEnum.mkv, MimeEnum.mpd, MimeEnum.ogv, MimeEnum.webm, MimeEnum.wmv]);
 
