@@ -7,7 +7,7 @@ import { Trigger } from '../../types/trigger';
 import { rollPromises } from '../../utils/rollingPromises';
 
 const TIMEOUT = parseInt(process.env.METADATA_REQUEST_TIMEOUT!)
-const QUERY_LIMIT = process.env.QUERY_TRIGGER_BATCH_SIZE
+const QUERY_LIMIT = process.env.IPFS_METADATA_REQUEST_BATCH_SIZE || process.env.QUERY_TRIGGER_BATCH_SIZE
 
 const missingMimeType: Trigger<undefined> = async (clients) => {
   const query = `select * from "${Table.ipfsFiles}"
