@@ -11,15 +11,18 @@ describe('views', async () => {
   let dbClient: DBClient;
 
   const ipfsFiles: IPFSFile[] = [
-    { url: 'https://spinamp.xyz/1xx', cid: '1xx', mimeType: 'image/jpeg' },
-    { url: 'https://spinamp.xyz/2xx', cid: undefined, mimeType: 'image/jpeg' }, // undefined cid skipped later
-    { url: 'https://spinamp.xyz/3xx', cid: '3xx', mimeType: 'image/jpeg' },
-    { url: 'https://spinamp.xyz/4xx', cid: '4xx', mimeType: 'image/jpeg' },
-    { url: 'https://spinamp.xyz/5xx', cid: '5xx', mimeType: 'image/jpeg' },
-    { url: 'https://spinamp.xyz/6xx', cid: '6xx', mimeType: 'image/jpeg' },
-    { url: 'https://spinamp.xyz/7xx', cid: '7xx', mimeType: 'image/jpeg' },
+    { url: 'https://spinamp.xyz/1xx', cid: '1xx', mimeType: 'image/jpeg', isImage: true },
+    { url: 'https://spinamp.xyz/2xx', cid: undefined, mimeType: 'image/jpeg', isImage: true }, // undefined cid skipped later
+    { url: 'https://spinamp.xyz/3xx', cid: '3xx', mimeType: 'audio/wav', isAudio: true },
+    { url: 'https://spinamp.xyz/4xx', cid: '4xx', mimeType: 'image/jpeg', isImage: true },
+    { url: 'https://spinamp.xyz/5xx', cid: '5xx', mimeType: 'audio/wav', isAudio: true },
+    { url: 'https://spinamp.xyz/6xx', cid: '6xx', mimeType: 'image/jpeg', isImage: true },
+    { url: 'https://spinamp.xyz/7xx', cid: '7xx', mimeType: 'image/jpeg', isImage: true },
     { url: 'https://spinamp.xyz/noArtworkMimeType', cid: 'noArtworkMimeType' }, // no mime type skipped later
     { url: 'https://spinamp.xyz/noAudioMimeType', cid: 'noAudioMimeType' }, // no mime type skipped later
+    { url: 'https://spinamp.xyz/mismatchedAudio', cid: 'mismatchedAudio', mimeType: 'audio/wav', isAudio: true }, // mismatched audio is skipped later
+    { url: 'https://spinamp.xyz/mismatchedImage', cid: 'mismatchedImage' , mimeType: 'image/jpeg', isImage: true }, // mismatched image is skipped later
+    { url: 'https://spinamp.xyz/video', cid: 'video' , mimeType: 'video/webm', isVideo: true },
   ]
 
   const ipfsPins = [
@@ -32,6 +35,9 @@ describe('views', async () => {
     { id: '7xx', requestId: '7' },
     { id: 'noArtworkMimeType', requestId: '8' },
     { id: 'noAudioMimeType', requestId: '9' },
+    { id: 'mismatchedAudio', requestId: '10' },
+    { id: 'mismatchedImage', requestId: '11' },
+    { id: 'video', requestId: '12' },
   ]
 
   const processedTracks: Partial<ProcessedTrack>[] = [
@@ -41,6 +47,9 @@ describe('views', async () => {
     { id: '44', lossyArtworkIPFSHash: 'noArtworkMimeType', lossyAudioIPFSHash: '6xx' }, // skips when missing artwork mimetype
     { id: '55', lossyArtworkIPFSHash: '7xx', lossyAudioIPFSHash: 'noAudioMimeType' }, // skips when missing audio mimetype
     { id: '66', lossyArtworkIPFSHash: '1xx', lossyAudioIPFSHash: '2xx' }, // skips undefined cid on ipfsFiles
+    { id: '77', lossyArtworkIPFSHash: '1xx', lossyAudioIPFSHash: 'mismatchedImage' }, // skips mismatched audio
+    { id: '88', lossyArtworkIPFSHash: 'mismatchedAudio', lossyAudioIPFSHash: 'mismatchedImage' }, // skips mismatched audio
+    { id: '99', lossyArtworkIPFSHash: 'video', lossyAudioIPFSHash: 'video' },
   ]
 
   const setupFixtures = async () => {
@@ -64,8 +73,9 @@ describe('views', async () => {
       const tracks: any = await dbClient.rawSQL('SELECT * FROM processed_tracks');
       const result = tracks.rows;
 
-      assert(result.length === 1, `should only return 1 track based on test data, instead returned ids: ${ result.length > 0 ? result.map((t: any) => t.id) : 'none' }`);
+      assert(result.length === 2, `should only return 2 tracks based on test data, instead returned ids: ${ result.length > 0 ? result.map((t: any) => t.id) : 'none' }`);
       assert(result[0].id === '11', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
+      assert(result[1].id === '99', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
     });
   });
 })

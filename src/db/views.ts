@@ -19,8 +19,8 @@ export const overrides: {
 
     where t."lossyArtworkIPFSHash" is not null
     and t."lossyAudioIPFSHash" is not null
-    and audio_file."mimeType" is not null
-    and artwork_file."mimeType" is not null
+    and (audio_file."mimeType" is not null and (audio_file."isAudio" = true or audio_file."isVideo" = true))
+    and (artwork_file."mimeType" is not null and (artwork_file."isImage" = true or artwork_file."isVideo" = true))
     `
 }
 
