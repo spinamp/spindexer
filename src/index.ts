@@ -69,6 +69,7 @@ const PROCESSORS = (
   return [
     insertSeedsIntoMempool,
     errorAndMetadataResetProcessor,
+    nftErrorProcessor,
     ...tableInsertsMempoolProcessors,
     ...tableUpdatesMempoolProcessors,
     ...erc721MetaFactoryProcessors,
@@ -91,7 +92,6 @@ const PROCESSORS = (
     ipfsArtworkPinner,
     ipfsFileErrorRetry,
     ipfsMimeTypeProcessor,
-    nftErrorProcessor,
   ]
 };
 

@@ -14,7 +14,7 @@ export const nftErrorProcessor: Processor = {
       numberOfRetries: (n.numberOfRetries ?? 0) + 1,
       lastRetry: new Date()
     }));
-    await clients.db.upsert(Table.nftProcessErrors, errorUpdates, 'nftId');
+    await clients.db.upsert(Table.nftProcessErrors, errorUpdates, 'nftId', undefined, true);
   },
   initialCursor: undefined
 };
