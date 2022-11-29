@@ -11,7 +11,35 @@ import { cleanURL } from '../../utils/sanitizers';
 
 const name = 'addMetadataObject';
 
-const getMetadataObject = async (nft: NFT, timeout: number, axios: Axios, ipfs: IPFSClient, erc721ContractsByAddress: { [key: string]: NftFactory }): Promise<{
+export const getMetadataFromURI = async (uri: string, axios: Axios, timeout: number) => {
+  if (uri.startsWith('data:application/json;base64,')) {
+    try {
+      const base64 = uri.substring(uri.indexOf(',') + 1);
+      const data = Buffer.from(base64, 'base64').toString('utf-8')
+      const metadata = JSON.parse(data);
+      return { data: metadata };
+    } catch (e: any){
+      return {
+        error: e.toString()
+      }
+    }
+  }
+
+  const queryURL = cleanURL(uri);
+  try {
+    const response = await axios.get(queryURL, { timeout });
+    return {
+      data: response.data
+    }
+  } catch (e: any){
+    return {
+      error: e.toString()
+    }
+  }
+
+}
+
+const getNFTMetadata = async (nft: NFT, timeout: number, axios: Axios, ipfs: IPFSClient, erc721ContractsByAddress: { [key: string]: NftFactory }): Promise<{
   metadata?: any,
   metadataError?: any
 }> => {
@@ -19,47 +47,27 @@ const getMetadataObject = async (nft: NFT, timeout: number, axios: Axios, ipfs: 
   const contract = erc721ContractsByAddress[address];
   const contractTypeName = contract?.contractType;
 
-  const metadataURL = getMetadataURL(nft, contractTypeName);
-  if (!metadataURL) {
+  let uri = getMetadataURL(nft, contractTypeName);
+  if (!uri) {
     return Promise.reject({ message: `Metadata metadataURL missing` });
   }
-
-  if (metadataURL.startsWith('data:application/json;base64,')){
-    try {
-      const base64 = metadataURL.substring(metadataURL.indexOf(',') + 1);
-      const data = Buffer.from(base64, 'base64').toString('utf-8')
-      const metadata = JSON.parse(data);
-      return { metadata };
-    } catch (e: any){
-      return {
-        metadataError: e.toString()
-      }
-    }
-  }
-
-  let queryURL = cleanURL(metadataURL);
   if (nft.metadataIPFSHash) {
-    queryURL = ipfs.getHTTPURL(nft.metadataIPFSHash);
+    uri = ipfs.getHTTPURL(nft.metadataIPFSHash);
   }
 
-  console.info(`Querying for metadata for nft id ${nft.id}: ${queryURL}`)
-  try {
-    const response = await axios.get(queryURL, { timeout });
-    return {
-      metadata: response.data
-    }
-  } catch (e: any){
-    return {
-      metadataError: e.toString()
-    }
-  }
+  console.info(`Querying for metadata for nft id ${nft.id}: ${uri}`)
+  const response = await getMetadataFromURI(uri, axios, timeout);
 
+  return {
+    metadata: response.data,
+    metadataError: response.error
+  };
 }
 
 const processorFunction = (erc721ContractsByAddress: { [key: string]: NftFactory }) => async (batch: NFT[], clients: Clients) => {
 
   const processMetadataResponse = (nft: NFT) =>
-    getMetadataObject(nft, parseInt(process.env.METADATA_REQUEST_TIMEOUT!), clients.axios, clients.ipfs, erc721ContractsByAddress);
+    getNFTMetadata(nft, parseInt(process.env.METADATA_REQUEST_TIMEOUT!), clients.axios, clients.ipfs, erc721ContractsByAddress);
 
   const results = await rollPromises<NFT, { metadata?: any, metadataError?: any }, any>(batch, processMetadataResponse);
 
