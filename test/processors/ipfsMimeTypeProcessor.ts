@@ -113,6 +113,8 @@ describe('ipfsMimeTypeProcessor', async () => {
       assert(files[0].cid === '1xx', `incorrect row returned, file was ${JSON.stringify(files[0])}`);
       assert(files[0].mimeType === MimeEnum.jpg, `incorrect data was set on file: ${JSON.stringify(files[0])}`);
       assert(files[0].isImage === true, `incorrect data was set on file: ${JSON.stringify(files[0])}`);
+      assert(files[0].isVideo === false, `incorrect data was set on file: ${JSON.stringify(files[0])}`);
+      assert(files[0].isAudio === false, `incorrect data was set on file: ${JSON.stringify(files[0])}`);
     });
   });
 })

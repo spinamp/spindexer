@@ -82,15 +82,9 @@ export const updateMimeTypes = async (ipfsFile: IPFSFile) => {
     updated.error = errorMsg;
   } else {
     updated.mimeType = contentType;
-    if (AudioTypes.includes(contentType)) {
-      updated.isAudio = true;
-    }
-    if (VideoTypes.includes(contentType)) {
-      updated.isVideo = true;
-    }
-    if (ImageTypes.includes(contentType)) {
-      updated.isImage = true;
-    }
+    updated.isAudio = AudioTypes.includes(contentType) ? true : false;
+    updated.isVideo = VideoTypes.includes(contentType) ? true : false;
+    updated.isImage = ImageTypes.includes(contentType) ? true : false;
   }
 
   return updated;
