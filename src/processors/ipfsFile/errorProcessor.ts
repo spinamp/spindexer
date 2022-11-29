@@ -5,7 +5,7 @@ import { Trigger } from '../../types/trigger';
 
 const NUMBER_OF_RETRIES = parseInt(process.env.NUMBER_OF_ERROR_RETRIES!);
 
-export const ipfsFilesWithErrors: Trigger<undefined> = async (clients) => {
+const ipfsFilesWithErrors: Trigger<undefined> = async (clients) => {
   const query = `select * from "${Table.ipfsFiles}"
       where "error" is not null
       and ("mimeType" is null or "cid" is null)
@@ -29,7 +29,7 @@ export const ipfsFileErrorRetry: Processor = {
       numberOfRetries: (ipfsFile.numberOfRetries ?? 0) + 1,
       lastRetry: new Date()
     }));
-    await clients.db.update(Table.ipfsFiles, errorUpdates, 'url');
+    await clients.db.upsert(Table.ipfsFiles, errorUpdates, 'url', undefined, true);
   },
   initialCursor: undefined
 }
