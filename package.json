@@ -30,6 +30,7 @@
     "restore-full-db": "source .env && PGPASSWORD=$POSTGRES_PASSWORD pg_restore ./db/dump  -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME --create --clean --if-exists --verbose --verbose -F d -d postgres",
     "reset-db": "yarn drop-db && yarn restore-full-db",
     "reset-db-minimal": "yarn drop-db && yarn create-db && yarn migrate-latest && yarn restore-db-table raw_ipfs_pins && yarn restore-db-table raw_ipfs_files",
+    "reset-db-views": "source .env && ts-node scripts/reset_db_views.ts",
     "restore-db-table": "source .env && PGPASSWORD=$POSTGRES_PASSWORD pg_restore ./db/dump  -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME --verbose --verbose -F d -d $POSTGRES_DATABASE --data-only -t",
     "restore-seeds": "source .env && PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USERNAME -d $POSTGRES_DATABASE -f db/seeds.dump",
     "knex": "source .env && npx knex --knexfile ./db/../src/db/knexfile.ts --connection postgresql://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DATABASE",
