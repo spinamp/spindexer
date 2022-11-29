@@ -27,6 +27,12 @@ function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', rep
         delete trackWithFile['url']
         delete trackWithFile['error'];
         delete trackWithFile['cid'];
+        delete trackWithFile['mimeType'];
+        delete trackWithFile['isAudio'];
+        delete trackWithFile['isVideo'];
+        delete trackWithFile['isImage'];
+        delete trackWithFile['numberOfRetries'];
+        delete trackWithFile['lastRetry'];
 
         const track: ProcessedTrack = {
           ...trackWithFile
