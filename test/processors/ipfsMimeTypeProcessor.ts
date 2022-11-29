@@ -6,6 +6,7 @@ import { DBClient, Table } from '../../src/db/db';
 import { ipfsMimeTypeProcessor } from '../../src/processors/ipfsFile/mimeTypeProcessor';
 import { initClients } from '../../src/runner';
 import { IPFSFile } from '../../src/types/ipfsFile';
+import { MimeEnum } from '../../src/types/media';
 import { Clients } from '../../src/types/processor';
 import { truncateDB } from '../helpers'
 
@@ -103,14 +104,15 @@ describe('ipfsMimeTypeProcessor', async () => {
 
     it('adds mime type to file when response is valid', async () => {
       const mock = new MockAdapter(clients.axios as any);
-      mock.onHead(/\/1xx/).reply(200, {}, { 'content-type': 'image/jpeg' });
+      mock.onHead(/\/1xx/).reply(200, {}, { 'content-type': MimeEnum.jpg });
 
       const triggerItems = await ipfsMimeTypeProcessor.trigger(clients, undefined);
       await ipfsMimeTypeProcessor.processorFunction(triggerItems, clients);
 
       const files: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['url', 'like', '%1xx%']]]);
       assert(files[0].cid === '1xx', `incorrect row returned, file was ${JSON.stringify(files[0])}`);
-      assert(files[0].mimeType === 'image/jpeg', `incorrect data was set on file: ${JSON.stringify(files[0])}`);
+      assert(files[0].mimeType === MimeEnum.jpg, `incorrect data was set on file: ${JSON.stringify(files[0])}`);
+      assert(files[0].isImage === true, `incorrect data was set on file: ${JSON.stringify(files[0])}`);
     });
   });
 })

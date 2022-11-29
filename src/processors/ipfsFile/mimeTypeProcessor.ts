@@ -1,7 +1,7 @@
 
 import { Table } from '../../db/db';
 import { IPFSFile } from '../../types/ipfsFile';
-import { MimeEnum } from '../../types/media';
+import { AudioTypes, ImageTypes, MimeEnum, VideoTypes } from '../../types/media';
 import { Clients, Processor } from '../../types/processor';
 import { Trigger } from '../../types/trigger';
 import { rollPromises } from '../../utils/rollingPromises';
@@ -41,7 +41,6 @@ export const ipfsMimeTypeProcessor: Processor =
           errorMsg = `Error: failed to fetch mime type for ipfs hash: ${ipfsHash} with error: ${e.message}`;
         }
 
-        // todo: enrich with isAudio, isVideo, isImage flags
         if (contentType && !Object.values(MimeEnum).includes(contentType)) {
           errorMsg = `Error: unsupported mime type '${contentType}' for ipfs hash: ${ipfsHash}`;
         }
@@ -52,6 +51,15 @@ export const ipfsMimeTypeProcessor: Processor =
           result.error = errorMsg;
         } else {
           result.mimeType = contentType;
+          if (AudioTypes.includes(contentType)) {
+            result.isAudio = true;
+          }
+          if (VideoTypes.includes(contentType)) {
+            result.isVideo = true;
+          }
+          if (ImageTypes.includes(contentType)) {
+            result.isImage = true;
+          }
         }
 
         return result;

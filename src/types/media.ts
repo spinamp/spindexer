@@ -26,7 +26,11 @@ export enum MimeEnum {
   wmv = 'video/x-ms-wmv',
 }
 
-export const AudioAndVideoTypes = _.uniq([MimeEnum.mp3, MimeEnum.wav, MimeEnum.xWav, MimeEnum.mp4, MimeEnum.quicktime, MimeEnum.m3u8, MimeEnum.ts, MimeEnum.m2ts, MimeEnum.mts, MimeEnum.mov, MimeEnum.mpd, MimeEnum.ogv, MimeEnum.webm, MimeEnum.wmv]);
+export const AudioTypes = [MimeEnum.mp3, MimeEnum.wav, MimeEnum.xWav];
+export const ImageTypes = [MimeEnum.gif, MimeEnum.jpeg, MimeEnum.jpg, MimeEnum.png, MimeEnum.pdf];
+export const VideoTypes = _.uniq([MimeEnum.mp4, MimeEnum.quicktime, MimeEnum.m3u8, MimeEnum.ts, MimeEnum.m2ts, MimeEnum.mts, MimeEnum.mov, MimeEnum.mkv, MimeEnum.mpd, MimeEnum.ogv, MimeEnum.webm, MimeEnum.wmv]);
+
+export const AudioAndVideoTypes = _.uniq(AudioTypes.concat(VideoTypes));
 
 export type LensMediaMetadata = {
   item: string;
