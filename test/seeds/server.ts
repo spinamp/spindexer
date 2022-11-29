@@ -7,6 +7,7 @@ import { NOIZD_PLATFORM, ZORA_LATEST_PLATFORM, ZORA_ORIGINAL_FACTORY } from '../
 import { DBClient, Table } from '../../src/db/db';
 import db from '../../src/db/sql-db';
 import { createSeedsAPIServer } from '../../src/seeds/server';
+import { truncateDB } from '../helpers'
 import { TEST_ADMIN_WALLET } from '../pretest';
 
 describe('Seeds API server', async () => {
@@ -21,13 +22,9 @@ describe('Seeds API server', async () => {
     throw new Error(`${err.message}\nHINT: tests run against dev DB. Ensure that DB running, migrated, and working as expected`)
   };
 
-  const truncateDB = async () => {
-    await dbClient.rawSQL(`TRUNCATE TABLE ${Object.values(Table).join(', ')} CASCADE;`);
-  }
-
   before( async () => {
     dbClient = await db.init();
-    await truncateDB();
+    await truncateDB(dbClient);
     app = createSeedsAPIServer(dbClient);
   });
 
@@ -370,7 +367,7 @@ describe('Seeds API server', async () => {
 
       describe('contractApproval', async () => {
         beforeEach( async () => {
-          await truncateDB();
+          await truncateDB(dbClient);
           await dbClient.upsert(Table.platforms, [ZORA_LATEST_PLATFORM]);
           await dbClient.upsert(Table.nftFactories, [{ ...ZORA_ORIGINAL_FACTORY, platformId: ZORA_LATEST_PLATFORM.id, approved: false, autoApprove: false }]);
         })
@@ -405,7 +402,7 @@ describe('Seeds API server', async () => {
 
         describe('with a valid payload but contract is not on zora', async () => {
           beforeEach( async () => {
-            await truncateDB();
+            await truncateDB(dbClient);
             await dbClient.upsert(Table.platforms, [NOIZD_PLATFORM]);
             await dbClient.upsert(Table.nftFactories, [{ ...ZORA_ORIGINAL_FACTORY, platformId: NOIZD_PLATFORM.id, approved: false, autoApprove: false }]);
           })
@@ -424,7 +421,7 @@ describe('Seeds API server', async () => {
 
         describe('with a valid payload and when a contract on zora platform exists', () => {
           beforeEach( async () => {
-            await truncateDB();
+            await truncateDB(dbClient);
             await dbClient.upsert(Table.platforms, [ZORA_LATEST_PLATFORM]);
             await dbClient.upsert(Table.nftFactories, [{ ...ZORA_ORIGINAL_FACTORY, platformId: ZORA_LATEST_PLATFORM.id, approved: false, autoApprove: false }]);
           })

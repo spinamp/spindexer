@@ -50,6 +50,7 @@
     "@types/yargs": "^17.0.10",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
+    "axios-mock-adapter": "^1.21.2",
     "babel-plugin-module-resolver": "^4.1.0",
     "eslint": "^8.16.0",
     "eslint-import-resolver-babel-module": "^5.3.1",

@@ -7,7 +7,6 @@ import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
 import { NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
 import { Table } from '../db';
-import { updateViews } from '../migration-helpers';
 
 const KOTA_PLATFORM: MusicPlatform = {
   id: 'kota',
@@ -58,8 +57,6 @@ export const up = async (knex: Knex) => {
 
   await knex(Table.seeds).insert(platform)
   await knex(Table.seeds).insert(metaFactory)
-
-  await updateViews(knex)
 }
 
 export const down = async (knex: Knex) => {

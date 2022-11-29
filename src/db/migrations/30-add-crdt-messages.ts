@@ -2,7 +2,7 @@ import { Knex } from 'knex';
 
 import { CrdtOperation } from '../../types/message';
 import { Table } from '../db';
-import { tableNameToViewName, updateViews } from '../migration-helpers';
+import { tableNameToViewName } from '../migration-helpers';
 
 export const up = async (knex: Knex) => {
   await knex.schema.createTable(Table.seeds, table => {
@@ -29,8 +29,6 @@ export const up = async (knex: Knex) => {
     table.jsonb('data')
     table.enu('operation', Object.values(CrdtOperation));
   })
-
-  await updateViews(knex);
 }
 
 export const down = async (knex: Knex) => {
@@ -40,6 +38,4 @@ export const down = async (knex: Knex) => {
   await knex.schema.dropTable(Table.seeds);
   await knex.schema.dropTable(Table.crdtState);
   await knex.schema.dropTable(Table.mempool);
-
-  await updateViews(knex);
 }

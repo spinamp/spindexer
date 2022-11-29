@@ -1,10 +1,10 @@
 import { isValidChecksumAddress } from 'ethereumjs-util';
 
-import { EthereumAddress } from '../types/ethereum';
+import { EVMAddress } from '../types/evm';
 
 import { MessagePayload, PublicOperations } from './types';
 
-export const restrictAccess = (payload: MessagePayload, signer?: EthereumAddress) => {
+export const restrictAccess = (payload: MessagePayload, signer?: EVMAddress) => {
   if (Object.values(PublicOperations).includes(payload.operation as any)) {
     return;
   }

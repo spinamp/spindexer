@@ -7,7 +7,6 @@ import { MetaFactory, MetaFactoryTypeName } from '../../types/metaFactory';
 import { NFTStandard } from '../../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../../types/platform';
 import { Table } from '../db';
-import { updateViews } from '../migration-helpers';
 
 const LENS_PLATFORM: MusicPlatform = {
   id: 'lens',
@@ -66,7 +65,7 @@ export const up = async (knex: Knex) => {
     table.string('chainId')
     table.string('address')
   })
-  
+
   await knex.schema.alterTable(Table.metaFactories, table => {
     table.string('chainId')
     table.string('address')
@@ -76,7 +75,7 @@ export const up = async (knex: Knex) => {
   const nftFactoryUpdates = `
     update ${Table.nftFactories}
     set address=id,
-    "chainId"= 
+    "chainId"=
     case
       when "standard" = '${NFTStandard.METAPLEX}' then 'solana'
       else 'ethereum'
@@ -85,7 +84,7 @@ export const up = async (knex: Knex) => {
   const metaFactoryUpdates = `
     update ${Table.metaFactories}
     set address=id,
-    "chainId"= 
+    "chainId"=
     case
       when "standard" = '${NFTStandard.METAPLEX}' then 'solana'
       else 'ethereum'
@@ -100,7 +99,7 @@ export const up = async (knex: Knex) => {
     table.string('address').notNullable().alter()
     table.foreign('chainId').references('id').inTable(Table.chains).onDelete('cascade');
   })
-  
+
   await knex.schema.alterTable(Table.metaFactories, table => {
     table.string('address').notNullable().alter()
     table.foreign('chainId').references('id').inTable(Table.chains).onDelete('cascade');
@@ -139,7 +138,7 @@ export const up = async (knex: Knex) => {
   const nftsUpdate = `
     update ${Table.nfts}
     set "contractAddress" = "nftFactoryId",
-    "chainId"= 
+    "chainId"=
     case
       when "platformId" = 'nina' or "platformId" = 'kota' then 'solana'
       else 'ethereum'
@@ -167,14 +166,12 @@ export const up = async (knex: Knex) => {
     table.renameColumn('createdAtEthereumBlockNumber', 'createdAtBlockNumber')
   })
 
-  
+
   const platformMessage = getCrdtUpsertMessage(Table.platforms, LENS_PLATFORM, process.env.DEFAULT_ADMIN_ADDRESS! )
   const metaFactoryMessage = getCrdtUpsertMessage(Table.metaFactories, LENS_HUB as MetaFactory, process.env.DEFAULT_ADMIN_ADDRESS!)
 
   await knex(Table.seeds).insert(platformMessage);
   await knex(Table.seeds).insert(metaFactoryMessage);
-
-  await updateViews(knex);
 }
 
 export const down = async (knex: Knex) => {

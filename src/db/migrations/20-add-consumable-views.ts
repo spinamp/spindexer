@@ -2,7 +2,6 @@
 import { Knex } from 'knex';
 
 import { Table } from '../db';
-import { updateViews } from '../migration-helpers';
 
 enum oldTables {
   platforms = 'platforms',
@@ -42,8 +41,6 @@ export const up = async (knex: Knex) => {
   await knex.schema.alterTable(Table.ipfsPins, table => {
     table.dropColumn('status')
   })
-
-  await updateViews(knex);
 }
 
 export const down = async (knex: Knex) => {

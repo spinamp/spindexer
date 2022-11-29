@@ -1,10 +1,9 @@
 
 import { Knex } from 'knex'
 
-import { updateViews } from '../migration-helpers'
 
 export const up = async (knex: Knex) => {
-  await updateViews(knex);
+  // this is deprecated (old code recreated views)
 }
 
 export const down = async (knex: Knex) => {
