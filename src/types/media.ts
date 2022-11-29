@@ -6,8 +6,20 @@ import { IPFSFile } from './ipfsFile';
 
 export enum MimeEnum {
   // audio formats
+  // (https://mimetype.io/all-types/#audio) (https://cloudinary.com/documentation/formats_supported_for_transformation#supported_audio_formats)
+  aac = 'audio/aac',
+  aiff = 'audio/aiff',
+  flac = 'audio/flac',
+  m4a = 'audio/m4a',
+  ogg = 'audio/ogg',
+  opus = 'audio/opus',
+  mpeg = 'audio/mpeg',
+  mpeg3 = 'audio/mpeg3',
   mp3 = 'audio/mpeg',
   wav = 'audio/wav',
+  xAac = 'audio/x-aac',
+  xAiff = 'audio/x-aiff',
+  xMpeg = 'audio/x-mpeg-3',
   xWav = 'audio/x-wav',
   // image formats
   gif = 'image/gif',
@@ -16,11 +28,13 @@ export enum MimeEnum {
   png = 'image/png',
   pdf = 'application/pdf',
   // video formats
+  // (https://cloudinary.com/documentation/formats_supported_for_transformation#supported_video_formats)
   mp4 = 'video/mp4',
   quicktime = 'video/quicktime',
   m3u8 = 'application/x-mpegURL',
   ts = 'video/MP2T',
   m2ts = 'video/MP2T',
+  m4v = 'video/x-m4v',
   mts = 'video/MP2T',
   mov = 'video/quicktime',
   mkv = 'video/x-matroska',
@@ -30,9 +44,9 @@ export enum MimeEnum {
   wmv = 'video/x-ms-wmv',
 }
 
-export const AudioTypes = [MimeEnum.mp3, MimeEnum.wav, MimeEnum.xWav];
+export const AudioTypes = [MimeEnum.aac, MimeEnum.aiff, MimeEnum.flac, MimeEnum.m4a, MimeEnum.ogg, MimeEnum.opus, MimeEnum.mpeg, MimeEnum.mpeg3, MimeEnum.mp3, MimeEnum.wav, MimeEnum.xAac, MimeEnum.xAiff, MimeEnum.xMpeg, MimeEnum.xWav]
 export const ImageTypes = [MimeEnum.gif, MimeEnum.jpeg, MimeEnum.jpg, MimeEnum.png, MimeEnum.pdf];
-export const VideoTypes = _.uniq([MimeEnum.mp4, MimeEnum.quicktime, MimeEnum.m3u8, MimeEnum.ts, MimeEnum.m2ts, MimeEnum.mts, MimeEnum.mov, MimeEnum.mkv, MimeEnum.mpd, MimeEnum.ogv, MimeEnum.webm, MimeEnum.wmv]);
+export const VideoTypes = _.uniq([MimeEnum.mp4, MimeEnum.quicktime, MimeEnum.m3u8, MimeEnum.ts, MimeEnum.m2ts, MimeEnum.m4v, MimeEnum.mts, MimeEnum.mov, MimeEnum.mkv, MimeEnum.mpd, MimeEnum.ogv, MimeEnum.webm, MimeEnum.wmv]);
 
 export const AudioAndVideoTypes = _.uniq(AudioTypes.concat(VideoTypes));
 
