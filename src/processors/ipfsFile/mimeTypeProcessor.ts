@@ -10,10 +10,11 @@ const TIMEOUT = parseInt(process.env.METADATA_REQUEST_TIMEOUT!)
 const QUERY_LIMIT = process.env.IPFS_METADATA_REQUEST_BATCH_SIZE || process.env.QUERY_TRIGGER_BATCH_SIZE
 
 const missingMimeType: Trigger<undefined> = async (clients) => {
-  const query = `select * from "${Table.ipfsFiles}"
-      where "cid" is not null
-      and "mimeType" is null
-      and "error" is null
+  const query = `select f.* from "${Table.ipfsFiles}" as f
+      join "${Table.ipfsPins}" as p on f."cid" = p."id"
+      where f."cid" is not null
+      and f."mimeType" is null
+      and f."error" is null
       LIMIT ${QUERY_LIMIT}`
 
   const ipfsFiles = (await clients.db.rawSQL(query)).rows;

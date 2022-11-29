@@ -7,20 +7,20 @@ export const overrides: {
   [Table.processedTracks]: `
     select t.* from "${Table.processedTracks}" t
 
-    join "${Table.ipfsPins}" p
-    on t."lossyAudioIPFSHash" = p.id
-    join "${Table.ipfsPins}" p1
-    on t."lossyArtworkIPFSHash" = p1.id
+    join "${Table.ipfsPins}" audio_pin
+    on t."lossyAudioIPFSHash" = audio_pin.id
+    join "${Table.ipfsPins}" artwork_pin
+    on t."lossyArtworkIPFSHash" = artwork_pin.id
 
-    join "${Table.ipfsFiles}" f
-    on t."lossyAudioIPFSHash" = f.cid
-    join "${Table.ipfsFiles}" f1
-    on t."lossyArtworkIPFSHash" = f1.cid
+    join "${Table.ipfsFiles}" audio_file
+    on t."lossyAudioIPFSHash" = audio_file.cid
+    join "${Table.ipfsFiles}" artwork_file
+    on t."lossyArtworkIPFSHash" = artwork_file.cid
 
-    where "lossyArtworkIPFSHash" is not null
-    and "lossyAudioIPFSHash" is not null
-    and f."mimeType" is not null
-    and f1."mimeType" is not null
+    where t."lossyArtworkIPFSHash" is not null
+    and t."lossyAudioIPFSHash" is not null
+    and audio_file."mimeType" is not null
+    and artwork_file."mimeType" is not null
     `
 }
 

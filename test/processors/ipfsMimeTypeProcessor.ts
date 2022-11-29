@@ -21,10 +21,19 @@ describe('ipfsMimeTypeProcessor', async () => {
     { url: 'https://spinamp.xyz/3xx', cid: '3xx', mimeType: 'image/jpeg' }, // skips existing
     { url: 'https://spinamp.xyz/4xx', cid: '4xx', error: 'nope' }, // skips errors
     { url: 'https://spinamp.xyz/5xx', cid: '5xx', mimeType: 'image/jpg', error: 'nope' }, // skips with mimeType and errors
+    { url: 'https://spinamp.xyz/6xx', cid: '6xx' }, // skips unpinned
+  ]
+
+  const ipfsPins: any[] = [
+    { id: '1xx', requestId: 'abc' },
+    { id: '3xx', requestId: 'abc' },
+    { id: '4xx', requestId: 'abc' },
+    { id: '5xx', requestId: 'abc' },
   ]
 
   const setupFixtures = async () => {
     await dbClient.insert<Partial<IPFSFile>>(Table.ipfsFiles, ipfsFiles);
+    await dbClient.insert(Table.ipfsPins, ipfsPins);
   };
 
   before( async () => {
@@ -39,10 +48,10 @@ describe('ipfsMimeTypeProcessor', async () => {
       await setupFixtures();
     })
 
-    it('trigger returns valid ipfs files without a mime type', async () => {
+    it('trigger returns pinned ipfs files without a mime type', async () => {
       const result: any = await ipfsMimeTypeProcessor.trigger(clients, undefined);
 
-      assert(result.length === 1, `should only return 1 file based on test data, instead returned ids: ${ result ? result.map((t: any) => t.id) : 'none' }`);
+      assert(result.length === 1, `should only return 1 file based on test data, instead returned ids: ${ result.length > 0 ? result.map((t: any) => t.cid) : 'none' }`);
       assert(result[0].cid === '1xx', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
     });
   });
