@@ -76,7 +76,7 @@ export const updateMimeTypes = async (ipfsFile: IPFSFile) => {
     errorMsg = `Error: unsupported mime type '${contentType}' for ipfs hash: ${ipfsHash}`;
   }
 
-  const updated = ipfsFile;
+  const updated = { ...ipfsFile };
 
   if (errorMsg) {
     updated.error = errorMsg;
