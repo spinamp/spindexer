@@ -1,10 +1,12 @@
 import { ValidContractNFTCallFunction } from '../clients/evm';
+import { IPFSClient } from '../clients/ipfs';
 
 import { ArtistProfile } from './artist';
 import { ChainId } from './chain';
 import { Contract } from './contract';
 import { ExtractorTypes } from './fieldExtractor';
 import { LensMediaMetadata, MimeEnum } from './media';
+import { getMetadataURL } from './metadata';
 import { NFTFactoryTypes } from './nftFactory';
 import { MusicPlatformType } from './platform';
 import { Record } from './record';
@@ -101,6 +103,15 @@ export const getNFTMetadataField = (nft: NFT, field: string) => {
     throw new Error(`NFT metadata missing ${field}`)
   }
   return nft.metadata[field];
+}
+
+export const getNFTMetadataURL = async (nft: NFT, nftFactory: NftFactory, ipfs: IPFSClient) => {
+  if (nft.metadataIPFSHash) {
+    return ipfs.getHTTPURL(nft.metadataIPFSHash);
+  } else {
+    const contractTypeName = nftFactory?.contractType;
+    return getMetadataURL(nft, contractTypeName);
+  }
 }
 
 export const getTrait = (nft: NFT, type: string) => {
