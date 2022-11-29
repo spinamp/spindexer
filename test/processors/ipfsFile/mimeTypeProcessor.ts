@@ -2,15 +2,15 @@ import assert from 'assert';
 
 import MockAdapter from 'axios-mock-adapter';
 
-import { DBClient, Table } from '../../src/db/db';
-import { ipfsMimeTypeProcessor } from '../../src/processors/ipfsFile/mimeTypeProcessor';
-import { initClients } from '../../src/runner';
-import { IPFSFile } from '../../src/types/ipfsFile';
-import { MimeEnum } from '../../src/types/media';
-import { Clients } from '../../src/types/processor';
-import { truncateDB } from '../helpers'
+import { DBClient, Table } from '../../../src/db/db';
+import db from '../../../src/db/sql-db';
+import { ipfsMimeTypeProcessor } from '../../../src/processors/ipfsFile/mimeTypeProcessor';
+import { initClients } from '../../../src/runner';
+import { IPFSFile } from '../../../src/types/ipfsFile';
+import { MimeEnum } from '../../../src/types/media';
+import { Clients } from '../../../src/types/processor';
+import { truncateDB } from '../../helpers'
 
-import db from './../../src/db/sql-db';
 
 describe('ipfsMimeTypeProcessor', async () => {
   let dbClient: DBClient;
