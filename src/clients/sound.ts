@@ -94,7 +94,7 @@ const init = async () => {
       }
       `,
     );
-    return result.search.releases;
+    return result.search.releases.filter((release: any) => release.title === title);
   };
 
   const searchFunction = async (nfts: NFT[]): Promise<any[]> => {
