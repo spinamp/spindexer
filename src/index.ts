@@ -25,6 +25,7 @@ import { processMempoolInserts, processMempoolUpdates } from './processors/defau
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
 import { ipfsFileErrorRetry } from './processors/ipfsFile/errorProcessor';
 import { ipfsMimeTypeProcessor } from './processors/ipfsFile/mimeTypeProcessor';
+import { ipfsFileSyncExistingPinsProcessor } from './processors/ipfsFile/syncExistingPinsProcessor';
 import { runProcessors } from './runner';
 import { ChainId } from './types/chain';
 import { MetaFactory, MetaFactoryTypeName } from './types/metaFactory';
@@ -91,6 +92,7 @@ const PROCESSORS = (
     ipfsAudioPinner,
     ipfsArtworkPinner,
     ipfsFileErrorRetry,
+    ipfsFileSyncExistingPinsProcessor,
     ipfsMimeTypeProcessor,
   ]
 };
