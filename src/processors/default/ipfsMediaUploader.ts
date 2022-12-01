@@ -1,12 +1,44 @@
 import { urlSource } from '../../clients/ipfs';
 import { Table } from '../../db/db';
-import { artworkNotOnIpfs, audioNotOnIpfs } from '../../triggers/ipfs';
 import { IPFSFile } from '../../types/ipfsFile';
 import { Clients, Processor } from '../../types/processor';
 import { ProcessedTrack } from '../../types/track';
+import { Trigger } from '../../types/trigger';
 import { rollPromises } from '../../utils/rollingPromises';
 
 type TrackFileJoin = ProcessedTrack & Partial<IPFSFile>;
+
+const audioNotOnIpfs: Trigger<undefined> = async (clients: Clients) => {
+  const query = `select * from "${Table.processedTracks}" as t
+      left outer join "${Table.ipfsFiles}" i
+      on t."lossyAudioURL" = i.url
+      where "lossyAudioIPFSHash" is null
+      and "lossyAudioURL" is not null
+      and i.error is null
+      LIMIT ${process.env.IPFS_UPLOAD_BATCH_SIZE || process.env.QUERY_TRIGGER_BATCH_SIZE!}`
+
+  const tracksWithFiles = (await clients.db.rawSQL(
+    query
+  )).rows
+
+  return tracksWithFiles
+};
+
+const artworkNotOnIpfs: Trigger<undefined> = async (clients: Clients) => {
+  const query = `select * from "${Table.processedTracks}" as t
+      left outer join "${Table.ipfsFiles}" i
+      on t."lossyArtworkURL" = i.url
+      where "lossyArtworkIPFSHash" is null
+      and "lossyArtworkURL" is not null
+      and i.error is null
+      LIMIT ${process.env.IPFS_UPLOAD_BATCH_SIZE || process.env.QUERY_TRIGGER_BATCH_SIZE!}`
+
+  const tracksWithFiles = (await clients.db.rawSQL(
+    query
+  )).rows
+
+  return tracksWithFiles
+};
 
 function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', replaceField: 'lossyAudioIPFSHash' | 'lossyArtworkIPFSHash') {
   return async (tracksWithIPFSFiles: TrackFileJoin[], clients: Clients) => {
