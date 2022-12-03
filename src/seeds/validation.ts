@@ -84,7 +84,7 @@ const minimumKeysPresent = (input: MessagePayload, keys: any): void => {
 // Checks that every key in the input data is valid
 const onlyValidKeysPresent = (input: MessagePayload, keys: any): void => {
   if (!Object.keys(input.data).every((key: any) => keys.includes(key))) {
-    throw new Error(`${input.entity} entity has unsupported fields`)
+    throw new Error(`${input.entity} entity has an unsupported field amongst ${Object.keys(input.data)}`)
   }
 }
 
