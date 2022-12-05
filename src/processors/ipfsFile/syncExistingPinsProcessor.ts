@@ -5,20 +5,17 @@ import { Trigger } from '../../types/trigger'
 
 const ipfsFilesOutOfSyncWithPins: Trigger<undefined> = async (clients) => {
   const tracksWithCIDsMatchingURL = await clients.db.rawSQL(`
-  select distinct "lossyArtworkIPFSHash" from "${Table.processedTracks}" as t
-  left outer join "${Table.ipfsFiles}" as i
-  on t."lossyArtworkIPFSHash" = i.cid
-  where
-    t."lossyArtworkIPFSHash" is not null and
-    i.cid is null and
-    i.error is null and
-    t."lossyArtworkURL" ILIKE ('%' || t."lossyArtworkIPFSHash" || '%')
+    select distinct "lossyArtworkIPFSHash", "lossyArtworkURL" from "${Table.processedTracks}" as t
+    left outer join "${Table.ipfsFiles}" as file
+    on t."lossyArtworkIPFSHash" = file.cid
+    where
+      t."lossyArtworkIPFSHash" is not null and
+      file.cid is null and
+      file.error is null and
+      t."lossyArtworkURL" ILIKE ('%' || t."lossyArtworkIPFSHash" || '%')
   `)
 
-  return tracksWithCIDsMatchingURL.rows.map((row: any) => ({
-    url: row.lossyArtworkURL,
-    cid: row.lossyArtworkIPFSHash,
-  }))
+  return tracksWithCIDsMatchingURL.rows;
 }
 
 export const ipfsFileSyncExistingPinsProcessor: Processor =
@@ -28,6 +25,10 @@ export const ipfsFileSyncExistingPinsProcessor: Processor =
     processorFunction: async (input: IPFSFile[], clients: Clients) => {
       console.log('Adding ipfs files for media pinned by other platforms');
 
-      await clients.db.update(Table.ipfsFiles, input, 'url')
+      const files = input.map((row: any) => ({
+        url: row.lossyArtworkURL,
+        cid: row.lossyArtworkIPFSHash,
+      }))
+      await clients.db.insert(Table.ipfsFiles, files)
     }
   }
