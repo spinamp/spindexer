@@ -6,7 +6,7 @@ import { Table } from '../db';
 export const up = async (knex: Knex) => {
   // Artwork
   const artworkTracksWithCIDsMatchingURL = await knex.raw(`
-  select distinct "lossyArtworkIPFSHash" from "${Table.processedTracks}" as t
+  select distinct "lossyArtworkIPFSHash", "lossyArtworkURL" from "${Table.processedTracks}" as t
   left outer join "${Table.ipfsFiles}" as i
   on t."lossyArtworkIPFSHash" = i.cid
   where
@@ -28,7 +28,7 @@ export const up = async (knex: Knex) => {
 
   // Audio
   const audioTracksWithCIDsMatchingURL = await knex.raw(`
-  select distinct "lossyAudioIPFSHash" from "${Table.processedTracks}" as t
+  select distinct "lossyAudioIPFSHash", "lossyAudioURL" from "${Table.processedTracks}" as t
   left outer join "${Table.ipfsFiles}" as i
   on t."lossyAudioIPFSHash" = i.cid
   where
