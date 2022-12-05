@@ -3,7 +3,9 @@ import { IPFSFile } from '../../types/ipfsFile'
 import { Processor, Clients } from '../../types/processor'
 import { Trigger } from '../../types/trigger'
 
-const ipfsFilesOutOfSyncWithPins: (field: 'lossyArtwork' | 'lossyAudio') => Trigger<undefined> =
+type TrackMediaField = 'lossyArtwork' | 'lossyAudio';
+
+const ipfsFilesOutOfSyncWithPins: (field: TrackMediaField) => Trigger<undefined> =
  (field) => async (clients) => {
    const tracksWithCIDsMatchingURL = await clients.db.rawSQL(`
     select distinct "${field}IPFSHash", "${field}URL" from "${Table.processedTracks}" as t
@@ -19,7 +21,7 @@ const ipfsFilesOutOfSyncWithPins: (field: 'lossyArtwork' | 'lossyAudio') => Trig
    return tracksWithCIDsMatchingURL.rows;
  }
 
-export const ipfsFileSyncExistingPinsProcessor: (field: 'lossyArtwork' | 'lossyAudio') => Processor =
+export const ipfsFileSyncExistingPinsProcessor: (field: TrackMediaField) => Processor =
 (field) => {
   return {
     name: 'ipfsFileSyncExistingPinsProcessor',
@@ -31,7 +33,7 @@ export const ipfsFileSyncExistingPinsProcessor: (field: 'lossyArtwork' | 'lossyA
         url: row[`${field}URL`],
         cid: row[`${field}IPFSHash`],
       }))
-      await clients.db.insert(Table.ipfsFiles, files)
+      await clients.db.insert(Table.ipfsFiles, files);
     }
   }
 }

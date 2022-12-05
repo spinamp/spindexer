@@ -4,7 +4,8 @@ import { Knex } from 'knex';
 import { Table } from '../db';
 
 export const up = async (knex: Knex) => {
-  const tracksWithCIDsMatchingURL = await knex.raw(`
+  // Artwork
+  const artworkTracksWithCIDsMatchingURL = await knex.raw(`
   select distinct "lossyArtworkIPFSHash" from "${Table.processedTracks}" as t
   left outer join "${Table.ipfsFiles}" as i
   on t."lossyArtworkIPFSHash" = i.cid
@@ -15,14 +16,36 @@ export const up = async (knex: Knex) => {
     t."lossyArtworkURL" ILIKE ('%' || t."lossyArtworkIPFSHash" || '%')
   `)
 
-  const ipfsFiles = tracksWithCIDsMatchingURL.rows.map((row: any) => ({
+  const artworkFiles = artworkTracksWithCIDsMatchingURL.rows.map((row: any) => ({
     url: row.lossyArtworkURL,
     cid: row.lossyArtworkIPFSHash,
   }))
 
-  console.log(`Migrating ${ipfsFiles.length} ProcessedTracks without IPFSFiles...`);
-  if (ipfsFiles.length > 0) {
-    await knex(Table.ipfsFiles).insert(ipfsFiles)
+  console.log(`Migrating ${artworkFiles.length} ProcessedTracks without artwork files...`);
+  if (artworkFiles.length > 0) {
+    await knex(Table.ipfsFiles).insert(artworkFiles)
+  }
+
+  // Audio
+  const audioTracksWithCIDsMatchingURL = await knex.raw(`
+  select distinct "lossyAudioIPFSHash" from "${Table.processedTracks}" as t
+  left outer join "${Table.ipfsFiles}" as i
+  on t."lossyAudioIPFSHash" = i.cid
+  where
+    t."lossyAudioIPFSHash" is not null and
+    i.cid is null and
+    i.error is null and
+    t."lossyAudioURL" ILIKE ('%' || t."lossyAudioIPFSHash" || '%')
+  `)
+
+  const audioFiles = audioTracksWithCIDsMatchingURL.rows.map((row: any) => ({
+    url: row.lossyAudioURL,
+    cid: row.lossyAudioIPFSHash,
+  }))
+
+  console.log(`Migrating ${audioFiles.length} ProcessedTracks without audio files...`);
+  if (audioFiles.length > 0) {
+    await knex(Table.ipfsFiles).insert(audioFiles)
   }
 }
 

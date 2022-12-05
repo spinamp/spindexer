@@ -92,7 +92,8 @@ const PROCESSORS = (
     ipfsAudioPinner,
     ipfsArtworkPinner,
     ipfsFileErrorRetry,
-    ipfsFileSyncExistingPinsProcessor,
+    ipfsFileSyncExistingPinsProcessor('lossyArtwork'),
+    ipfsFileSyncExistingPinsProcessor('lossyAudio'),
     ipfsMimeTypeProcessor,
   ]
 };
