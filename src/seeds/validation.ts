@@ -5,10 +5,9 @@ import { MusicPlatformType } from '../types/platform';
 
 import { AllApiOperations, CrdtEntities, MessagePayload } from './types';
 
-
 const PlatformValidKeys = ['id', 'name', 'type'];
 
-const NFTFactoryValidUpdateKeys = ['id', 'autoApprove', 'approved'];
+const NFTFactoryValidUpdateKeys = ['id', 'autoApprove', 'approved', 'typeMetadata'];
 const NFTFactoryValidUpsertKeys = ['id', 'startingBlock', 'platformId', 'contractType', 'standard', 'typeMetadata', 'autoApprove', 'approved'];
 const NFTFactoryMinUpsertKeys = NFTFactoryValidUpsertKeys.filter((key) => !['typeMetadata'].includes(key));
 
