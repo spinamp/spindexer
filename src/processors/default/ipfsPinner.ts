@@ -3,8 +3,9 @@ import _ from 'lodash';
 
 import { extractBaseCIDFromHash } from '../../clients/ipfs';
 import { Table } from '../../db/db';
-import { unpinnedTrackContent } from '../../triggers/ipfs';
 import { Clients, Processor } from '../../types/processor';
+import { ProcessedTrack } from '../../types/track';
+import { Trigger } from '../../types/trigger';
 import { rollPromises } from '../../utils/rollingPromises';
 
 const ipfsPinEndpoint = `${process.env.IPFS_PIN_URL}`;
@@ -14,6 +15,30 @@ const pinAuth = {
 const maxPPM = parseInt(process.env.IPFS_PIN_MAX_PROMISES_PER_MINUTE!);
 
 const IPFS_ORIGINS = process.env.IPFS_NODE_MULTIADDRESS?.split(',');
+
+const unpinnedTrackContent: (cidField: string, limit?: number) => Trigger<undefined> =
+  (cidField: string, limit: number = parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!)) => async (clients: Clients) => {
+    const query = `select t.* from "${Table.processedTracks}" as t
+      LEFT OUTER JOIN "${Table.ipfsPins}" as p
+      ON t."${cidField}" = p.id
+      WHERE (t."${cidField}" IS NOT NULL)
+      AND (t."${cidField}" <> '')
+      AND (p.id is NULL)
+      LIMIT ${limit}`
+
+    const tracks = (await clients.db.rawSQL(
+      query
+    )).rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+
+    const cids = tracks.map((track: ProcessedTrack) => {
+      if (!(track as any)[cidField]) {
+        throw new Error('Unexpected null ipfs cid')
+      }
+      return (track as any)[cidField];
+    });
+
+    return _.uniq(cids);
+  };
 
 const processorFunction = async (cids: string[], clients: Clients) => {
   console.log(`Pinning ${cids}`);
@@ -48,7 +73,7 @@ const processorFunction = async (cids: string[], clients: Clients) => {
 
   if (newPins.length !== 0) {
     const pinBaseCID = (baseCid: string) => clients.axios.post(
-      ipfsPinEndpoint, { cid: baseCid, 
+      ipfsPinEndpoint, { cid: baseCid,
         origins: IPFS_ORIGINS
       },
       { timeout: parseInt(process.env.IPFS_PIN_REQUEST_TIMEOUT!), ...pinAuth });
