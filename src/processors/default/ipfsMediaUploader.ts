@@ -8,6 +8,7 @@ import { rollPromises } from '../../utils/rollingPromises';
 
 type TrackFileJoin = ProcessedTrack & Partial<IPFSFile>;
 
+// change to only return where ipfs url is set, but hash is not set, i.e. remove the join
 const audioNotOnIpfs: Trigger<undefined> = async (clients: Clients) => {
   const query = `select * from "${Table.processedTracks}" as t
       left outer join "${Table.ipfsFiles}" i
@@ -24,6 +25,7 @@ const audioNotOnIpfs: Trigger<undefined> = async (clients: Clients) => {
   return tracksWithFiles
 };
 
+// change to only return where ipfs url is set, but hash is not set, i.e. remove the join
 const artworkNotOnIpfs: Trigger<undefined> = async (clients: Clients) => {
   const query = `select * from "${Table.processedTracks}" as t
       left outer join "${Table.ipfsFiles}" i
@@ -40,6 +42,8 @@ const artworkNotOnIpfs: Trigger<undefined> = async (clients: Clients) => {
   return tracksWithFiles
 };
 
+// TODO: from inputs, grab the cids, select all from ipfs files where cid in input cids, and then append to the url
+// TODO: for non matches, just insert the new entries
 function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', replaceField: 'lossyAudioIPFSHash' | 'lossyArtworkIPFSHash') {
   return async (tracksWithIPFSFiles: TrackFileJoin[], clients: Clients) => {
     const updates: Partial<ProcessedTrack>[] = [];
@@ -100,6 +104,8 @@ function processorFunction(sourceField: 'lossyAudioURL' | 'lossyArtworkURL', rep
     await rollPromises<ProcessedTrack, void, void>(tracksWithIPFSFiles, processTrack, 300, 10000)
 
     await clients.db.update(Table.processedTracks, updates)
+
+    // TODO: replace with 1 insert and 1 update
     await clients.db.upsert(Table.ipfsFiles, ipfsFiles, 'url');
   }
 }
