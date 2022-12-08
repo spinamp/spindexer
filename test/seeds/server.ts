@@ -119,7 +119,7 @@ describe('Seeds API server', async () => {
 
             supertest(app).post(endpoint).send(body)
               .set('x-signature', signature)
-              .expect(422, { error: 'platforms entity has unsupported fields' })
+              .expect(422, { error: 'platforms entity has an unsupported field amongst id,name,type,hackyou' })
               .end((err,res) => { if (err) throw err });
           })
         })
@@ -184,7 +184,7 @@ describe('Seeds API server', async () => {
 
             supertest(app).post(endpoint).send(body)
               .set('x-signature', signature)
-              .expect(422, { error: 'platforms entity has unsupported fields' })
+              .expect(422, { error: 'platforms entity has an unsupported field amongst id,name,type,hackyou' })
               .end((err,res) => { if (err) throw err });
           })
         })
@@ -278,7 +278,7 @@ describe('Seeds API server', async () => {
 
             supertest(app).post(endpoint).send(body)
               .set('x-signature', signature)
-              .expect(422, { error: 'nftFactories entity has unsupported fields' })
+              .expect(422, { error: 'nftFactories entity has an unsupported field amongst id,startingBlock,platformId,contractType,typeMetadata,standard,autoApprove,approved,hackyou' })
               .end((err,res) => { if (err) throw err });
           })
         })
@@ -332,7 +332,7 @@ describe('Seeds API server', async () => {
 
             supertest(app).post(endpoint).send(body)
               .set('x-signature', signature)
-              .expect(422, { error: 'nftFactories entity has unsupported fields' })
+              .expect(422, { error: 'nftFactories entity has an unsupported field amongst id,autoApprove,approved,hackyou' })
               .end((err,res) => { if (err) throw err });
           })
         })
