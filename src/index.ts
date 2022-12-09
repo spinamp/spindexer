@@ -31,6 +31,7 @@ import { ChainId } from './types/chain';
 import { MetaFactory, MetaFactoryTypeName } from './types/metaFactory';
 import { NftFactory, NFTStandard } from './types/nft';
 import { API_PLATFORMS, MusicPlatform } from './types/platform';
+import ipfsAvatarUploader from './processors/uploadAvatarToIpfs';
 
 const PROCESSORS = (
   nftFactories: NftFactory[],
@@ -95,6 +96,7 @@ const PROCESSORS = (
     ipfsFileSyncExistingPinsProcessor('lossyArtwork'),
     ipfsFileSyncExistingPinsProcessor('lossyAudio'),
     ipfsMimeTypeProcessor,
+    ipfsAvatarUploader
   ]
 };
 

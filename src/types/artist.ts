@@ -14,6 +14,7 @@ export type ArtistProfile = TimeField & {
   platformId: string;
   avatarUrl?: string;
   websiteUrl?: string;
+  avatarIPFSHash?: string;
 }
 
 export const mapArtist = (artistProfile: ArtistProfile): Artist => {
