@@ -8,6 +8,8 @@ import { AllApiOperations, CrdtEntities, MessagePayload } from './types';
 const PlatformValidKeys = ['id', 'name', 'type'];
 
 const NFTFactoryValidUpdateKeys = ['id', 'autoApprove', 'approved', 'typeMetadata'];
+const NFTFactoryMinUpdateKeys = NFTFactoryValidUpdateKeys.filter((key) => !['typeMetadata'].includes(key));
+
 const NFTFactoryValidUpsertKeys = ['id', 'startingBlock', 'platformId', 'contractType', 'standard', 'typeMetadata', 'autoApprove', 'approved'];
 const NFTFactoryMinUpsertKeys = NFTFactoryValidUpsertKeys.filter((key) => !['typeMetadata'].includes(key));
 
@@ -42,7 +44,7 @@ export const validateMessage = async (payload: MessagePayload, dbClient: DBClien
         () => onlyValidKeysPresent(payload, NFTFactoryValidUpdateKeys),
       ],
       'contractApproval': [
-        () => minimumKeysPresent(payload, NFTFactoryValidUpdateKeys),
+        () => minimumKeysPresent(payload, NFTFactoryMinUpdateKeys),
         () => onlyValidKeysPresent(payload, NFTFactoryValidUpdateKeys),
         () => onlyZoraContract(payload, dbClient),
       ],
