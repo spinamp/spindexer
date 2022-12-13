@@ -12,6 +12,7 @@ export enum Table {
   erc721Transfers = 'raw_erc721_transfers',
   ipfsPins = 'raw_ipfs_pins',
   ipfsFiles = 'raw_ipfs_files',
+  ipfsFilesUrls = 'raw_ipfs_files_urls',
   mempool = 'raw_mempool',
   metaFactories = 'raw_meta_factories',
   nfts = 'raw_nfts',
