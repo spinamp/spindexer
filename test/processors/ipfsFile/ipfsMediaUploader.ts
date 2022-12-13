@@ -4,7 +4,7 @@ import sinon from 'sinon';
 
 import { DBClient, Table } from '../../../src/db/db';
 import db from '../../../src/db/sql-db';
-import { ipfsMediaUploader } from '../../../src/processors/default/ipfsMediaUploader';
+import { ipfsMediaUploader } from '../../../src/processors/ipfsFile/mediaUploader';
 import { initClients } from '../../../src/runner';
 import { IPFSFileUrl } from '../../../src/types/ipfsFile';
 import { Clients } from '../../../src/types/processor';

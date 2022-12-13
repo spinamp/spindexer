@@ -26,7 +26,7 @@ const notOnIpfs: (media: MediaType) => Trigger<undefined> =
   return trackUrlJoin
 };
 
-function processorFunction2(media: MediaType) {
+function processorFunction(media: MediaType) {
   return async (tracksWithIPFSFiles: TrackUrlJoin[], clients: Clients) => {
     const trackUpdates: Partial<ProcessedTrack>[] = [];
     const ipfsFiles: IPFSFile[] = [];
@@ -90,7 +90,7 @@ export const ipfsMediaUploader: (media: MediaType) => Processor =
   return {
     name: `ipfs${media}Uploader`,
     trigger: notOnIpfs(media),
-    processorFunction: processorFunction2(media),
+    processorFunction: processorFunction(media),
     initialCursor: undefined
   }
 }
