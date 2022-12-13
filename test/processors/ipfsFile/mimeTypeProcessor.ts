@@ -6,7 +6,7 @@ import { DBClient, Table } from '../../../src/db/db';
 import db from '../../../src/db/sql-db';
 import { ipfsMimeTypeProcessor } from '../../../src/processors/ipfsFile/mimeTypeProcessor';
 import { initClients } from '../../../src/runner';
-import { IPFSFile } from '../../../src/types/ipfsFile';
+import { IPFSFile, IPFSFileUrl } from '../../../src/types/ipfsFile';
 import { MimeEnum } from '../../../src/types/media';
 import { Clients } from '../../../src/types/processor';
 import { truncateDB } from '../../helpers'
@@ -17,12 +17,20 @@ describe('ipfsMimeTypeProcessor', async () => {
   let clients: Clients;
 
   const ipfsFiles: IPFSFile[] = [
+    { cid: '1xx' },
+    { cid: '3xx', mimeType: 'image/jpeg' }, // skips existing
+    { cid: '4xx', error: 'nope' }, // skips errors
+    { cid: '5xx', mimeType: 'image/jpg', error: 'nope' }, // skips with mimeType and errors
+    { cid: '6xx' }, // skips unpinned
+  ]
+
+  const ipfsFilesUrls: IPFSFileUrl[] = [
     { url: 'https://spinamp.xyz/1xx', cid: '1xx' },
     { url: 'https://spinamp.xyz/2xx', cid: undefined }, // skips undefined
-    { url: 'https://spinamp.xyz/3xx', cid: '3xx', mimeType: 'image/jpeg' }, // skips existing
-    { url: 'https://spinamp.xyz/4xx', cid: '4xx', error: 'nope' }, // skips errors
-    { url: 'https://spinamp.xyz/5xx', cid: '5xx', mimeType: 'image/jpg', error: 'nope' }, // skips with mimeType and errors
-    { url: 'https://spinamp.xyz/6xx', cid: '6xx' }, // skips unpinned
+    { url: 'https://spinamp.xyz/3xx', cid: '3xx' },
+    { url: 'https://spinamp.xyz/4xx', cid: '4xx' },
+    { url: 'https://spinamp.xyz/5xx', cid: '5xx' },
+    { url: 'https://spinamp.xyz/6xx', cid: '6xx' },
   ]
 
   const ipfsPins: any[] = [
@@ -34,6 +42,7 @@ describe('ipfsMimeTypeProcessor', async () => {
 
   const setupFixtures = async () => {
     await dbClient.insert<Partial<IPFSFile>>(Table.ipfsFiles, ipfsFiles);
+    await dbClient.insert<Partial<IPFSFileUrl>>(Table.ipfsFilesUrls, ipfsFilesUrls);
     await dbClient.insert(Table.ipfsPins, ipfsPins);
   };
 
@@ -70,7 +79,7 @@ describe('ipfsMimeTypeProcessor', async () => {
       const triggerItems = await ipfsMimeTypeProcessor.trigger(clients, undefined);
       await ipfsMimeTypeProcessor.processorFunction(triggerItems, clients);
 
-      const files: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['url', 'like', '%1xx%']]]);
+      const files: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['cid', 'like', '%1xx%']]]);
       assert(files[0].cid === '1xx', `incorrect row returned, file was ${JSON.stringify(files[0])}`);
       assert(files[0].mimeType === null, `data should not be set on file: ${JSON.stringify(files[0])}`);
       assert(files[0].error === 'Error: failed to fetch mime type for ipfs hash: 1xx with error: timeout of 10000ms exceeded', `incorrect data was set on file: ${JSON.stringify(files[0])}`);
@@ -83,7 +92,7 @@ describe('ipfsMimeTypeProcessor', async () => {
       const triggerItems = await ipfsMimeTypeProcessor.trigger(clients, undefined);
       await ipfsMimeTypeProcessor.processorFunction(triggerItems, clients);
 
-      const files: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['url', 'like', '%1xx%']]]);
+      const files: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['cid', 'like', '%1xx%']]]);
       assert(files[0].cid === '1xx', `incorrect row returned, file was ${JSON.stringify(files[0])}`);
       assert(files[0].mimeType === null, `data should not be set on file: ${JSON.stringify(files[0])}`);
       assert(files[0].error === 'Error: failed to fetch mime type for ipfs hash: 1xx with error: Request failed with status code 400', `incorrect data was set on file: ${JSON.stringify(files[0])}`);
@@ -96,7 +105,7 @@ describe('ipfsMimeTypeProcessor', async () => {
       const triggerItems = await ipfsMimeTypeProcessor.trigger(clients, undefined);
       await ipfsMimeTypeProcessor.processorFunction(triggerItems, clients);
 
-      const files: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['url', 'like', '%1xx%']]]);
+      const files: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['cid', 'like', '%1xx%']]]);
       assert(files[0].cid === '1xx', `incorrect row returned, file was ${JSON.stringify(files[0])}`);
       assert(files[0].mimeType === null, `data should not be set on file: ${JSON.stringify(files[0])}`);
       assert(files[0].error === 'Error: unsupported mime type \'application/binary\' for ipfs hash: 1xx', `incorrect data was set on file: ${JSON.stringify(files[0])}`);
@@ -109,7 +118,7 @@ describe('ipfsMimeTypeProcessor', async () => {
       const triggerItems = await ipfsMimeTypeProcessor.trigger(clients, undefined);
       await ipfsMimeTypeProcessor.processorFunction(triggerItems, clients);
 
-      const files: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['url', 'like', '%1xx%']]]);
+      const files: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['cid', 'like', '%1xx%']]]);
       assert(files[0].cid === '1xx', `incorrect row returned, file was ${JSON.stringify(files[0])}`);
       assert(files[0].mimeType === MimeEnum.jpg, `incorrect data was set on file: ${JSON.stringify(files[0])}`);
       assert(files[0].isImage === true, `incorrect data was set on file: ${JSON.stringify(files[0])}`);

@@ -12,7 +12,6 @@ const QUERY_LIMIT = process.env.IPFS_METADATA_REQUEST_BATCH_SIZE || process.env.
 const missingMimeType: Trigger<undefined> = async (clients) => {
   const query = `select f.* from "${Table.ipfsFiles}" as f
       join "${Table.ipfsPins}" as p on f."cid" = p."id"
-      where f."cid" is not null
       and f."mimeType" is null
       and f."error" is null
       LIMIT ${QUERY_LIMIT}`
@@ -35,7 +34,7 @@ export const ipfsMimeTypeProcessor: Processor =
 
       const updates = results.map(result => result.response);
       if (updates.length > 0) {
-        await clients.db.update(Table.ipfsFiles, updates, 'url');
+        await clients.db.update(Table.ipfsFiles, updates, 'cid');
       }
     },
     initialCursor: undefined

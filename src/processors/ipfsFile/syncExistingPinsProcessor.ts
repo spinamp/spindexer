@@ -1,5 +1,5 @@
 import { Table } from '../../db/db'
-import { IPFSFile } from '../../types/ipfsFile'
+import { IPFSFile, IPFSFileUrl } from '../../types/ipfsFile'
 import { Processor, Clients } from '../../types/processor'
 import { Trigger } from '../../types/trigger'
 
@@ -29,11 +29,14 @@ export const ipfsFileSyncExistingPinsProcessor: (field: TrackMediaField) => Proc
     processorFunction: async (input: IPFSFile[], clients: Clients) => {
       console.log(`Adding ${field} ipfs files for media pinned by other platforms`);
 
-      const files = input.map((row: any) => ({
+      const files: IPFSFile[] = input.map((row: any) => ({ cid: row[`${field}IPFSHash`] }))
+      await clients.db.insert(Table.ipfsFiles, files);
+
+      const filesUrls: IPFSFileUrl[] = input.map((row: any) => ({
         url: row[`${field}URL`],
         cid: row[`${field}IPFSHash`],
       }))
-      await clients.db.insert(Table.ipfsFiles, files);
+      await clients.db.insert(Table.ipfsFilesUrls, filesUrls);
     }
   }
 }

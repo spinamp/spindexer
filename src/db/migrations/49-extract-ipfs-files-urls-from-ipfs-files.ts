@@ -46,7 +46,7 @@ export const up = async (knex: Knex) => {
     table.primary(['cid']);
   })
   await knex.schema.alterTable(Table.ipfsFilesUrls, table => {
-    table.primary(['cid', 'url']);
+    table.primary(['url']);
   })
 
   await updateViews(knex);

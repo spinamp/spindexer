@@ -1,6 +1,5 @@
 export type IPFSFile = {
-  url: string;
-  cid?: string;
+  cid: string;
   mimeType?: string;
   isAudio?: boolean;
   isVideo?: boolean;
@@ -8,4 +7,9 @@ export type IPFSFile = {
   error?: string;
   numberOfRetries?: number;
   lastRetry?: Date;
+}
+
+export type IPFSFileUrl = {
+  url: string;
+  cid?: string;
 }

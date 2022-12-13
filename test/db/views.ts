@@ -1,7 +1,7 @@
 import assert from 'assert';
 
 import { DBClient, Table } from '../../src/db/db';
-import { IPFSFile } from '../../src/types/ipfsFile';
+import { IPFSFile, IPFSFileUrl } from '../../src/types/ipfsFile';
 import { ProcessedTrack } from '../../src/types/track';
 import { truncateDB } from '../helpers'
 
@@ -11,18 +11,32 @@ describe('views', async () => {
   let dbClient: DBClient;
 
   const ipfsFiles: IPFSFile[] = [
-    { url: 'https://spinamp.xyz/1xx', cid: '1xx', mimeType: 'image/jpeg', isImage: true },
-    { url: 'https://spinamp.xyz/2xx', cid: undefined, mimeType: 'image/jpeg', isImage: true }, // undefined cid skipped later
-    { url: 'https://spinamp.xyz/3xx', cid: '3xx', mimeType: 'audio/wav', isAudio: true },
-    { url: 'https://spinamp.xyz/4xx', cid: '4xx', mimeType: 'image/jpeg', isImage: true },
-    { url: 'https://spinamp.xyz/5xx', cid: '5xx', mimeType: 'audio/wav', isAudio: true },
-    { url: 'https://spinamp.xyz/6xx', cid: '6xx', mimeType: 'image/jpeg', isImage: true },
-    { url: 'https://spinamp.xyz/7xx', cid: '7xx', mimeType: 'image/jpeg', isImage: true },
+    { cid: '1xx', mimeType: 'image/jpeg', isImage: true },
+    { cid: '3xx', mimeType: 'audio/wav', isAudio: true },
+    { cid: '4xx', mimeType: 'image/jpeg', isImage: true },
+    { cid: '5xx', mimeType: 'audio/wav', isAudio: true },
+    { cid: '6xx', mimeType: 'image/jpeg', isImage: true },
+    { cid: '7xx', mimeType: 'image/jpeg', isImage: true },
+    { cid: 'noArtworkMimeType' }, // no mime type skipped later
+    { cid: 'noAudioMimeType' }, // no mime type skipped later
+    { cid: 'mismatchedAudio', mimeType: 'audio/wav', isAudio: true }, // mismatched audio is skipped later
+    { cid: 'mismatchedImage' , mimeType: 'image/jpeg', isImage: true }, // mismatched image is skipped later
+    { cid: 'video' , mimeType: 'video/webm', isVideo: true },
+  ]
+
+  const ipfsFilesUrls: IPFSFileUrl[] = [
+    { url: 'https://spinamp.xyz/1xx', cid: '1xx' },
+    { url: 'https://spinamp.xyz/2xx', cid: undefined }, // undefined cid skipped later
+    { url: 'https://spinamp.xyz/3xx', cid: '3xx' },
+    { url: 'https://spinamp.xyz/4xx', cid: '4xx' },
+    { url: 'https://spinamp.xyz/5xx', cid: '5xx' },
+    { url: 'https://spinamp.xyz/6xx', cid: '6xx' },
+    { url: 'https://spinamp.xyz/7xx', cid: '7xx' },
     { url: 'https://spinamp.xyz/noArtworkMimeType', cid: 'noArtworkMimeType' }, // no mime type skipped later
     { url: 'https://spinamp.xyz/noAudioMimeType', cid: 'noAudioMimeType' }, // no mime type skipped later
-    { url: 'https://spinamp.xyz/mismatchedAudio', cid: 'mismatchedAudio', mimeType: 'audio/wav', isAudio: true }, // mismatched audio is skipped later
-    { url: 'https://spinamp.xyz/mismatchedImage', cid: 'mismatchedImage' , mimeType: 'image/jpeg', isImage: true }, // mismatched image is skipped later
-    { url: 'https://spinamp.xyz/video', cid: 'video' , mimeType: 'video/webm', isVideo: true },
+    { url: 'https://spinamp.xyz/mismatchedAudio', cid: 'mismatchedAudio' }, // mismatched audio is skipped later
+    { url: 'https://spinamp.xyz/mismatchedImage', cid: 'mismatchedImage' }, // mismatched image is skipped later
+    { url: 'https://spinamp.xyz/video', cid: 'video' },
   ]
 
   const ipfsPins = [
@@ -54,6 +68,7 @@ describe('views', async () => {
 
   const setupFixtures = async () => {
     await dbClient.insert<Partial<IPFSFile>>(Table.ipfsFiles, ipfsFiles);
+    await dbClient.insert<Partial<IPFSFileUrl>>(Table.ipfsFilesUrls, ipfsFilesUrls);
     await dbClient.insert(Table.ipfsPins, ipfsPins);
     await dbClient.insert<Partial<ProcessedTrack>>(Table.processedTracks, processedTracks);
   };

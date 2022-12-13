@@ -8,7 +8,7 @@ const NUMBER_OF_RETRIES = parseInt(process.env.NUMBER_OF_ERROR_RETRIES!);
 const ipfsFilesWithErrors: Trigger<undefined> = async (clients) => {
   const query = `select * from "${Table.ipfsFiles}"
       where "error" is not null
-      and ("mimeType" is null or "cid" is null)
+      and ("mimeType" is null)
       and ("numberOfRetries" < '${NUMBER_OF_RETRIES}' or "numberOfRetries" is null)
       and (age(now(), "lastRetry") >= make_interval(mins => cast(pow(coalesce("numberOfRetries", 0), 3) as int)) or "lastRetry" is null)
       LIMIT ${process.env.QUERY_TRIGGER_BATCH_SIZE}`;
@@ -29,7 +29,7 @@ export const ipfsFileErrorRetry: Processor = {
       numberOfRetries: (ipfsFile.numberOfRetries ?? 0) + 1,
       lastRetry: new Date()
     }));
-    await clients.db.upsert(Table.ipfsFiles, errorUpdates, 'url', undefined, true);
+    await clients.db.upsert(Table.ipfsFiles, errorUpdates, 'cid', undefined, true);
   },
   initialCursor: undefined
 }

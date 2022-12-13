@@ -4,7 +4,7 @@ import { DBClient, Table } from '../../../src/db/db';
 import db from '../../../src/db/sql-db';
 import { ipfsFileSyncExistingPinsProcessor } from '../../../src/processors/ipfsFile/syncExistingPinsProcessor';
 import { initClients } from '../../../src/runner';
-import { IPFSFile } from '../../../src/types/ipfsFile';
+import { IPFSFile, IPFSFileUrl } from '../../../src/types/ipfsFile';
 import { Clients } from '../../../src/types/processor';
 import { ProcessedTrack } from '../../../src/types/track';
 import { truncateDB } from '../../helpers'
@@ -21,8 +21,12 @@ describe('ipfsFileSyncExistingPinsProcessor', async () => {
 
   describe('lossyArtwork', async () => {
     const ipfsFiles: IPFSFile[] = [
+      { cid: '2xx' },
+      { cid: '3xx', error: 'nope' },
+    ]
+    const ipfsFilesUrls: IPFSFileUrl[] = [
       { url: 'https://spinamp.xyz/2xx', cid: '2xx' },
-      { url: 'https://spinamp.xyz/3xx', cid: '3xx', error: 'nope' },
+      { url: 'https://spinamp.xyz/3xx', cid: '3xx' },
     ]
 
     const processedTracks: Partial<ProcessedTrack>[] = [
@@ -34,6 +38,7 @@ describe('ipfsFileSyncExistingPinsProcessor', async () => {
 
     const setupFixtures = async () => {
       await dbClient.insert<Partial<IPFSFile>>(Table.ipfsFiles, ipfsFiles);
+      await dbClient.insert<Partial<IPFSFileUrl>>(Table.ipfsFilesUrls, ipfsFilesUrls);
       await dbClient.insert<Partial<ProcessedTrack>>(Table.processedTracks, processedTracks);
     };
 
@@ -48,7 +53,9 @@ describe('ipfsFileSyncExistingPinsProcessor', async () => {
 
         assert(result.length === 2, `should only return 1 file based on test data, instead returned ids: ${ result.length > 0 ? result.map((t: any) => t.cid) : 'none' }`);
         assert(result[0].lossyArtworkURL === 'https://spinamp.xyz/1xx', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
+        assert(result[0].lossyArtworkIPFSHash === '1xx', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
         assert(result[1].lossyArtworkURL === 'https://spinamp.xyz/4xx', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
+        assert(result[1].lossyArtworkIPFSHash === '4xx', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
       });
     })
 
@@ -62,21 +69,28 @@ describe('ipfsFileSyncExistingPinsProcessor', async () => {
         const triggerItems = await ipfsFileSyncExistingPinsProcessor('lossyArtwork').trigger(clients, undefined);
         await ipfsFileSyncExistingPinsProcessor('lossyArtwork').processorFunction(triggerItems, clients);
 
-        const file1: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['url', 'like', '%1xx%']]]);
-        assert(file1[0].url === 'https://spinamp.xyz/1xx', `incorrect row returned, file was ${JSON.stringify(file1[0])}`);
+        const file1: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['cid', 'like', '%1xx%']]]);
         assert(file1[0].cid === '1xx', `incorrect row returned, file was ${JSON.stringify(file1[0])}`);
 
-        const file4: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['url', 'like', '%4xx%']]]);
-        assert(file4[0].url === 'https://spinamp.xyz/4xx', `incorrect row returned, file was ${JSON.stringify(file4[0])}`);
+        const file4: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['cid', 'like', '%4xx%']]]);
         assert(file4[0].cid === '4xx', `incorrect row returned, file was ${JSON.stringify(file4[0])}`);
+
+        const fileUrls: any = await dbClient.getRecords(Table.ipfsFilesUrls);
+        assert(fileUrls.map((e: any) => e.cid).includes('1xx'), `did not sync the missing 1xx cid on ipfsFilesUrls table`);
+        assert(fileUrls.map((e: any) => e.cid).includes('4xx'), `did not sync the missing 4xx cid on ipfsFilesUrls table`);
       });
     });
   });
 
   describe('lossyAudio', async () => {
     const ipfsFiles: IPFSFile[] = [
+      { cid: '2xx' },
+      { cid: '3xx', error: 'nope' },
+    ]
+
+    const ipfsFilesUrls: IPFSFileUrl[] = [
       { url: 'https://spinamp.xyz/2xx', cid: '2xx' },
-      { url: 'https://spinamp.xyz/3xx', cid: '3xx', error: 'nope' },
+      { url: 'https://spinamp.xyz/3xx', cid: '3xx' },
     ]
 
     const processedTracks: Partial<ProcessedTrack>[] = [
@@ -88,6 +102,7 @@ describe('ipfsFileSyncExistingPinsProcessor', async () => {
 
     const setupFixtures = async () => {
       await dbClient.insert<Partial<IPFSFile>>(Table.ipfsFiles, ipfsFiles);
+      await dbClient.insert<Partial<IPFSFileUrl>>(Table.ipfsFilesUrls, ipfsFilesUrls);
       await dbClient.insert<Partial<ProcessedTrack>>(Table.processedTracks, processedTracks);
     };
 
@@ -102,7 +117,9 @@ describe('ipfsFileSyncExistingPinsProcessor', async () => {
 
         assert(result.length === 2, `should only return 1 file based on test data, instead returned ids: ${ result.length > 0 ? result.map((t: any) => t.cid) : 'none' }`);
         assert(result[0].lossyAudioURL === 'https://spinamp.xyz/1xx', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
+        assert(result[0].lossyAudioIPFSHash === '1xx', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
         assert(result[1].lossyAudioURL === 'https://spinamp.xyz/4xx', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
+        assert(result[1].lossyAudioIPFSHash === '4xx', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
       });
     })
 
@@ -116,13 +133,14 @@ describe('ipfsFileSyncExistingPinsProcessor', async () => {
         const triggerItems = await ipfsFileSyncExistingPinsProcessor('lossyAudio').trigger(clients, undefined);
         await ipfsFileSyncExistingPinsProcessor('lossyAudio').processorFunction(triggerItems, clients);
 
-        const file1: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['url', 'like', '%1xx%']]]);
-        assert(file1[0].url === 'https://spinamp.xyz/1xx', `incorrect row returned, file was ${JSON.stringify(file1[0])}`);
+        const file1: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['cid', 'like', '%1xx%']]]);
         assert(file1[0].cid === '1xx', `incorrect row returned, file was ${JSON.stringify(file1[0])}`);
-
-        const file4: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['url', 'like', '%4xx%']]]);
-        assert(file4[0].url === 'https://spinamp.xyz/4xx', `incorrect row returned, file was ${JSON.stringify(file4[0])}`);
+        const file4: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['cid', 'like', '%4xx%']]]);
         assert(file4[0].cid === '4xx', `incorrect row returned, file was ${JSON.stringify(file4[0])}`);
+
+        const fileUrls: any = await dbClient.getRecords(Table.ipfsFilesUrls);
+        assert(fileUrls.map((e: any) => e.cid).includes('1xx'), `did not sync the missing 1xx cid on ipfsFilesUrls table`);
+        assert(fileUrls.map((e: any) => e.cid).includes('4xx'), `did not sync the missing 4xx cid on ipfsFilesUrls table`);
       });
     });
   });
