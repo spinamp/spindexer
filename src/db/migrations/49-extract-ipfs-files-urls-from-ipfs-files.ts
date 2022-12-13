@@ -38,6 +38,9 @@ export const up = async (knex: Knex) => {
   await knex.schema.createTable(Table.ipfsFilesUrls, table => {
     table.string('url').notNullable();
     table.string('cid');
+    table.string('error');
+    table.integer('numberOfRetries').defaultTo(0);
+    table.dateTime('lastRetry');
   })
   await knex.batchInsert(Table.ipfsFilesUrls, urlCids);
 

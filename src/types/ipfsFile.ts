@@ -12,4 +12,7 @@ export type IPFSFile = {
 export type IPFSFileUrl = {
   url: string;
   cid?: string;
+  error?: string;
+  numberOfRetries?: number;
+  lastRetry?: Date;
 }
