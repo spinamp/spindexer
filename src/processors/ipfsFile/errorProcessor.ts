@@ -1,5 +1,5 @@
 import { Table } from '../../db/db';
-import { IPFSFile } from '../../types/ipfsFile';
+import { IPFSFile, IPFSFileUrl } from '../../types/ipfsFile';
 import { Clients, Processor } from '../../types/processor';
 import { Trigger } from '../../types/trigger';
 
@@ -19,6 +19,20 @@ const ipfsFilesWithErrors: Trigger<undefined> = async (clients) => {
   return ipfsFiles;
 }
 
+const ipfsFilesUrlsWithErrors: Trigger<undefined> = async (clients) => {
+  const query = `select * from "${Table.ipfsFilesUrls}"
+      where "error" is not null
+      and ("cid" is null)
+      and ("numberOfRetries" < '${NUMBER_OF_RETRIES}' or "numberOfRetries" is null)
+      and (age(now(), "lastRetry") >= make_interval(mins => cast(pow(coalesce("numberOfRetries", 0), 3) as int)) or "lastRetry" is null)
+      LIMIT ${process.env.QUERY_TRIGGER_BATCH_SIZE}`;
+
+  const ipfsFilesUrls = (await clients.db.rawSQL(query))
+    .rows.slice(0, parseInt(process.env.QUERY_TRIGGER_BATCH_SIZE!));
+
+  return ipfsFilesUrls;
+}
+
 export const ipfsFileErrorRetry: Processor = {
   name: `ipfsFileErrorRetry`,
   trigger: ipfsFilesWithErrors,
@@ -30,6 +44,21 @@ export const ipfsFileErrorRetry: Processor = {
       lastRetry: new Date()
     }));
     await clients.db.upsert(Table.ipfsFiles, errorUpdates, 'cid', undefined, true);
+  },
+  initialCursor: undefined
+}
+
+export const ipfsFileUrlErrorRetry: Processor = {
+  name: `ipfsFileUrlErrorRetry`,
+  trigger: ipfsFilesUrlsWithErrors,
+  processorFunction: async (input: IPFSFileUrl[], clients: Clients) => {
+    const errorUpdates: IPFSFileUrl[] = input.map((ipfsFileUrl) => ({
+      ...ipfsFileUrl,
+      error: undefined,
+      numberOfRetries: (ipfsFileUrl.numberOfRetries ?? 0) + 1,
+      lastRetry: new Date()
+    }));
+    await clients.db.upsert(Table.ipfsFilesUrls, errorUpdates, 'url', undefined, true);
   },
   initialCursor: undefined
 }

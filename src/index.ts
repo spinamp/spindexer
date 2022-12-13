@@ -22,7 +22,7 @@ import { insertSeedsIntoMempool } from './processors/default/insertSeedsIntoMemp
 import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfsPinner';
 import { processMempoolInserts, processMempoolUpdates } from './processors/default/processMempool';
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
-import { ipfsFileErrorRetry } from './processors/ipfsFile/errorProcessor';
+import { ipfsFileErrorRetry, ipfsFileUrlErrorRetry } from './processors/ipfsFile/errorProcessor';
 import { ipfsMediaUploader } from './processors/ipfsFile/mediaUploader';
 import { ipfsMimeTypeProcessor } from './processors/ipfsFile/mimeTypeProcessor';
 import { ipfsFileSyncExistingPinsProcessor } from './processors/ipfsFile/syncExistingPinsProcessor';
@@ -87,6 +87,7 @@ const PROCESSORS = (
     addTimestampFromMetadata,
     ...platformTrackProcessors,
     ...apiTrackProcessors,
+    ipfsFileUrlErrorRetry,
     ipfsMediaUploader('Artwork'),
     ipfsMediaUploader('Audio'),
     ipfsArtworkPinner,
