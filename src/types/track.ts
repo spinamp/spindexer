@@ -13,8 +13,8 @@ export type NFTTrackJoin = {
   processedTrackId: string;
 }
 
-export type ProcessedTrackAudio = { lossyAudioURL: string } | { lossyAudioIPFSHash: string };
-export type ProcessedTrackArtwork = { lossyArtworkURL: string } | { lossyArtworkIPFSHash: string };
+export type ProcessedTrackAudio = { lossyAudioURL: string } | { lossyAudioIPFSHash: string } | { lossyAudioMimeType: string };
+export type ProcessedTrackArtwork = { lossyArtworkURL: string } | { lossyArtworkIPFSHash: string } | { lossyArtworkMimeType: string };
 
 export type ProcessedTrack = Record & {
   platformInternalId: string;
