@@ -56,9 +56,6 @@ function processorFunction(media: MediaType) {
           [ipfsField]: cid,
           [urlField]: url
         })
-        ipfsFiles.push({
-          cid: cid
-        })
         ipfsFilesUrls.push({
           url: url,
           cid: cid
@@ -71,7 +68,6 @@ function processorFunction(media: MediaType) {
     await rollPromises<ProcessedTrack, void, void>(tracksWithIPFSFiles, processTrack, 300, 10000)
 
     await clients.db.update(Table.processedTracks, trackUpdates)
-    await clients.db.upsert(Table.ipfsFiles, ipfsFiles, 'cid');
     await clients.db.upsert(Table.ipfsFilesUrls, ipfsFilesUrls, 'url');
   }
 }

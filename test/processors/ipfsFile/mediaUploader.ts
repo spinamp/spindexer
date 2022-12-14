@@ -63,7 +63,7 @@ describe('ipfsMediaUploader', async () => {
         sinon.restore();
       })
 
-      it('with a successful upload, adds the missing ipfs file', async () => {
+      it('with a successful upload, adds the missing ipfsFilesUrl', async () => {
         const callback = sinon.fake.resolves({ cid: '5xx' });
         sinon.replace(clients.ipfs.client, 'add', callback);
 
@@ -72,9 +72,6 @@ describe('ipfsMediaUploader', async () => {
 
         const track: any = await dbClient.getRecords(Table.processedTracks, [['where', ['lossyAudioURL', 'like', '%5xx%']]]);
         assert(track[0].lossyAudioIPFSHash === '5xx', `ipfs hash not updated on processed tracks table: ${JSON.stringify(track[0])}`);
-
-        const file: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['cid', 'like', '%5xx%']]]);
-        assert(file[0].cid === '5xx', `incorrect row returned, file was ${JSON.stringify(file[0])}`);
 
         const fileUrls: any = await dbClient.getRecords(Table.ipfsFilesUrls, [['where', ['url', 'like', '%5xx%']]]);
         assert(fileUrls.map((e: any) => e.cid).includes('5xx'), `did not sync the missing 5xx cid on ipfsFilesUrls table`);
@@ -150,9 +147,6 @@ describe('ipfsMediaUploader', async () => {
 
         const track: any = await dbClient.getRecords(Table.processedTracks, [['where', ['lossyArtworkURL', 'like', '%5xx%']]]);
         assert(track[0].lossyArtworkIPFSHash === '5xx', `ipfs hash not updated on processed tracks table: ${JSON.stringify(track[0])}`);
-
-        const file: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['cid', 'like', '%5xx%']]]);
-        assert(file[0].cid === '5xx', `incorrect row returned, file was ${JSON.stringify(file[0])}`);
 
         const fileUrls: any = await dbClient.getRecords(Table.ipfsFilesUrls, [['where', ['url', 'like', '%5xx%']]]);
         assert(fileUrls.map((e: any) => e.cid).includes('5xx'), `did not sync the missing 5xx cid on ipfsFilesUrls table`);
