@@ -11,9 +11,9 @@ type MediaType = 'Artwork' | 'Audio';
 
 const notOnIpfs: (media: MediaType) => Trigger<undefined> =
 (media) => async (clients: Clients) => {
-  const query = `select * from "${Table.processedTracks}" as t
+  const query = `select "id", "lossy${media}URL", "lossy${media}IPFSHash", fileUrl."url", fileUrl."cid" from "${Table.processedTracks}"
       left outer join "${Table.ipfsFilesUrls}" as fileUrl
-      on t."lossy${media}URL" = fileUrl.url
+      on "lossy${media}URL" = fileUrl.url
       where "lossy${media}IPFSHash" is null
       and "lossy${media}URL" is not null
       and fileUrl.error is null
@@ -42,14 +42,10 @@ function processorFunction(media: MediaType) {
       const source = urlSource(url)
       let cid = trackWithUrl['cid']
 
-      delete trackWithUrl['url']
-      delete trackWithUrl['cid']
-      delete trackWithUrl['error']
-      delete trackWithUrl['lastRetry']
-      delete trackWithUrl['numberOfRetries']
-
-      const track: ProcessedTrack = {
-        ...trackWithUrl
+      const track: Partial<ProcessedTrack> = {
+        id: trackWithUrl.id,
+        [ipfsField]: cid,
+        [urlField]: url
       }
 
       try {
