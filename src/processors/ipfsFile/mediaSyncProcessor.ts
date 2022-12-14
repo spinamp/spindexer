@@ -28,7 +28,7 @@ export const ipfsFileSyncExistingUploadsProcessor: (field: TrackMediaField) => P
     name: 'ipfsFileSyncExistingUploadsProcessor',
     trigger: ipfsFilesOutOfSyncWithUploads(field),
     processorFunction: async (input: any[], clients: Clients) => {
-      console.log(`Adding ${field} ipfs files for media uploaded by other platforms`);
+      console.log(`Adding ${field} ipfsFiles and ipfsFileUrls for media already on IPFS`);
 
       const files: IPFSFile[] = input.map((row: any) => ({ cid: row[`${field}IPFSHash`] }))
       const filesUrls: IPFSFileUrl[] = input.map((row: any) => ({
