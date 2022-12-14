@@ -36,8 +36,8 @@ export const ipfsFileSyncExistingUploadsProcessor: (field: TrackMediaField) => P
         cid: row[`${field}IPFSHash`],
       }))
 
-      await clients.db.insert(Table.ipfsFiles, files);
-      await clients.db.insert(Table.ipfsFilesUrls, filesUrls);
+      await clients.db.upsert(Table.ipfsFiles, files);
+      await clients.db.upsert(Table.ipfsFilesUrls, filesUrls);
     }
   }
 }
