@@ -2,7 +2,7 @@ import assert from 'assert';
 
 import { DBClient, Table } from '../../../src/db/db';
 import db from '../../../src/db/sql-db';
-import { ipfsFileSyncExistingUploadsProcessor, ipfsFileSyncExternalUploadsProcessor } from '../../../src/processors/ipfsFile/syncExistingPinsProcessor';
+import { ipfsFileSyncExistingUploadsProcessor, ipfsFileSyncExternalUploadsProcessor } from '../../../src/processors/ipfsFile/mediaSyncProcessor';
 import { initClients } from '../../../src/runner';
 import { IPFSFile, IPFSFileUrl } from '../../../src/types/ipfsFile';
 import { Clients } from '../../../src/types/processor';
