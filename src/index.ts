@@ -23,7 +23,7 @@ import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfsPin
 import { processMempoolInserts, processMempoolUpdates } from './processors/default/processMempool';
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
 import { ipfsFileErrorRetry, ipfsFileUrlErrorRetry } from './processors/ipfsFile/errorProcessor';
-import { ipfsFileSyncExistingUploadsProcessor, ipfsFileSyncExternalUploadsProcessor } from './processors/ipfsFile/mediaSyncProcessor';
+import { ipfsFileSyncExistingUploadsProcessor, ipfsHashAndUrlSync } from './processors/ipfsFile/mediaSyncProcessor';
 import { ipfsMediaUploader } from './processors/ipfsFile/mediaUploader';
 import { ipfsMimeTypeProcessor } from './processors/ipfsFile/mimeTypeProcessor';
 import { runProcessors } from './runner';
@@ -87,16 +87,16 @@ const PROCESSORS = (
     addTimestampFromMetadata,
     ...platformTrackProcessors,
     ...apiTrackProcessors,
+    ipfsFileErrorRetry,
     ipfsFileUrlErrorRetry,
+    ipfsHashAndUrlSync('lossyArtwork'),
+    ipfsHashAndUrlSync('lossyAudio'),
     ipfsMediaUploader('Artwork'),
     ipfsMediaUploader('Audio'),
     ipfsArtworkPinner,
     ipfsAudioPinner,
-    ipfsFileErrorRetry,
     ipfsFileSyncExistingUploadsProcessor('lossyArtwork'),
     ipfsFileSyncExistingUploadsProcessor('lossyAudio'),
-    ipfsFileSyncExternalUploadsProcessor('lossyArtwork'),
-    ipfsFileSyncExternalUploadsProcessor('lossyAudio'),
     ipfsMimeTypeProcessor,
   ]
 };

@@ -59,27 +59,20 @@ export const ipfsFileSyncExistingUploadsProcessor: (field: TrackMediaField) => P
   }
 }
 
-export const ipfsFileSyncExternalUploadsProcessor: (field: TrackMediaField) => Processor =
+export const ipfsHashAndUrlSync: (field: TrackMediaField) => Processor =
 (field) => {
   return {
-    name: 'ipfsFileSyncExternalUploadsProcessor',
+    name: 'ipfsHashAndUrlSync',
     trigger: ipfsFilesUploadedWithoutUrl(field),
     processorFunction: async (input: any[], clients: Clients) => {
-      console.log(`Adding ${field} ipfs files for media uploaded without URLS`);
+      console.log(`Adding missing ${field}Urls for tracks which already have an ${field}IPFSHash`);
 
       const tracks: Partial<ProcessedTrack>[] = input.map((row: any) => ({
         id: row.id,
         [`${field}URL`]: `${process.env.IPFS_ENDPOINT}${row[`${field}IPFSHash`]}`,
       }))
-      const files: IPFSFile[] = input.map((row: any) => ({ cid: row[`${field}IPFSHash`] }))
-      const filesUrls: IPFSFileUrl[] = input.map((row: any) => ({
-        url: `${process.env.IPFS_ENDPOINT}${row[`${field}IPFSHash`]}`,
-        cid: row[`${field}IPFSHash`],
-      }))
 
       await clients.db.update(Table.processedTracks, tracks);
-      await clients.db.upsert(Table.ipfsFiles, files, 'cid');
-      await clients.db.upsert(Table.ipfsFilesUrls, filesUrls, 'url');
     }
   }
 }
