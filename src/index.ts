@@ -23,9 +23,10 @@ import { ipfsAudioPinner, ipfsArtworkPinner } from './processors/default/ipfsPin
 import { processMempoolInserts, processMempoolUpdates } from './processors/default/processMempool';
 import { processPlatformTracks } from './processors/default/processPlatformTracks/processPlatformTracks';
 import { ipfsFileErrorRetry, ipfsFileUrlErrorRetry } from './processors/ipfsFile/errorProcessor';
-import { ipfsFileSyncExistingUploadsProcessor, ipfsHashAndUrlSync } from './processors/ipfsFile/mediaSyncProcessor';
+import { ipfsFileSyncExistingUploadsProcessor } from './processors/ipfsFile/mediaSyncProcessor';
 import { ipfsMediaUploader } from './processors/ipfsFile/mediaUploader';
 import { ipfsMimeTypeProcessor } from './processors/ipfsFile/mimeTypeProcessor';
+import { processedTrackUrlSync } from './processors/processedTrack/urlSyncProcessor';
 import { runProcessors } from './runner';
 import { ChainId } from './types/chain';
 import { MetaFactory, MetaFactoryTypeName } from './types/metaFactory';
@@ -89,8 +90,8 @@ const PROCESSORS = (
     ...apiTrackProcessors,
     ipfsFileErrorRetry,
     ipfsFileUrlErrorRetry,
-    ipfsHashAndUrlSync('lossyArtwork'),
-    ipfsHashAndUrlSync('lossyAudio'),
+    processedTrackUrlSync('lossyArtwork'),
+    processedTrackUrlSync('lossyAudio'),
     ipfsMediaUploader('Artwork'),
     ipfsMediaUploader('Audio'),
     ipfsArtworkPinner,
