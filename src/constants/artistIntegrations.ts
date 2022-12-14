@@ -1,7 +1,7 @@
 
 import { formatAddress } from '../types/address';
 import { ChainId } from '../types/chain';
-import { TitleExtractorTypes, IdExtractorTypes, ArtistIdExtractorTypes, ArtistNameExtractorTypes, WebsiteUrlExtractorTypes, ArtworkUrlExtractorTypes, AudioUrlExtractorTypes } from '../types/fieldExtractor';
+import { TitleExtractorTypes, IdExtractorTypes, ArtistIdExtractorTypes, ArtistNameExtractorTypes, WebsiteUrlExtractorTypes, AudioUrlExtractorTypes } from '../types/fieldExtractor';
 import { MetaFactory, MetaFactoryTypeName } from '../types/metaFactory';
 import { NftFactory, NFTContractTypeName, NFTStandard } from '../types/nft';
 import { MusicPlatform, MusicPlatformType } from '../types/platform';
@@ -632,7 +632,7 @@ const RELICS_YXZ_PLATFORM: MusicPlatform = {
   name: 'RELICS',
 }
 
-const RELICS_SEASON_1_FACTORY: NftFactory = {
+export const RELICS_SEASON_1_FACTORY: NftFactory = {
   id: '0x441C1266E6fb13C38c2752eab0D11A99905FFef4',
   address: formatAddress('0x441C1266E6fb13C38c2752eab0D11A99905FFef4'),
   platformId: RELICS_YXZ_PLATFORM.id,
@@ -649,14 +649,12 @@ const RELICS_SEASON_1_FACTORY: NftFactory = {
       },
       track: {
         websiteUrl: 'https://relics.xyz',
-        lossyArtworkURL: 'https://web3-music-pipeline.mypinata.cloud/ipfs/QmSRN9HKXiziZzvkWrPG92UUHYiDKSZhfrFKf42EkniZVt',
       },
       type: MusicPlatformType['multi-track-multiprint-contract'],
       extractor: {
         id: IdExtractorTypes.USE_TITLE_EXTRACTOR,
         title: TitleExtractorTypes.METADATA_NAME_WITHOUT_TRAILING_INFO,
         audioUrl: AudioUrlExtractorTypes.ATTRIBUTES_TRAIT_AUDIO,
-        artworkUrl: ArtworkUrlExtractorTypes.USE_ARTWORK_URL_OVERRIDE,
         artistName: ArtistNameExtractorTypes.ATTRIBUTES_TRAIT_MUSICIAN,
         artistId: ArtistIdExtractorTypes.USE_PLATFORM_AND_ARTIST_NAME,
       }
