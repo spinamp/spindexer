@@ -36,7 +36,7 @@ export const up = async (knex: Knex) => {
 
   // create and populate new join table
   await knex.schema.createTable(Table.ipfsFilesUrls, table => {
-    table.string('url').notNullable();
+    table.string('url', 2048).notNullable();
     table.string('cid');
     table.string('error');
     table.integer('numberOfRetries').defaultTo(0);
