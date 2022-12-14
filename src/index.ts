@@ -25,7 +25,7 @@ import { processPlatformTracks } from './processors/default/processPlatformTrack
 import { ipfsFileErrorRetry, ipfsFileUrlErrorRetry } from './processors/ipfsFile/errorProcessor';
 import { ipfsMediaUploader } from './processors/ipfsFile/mediaUploader';
 import { ipfsMimeTypeProcessor } from './processors/ipfsFile/mimeTypeProcessor';
-import { ipfsFileSyncExistingPinsProcessor, ipfsFileSyncExternalPinsProcessor } from './processors/ipfsFile/syncExistingPinsProcessor';
+import { ipfsFileSyncExistingUploadsProcessor, ipfsFileSyncExternalUploadsProcessor } from './processors/ipfsFile/syncExistingPinsProcessor';
 import { runProcessors } from './runner';
 import { ChainId } from './types/chain';
 import { MetaFactory, MetaFactoryTypeName } from './types/metaFactory';
@@ -93,10 +93,10 @@ const PROCESSORS = (
     ipfsArtworkPinner,
     ipfsAudioPinner,
     ipfsFileErrorRetry,
-    ipfsFileSyncExistingPinsProcessor('lossyArtwork'),
-    ipfsFileSyncExistingPinsProcessor('lossyAudio'),
-    ipfsFileSyncExternalPinsProcessor('lossyArtwork'),
-    ipfsFileSyncExternalPinsProcessor('lossyAudio'),
+    ipfsFileSyncExistingUploadsProcessor('lossyArtwork'),
+    ipfsFileSyncExistingUploadsProcessor('lossyAudio'),
+    ipfsFileSyncExternalUploadsProcessor('lossyArtwork'),
+    ipfsFileSyncExternalUploadsProcessor('lossyAudio'),
     ipfsMimeTypeProcessor,
   ]
 };

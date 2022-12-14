@@ -5,7 +5,8 @@ export const overrides: {
   [table in Table]?: string;
 } = {
   [Table.processedTracks]: `
-    select t.* from "${Table.processedTracks}" t
+    select t.*, audio_file."mimeType" as "lossyAudioMimeType", artwork_file."mimeType" as "lossyArtworkMimeType"
+    from "${Table.processedTracks}" t
 
     join "${Table.ipfsPins}" audio_pin
     on t."lossyAudioIPFSHash" = audio_pin.id

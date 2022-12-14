@@ -90,7 +90,9 @@ describe('views', async () => {
 
       assert(result.length === 2, `should only return 2 tracks based on test data, instead returned ids: ${ result.length > 0 ? result.map((t: any) => t.id) : 'none' }`);
       assert(result[0].id === '11', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
+      assert(result[0].lossyAudioMimeType === 'audio/wav', `did not contain correct audio mimeType, result was ${JSON.stringify(result[0])}`);
       assert(result[1].id === '99', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
+      assert(result[1].lossyArtworkMimeType === 'video/webm', `did not contain correct artwork mimeType, result was ${JSON.stringify(result[0])}`);
     });
   });
 })

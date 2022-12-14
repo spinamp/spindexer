@@ -2,14 +2,14 @@ import assert from 'assert';
 
 import { DBClient, Table } from '../../../src/db/db';
 import db from '../../../src/db/sql-db';
-import { ipfsFileSyncExistingPinsProcessor, ipfsFileSyncExternalPinsProcessor } from '../../../src/processors/ipfsFile/syncExistingPinsProcessor';
+import { ipfsFileSyncExistingUploadsProcessor, ipfsFileSyncExternalUploadsProcessor } from '../../../src/processors/ipfsFile/syncExistingPinsProcessor';
 import { initClients } from '../../../src/runner';
 import { IPFSFile, IPFSFileUrl } from '../../../src/types/ipfsFile';
 import { Clients } from '../../../src/types/processor';
 import { ProcessedTrack } from '../../../src/types/track';
 import { truncateDB } from '../../helpers'
 
-describe('ipfsFileSyncExistingPinsProcessor', async () => {
+describe('ipfsFileSyncExistingUploadsProcessor', async () => {
   let dbClient: DBClient;
   let clients: Clients;
 
@@ -49,7 +49,7 @@ describe('ipfsFileSyncExistingPinsProcessor', async () => {
       });
 
       it ('returns ipfsFiles', async () => {
-        const result: any = await ipfsFileSyncExistingPinsProcessor('lossyArtwork').trigger(clients, undefined);
+        const result: any = await ipfsFileSyncExistingUploadsProcessor('lossyArtwork').trigger(clients, undefined);
 
         assert(result.length === 2, `should only return 1 file based on test data, instead returned ids: ${ result.length > 0 ? result.map((t: any) => t.cid) : 'none' }`);
         assert(result[0].lossyArtworkURL === 'https://spinamp.xyz/1xx', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
@@ -66,8 +66,8 @@ describe('ipfsFileSyncExistingPinsProcessor', async () => {
       })
 
       it('adds the missing ipfs file', async () => {
-        const triggerItems = await ipfsFileSyncExistingPinsProcessor('lossyArtwork').trigger(clients, undefined);
-        await ipfsFileSyncExistingPinsProcessor('lossyArtwork').processorFunction(triggerItems, clients);
+        const triggerItems = await ipfsFileSyncExistingUploadsProcessor('lossyArtwork').trigger(clients, undefined);
+        await ipfsFileSyncExistingUploadsProcessor('lossyArtwork').processorFunction(triggerItems, clients);
 
         const file1: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['cid', 'like', '%1xx%']]]);
         assert(file1[0]?.cid === '1xx', `incorrect row returned, file was ${JSON.stringify(file1[0])}`);
@@ -113,7 +113,7 @@ describe('ipfsFileSyncExistingPinsProcessor', async () => {
       });
 
       it ('returns ipfsFiles', async () => {
-        const result: any = await ipfsFileSyncExistingPinsProcessor('lossyAudio').trigger(clients, undefined);
+        const result: any = await ipfsFileSyncExistingUploadsProcessor('lossyAudio').trigger(clients, undefined);
 
         assert(result.length === 2, `should only return 1 file based on test data, instead returned ids: ${ result.length > 0 ? result.map((t: any) => t.cid) : 'none' }`);
         assert(result[0].lossyAudioURL === 'https://spinamp.xyz/1xx', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
@@ -130,8 +130,8 @@ describe('ipfsFileSyncExistingPinsProcessor', async () => {
       })
 
       it('adds the missing ipfs file', async () => {
-        const triggerItems = await ipfsFileSyncExistingPinsProcessor('lossyAudio').trigger(clients, undefined);
-        await ipfsFileSyncExistingPinsProcessor('lossyAudio').processorFunction(triggerItems, clients);
+        const triggerItems = await ipfsFileSyncExistingUploadsProcessor('lossyAudio').trigger(clients, undefined);
+        await ipfsFileSyncExistingUploadsProcessor('lossyAudio').processorFunction(triggerItems, clients);
 
         const file1: any = await dbClient.getRecords(Table.ipfsFiles, [['where', ['cid', 'like', '%1xx%']]]);
         assert(file1[0]?.cid === '1xx', `incorrect row returned, file was ${JSON.stringify(file1[0])}`);
@@ -146,7 +146,7 @@ describe('ipfsFileSyncExistingPinsProcessor', async () => {
   });
 });
 
-describe('ipfsFileSyncExternalPinsProcessor', async () => {
+describe('ipfsFileSyncExternalUploadsProcessor', async () => {
   let dbClient: DBClient;
   let clients: Clients;
 
@@ -185,7 +185,7 @@ describe('ipfsFileSyncExternalPinsProcessor', async () => {
       });
 
       it ('returns ipfsFiles', async () => {
-        const result: any = await ipfsFileSyncExternalPinsProcessor('lossyArtwork').trigger(clients, undefined);
+        const result: any = await ipfsFileSyncExternalUploadsProcessor('lossyArtwork').trigger(clients, undefined);
 
         assert(result.length === 2, `should only return 1 file based on test data, instead returned ids: ${ result.length > 0 ? result.map((t: any) => t.cid) : 'none' }`);
         assert(result[0].lossyArtworkIPFSHash === '1xx', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
@@ -200,8 +200,8 @@ describe('ipfsFileSyncExternalPinsProcessor', async () => {
       })
 
       it('adds the missing ipfs file url', async () => {
-        const triggerItems = await ipfsFileSyncExternalPinsProcessor('lossyArtwork').trigger(clients, undefined);
-        await ipfsFileSyncExternalPinsProcessor('lossyArtwork').processorFunction(triggerItems, clients);
+        const triggerItems = await ipfsFileSyncExternalUploadsProcessor('lossyArtwork').trigger(clients, undefined);
+        await ipfsFileSyncExternalUploadsProcessor('lossyArtwork').processorFunction(triggerItems, clients);
 
         const track1: any = await dbClient.getRecords(Table.processedTracks, [['where', ['lossyArtworkIPFSHash', 'like', '%1xx%']]]);
         assert(track1[0].lossyArtworkURL?.includes('1xx'), `did not set url properly on processed track: ${JSON.stringify(track1[0])}`);
@@ -255,7 +255,7 @@ describe('ipfsFileSyncExternalPinsProcessor', async () => {
       });
 
       it ('returns ipfsFiles', async () => {
-        const result: any = await ipfsFileSyncExternalPinsProcessor('lossyAudio').trigger(clients, undefined);
+        const result: any = await ipfsFileSyncExternalUploadsProcessor('lossyAudio').trigger(clients, undefined);
 
         assert(result.length === 2, `should only return 1 file based on test data, instead returned ids: ${ result.length > 0 ? result.map((t: any) => t.cid) : 'none' }`);
         assert(result[0].lossyAudioIPFSHash === '1xx', `incorrect row returned, result was ${JSON.stringify(result[0])}`);
@@ -270,8 +270,8 @@ describe('ipfsFileSyncExternalPinsProcessor', async () => {
       })
 
       it('adds the missing ipfs file url', async () => {
-        const triggerItems = await ipfsFileSyncExternalPinsProcessor('lossyAudio').trigger(clients, undefined);
-        await ipfsFileSyncExternalPinsProcessor('lossyAudio').processorFunction(triggerItems, clients);
+        const triggerItems = await ipfsFileSyncExternalUploadsProcessor('lossyAudio').trigger(clients, undefined);
+        await ipfsFileSyncExternalUploadsProcessor('lossyAudio').processorFunction(triggerItems, clients);
 
         const track1: any = await dbClient.getRecords(Table.processedTracks, [['where', ['lossyAudioIPFSHash', 'like', '%1xx%']]]);
         assert(track1[0].lossyAudioURL?.includes('1xx'), `did not set url properly on processed track: ${JSON.stringify(track1[0])}`);

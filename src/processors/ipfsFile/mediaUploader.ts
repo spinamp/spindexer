@@ -42,12 +42,6 @@ function processorFunction(media: MediaType) {
       const source = urlSource(url)
       let cid = trackWithUrl['cid']
 
-      const track: Partial<ProcessedTrack> = {
-        id: trackWithUrl.id,
-        [ipfsField]: cid,
-        [urlField]: url
-      }
-
       try {
         if (!cid){
           const file = await clients.ipfs.client.add(source, {
@@ -58,8 +52,9 @@ function processorFunction(media: MediaType) {
         }
 
         trackUpdates.push({
-          ...track,
-          [ipfsField]: cid
+          id: trackWithUrl.id,
+          [ipfsField]: cid,
+          [urlField]: url
         })
         ipfsFiles.push({
           cid: cid
