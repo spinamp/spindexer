@@ -22,9 +22,6 @@ export const up = async (knex: Knex) => {
   // remove relics tracks
   await knex(Table.processedTracks).where({ platformId: 'relics' }).del()
 
-  // remove nftsProcessedTracks join
-  await knex(Table.nfts_processedTracks).whereIn('processedTrackId', tracks.map((track) => track.id)).del()
-
   // remove ipfsFiles
   if (artworkCids.length > 0) {
     await knex(Table.ipfsFiles).whereIn('cid', artworkCids).del()
@@ -33,11 +30,6 @@ export const up = async (knex: Knex) => {
   // remove ipfsPins
   if (artworkUrls.length > 0) {
     await knex(Table.ipfsPins).whereIn('id', artworkCids).del()
-  }
-
-  // remove ipfsFilesUrls
-  if (artworkUrls.length > 0) {
-    await knex(Table.ipfsFilesUrls).whereIn('url', artworkUrls).del()
   }
 
   const factories: any[] = [RELICS_SEASON_1_FACTORY].map((factory) => ({
