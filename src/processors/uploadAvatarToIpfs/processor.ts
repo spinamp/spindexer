@@ -118,7 +118,6 @@ const processorFunction = async (
 
   if (ipfsFileFailureUpdates.length > 0) console.log("IPFS file uploads failed: ", JSON.stringify(ipfsFileFailureUpdates))
 
-  // TODO: update rather than upsert (needs change to db client to accept multiple IDs)
   await clients.db.upsert(Table.artistProfiles, artistProfileUpdates, ['artistId', 'platformId']);
   await clients.db.upsert(Table.ipfsFiles, ipfsFileUpdates, 'url');
 };
