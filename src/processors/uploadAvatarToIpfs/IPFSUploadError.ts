@@ -10,7 +10,4 @@ export class IPFSUploadError extends Error {
     this.url = url;
   }
 
-  getErrorMessage() {
-    return 'Error when uploading file to IPFS: ' + this.message;
-  }
 }
