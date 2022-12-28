@@ -43,6 +43,7 @@ export function getEVMClient(chainId: ChainId | string, clients: Clients): EVMCl
 }
 
 export type EVMClient = {
+  provider: JsonRpcProvider;
   call: (ethCalls: EVMCall[]) => Promise<unknown[]>;
   getEventsFrom: (fromBlock: string, toBlock: string, contractFilters: ContractFilter[]) => Promise<Events[]>;
   getBlockTimestamps: (blockHashes: string[]) => Promise<number[]>;
@@ -107,6 +108,7 @@ const init = async (providerUrl: string): Promise<EVMClient> => {
   const ethcallProvider = new Provider();
   await ethcallProvider.init(provider);
   return {
+    provider,
     call: async (ethCalls: EVMCall[]) => {
       const calls = ethCalls.map(ethCall => {
         const contract = new Contract(ethCall.contractAddress, MetaABI.abi);
